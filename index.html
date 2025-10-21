@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MOMO財商智庫｜月配息 × 資產增值 × 智能決策</title>
+<meta name="theme-color" content="#0A1221" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap" rel="stylesheet" />
+<style>
+/* === Design Tokens（嵌入版，避免外部 CSS 載入失敗） === */
+:root{
+  --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#9AA4B2;
+  --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
+  --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
+  --accent:#2D7A77;
+}
+/* base */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--deep, #0A1221);
+  color:var(--ink, #EDEFF5);
+  font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+a{color:inherit;text-decoration:none}
+/* layout */
+.wrap{max-width:1120px;margin:0 auto;padding:16px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800}
+.logo::before{content:"";width:28px;height:28px;border-radius:50%;
+  background:radial-gradient(120% 120% at 20% 20%, var(--gold) 0%, var(--gold-soft) 45%, transparent 46%), #1a1f2b;
+  border:1px solid var(--line)}
+.nav{display:flex;gap:10px;flex-wrap:wrap}
+.nav a{padding:10px 14px;border-radius:999px;border:1px solid var(--line);
+  background:linear-gradient(180deg,#0e172b,#111a2f);font-weight:600}
+.nav a:hover{background:var(--gold-grad);color:#0A1221}
+.hero{border:1px solid var(--line);border-radius:16px;padding:24px;
+  background:linear-gradient(120deg,rgba(201,162,39,.15),rgba(45,122,119,.12) 40%, transparent 100%), #0B1222}
+.hero h1{margin:6px 0 8px;font-size:26px;background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
+.section{margin-top:24px}
+.tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center;border-top:1px solid var(--line);padding:20px 0}
+/* components */
+.card{background:var(--card, #0C152A);border:1px solid var(--line);border-radius:16px;padding:16px}
+.btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
+.btn-gold{background:var(--gold-grad);color:#0A1221;border:none}
+.btn-gold:hover{filter:brightness(1.1)}
+/* ensure link color never fallback to blue */
+.card a, .hero a, .nav a{color:inherit}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <div class="logo">MOMO財商智庫</div>
+      <nav class="nav">
+        <a href="#">首頁</a>
+        <a href="#tools">智能工具</a>
+        <a href="#">基金研究</a>
+        <a href="#">財商知識庫</a>
+        <a href="#">關於MOMO</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <small style="color:var(--gold-soft)">品牌工具中心</small>
+      <h1>月配息 × 資產增值 × 智能決策</h1>
+      <p style="color:var(--muted)">MOMO財商智庫整合基金分析、回撤策略與權證監控，打造全方位財商系統。</p>
+      <a class="btn btn-gold" href="#tools">立即體驗</a>
+    </section>
+
+    <section class="section" id="tools">
+      <h2 style="margin-bottom:16px">智能工具</h2>
+      <div class="tools">
+        <div class="card">
+          <h3>BTC 回撤策略</h3>
+          <p style="color:var(--muted)">桌面版工具，用於模擬加密市場回撤與進出場策略。</p>
+          <a class="btn btn-gold" href="https://nms3194949.github.io/BTC_PC/" target="_blank" rel="noopener">開啟工具</a>
+        </div>
+        <div class="card">
+          <h3>CAGR 行動試算</h3>
+          <p style="color:var(--muted)">行動版 CAGR 試算器，計算年化報酬與配息影響。</p>
+          <a class="btn btn-gold" href="https://nms3194949.github.io/CAGR_Mobile/" target="_blank" rel="noopener">開啟工具</a>
+        </div>
+        <div class="card">
+          <h3>權證監控 API</h3>
+          <p style="color:var(--muted)">串接 Render API，查詢與設定權證警報。</p>
+          <a class="btn btn-gold" href="https://warrant-render-proxy-1.onrender.com/" target="_blank" rel="noopener">開啟工具</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      © MOMO財商智庫｜投資一定有風險，基金與加密資產之淨值可能因市場波動而上下變動。
+    </footer>
+  </div>
+</body>
+</html>
