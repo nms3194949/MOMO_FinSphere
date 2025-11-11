@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html> 
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
@@ -107,6 +107,17 @@ a{color:inherit;text-decoration:none}
 #calc .actions{position:absolute;top:16px;right:16px;display:flex;gap:8px}
 .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px}
 .btn-outline:hover{background:rgba(233,209,138,.08)}
+
+/* 結果數值：循環漸層金（快速） */
+.gold-cycling{
+  background: linear-gradient(90deg,#F9E27C 0%,#D9B84B 25%,#B88A1E 50%,#D9B84B 75%,#F9E27C 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: goldflow 1.4s linear infinite;
+}
 </style>
 </head>
 <body>
@@ -167,7 +178,7 @@ a{color:inherit;text-decoration:none}
     <!-- ===== 互動小工具：配息率 ↔ 年均成長試算 ===== -->
     <section id="calc" class="section" aria-labelledby="calc-title">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
-        <h2 id="calc-title">配息許願</h2>
+        <h2 id="calc-title" style="color:var(--gold-soft)">配息許願</h2>
         <button id="btn-save-png" class="btn-outline" type="button" aria-label="匯出目前互動試算為 PNG">匯出 PNG</button>
       </div>
       <p class="desc">輸入本金，調整「配息率」拉桿，系統會即時計算：每月配息、<strong>每年的本金成長率</strong></p>
@@ -196,8 +207,8 @@ a{color:inherit;text-decoration:none}
             <div class="kv"><div class="k">三年後本金（不含配息）</div><div class="v" id="out-3y">—</div></div>
             <div class="kv"><div class="k">三年總領配息</div><div class="v" id="out-3y-div">—</div></div>
             <div class="out-row">
-              <div class="kv"><div class="k">三年總報酬（本金+配息）</div><div class="v" id="out-total">—</div></div>
-              <div class="kv"><div class="k">三年累積報酬率</div><div class="v" id="out-total-rate">—</div></div>
+              <div class="kv"><div class="k">三年總報酬（本金+配息）</div><div class="v gold-cycling" id="out-total">—</div></div>
+              <div class="kv"><div class="k">三年累積報酬率</div><div class="v gold-cycling" id="out-total-rate">—</div></div>
             </div>
           </div>
         </div>
@@ -347,12 +358,12 @@ a{color:inherit;text-decoration:none}
       if(distNow) distNow.textContent=d+'%';
       if(range) range.setAttribute('aria-valuenow',String(d));
 
-      const monthly=principal*(d/100)/12;           // 月配息
-      const grow=growthByDist(d);                    // 每年本金成長率(%)
-      const after3y=principal*Math.pow(1+grow/100,3);// 三年後本金(不含息)
-      const div3y=principal*(d/100)*3;               // 三年總領配息(不再投)
-      const total=after3y+div3y;                     // 三年總報酬
-      const totalRate=(total/principal-1)*100;       // 三年累積報酬率
+      const monthly=principal*(d/100)/12;            // 月配息
+      const grow=growthByDist(d);                     // 每年本金成長率(%)
+      const after3y=principal*Math.pow(1+grow/100,3); // 三年後本金(不含息)
+      const div3y=principal*(d/100)*3;                // 三年總領配息(不再投)
+      const total=after3y+div3y;                      // 三年總報酬
+      const totalRate=(total/principal-1)*100;        // 三年累積報酬率
 
       if(outM) outM.textContent=money(monthly);
       if(outG) outG.textContent=pct(grow);
