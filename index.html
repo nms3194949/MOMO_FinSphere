@@ -204,10 +204,13 @@ a{color:inherit;text-decoration:none}
   /* 可用網址參數覆寫：?monthly=80000&principal=7000000&dist=12&annual=38 */
   function readQueryOverrides(){
     const p = new URLSearchParams(location.search);
+    const normalize = s => s
+      .replace(/[\,\s]/g,'')
+      .replace(/[０-９]/g, d => String.fromCharCode(d.charCodeAt(0)-0xFEE0));
     const o = {};
     ['monthly','principal','dist','annual'].forEach(k=>{
       if(p.has(k) && p.get(k)!==''){
-        const v = Number(p.get(k).replace(/[,\s]/g,''));
+        const v = Number(normalize(p.get(k)));
         if(!Number.isNaN(v)) o[k]=v;
       }
     });
@@ -259,7 +262,7 @@ a{color:inherit;text-decoration:none}
     const lblStep=stepUsed*2;
     for(let v=min; v<=max; v+=stepUsed){
       const x=valueToX(v);
-      const major=((v-min)%lblStep===0)||v===min||v===max;
+      const major=(Math.abs(((v-min) % lblStep)) < 1e-6) || v===min || v===max;
       const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
       ln.setAttribute('x1',x); ln.setAttribute('y1',Y-BH/2-TYO);
       ln.setAttribute('x2',x); ln.setAttribute('y2',Y-BH/2-TYO+TL);
@@ -298,35 +301,44 @@ a{color:inherit;text-decoration:none}
   function showNotice(msg){ document.getElementById('notice').textContent = msg; }
 
   function mountBlock(blockEl){
-    const key = blockEl.dataset.key;
-    const min = +blockEl.dataset.min;
-    const max = +blockEl.dataset.max;
-    const step= +blockEl.dataset.step;
+    const key  = blockEl.dataset.key;
+    const min  = +blockEl.dataset.min;
+    const max  = +blockEl.dataset.max;
+    const step = +blockEl.dataset.step;
     const unit = blockEl.dataset.unit;
     const gaugeEl = blockEl.querySelector('.gauge');
     const readEl  = blockEl.querySelector('.readout');
 
-    // 初始值 + 護欄
+    // 初始值（含網址參數覆寫後的 state）
     const initVal = clamp(Number(state[key] ?? 0), min, max);
 
-    // 繪製一次並建立 updater
-    const updater = drawGauge(gaugeEl, {min,max,step,unit,value:initVal,breath:(key==='monthly')});
+    // 首次繪製並保存目前值
+    let updateWidth = drawGauge(gaugeEl, {min,max,step,unit,value:initVal,breath:(key==='monthly')});
+    blockEl._value = initVal;
     readEl.textContent = fmtRead(initVal, unit);
 
-    // 保存更新方法
-    blockEl._update = (v)=>{ v=clamp(v,min,max); updater(v); readEl.textContent = fmtRead(v, unit); };
+    // 封裝更新方法：任何外部更新都同步紀錄 _value
+    blockEl._update = (v)=>{
+      const nv = clamp(v, min, max);
+      blockEl._value = nv;
+      updateWidth(nv);
+      readEl.textContent = fmtRead(nv, unit);
+    };
 
-    // 監聽容器寬度變化：防抖後重畫
+    // 監聽容器寬度變化：重畫但保留目前值
     let rafId = null;
     const ro = new ResizeObserver(()=>{
-      if(rafId) cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(()=>{
-        const current = initVal; // 以目前文字反推也可
-        const u = drawGauge(gaugeEl, {min,max,step,unit,value:current,breath:(key==='monthly')});
-        blockEl._update = (v)=>{ v=clamp(v,min,max); u(v); readEl.textContent = fmtRead(v, unit); };
+        const curr = blockEl._value ?? initVal;
+        updateWidth = drawGauge(gaugeEl, {min,max,step,unit,value:curr,breath:(key==='monthly')});
+        readEl.textContent = fmtRead(curr, unit);
       });
     });
     ro.observe(gaugeEl);
+
+    // 如需在離開頁面時釋放（可選）
+    blockEl._destroy = ()=> ro.disconnect();
   }
 
   try{
