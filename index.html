@@ -171,6 +171,14 @@ a{color:inherit;text-decoration:none}
   animation:goldSweep 1.8s linear infinite;
 }
 @keyframes goldSweep{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+
+/* ★ 截圖用：純色金文字，避免變成整塊色塊 ★ */
+.goldPlain{
+  background:none !important;
+  -webkit-background-clip:border-box !important;
+  color:var(--gold-soft) !important;
+}
+
 </style>
 </head>
 <body>
@@ -194,7 +202,7 @@ a{color:inherit;text-decoration:none}
       <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="加入 MOMO 財商智庫官方 LINE">加入官方 LINE ▶</a>
     </section>
 
-    <!-- ====== 策略進度 ====== -->
+    <!-- ===== 策略進度 ===== -->
     <section id="strategy" class="section" aria-labelledby="strategy-title">
       <div class="bar-header"><h2 id="strategy-title" class="bar-title">MOMO「雙贏巔峰」策略（進行中）</h2></div>
       <div class="row">
@@ -540,12 +548,25 @@ a{color:inherit;text-decoration:none}
     if(btn && target){
       btn.addEventListener('click', async ()=>{
         const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background};
+
+        // ★ 1) 匯出前先把漸層文字改成純色 ★
+        const goldEls = Array.from(document.querySelectorAll('.goldCycle'));
+        const prevClasses = goldEls.map(el => el.className);
+        goldEls.forEach(el => {
+          el.classList.add('goldPlain');
+        });
+
         target.style.boxShadow='0 0 0 1px rgba(233,209,138,.18)';
         target.style.padding='8px';
         target.style.background='transparent';
         try{
           await ensureCanvas();
-          const canvas = await html2canvas(target,{backgroundColor:'#0A1221', scale: Math.min(2, window.devicePixelRatio || 1), useCORS:true, logging:false});
+          const canvas = await html2canvas(target,{
+            backgroundColor:'#0A1221',
+            scale: Math.min(2, window.devicePixelRatio || 1),
+            useCORS:true,
+            logging:false
+          });
           canvas.toBlob(blob=>{
             if(blob){
               const url = URL.createObjectURL(blob);
@@ -555,9 +576,18 @@ a{color:inherit;text-decoration:none}
               setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 250);
             }
           });
-        }catch(e){ alert('匯出失敗，請再試一次'); }
+        }catch(e){
+          alert('匯出失敗，請再試一次');
+        }
         finally{
+          // 還原 panel 樣式
           target.style.boxShadow=prev.boxShadow; target.style.padding=prev.padding; target.style.background=prev.bg;
+
+          // ★ 2) 匯出完成後，把 goldPlain 還原成原本的 class 設定（恢復漸層） ★
+          const goldNow = Array.from(document.querySelectorAll('.goldPlain'));
+          goldNow.forEach((el,idx) => {
+            el.className = prevClasses[idx] || el.className.replace(' goldPlain','');
+          });
         }
       }, passiveOpt);
     }
