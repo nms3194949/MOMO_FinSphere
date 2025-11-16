@@ -1,0 +1,1076 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MOMO雙贏策略｜月配息 × 資產增值 × 智能決策</title>
+<style>
+:root{--deep:#0A1221;--gold:#C9A227;--gold-soft:#E9D18A;--card:#0F1830;--pos:#39C27A;--neg:#E25A5A;--input:#071226;}
+html,body{margin:0;background:var(--deep);color:#fff;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+.wrap{max-width:540px;margin:0 auto;padding:12px 12px 84px}
+
+/* Tabs + Export */
+.topbar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:10px 0}
+.tabs{display:flex;gap:8px;flex:1}
+.tab{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(201,162,39,.35);background:#0f1830;color:#E9D18A;font-weight:700;cursor:pointer}
+.tab[aria-selected="true"]{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A1221;border-color:transparent}
+.btn{padding:10px 12px;border:0;border-radius:10px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A1221;font-weight:700;white-space:nowrap;cursor:pointer}
+.btn.secondary{background:#1a2746;color:#E9D18A;border:1px solid rgba(201,162,39,.35)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Form + Table */
+.field{margin-bottom:10px}
+label{display:block;font-size:13px;color:#E9D18A;margin-bottom:6px}
+.control{width:100%;height:42px;border-radius:9px;border:1px solid rgba(233,209,138,.12);background:var(--input);color:#fff;font-size:15px;padding:0 10px;box-sizing:border-box}
+.inline{display:flex;align-items:center;gap:10px}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid rgba(201,162,39,.25);border-radius:10px;background:#0C152A}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:6px 8px;text-align:left;font-size:14px;white-space:nowrap;vertical-align:middle}
+.table-grid th,.table-grid td{border:1px solid rgba(233,209,138,.35)}
+.table-grid thead th{background:rgba(201,162,39,.12);border-bottom:2px solid rgba(201,162,39,.8);color:#E9D18A}
+
+.pos{color:var(--pos);font-weight:700}
+.neg{color:var(--neg);font-weight:700}
+.gold{color:var(--gold);font-weight:700}
+.em{font-weight:700}
+.note{color:#b9c2d5;font-size:12px;margin-top:6px}
+
+/* Collapsible */
+details.collapsible{border:1px solid rgba(201,162,39,.35);border-radius:10px;background:#0f1830;padding:8px 10px;margin:10px 0}
+details.collapsible summary{cursor:pointer;color:#E9D18A;font-weight:700;list-style:none}
+details.collapsible summary::-webkit-details-marker{display:none}
+
+/* Loan grid */
+.loan-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.loan-grid .field{margin:0}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(201,162,39,.18);border:1px solid rgba(201,162,39,.35);color:#E9D18A;font-size:12px;margin-left:8px}
+
+/* Inputs inside table smaller */
+#fundInputTable input.control{height:30px;padding:0 6px;font-size:13px;border-radius:7px;box-sizing:border-box}
+
+/* AI card */
+.ai-card{border:1px solid rgba(201,162,39,.35);border-radius:10px;background:#0f1830;padding:10px;margin-top:10px}
+.ai-card h4{margin:0 0 8px 0;color:#E9D18A}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ai-mini{font-size:12px;color:#cbd3e6}
+.ai-pill{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(201,162,39,.18);border:1px solid rgba(201,162,39,.35);color:#E9D18A;font-size:12px;margin-right:6px}
+
+/* Export background fix */
+.exporting .table-wrap{background:#0A1221!important}
+.exporting #cashExportArea,.exporting #pfExportArea,.exporting #pro_export_target{background-color:var(--deep)!important;padding:1px 0}
+.exporting [data-apply-pro]{display:none!important}
+/* ✅ 匯出時隱藏 AI 區塊中的相關係數明細，避免遮住表格 */
+.exporting #pro_export_target details.collapsible{display:none!important}
+
+@media (max-width:480px){
+  th,td{font-size:13px;padding:5px 6px}
+  #fundInputTable input.control{height:28px;font-size:12.5px}
+  .ai-grid{grid-template-columns:1fr}
+}
+
+/* Tab panels */
+.tabpanel:not(.active){display:none}
+
+/* 排除清單 */
+#pro_exclude_checks{max-height:240px;overflow:auto;padding-right:4px}
+#pro_exclude_checks label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:#0b1730;border:1px solid rgba(233,209,138,.12);margin:6px 0}
+#pro_exclude_checks input[type="checkbox"]{width:18px;height:18px}
+
+/* 隱藏自動重算 */
+#autorunWrap{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-cash" aria-selected="true">每月配息</button>
+      <button class="tab" id="tab-portfolio" aria-selected="false">投組分析</button>
+      <button class="tab" id="tab-ai" aria-selected="false">AI最佳化（Pro）</button>
+    </div>
+    <button class="btn" id="btnPng">匯出 PNG</button>
+  </div>
+
+  <section class="tabpanel active" id="panel-cash" role="tabpanel" aria-labelledby="tab-cash">
+    <div class="field"><label>投入本金（$）</label><input id="principal" type="number" class="control" value="1000000" step="1"></div>
+    <div class="field"><label>融資金額（$）</label><input id="loan" type="number" class="control" value="1500000" step="1"></div>
+    <div class="field">
+      <label>融資成數</label>
+      <select id="ratio" class="control">
+        <option value="0|0.0000">0 成</option><option value="0.1|0.1111111111">1 成</option>
+        <option value="0.2|0.25">2 成</option><option value="0.3|0.4285714286">3 成</option>
+        <option value="0.4|0.6666666667">4 成</option><option value="0.5|1.0">5 成</option>
+        <option value="0.6|1.5" selected>6 成</option><option value="custom|custom">自訂</option>
+      </select>
+    </div>
+    <div class="field"><label>年化配息率（%）</label><input id="rate" type="number" class="control" value="8.0" step="0.01"></div>
+    <div class="field"><label>融資年利率（%）</label><input id="loanRate" type="number" class="control" value="4.0" step="0.01"></div>
+
+    <div id="cashExportArea">
+      <details class="collapsible" id="loan2Box" open>
+        <summary>貸款（等額本息）<span class="badge" id="loan2Badge">未啟用</span></summary>
+        <div class="inline" style="margin-top:8px"><input id="loan2EnabledCk" type="checkbox" /><label for="loan2EnabledCk">啟用貸款試算</label></div>
+        <div class="loan-grid">
+          <div class="field"><label>貸款金額（$）</label><input id="loan2Amount" type="number" class="control" value="500000" step="1" disabled></div>
+          <div class="field"><label>年限（年）</label><input id="loan2Years" type="number" class="control" value="5" step="1" min="1" disabled></div>
+          <div class="field"><label>年利率（%）</label><input id="loan2Rate" type="number" class="control" value="3.5" step="0.01" disabled></div>
+          <div class="field" style="grid-column:1/-1"><label>每月本息（自動計算）</label><input id="loan2Monthly" class="control" value="—" disabled></div>
+        </div>
+        <p class="note">r=年利率/12、n=年×12；月付=A·r/(1-(1+r)<sup>-n</sup>)；r=0 → A/n。</p>
+      </details>
+
+      <div class="table-wrap">
+        <table class="table-grid">
+          <tbody>
+            <tr><td>投入本金</td><td id="vPrincipal">—</td></tr>
+            <tr><td>融資成數</td><td id="vRatio">—</td></tr>
+            <tr><td>融資金額</td><td id="vLoan">—</td></tr>
+            <tr><td>總投入</td><td id="vTotal" class="em">—</td></tr>
+            <tr><td>年化配息率</td><td id="vRate">—</td></tr>
+            <tr><td>每月配息（毛）</td><td id="vMonthlyDivGross" class="pos">—</td></tr>
+            <tr><td>每月融資利息</td><td id="vMonthlyInt" class="neg">—</td></tr>
+            <tr><td>每月貸款本息</td><td id="vMonthlyLoan2" class="neg">—</td></tr>
+            <tr><td>每月配息（淨）</td><td id="vMonthlyDivNet" class="em">—</td></tr>
+            <tr><td>每月淨現金流</td><td id="vMonthlyNet" class="em">—</td></tr>
+            <tr><td>預估報酬率（含息）</td><td id="vEstReturn" class="gold">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="panel-portfolio" role="tabpanel" aria-labelledby="tab-portfolio">
+
+    <div class="field">
+      <label>常用基金清單</label>
+      <select id="presetSelect" class="control"><option value="">— 選擇常用基金 —</option></select>
+    </div>
+
+    <div class="actions" style="margin-bottom:6px">
+      <button class="btn" id="applyPresetBtn">帶入至下一個空列</button>
+      <button class="btn secondary" id="btnAddRow">新增一列</button>
+      <button class="btn secondary" id="btnRemoveRow">移除末列</button>
+      <button class="btn" id="btnExportXlsx">匯出 Excel</button>
+      <button class="btn" id="btnImportXlsx">匯入 Excel</button>
+      <button class="btn secondary" id="btnClearRows">清除表格</button>
+      <input type="file" id="importXlsx" accept=".xlsx,.xls" style="display:none" />
+    </div>
+
+    <p id="uploadInfo" class="note"></p>
+    <div class="note">Excel 欄位：基金名稱、近1年%、近3年累積%、近5年累積%、配息率%。<br>數字/純數字字串一律 ×100；結尾含「%」維持原值。</div>
+
+    <div id="pfExportArea">
+      <div class="table-wrap" style="margin-top:10px">
+        <table id="fundInputTable" class="table-grid">
+          <thead><tr><th>基金名稱</th><th>近1年%</th><th>近3年%</th><th>近5年%</th><th>配息%</th><th>比重%</th></tr></thead>
+          <tbody>
+            <tr><td><input class="control name" placeholder="基金A"></td><td><input class="control fin r1" type="number" step="0.01"></td><td><input class="control fin r3" type="number" step="0.01"></td><td><input class="control fin r5" type="number" step="0.01"></td><td><input class="control fin dy" type="number" step="0.01"></td><td><input class="control fin wt" type="number" step="0.01"></td></tr>
+            <tr><td><input class="control name" placeholder="基金B"></td><td><input class="control fin r1" type="number" step="0.01"></td><td><input class="control fin r3" type="number" step="0.01"></td><td><input class="control fin r5" type="number" step="0.01"></td><td><input class="control fin dy" type="number" step="0.01"></td><td><input class="control fin wt" type="number" step="0.01"></td></tr>
+            <tr><td><input class="control name" placeholder="基金C"></td><td><input class="control fin r1" type="number" step="0.01"></td><td><input class="control fin r3" type="number" step="0.01"></td><td><input class="control fin r5" type="number" step="0.01"></td><td><input class="control fin dy" type="number" step="0.01"></td><td><input class="control fin wt" type="number" step="0.01"></td></tr>
+            <tr><td><input class="control name" placeholder="基金D"></td><td><input class="control fin r1" type="number" step="0.01"></td><td><input class="control fin r3" type="number" step="0.01"></td><td><input class="control fin r5" type="number" step="0.01"></td><td><input class="control fin dy" type="number" step="0.01"></td><td><input class="control fin wt" type="number" step="0.01"></td></tr>
+            <tr><td><input class="control name" placeholder="基金E"></td><td><input class="control fin r1" type="number" step="0.01"></td><td><input class="control fin r3" type="number" step="0.01"></td><td><input class="control fin r5" type="number" step="0.01"></td><td><input class="control fin dy" type="number" step="0.01"></td><td><input class="control fin wt" type="number" step="0.01"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap" style="margin-top:12px">
+        <table class="table-grid">
+          <thead><tr><th>投組指標（加權年化）</th><th>1年</th><th>3年</th><th>5年</th></tr></thead>
+          <tbody>
+            <tr><td>含息報酬率（CAGR）</td><td id="pf_cagr1" class="gold">—</td><td id="pf_cagr3" class="gold">—</td><td id="pf_cagr5" class="gold">—</td></tr>
+            <tr><td>配息率（加權）</td><td id="pf_div1" class="pos">—</td><td id="pf_div3" class="pos">—</td><td id="pf_div5" class="pos">—</td></tr>
+            <tr><td>資本成長率（含息−配息）</td><td id="pf_cap1" class="em">—</td><td id="pf_cap3" class="em">—</td><td id="pf_cap5" class="em">—</td></tr>
+            <tr><td>融資水位 LTV</td><td id="pf_ltv1" class="em">—</td><td id="pf_ltv3" class="em">—</td><td id="pf_ltv5" class="em">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">權重合計：<span id="wtSum">0%</span>（建議接近 100%）</p>
+    </div>
+    <div class="note">LTV > 80% 標紅；LTV 估算以「資本成長率」（CAGR−配息）為投組價值變動率。</div>
+
+  </section>
+
+  <section class="tabpanel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai">
+    <div class="ai-card">
+      <h4>AI 最佳化（Pro）</h4>
+
+      <div class="ai-grid">
+        <div class="field"><label>年化配息率（%）</label><input id="pro_minDy" type="number" class="control" value="7.0" step="0.1"></div>
+        <div class="field"><label>配息基金上限</label><input id="pro_maxDiv" type="number" class="control" value="2" step="1" min="1"></div>
+        <div class="field"><label>基金總檔數</label><input id="pro_maxTotal" type="number" class="control" value="4" step="1" min="1"></div>
+        <div class="field"><label>單檔權重上限（%）</label><input id="pro_wCap" type="number" class="control" value="80" step="1" min="10" max="100"></div>
+        <div class="field"><label>風險權重 λ</label><input id="pro_lambda" type="number" class="control" value="0.5" step="0.05" min="0"></div>
+        <div class="field"><label>資料來源</label>
+          <select id="pro_source" class="control">
+            <option value="catalog" selected>匯入的清單（FUND_CATALOG）</option>
+            <option value="table">目前表格內容</option>
+          </select>
+        </div>
+        <div class="field"><label>排序依據</label>
+          <select id="pro_sort" class="control">
+            <option value="ret_first" selected>加權CAGR</option>
+            <option value="corr_first">相關係數</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:8px;gap:8px;flex-wrap:wrap">
+        <input type="file" id="pro_corr_file" accept=".xlsx,.xls,.csv,.tsv" style="display:none" />
+        <button class="btn secondary" id="pro_corr_import_btn">匯入相關係數</button>
+        <span id="corr_status_indicator" class="ai-pill">未載入</span>
+        <button class="btn secondary" id="pro_corr_load_btn">載入已儲存</button>
+        <button class="btn secondary" id="pro_corr_clear_btn">清空</button>
+        <button class="btn secondary" id="btn_clear_storage" style="background:#555; border-color:#888;">清理所有暫存</button>
+      </div>
+
+      <details class="collapsible" id="excludeBox">
+        <summary>排除基金（勾選即排除）</summary>
+        <div class="actions" style="margin:6px 0">
+          <button class="btn secondary" id="pro_exclude_sync">從資料來源同步名單</button>
+          <button class="btn secondary" id="pro_exclude_clear">取消所有勾選</button>
+        </div>
+        <div id="pro_exclude_checks" class="field"></div>
+      </details>
+
+      <div id="autorunWrap" class="inline" style="margin:8px 0 4px 0">
+        <input id="pro_autorun" type="checkbox" checked />
+        <label for="pro_autorun">自動重算</label>
+      </div>
+
+      <p class="ai-mini" style="margin-top:4px">顯示：加權CAGR（≤3y 優先）、相關係數（加權平均正相關，越低越好，0~1 數值）。未提供或 0 的 ρ 不納入。</p>
+    </div>
+
+    <div id="pro_export_target">
+      <div id="pro_output"></div>
+    </div>
+
+    <details class="collapsible"><summary>相關係數說明</summary>
+      <p class="note">• ρ ∈ [-1,+1]；ρ>0 同漲同跌、ρ<0 可分散。<br>• 0 或未填者視為缺資料，不納入平均與風險；不在矩陣內的基金不參與計算。</p>
+    </details>
+  </section>
+
+  <p class="note">⚠️ 本頁僅為試算與教育用途，非投資建議。歷史績效不代表未來表現。</p>
+</div>
+
+<script id="fundCatalogDefault" type="application/json">
+[
+  {"name":"鋒裕匯理基金新興市場債券 A 美元 (穩定月配息)","r1":8.56,"r3":39.91,"r5":15.07,"dy":17.16},
+  {"name":"高盛環球非投資等級債券基金X股美元(月配息)","r1":7.96,"r3":35.95,"r5":17.48,"dy":14.31}
+]
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+/* ========= 工具 ========= */
+const $=id=>document.getElementById(id);
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const twd=n=>new Intl.NumberFormat('zh-TW',{style:'currency',currency:'TWD',maximumFractionDigits:0}).format(n);
+const r2=v=>(v==null||!isFinite(v))?'':Number(v).toFixed(2);
+
+// 優化：統一浮點數精度，避免比較時的微小誤差
+const FLOAT_PRECISION = 10;
+const roundToPrecision = v => Math.round(v * Math.pow(10, FLOAT_PRECISION)) / Math.pow(10, FLOAT_PRECISION);
+
+function cagrFromTotalPct(totalPct,years){const x=parseFloat(totalPct); if(!isFinite(x)) return NaN; const d=x/100; if(d<=-1||years<=0) return NaN; return roundToPrecision(Math.pow(1+d,1/years)-1);}
+
+/* ========= Tabs ========= */
+function setTab(which){
+  const id=(which==='pf'||which==='ai')?which:'cash';
+  const tabId=id==='cash'?'tab-cash':(id==='pf'?'tab-portfolio':'tab-ai');
+  const panelId=id==='cash'?'panel-cash':(id==='pf'?'panel-portfolio':'panel-ai');
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected','false'));
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+  $(tabId).setAttribute('aria-selected','true');
+  $(panelId).classList.add('active');
+  saveState();
+  if(id==='ai') proScheduleRun(true);
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  $('tab-cash').addEventListener('click',()=>setTab('cash'));
+  $('tab-portfolio').addEventListener('click',()=>setTab('pf'));
+  $('tab-ai').addEventListener('click',()=>setTab('ai'));
+});
+
+/* ========= 狀態保存 ========= */
+const STATE_KEY='momo_winwin_state_v3', LS_CORR_KEY='momo_corr_matrix_csv_v1';
+const fundTableBody=document.querySelector('#fundInputTable tbody');
+
+function collectState(){
+  const s={};
+  ['principal','loan','ratio','rate','loanRate','loan2EnabledCk','loan2Amount','loan2Years','loan2Rate',
+   'pro_minDy','pro_maxDiv','pro_maxTotal','pro_wCap','pro_lambda','pro_source','pro_autorun','pro_sort'
+  ].forEach(id=>{const el=$(id); if(el) s[id]=(el.type==='checkbox')?el.checked:el.value;});
+  s.fundData=[...fundTableBody.querySelectorAll('tr')].map(tr=>({
+    name:tr.querySelector('.name').value,r1:tr.querySelector('.r1').value,r3:tr.querySelector('.r3').value,
+    r5:tr.querySelector('.r5').value,dy:tr.querySelector('.dy').value,wt:tr.querySelector('.wt').value
+  }));
+  const activeTabEl=document.querySelector('.tab[aria-selected="true"]'); s.activeTab=activeTabEl?(activeTabEl.id==='tab-cash'?'cash':(activeTabEl.id==='tab-ai'?'ai':'pf')):'cash';
+  s.loan2Open=$('loan2Box').open; return s;
+}
+function saveState(){ try{ localStorage.setItem(STATE_KEY,JSON.stringify(collectState())); }catch(e){} }
+function loadState(){
+  try{
+    const json=localStorage.getItem(STATE_KEY); if(!json) return false;
+    const s=JSON.parse(json);
+    for(const id in s){const el=$(id); if(el && id!=='fundData'&&id!=='activeTab'&&id!=='loan2Open'){ if(el.type==='checkbox') el.checked=!!s[id]; else el.value=s[id];}}
+    if(s.fundData && s.fundData.length){ while(fundTableBody.firstChild) fundTableBody.removeChild(fundTableBody.firstChild);
+      s.fundData.forEach(d=>{const tr=document.createElement('tr'); tr.innerHTML=createFundRowHtml(); fundTableBody.appendChild(tr);
+        tr.querySelector('.name').value=d.name||''; tr.querySelector('.r1').value=d.r1||''; tr.querySelector('.r3').value=d.r3||'';
+        tr.querySelector('.r5').value=d.r5||''; tr.querySelector('.dy').value=d.dy||''; tr.querySelector('.wt').value=d.wt||'';});
+    }
+    setTab(s.activeTab||'cash'); $('loan2Box').open = (s.loan2Open!==undefined)? s.loan2Open : true;
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ========= 常用基金 ========= */
+let FUND_CATALOG=[];
+function populatePresetSelect(){
+  const sel=$('presetSelect');
+  sel.innerHTML=`<option value="">— 選擇常用基金 —</option>` + (FUND_CATALOG||[]).map((f,i)=>`<option value="${i}">${f.name}</option>`).join('');
+}
+function updateUploadInfo(){ const ts=localStorage.getItem('fundCatalogUploadTime'); $('uploadInfo').textContent= ts?('最後匯入時間：'+new Date(ts).toLocaleString('zh-TW')):'目前使用預設清單（尚未匯入 Excel）';}
+function loadCatalog(){ try{ const ls=localStorage.getItem('fundCatalog'); FUND_CATALOG= ls? JSON.parse(ls) : JSON.parse($('fundCatalogDefault').textContent.trim()); }catch(e){FUND_CATALOG=[]} populatePresetSelect(); updateUploadInfo(); }
+
+$('applyPresetBtn').addEventListener('click',()=>{
+  const v=$('presetSelect').value; if(v===''){alert('請先選擇常用基金');return;}
+  let idx=nextEmptyRowIndex(); if(idx===-1){ addRow(); idx=[...fundTableBody.querySelectorAll('tr')].length-1; }
+  applyPresetToRow(idx,parseInt(v,10));
+});
+
+/* ========= 表格增減 ========= */
+const MIN_ROWS=1;
+function createFundRowHtml(ph='基金'){ return `
+  <td><input class="control name" placeholder="${ph}"></td>
+  <td><input class="control fin r1" type="number" step="0.01"></td>
+  <td><input class="control fin r3" type="number" step="0.01"></td>
+  <td><input class="control fin r5" type="number" step="0.01"></td>
+  <td><input class="control fin dy" type="number" step="0.01"></td>
+  <td><input class="control fin wt" type="number" step="0.01"></td>`;}
+function addRow(){ const tr=document.createElement('tr'); tr.innerHTML=createFundRowHtml(); fundTableBody.appendChild(tr); recomputePortfolio(); }
+function removeRow(){ const rows=fundTableBody.querySelectorAll('tr'); if(rows.length>MIN_ROWS){ fundTableBody.removeChild(rows[rows.length-1]); recomputePortfolio(); } else alert(`至少需要保留 ${MIN_ROWS} 列投組項目。`); }
+$('btnAddRow').addEventListener('click',addRow);
+$('btnRemoveRow').addEventListener('click',removeRow);
+$('btnClearRows').addEventListener('click',()=>{ [...fundTableBody.querySelectorAll('tr')].forEach(tr=>{ tr.querySelector('.name').value=''; tr.querySelectorAll('.fin').forEach(inp=>inp.value='');}); recomputePortfolio(); });
+
+/* ========= Excel 匯入/匯出 ========= */
+const HEADER_MAP={name:['基金名稱','r1','1Y'],r1:['近1年%','r1','1Y'],r3:['近3年累積%','r3','3Y'],r5:['近5年累積%','r5','5Y'],dy:['配息率%','dy','Yield%']};
+function pick(row,keys){for(const k of keys){if(Object.prototype.hasOwnProperty.call(row,k)&&row[k]!=='') return row[k];}return undefined;}
+// 優化：簡化百分比解析邏輯
+function parsePercentCell(v){ 
+    if(v===''||v==null) return null; 
+
+    // 處理數字類型（來自 XLSX 數字單元格，通常是小數）
+    if(typeof v==='number') return v*100; 
+
+    // 處理字串類型
+    if(typeof v==='string'){
+        const s=v.trim(); 
+        if (s.endsWith('%')){
+            // 情況 1: 結尾含 '%' (如 '8.00%') -> 移除 '%' 後直接使用數值
+            const n=parseFloat(s.slice(0,-1));
+            return isNaN(n)?null:n;
+        } 
+        // 情況 2: 純數字字串 (如 '0.08') -> 視為小數，乘 100
+        const n=parseFloat(s); 
+        return isNaN(n)?null:n*100; 
+    } 
+    return null; 
+}
+function sheetToCatalog(ws){ const rows=XLSX.utils.sheet_to_json(ws,{defval:''}), out=[]; rows.forEach(r=>{const item={name:String(pick(r,HEADER_MAP.name)||'').trim(), r1:parsePercentCell(pick(r,HEADER_MAP.r1)), r3:parsePercentCell(pick(r,HEADER_MAP.r3)), r5:parsePercentCell(pick(r,HEADER_MAP.r5)), dy:parsePercentCell(pick(r,HEADER_MAP.dy))}; ['r1','r3','r5','dy'].forEach(k=>{if(item[k]!=null&&isFinite(item[k])) item[k]=Math.round(item[k]*100)/100;}); if(item.name) out.push(item);}); return out; }
+$('btnImportXlsx').addEventListener('click',()=>$('importXlsx').click());
+$('importXlsx').addEventListener('change',(e)=>{ const f=e.target.files[0]; if(!f) return; const fr=new FileReader(); fr.onload=(evt)=>{
+  try{ const wb=XLSX.read(evt.target.result,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; const arr=sheetToCatalog(ws); if(!arr.length) throw new Error('沒有有效資料列');
+    FUND_CATALOG=arr; localStorage.setItem('fundCatalog',JSON.stringify(FUND_CATALOG)); localStorage.setItem('fundCatalogUploadTime',new Date().toISOString()); populatePresetSelect(); updateUploadInfo(); alert(`Excel 匯入完成：${arr.length} 筆`); proScheduleRun(); 
+  }catch(err){ alert('Excel 匯出/入失敗：'+err.message); } e.target.value=''; }; fr.readAsArrayBuffer(f);});
+$('btnExportXlsx').addEventListener('click',()=>{ try{ const header=['基金名稱','近1年%','近3年累積%','近5年累積%','配息率%']; const n2=v=>(v==null||!isFinite(v))?'':Number(v).toFixed(2); const body=(FUND_CATALOG||[]).map(f=>[f.name||'',n2(f.r1),n2(f.r3),n2(f.r5),n2(f.dy)]); const ws=XLSX.utils.aoa_to_sheet([header,...body]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'基金清單'); XLSX.writeFile(wb,'fund-catalog.xlsx'); }catch(err){ alert('Excel 匯出失敗：'+err.message); }});
+
+/* ========= 配息試算 ========= */
+const loan2EnabledCk=$('loan2EnabledCk'), loan2AmountEl=$('loan2Amount'), loan2YearsEl=$('loan2Years'), loan2RateEl=$('loan2Rate'), loan2MonthlyEl=$('loan2Monthly'), loan2Badge=$('loan2Badge');
+function refreshLoan2UI(){ const en=loan2EnabledCk.checked; [loan2AmountEl,loan2YearsEl,loan2RateEl].forEach(el=>el.disabled=!en); loan2Badge.textContent=en?'已啟用':'未啟用'; }
+function calcLoan2Monthly(){ if(!loan2EnabledCk.checked){ loan2MonthlyEl.value='—'; return 0; } const A=Math.max(0,parseFloat(loan2AmountEl.value)||0); const years=Math.max(1,parseInt(loan2YearsEl.value)||1); const yRate=Math.max(0,parseFloat(loan2RateEl.value)||0)/100; const r=yRate/12,n=years*12; let pay=0; if(r===0){pay=A/n;}else{const pow=Math.pow(1+r,-n); pay=A*(r/(1-pow));} loan2MonthlyEl.value=twd(pay); return pay; }
+let autoApplied=true;
+function parseRatioValue(val){ if(!val || val.startsWith('custom')) return null; const p=val.split('|'); return p.length>=2?{ratio:parseFloat(p[0]),mult:parseFloat(p[1])}:null; }
+function computeCashflow(){
+  const P=parseFloat($('principal').value)||0; let L=parseFloat($('loan').value)||0;
+  const r=parseFloat($('rate').value)||0; const i=parseFloat($('loanRate').value)||0; const ratio=parseRatioValue($('ratio').value);
+  if(ratio && isFinite(ratio.mult)){ const calcLoan=Math.round(P*ratio.mult); const isLoanFieldModified = document.activeElement && document.activeElement.id==='loan'; if(!isLoanFieldModified && (autoApplied || L===0 || L===calcLoan)){ L=calcLoan; $('loan').value=L; autoApplied=true; } else { autoApplied=false; } }
+  const annualDiv=(P+L)*r/100, annualInt=L*i/100;
+  const mDivGross=annualDiv/12, mInt=annualInt/12, mLoan2=calcLoan2Monthly();
+  $('vPrincipal').textContent=twd(P); $('vLoan').textContent=twd(L); $('vTotal').textContent=twd(P+L);
+  $('vRate').textContent=r.toFixed(2)+'%'; $('vRatio').textContent=ratio?(ratio.ratio*100).toFixed(0)+'%':'自訂';
+  $('vMonthlyDivGross').textContent=twd(mDivGross); $('vMonthlyInt').textContent=twd(mInt); $('vMonthlyLoan2').textContent=mLoan2>0?twd(mLoan2):'—';
+  $('vMonthlyDivNet').textContent=twd(mDivGross-mLoan2); $('vMonthlyNet').textContent=twd(mDivGross-mInt-mLoan2);
+  const est=(P>0)?((annualDiv-annualInt)/P):NaN; $('vEstReturn').textContent=isFinite(est)?(est*100).toFixed(2)+'%':'—';
+  saveState();
+}
+
+/* ========= 投組計算 + LTV ========= */
+function nextEmptyRowIndex(){ const rows=[...fundTableBody.querySelectorAll('tr')]; for(let i=0;i<rows.length;i++){ const name=(rows[i].querySelector('.name').value||'').trim(); const hasNum=[...rows[i].querySelectorAll('.fin')].some(x=>x.value); if(!name && !hasNum) return i; } return -1; }
+function applyPresetToRow(idx,presetIdx){ const p=(FUND_CATALOG||[])[presetIdx]; if(!p) return alert('找不到該基金'); const tr=document.querySelectorAll('#fundInputTable tbody tr')[idx]; if(!tr) return;
+  tr.querySelector('.name').value=p.name||''; tr.querySelector('.r1').value=r2(p.r1); tr.querySelector('.r3').value=r2(p.r3); tr.querySelector('.r5').value=r2(p.r5); tr.querySelector('.dy').value=r2(p.dy); recomputePortfolio(); proScheduleRun(); }
+function recomputePortfolio(){
+  const rows=[...fundTableBody.querySelectorAll('tr')];
+  const data=rows.map((tr,idx)=>({ name:(tr.querySelector('.name').value||`基金${'ABCDE'[idx]||idx+1}`), r1:parseFloat(tr.querySelector('.r1').value), r3:parseFloat(tr.querySelector('.r3').value), r5:parseFloat(tr.querySelector('.r5').value), dy:parseFloat(tr.querySelector('.dy').value), wt:parseFloat(tr.querySelector('.wt').value)}));
+  const valid=data.filter(f=>isFinite(f.wt)&&f.wt>0); 
+  const sumW=valid.reduce((s,f)=>s+f.wt,0);
+  
+  // 優化：將 sumW 向上取整，保持數值穩定性
+  const roundedSumW = roundToPrecision(sumW);
+  
+  const wtSumEl=$('wtSum'); if(wtSumEl){ wtSumEl.textContent=`${(sumW||0).toFixed(2)}%`; wtSumEl.style.color=(Math.abs((sumW||0)-100)<=2)?'var(--pos)':'var(--neg)'; wtSumEl.style.fontWeight='700'; }
+  
+  const wAvg=fn=>{
+      let acc=0,ws=0; 
+      valid.forEach(f=>{
+          const v=fn(f); 
+          if(isFinite(v)){
+              // 優化：中間計算結果向上取整
+              acc += roundToPrecision(v * (f.wt / roundedSumW)); 
+              ws += roundToPrecision(f.wt / roundedSumW);
+          }
+      }); 
+      return ws>0?acc:NaN;
+  };
+  
+  const c1=wAvg(f=>isFinite(f.r1)?f.r1/100:NaN);
+  const c3=wAvg(f=>isFinite(f.r3)?cagrFromTotalPct(f.r3,3):NaN); 
+  const c5=wAvg(f=>isFinite(f.r5)?cagrFromTotalPct(f.r5,5):NaN);
+  const dy=wAvg(f=>isFinite(f.dy)?f.dy/100:NaN);
+  
+  const cap1=(isFinite(c1)&&isFinite(dy))?roundToPrecision(c1-dy):NaN; 
+  const cap3=(isFinite(c3)&&isFinite(dy))?roundToPrecision(c3-dy):NaN; 
+  const cap5=(isFinite(c5)&&isFinite(dy))?roundToPrecision(c5-dy):NaN;
+  
+  const set=(id,v)=>$(id).textContent=isFinite(v)?(v*100).toFixed(2)+'%':'—';
+  set('pf_cagr1',c1); set('pf_cagr3',c3); set('pf_cagr5',c5); set('pf_div1',dy); set('pf_div3',dy); set('pf_div5',dy); set('pf_cap1',cap1); set('pf_cap3',cap3); set('pf_cap5',cap5);
+  updateLTV(cap1,cap3,cap5); saveState();
+}
+function outstandingSeries(P0,r,N=5){ const B={},I={},O={}; for(let t=1;t<=N;t++){ if(t<=2){B[t]=P0;} else {let s=0; for(let k=1;k<=t-2;k++) s+=I[k]; B[t]=P0+s;} I[t]=B[t]*r; O[t]=B[t]+I[t]+(t>=2?I[t-1]:0);} return {B,I,O}; }
+function updateLTV(cap1,cap3,cap5){ const P=parseFloat($('principal').value)||0; const L=parseFloat($('loan').value)||0; const i=(parseFloat($('loanRate').value)||0)/100; const V0=P+L,P0=L,r=i; const els=[$('pf_ltv1'),$('pf_ltv3'),$('pf_ltv5')]; els.forEach(el=>{el.textContent='—'; el.classList.remove('neg');}); if(!(P0>0&&V0>0)) return; const {O}=outstandingSeries(P0,r,5);
+  const l=(g,n)=>{ if(!isFinite(g)) return NaN; const Vn=V0*Math.pow(1+g,n); return (O[n]/Vn)*100; }; const l1=l(cap1,1), l3=l(cap3,3), l5=l(cap5,5);
+  const fmt=v=>isFinite(v)?v.toFixed(2)+'%':'—'; $('pf_ltv1').textContent=fmt(l1); $('pf_ltv3').textContent=fmt(l3); $('pf_ltv5').textContent=fmt(l5);
+  const paint=(el,v)=>{ el.classList.remove('neg'); if(isFinite(v)&&v>80) el.classList.add('neg'); }; paint($('pf_ltv1'),l1); paint($('pf_ltv3'),l3); paint($('pf_ltv5'),l5); }
+
+/* ========= PNG 匯出（AI 分頁匯出整個最佳化區域，且隱藏明細） ========= */
+async function exportPng(){
+  let target, filename, originalWrapOverflowY;
+  const active=document.querySelector('.tabpanel.active');
+  if(!active) return alert('找不到要匯出的區塊');
+
+  try{
+    document.body.classList.add('exporting');
+    
+    // 根據當前分頁確定截圖目標
+    if(active.id==='panel-cash'){ 
+        target=$('cashExportArea'); 
+        filename='配息試算結果'; 
+    }
+    // 修正：投組分析只截取結果表格區域 #pfExportArea
+    else if(active.id==='panel-portfolio'){ 
+        target=$('pfExportArea'); 
+        filename='投組分析'; 
+    }
+    else { 
+        target=$('pro_export_target'); 
+        filename='AI最佳化投組'; 
+    }
+    
+    const wrapEl = document.querySelector('.wrap');
+    
+    // 步驟 1: 暫時移除包裹容器的溢出隱藏，確保內容完全展開
+    if(wrapEl){
+        originalWrapOverflowY = wrapEl.style.overflowY;
+        wrapEl.style.overflowY = 'visible';
+    }
+
+    // 等待瀏覽器重新佈局，確保 scrollHeight 計算正確
+    await new Promise(r=>setTimeout(r,100)); 
+
+    // 步驟 2: 計算目標元素的實際內容高度，並確保截圖捕捉到完整高度
+    const targetHeight = target.scrollHeight + 20; // 額外增加 20px 邊距
+    
+    const canvas=await html2canvas(target,{
+        backgroundColor:'#0A1221',
+        // 嘗試修正跨域和縮放問題
+        scale: 2, 
+        useCORS: true, 
+        allowTaint: true, 
+        
+        // 關鍵：明確設定捕獲的高度
+        height: targetHeight 
+    });
+    
+    const a=document.createElement('a'); 
+    a.download=filename+'.png'; 
+    a.href=canvas.toDataURL('image/png'); 
+    a.click();
+    
+  }catch(err){ 
+    alert('匯出 PNG 失敗：'+err.message); 
+  }
+  finally{ 
+    // 清理：移除匯出狀態 class 並還原 overflow 樣式
+    document.body.classList.remove('exporting'); 
+    if(wrapEl){
+        wrapEl.style.overflowY = originalWrapOverflowY;
+    }
+  }
+}
+$('btnPng').addEventListener('click',exportPng);
+
+/* ========= 自動重算 ========= */
+function tryCalcAll(){ try{computeCashflow();}catch(e){} try{recomputePortfolio();}catch(e){} saveState(); proScheduleRun(); }
+document.addEventListener('input',(e)=>{ if(e.target.classList?.contains('control')) tryCalcAll(); });
+document.addEventListener('change',(e)=>{ if(e.target.classList?.contains('control')) tryCalcAll(); });
+
+/* ========= 來源資料 ========= */
+function readSourceData(source){
+  const out=[];
+  if(source==='catalog'){
+    (FUND_CATALOG||[]).forEach(f=>{ const r1=isFinite(f.r1)?Number(f.r1)/100:NaN; const r3=isFinite(f.r3)?cagrFromTotalPct(f.r3,3):NaN; const dy=isFinite(f.dy)?Number(f.dy)/100:0; if(f.name) out.push({name:String(f.name),r1:r1,r3CAGR:r3,dy:dy,isDividend:(dy>0)}); });
+  }else{
+    const rows=[...fundTableBody.querySelectorAll('tr')];
+    rows.forEach(tr=>{ const name=(tr.querySelector('.name').value||'').trim(); if(!name) return; const r1=parseFloat(tr.querySelector('.r1').value); const r3=parseFloat(tr.querySelector('.r3').value); const dy=parseFloat(tr.querySelector('.dy').value);
+      out.push({name, r1:isFinite(r1)?r1/100:NaN, r3CAGR:isFinite(r3)?cagrFromTotalPct(r3,3):NaN, dy:isFinite(dy)?dy/100:0, isDividend:(isFinite(dy)?dy>0:false)}); });
+  }
+  return out.filter(x=>x.name);
+}
+function scoreCAGR3or1(f){ if(isFinite(f.r3CAGR)) return f.r3CAGR; if(isFinite(f.r1)) return f.r1; return -Infinity; }
+
+/* ========= 相關係數 ========= */
+function parseCorrMatrix(text){
+  if(!text||!text.trim()) return {names:[],rho:{},covered:new Set()};
+  const lines=text.trim().split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const sep=lines[0].includes('\t')?'\t':',';
+  const table=lines.map(l=>l.split(sep).map(s=>s.trim()));
+  const header=table[0].slice(1);
+  const rho={}, used=new Set();
+  for(let i=1;i<table.length;i++){
+    const row=table[i], rowName=row[0]; if(!rowName) continue;
+    for(let j=1;j<row.length;j++){
+      const colName=header[j-1]; if(!colName) continue;
+      let v=parseFloat(row[j]); if(!isFinite(v)) continue; v=clamp(v,-1,1);
+      if(v===0) continue; // 0 視為未提供
+      const key=[rowName,colName].sort().join('|'); rho[key]=v; used.add(rowName); used.add(colName);
+    }
+  }
+  const allNames=[...new Set([...header, ...table.slice(1).map(r=>r[0])])].filter(Boolean);
+  return {names:allNames, rho, covered:used};
+}
+function getRho(rhoMap,a,b){ if(a===b) return 1; const key=[a,b].sort().join('|'); const v=rhoMap?rhoMap[key]:undefined; if(!isFinite(v)||v===0||v===undefined) return null; return clamp(v,-1,1); }
+// 預計算相關係數矩陣 (效能優化新增)
+function buildCorrMatrix(items,rhoMap){ 
+    const names=items.map(f=>f.name);
+    const mat=names.map((ri,i)=>names.map((cj,j)=>{ 
+        if(i===j) return 1; 
+        const r=getRho(rhoMap,ri,cj); 
+        // 矩陣中只儲存正相關部分，負相關或 null 存 0 
+        return (r==null||r<=0)?0:r; 
+    })); 
+    return {names,mat,indexMap:names.reduce((m,n,i)=>(m[n]=i,m),{})}; 
+}
+function buildCorrSubmatrix(items,rhoMap){ const names=items.map(f=>f.name); const mat=names.map(ri=>names.map(cj=>{ if(ri===cj) return 1; const r=getRho(rhoMap,ri,cj); return (r==null)?null:r; })); return {names,mat}; }
+function corrStats(items,weights,rhoMap){
+  const {names,mat}=buildCorrSubmatrix(items,rhoMap);
+  let num=0,den=0,maxPair=null,minPair=null, seen=false;
+  for(let i=0;i<names.length;i++){
+    for(let j=i+1;j<names.length;j++){
+      const wi=weights[names[i]]||0, wj=weights[names[j]]||0; const rho=mat[i][j];
+      if(rho==null) continue; seen=true;
+      const pos=Math.max(0,rho); num+=wi*wj*pos; den+=wi*wj;
+      if(!maxPair||rho>maxPair.rho) maxPair={a:names[i],b:names[j],rho};
+      if(!minPair||rho<minPair.rho) minPair={a:names[i],b:names[j],rho};
+    }
+  }
+  const avgPosRho=(seen&&den>0)?(num/den):NaN;
+  return {names,mat,avgPosRho,maxPair,minPair};
+}
+function renderCorrTable(names,mat){
+  if(!names.length) return '';
+  const head='<tr><th></th>'+names.map(n=>`<th>${n}</th>`).join('')+'</tr>';
+  const body=names.map((ri,i)=>{
+    const row=mat[i].map(v=>{ if(v==null) return `<td>—</td>`; const s=(Math.abs(v)===1||v===0)?v.toFixed(0):v.toFixed(2); const cls=v>0.7?'neg':(v<0?'pos':''); return `<td class="${cls}">${s}</td>`; }).join('');
+    return `<tr><th>${ri}</th>${row}</tr>`;
+  }).join('');
+  return `<div class="table-wrap" style="margin-top:6px"><table class="table-grid"><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
+}
+function renderCorrBlock(sug){
+  if(!sug._rhoMap) return '';
+  const st=corrStats(sug.items,sug.weights,sug._rhoMap); const has=Number.isFinite(st.avgPosRho);
+  const avgStr=has? st.avgPosRho.toFixed(2) : '—未提供—';
+  const maxStr=(has && st.maxPair)? `${st.maxPair.a}–${st.maxPair.b}：${st.maxPair.rho.toFixed(2)}`:'—';
+  const minStr=(has && st.minPair)? `${st.minPair.a}–${st.minPair.b}：${st.minPair.rho.toFixed(2)}`:'—';
+  const tableHtml=renderCorrTable(st.names,st.mat);
+  return `<details class="collapsible"><summary>相關係數明細</summary>
+    <p class="ai-mini" style="margin:6px 0 8px 0">
+      <span class="ai-pill">相關係數（加權平均正相關）：${avgStr}</span>
+      <span class="ai-pill">最高成對：${maxStr}</span>
+      <span class="ai-pill">最低成對：${minStr}</span>
+    </p>
+    ${tableHtml}
+    <p class="note">※ 顯示為數值（0~1）；未提供或填 0 的配對視為「缺資料」，不納入平均與風險。</p>
+  </details>`;
+}
+
+/* ========= 目標函數 & 啟發式 (優化後) ========= */
+// 接受預先計算的矩陣 (corrMat) 進行更快的查表
+function objective(items,w,lambda,corrMat){
+  // 優化：移除 Number() 呼叫
+  const lamEff=Math.max(lambda||0,0);
+  let ret=0,risk=0;
+  const indexMap = corrMat.indexMap;
+  const mat = corrMat.mat;
+
+  for(let i=0;i<items.length;i++){
+    const fi=items[i], wi=w[fi.name]||0; 
+    const ri=isFinite(fi.r3CAGR)?fi.r3CAGR:(isFinite(fi.r1)?fi.r1:0); 
+    ret+=wi*ri;
+    
+    // 透過索引直接存取矩陣，避免 getRho 內部的字串/對象操作 (效能優化)
+    const iIdx = indexMap[fi.name];
+    if(wi > 0 && isFinite(iIdx)){
+        for(let j=i+1;j<items.length;j++){
+            const fj=items[j], wj=w[fj.name]||0; 
+            const jIdx = indexMap[fj.name];
+            if(wj > 0 && isFinite(jIdx)){
+                 // mat[iIdx][jIdx] 已經是 max(0, rho)
+                risk += wi * wj * mat[iIdx][jIdx];
+            }
+        }
+    }
+  }
+  return {ret,risk,obj:ret - lamEff*risk};
+}
+
+function pruneTinyWeights(items,weights,eps=0.005){ const act=items.filter(f=>(weights[f.name]||0)>=eps); if(act.length===0) return {items,weights}; const sum=act.reduce((s,f)=>s+(weights[f.name]||0),0); const w2={}; act.forEach(f=>w2[f.name]=(weights[f.name]||0)/(sum||1)); return {items:act,weights:w2}; }
+function weightHeuristic(items,minDy,wCap,rhoMap,lambda){
+  const s=(f)=>Math.max(0,isFinite(f.r3CAGR)?f.r3CAGR:(isFinite(f.r1)?f.r1:0));
+  let w={}; const den=Math.max(1e-9,items.reduce((s2,f)=>s2+s(f),0)); items.forEach(f=>w[f.name]=s(f)/den);
+  function normalizeCap(){ let sum=0; items.forEach(f=>{ w[f.name]=Math.min(wCap,w[f.name]); sum+=w[f.name];}); if(sum<=0){const u=1/items.length; items.forEach(f=>w[f.name]=u);} else { items.forEach(f=>w[f.name]/=sum); } }
+  normalizeCap();
+  function weightedDy(W=w){ return items.reduce((x,f)=>x+(W[f.name]||0)*(f.dy||0),0); }
+  
+  // 效能優化：預先計算相關係數矩陣
+  const corrMat = buildCorrMatrix(items, rhoMap);
+
+  // 輔助函式: 取得單一基金的風險分數 (用於排序)
+  const getRhoRiskScore=(fund, currentWeights)=>{
+    let score = 0;
+    const iIdx = corrMat.indexMap[fund.name];
+    if(!isFinite(iIdx)) return 0;
+
+    for(const t of items){
+        if(fund.name === t.name) continue;
+        const jIdx = corrMat.indexMap[t.name];
+        if(!isFinite(jIdx)) continue;
+        // mat[iIdx][jIdx] 已經是 max(0, rho)
+        score += (currentWeights[t.name]||0) * corrMat.mat[iIdx][jIdx];
+    }
+    return score;
+  };
+  
+  // 呼叫目標函數的捷徑 (包含預計算的矩陣)
+  const obj = (weights) => objective(items, weights, lambda, corrMat);
+
+  let guard=0;
+  while(weightedDy()<minDy && guard++<200){
+    // 每次迭代前重新計算風險分數
+    const rhoRiskScores = {}; items.forEach(f => rhoRiskScores[f.name] = getRhoRiskScore(f, w));
+
+    const donors=[...items].sort((a,b)=>{ 
+      const wa=w[a.name]||0, wb=w[b.name]||0; 
+      const ra=isFinite(a.r3CAGR)?a.r3CAGR:(isFinite(a.r1)?a.r1:0); 
+      const rb=isFinite(b.r3CAGR)?b.r3CAGR:(isFinite(b.r1)?b.r1:0); 
+      const rhoA = rhoRiskScores[a.name];
+      const rhoB = rhoRiskScores[b.name];
+      // 排序條件：Dy差 > Ret差 > Rho差 > Weight差
+      return ((a.dy||0)-(b.dy||0)) || (ra-rb) || (rhoA-rhoB) || ((wa-wb));
+    });
+    
+    const receivers=[...items].filter(f=>(f.dy||0)>0).sort((a,b)=>(b.dy||0)-(a.dy||0));
+    if(!receivers.length) break;
+    const step=0.02; let moved=false;
+    
+    for(const d of donors){ 
+      for(const r of receivers){ 
+        if(d.name===r.name) continue; 
+        const wd=w[d.name]||0, wr=w[r.name]||0; if(wd<=1e-6) continue;
+        const delta=Math.min(step,wd,Math.max(0,wCap-wr)); if(delta<=1e-6) continue;
+        
+        const wTry={...w}; wTry[d.name]-=delta; wTry[r.name]+=delta;
+        
+        // 呼叫 obj() 替代 objective(..., rhoMap, ...)
+        const before=obj(w).obj; 
+        const after=obj(wTry).obj;
+        
+        if(after>=before || weightedDy()<minDy){ w=wTry; moved=true; break; } 
+      }
+      if(moved) break; 
+    }
+    if(!moved) break;
+  }
+  
+  function ok(W){ const dy=items.reduce((x,f)=>x+(W[f.name]||0)*(f.dy||0),0); return dy>=minDy && items.every(f=>(W[f.name]||0)<=wCap+1e-9); }
+  let improved=true,it=0;
+  while(improved && it++<200){
+    improved=false;
+    for(let i=0;i<items.length;i++){
+      for(let j=i+1;j<items.length;j++){
+        const a=items[i], b=items[j]; const step=0.01;
+        for(const dir of [+1,-1]){
+          const wa=w[a.name]||0, wb=w[b.name]||0; const delta= dir>0? Math.min(step,wb,Math.max(0,wCap-wa)) : Math.min(step,wa,Math.max(0,wCap-wb));
+          if(delta<=1e-6) continue; const W={...w}; if(dir>0){W[a.name]+=delta; W[b.name]-=delta;} else {W[a.name]-=delta; W[b.name]+=delta;}
+          if(!ok(W)) continue; 
+          // 呼叫 obj() 替代 objective(..., rhoMap, ...)
+          const before=obj(w).obj; 
+          const after=obj(W).obj; 
+          if(after>before+1e-9){ w=W; improved=true; }
+        }
+      }
+    }
+  }
+  let sTot=items.reduce((x,f)=>x+(w[f.name]||0),0); if(sTot<=0){ const u=1/items.length; items.forEach(f=>w[f.name]=u);} else items.forEach(f=>w[f.name]/=sTot);
+  // 傳遞 corrMat 以便後續 localSwapImprove 使用
+  return {weights: w, corrMat: corrMat};
+}
+
+/* ========= 候選與強化 ========= */
+function avgPositiveCorrAgainstPick(rhoMap,fund,picked){
+  let sum=0,den=0; for(const g of picked){ const r=getRho(rhoMap,fund.name,g.name); if(r!=null && r>0){ sum+=r; den++; } } return den>0? (sum/den) : 0;
+}
+function candidateSelection(universe,maxTotal,maxDiv,rhoMap,lambda,minDy){
+  const base=[...universe].sort((a,b)=>scoreCAGR3or1(b)-scoreCAGR3or1(a));
+  const selected=[]; let dCnt=0; const alpha=Math.max(lambda,0.8);
+  while(selected.length<maxTotal && base.length){
+    let bestIdx=-1, bestScore=-Infinity;
+    for(let i=0;i<base.length;i++){
+      const f=base[i]; if(f.isDividend && dCnt>=maxDiv) continue;
+      const corr = selected.length? avgPositiveCorrAgainstPick(rhoMap,f,selected) : 0;
+      const sc = scoreCAGR3or1(f) - alpha*corr;
+      if(sc>bestScore){ bestScore=sc; bestIdx=i; }
+    }
+    if(bestIdx<0) break;
+    const pick=base.splice(bestIdx,1)[0]; selected.push(pick); if(pick.isDividend) dCnt++;
+  }
+  if(minDy>0 && !selected.some(x=>x.isDividend)){ const divs=universe.filter(x=>x.isDividend); if(divs.length){ selected[selected.length-1]=divs[0]; } }
+  return selected;
+}
+function localSwapImprove(items,universe,maxTotal,maxDiv,rhoMap,lambda,minDy,wCap){
+  let curItems=[...items];
+  
+  // 建立輔助函式：計算權重和目標分數
+  function evalItems(arr){ 
+    const {weights: w, corrMat} = weightHeuristic(arr,minDy,wCap,rhoMap,lambda); 
+    const val=objective(arr,w,lambda,corrMat); 
+    const dy=arr.reduce((x,f)=>x+(w[f.name]||0)*(f.dy||0),0); 
+    const dcnt=arr.filter(x=>x.isDividend).length; 
+    return {w,val,dy,dcnt, corrMat}; 
+  }
+
+  let cur=evalItems(curItems); 
+  let improved=true, guard=0;
+  
+  while(improved && guard++<50){
+    improved=false;
+    for(let i=0;i<curItems.length;i++){
+      for(const cand of universe){
+        if(curItems.find(x=>x.name===cand.name)) continue;
+        const next=[...curItems]; next[i]=cand;
+        const dcnt=next.filter(x=>x.isDividend).length; if(dcnt>maxDiv) continue;
+        
+        const test=evalItems(next); 
+        if(test.dy+1e-9<minDy) continue;
+        
+        if(test.val.obj>cur.val.obj+1e-6){ 
+          curItems=next; 
+          cur=test; 
+          improved=true; 
+          break; 
+        }
+      }
+      if(improved) break;
+    }
+  }
+  
+  const pruned=pruneTinyWeights(curItems,cur.w,0.005);
+  // 計算最終目標分數時，使用預計算的矩陣
+  const val2=objective(pruned.items,pruned.weights,Number(lambda)||0, cur.corrMat);
+  const dy2=pruned.items.reduce((x,f)=>x+(pruned.weights[f.name]||0)*(f.dy||0),0);
+  // corrStats 仍需要原始 rhoMap 來取得負相關數據以顯示明細
+  const stats2=corrStats(pruned.items,pruned.weights,rhoMap);
+  
+  return {items:pruned.items,weights:pruned.weights,...val2,dy:dy2,avgPos:stats2.avgPosRho,_rhoMap:rhoMap};
+}
+
+/* ========= 主流程 ========= */
+function universeWithNames(source){ const U=readSourceData(source); const map={}; U.forEach(x=>map[x.name]=x); return {U,map}; }
+function getExcludeSet(){ const box=$('pro_exclude_checks'); const out=new Set(); box.querySelectorAll('input[type="checkbox"]').forEach(ch=>{ if(ch.checked) out.add(ch.value); }); return out; }
+
+function proOptimize(source,minDyPct,maxDiv,maxTotal,wCapPct,lambda,sortMode){
+  let {U}=universeWithNames(source); if(!U.length) return [];
+  const minDy=(isFinite(minDyPct)?Number(minDyPct)/100:0); const wCap=clamp((isFinite(wCapPct)?Number(wCapPct)/100:0.4),0.1,1.0);
+
+  const corrTextUse=localStorage.getItem(LS_CORR_KEY)||'';
+  const parsed=parseCorrMatrix(corrTextUse||''); const rho=parsed.rho; const covered=parsed.covered;
+
+  // 只保留在相關矩陣中出現的基金
+  U = U.filter(f=>covered.has(f.name));
+  if(!U.length){ $('pro_output').innerHTML='<p class="ai-mini">（相關係數未提供或皆為 0，無法計算投組。請匯入相關係數矩陣檔案。）</p>'; return []; }
+
+  const excludeSet=getExcludeSet(); if(excludeSet.size){ U = U.filter(f=>!excludeSet.has(f.name)); }
+  if(!U.length){ $('pro_output').innerHTML='<p class="ai-mini">（排除過多，已無可計算標的。）</p>'; return []; }
+
+  const universe=U, tryMaxTotal=Math.max(1,maxTotal|0), tryMaxDiv=Math.max(1,maxDiv|0), lam=Number(lambda)||0;
+  const results=[];
+
+  const seedA=candidateSelection(universe,tryMaxTotal,tryMaxDiv,rho,lam,minDy);
+  if(seedA.length){ results.push(localSwapImprove(seedA,universe,tryMaxTotal,tryMaxDiv,rho,lam,minDy,wCap)); }
+
+  if(minDy>0){
+    const divs=universe.filter(x=>x.isDividend).sort((a,b)=>(b.dy||0)-(a.dy||0)).slice(0, Math.min(tryMaxDiv,3));
+    const others=universe.filter(x=>!divs.find(d=>d.name===x.name)).sort((a,b)=>scoreCAGR3or1(b)-scoreCAGR3or1(a)).slice(0,Math.max(tryMaxTotal-divs.length,0));
+    const seedB=[...divs,...others].slice(0,tryMaxTotal); if(seedB.length){ results.push(localSwapImprove(seedB,universe,tryMaxTotal,tryMaxDiv,rho,lam,minDy,wCap)); }
+  }
+
+  const RAND_STARTS=8;
+  for(let t=0;t<RAND_STARTS;t++){
+    const sortedByRet=[...universe].sort((a,b)=>scoreCAGR3or1(b)-scoreCAGR3or1(a));
+    const pick=[]; let dcnt=0;
+    for(const f of sortedByRet){
+      if(pick.length>=tryMaxTotal) break;
+      if(f.isDividend && dcnt>=tryMaxDiv) continue;
+      if(pick.length){
+        const avgPos=avgPositiveCorrAgainstPick(rho,f,pick);
+        const skipProb=Math.min(0.6,Math.max(0,avgPos));
+        if(Math.random()<skipProb) continue;
+      }
+      pick.push(f); if(pick.isDividend) dcnt++;
+    }
+    if(!pick.length) continue;
+    results.push(localSwapImprove(pick,universe,tryMaxTotal,tryMaxDiv,rho,lam,minDy,wCap));
+  }
+
+  const seen=new Set(), uniq=[]; for(const r of results){ if(!r||!r.items||!r.items.length) continue; const key=[...r.items.map(x=>x.name)].sort().join('|'); if(!seen.has(key)){ seen.add(key); uniq.push(r);} }
+
+  // ---- 嚴格約束：若能達到配息門檻，低於門檻的解不展示 ----
+  const filtered = (minDy>0)? uniq.filter(s => (s && isFinite(s.dy) && s.dy + 1e-9 >= minDy)) : uniq;
+
+  const list = filtered.length ? filtered : uniq;
+
+  const normAvg=x=>Number.isFinite(x)?x:1e9;
+  if(sortMode==='corr_first'){
+    list.sort((a,b)=>{
+      const dCorr=normAvg(a.avgPos)-normAvg(b.avgPos);
+      if(Math.abs(dCorr)>1e-9) return dCorr;
+      const dRet=(b.ret||-1e-9)-(a.ret||-1e-9);
+      if(Math.abs(dRet)>1e-9) return dRet;
+      return (a.items.length||0)-(b.items.length||0);
+    });
+  }else{
+    list.sort((a,b)=>{
+      const dRet=(b.ret||-1e-9)-(a.ret||-1e-9);
+      if(Math.abs(dRet)>1e-9) return dRet;
+      const dCorr=normAvg(a.avgPos)-normAvg(b.avgPos);
+      if(Math.abs(dCorr)>1e-9) return dCorr;
+      return (a.items.length||0)-(b.items.length||0);
+    });
+  }
+  return list.slice(0,3);
+}
+
+/* ========= 渲染 ========= */
+function renderPro(list){
+  const box=$('pro_output'); box.innerHTML=''; if(!list.length){ box.innerHTML='<p class="ai-mini">（找不到符合條件的最佳化組合）</p>'; return; }
+  list=list.map(s=>{const p=pruneTinyWeights(s.items,s.weights,0.005); return {...s,items:p.items,weights:p.weights};});
+  list.forEach((sug,idx)=>{
+    const rows=sug.items.map(f=>{
+      const r3 = isFinite(f.r3CAGR)? (f.r3CAGR*100).toFixed(2)+'%' : '';
+      const r1 = isFinite(f.r1)     ? (f.r1*100).toFixed(2)+'%'     : '';
+      const c3show = r3 || (r1 ? (r1+'*') : '—'); // 無3年則以1年(＊)替代顯示
+      const c1show = r1 || '—';
+      const dy    = isFinite(f.dy) ? (f.dy*100).toFixed(2)+'%' : '—';
+      const wt    = ((sug.weights[f.name]||0)*100).toFixed(1)+'%';
+      return `<tr><td>${f.name}</td><td>${c3show}</td><td>${c1show}</td><td>${dy}</td><td class="em">${wt}</td></tr>`;
+    }).join('');
+    const corrBlock=renderCorrBlock(sug);
+    const html=`<div class="ai-card">
+      <h4>#${idx+1} 最佳化投組</h4>
+      <div class="ai-mini" style="margin-bottom:6px">
+        <span class="ai-pill">加權配息：${(sug.dy*100).toFixed(2)}%</span>
+        <span class="ai-pill">加權 CAGR(≤3y)：${(sug.ret*100).toFixed(2)}%</span>
+        <span class="ai-pill">相關係數：${Number.isFinite(sug.avgPos)?sug.avgPos.toFixed(2):'—未提供—'}</span>
+      </div>
+      <div class="table-wrap"><table class="table-grid">
+        <thead><tr><th>基金</th><th>3年CAGR</th><th>1年</th><th>配息</th><th>建議比重</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+      ${corrBlock}
+      <div class="actions" style="margin-top:8px"><button class="btn" data-apply-pro="${idx}">套用到表格</button></div>
+    </div>`;
+    box.insertAdjacentHTML('beforeend',html);
+  });
+  box.querySelectorAll('[data-apply-pro]').forEach(btn=>{
+    btn.addEventListener('click',()=>{ const i=parseInt(btn.getAttribute('data-apply-pro'),10); const sug=list[i]; const p=pruneTinyWeights(sug.items,sug.weights,0.005);
+      while(fundTableBody.firstChild) fundTableBody.removeChild(fundTableBody.firstChild);
+      p.items.forEach((f,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=createFundRowHtml(`基金${i+1}`); fundTableBody.appendChild(tr);
+        tr.querySelector('.name').value=f.name; tr.querySelector('.r1').value=isFinite(f.r1)?(f.r1*100).toFixed(2):''; tr.querySelector('.r3').value=isFinite(f.r3CAGR)?((Math.pow(1+f.r3CAGR,3)-1)*100).toFixed(2):''; tr.querySelector('.r5').value=''; tr.querySelector('.dy').value=isFinite(f.dy)?(f.dy*100).toFixed(2):''; tr.querySelector('.wt').value=((p.weights[f.name]||0)*100).toFixed(2); });
+      setTab('pf'); recomputePortfolio(); alert('已將最佳化投組（移除 0% 權重）套用至表格。');
+    });
+  });
+}
+
+/* ========= 排除清單 UI ========= */
+function collectFundNamesFromSource(source){
+  if(source==='catalog') return (FUND_CATALOG||[]).map(f=>String(f.name||'').trim()).filter(Boolean);
+  const rows=[...fundTableBody.querySelectorAll('tr')];
+  return rows.map(tr=>String(tr.querySelector('.name').value||'').trim()).filter(Boolean);
+}
+function syncExcludeList(){
+  const names=[...new Set(collectFundNamesFromSource($('pro_source').value))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+  const box=$('pro_exclude_checks'); box.innerHTML='';
+  names.forEach(n=>{
+    const id='ex_'+btoa(unescape(encodeURIComponent(n))).replace(/=/g,'');
+    const wrap=document.createElement('label');
+    wrap.innerHTML=`<input type="checkbox" value="${n}" id="${id}"><span>${n}</span>`;
+    box.appendChild(wrap);
+  });
+}
+$('pro_exclude_sync').addEventListener('click',syncExcludeList);
+$('pro_exclude_clear').addEventListener('click',()=>{ $('pro_exclude_checks').querySelectorAll('input[type="checkbox"]').forEach(ch=>ch.checked=false); proScheduleRun(); });
+$('pro_exclude_checks').addEventListener('change',()=>proScheduleRun());
+
+/* ========= 相關係數檔案 ========= */
+// 新增：更新相關係數燈號
+function updateCorrStatusIndicator(){
+    const indicator = $('corr_status_indicator');
+    if (!indicator) return;
+
+    const data = localStorage.getItem(LS_CORR_KEY);
+    // 檢查數據是否為 null, undefined, 或只包含空白字符
+    const hasData = (data && data.trim().length > 0);
+    
+    // 使用現有的 CSS 變數來控制顏色，保持風格一致
+    const deepColor = getComputedStyle(document.documentElement).getPropertyValue('--deep');
+    const posColor = getComputedStyle(document.documentElement).getPropertyValue('--pos');
+    const goldSoftColor = getComputedStyle(document.documentElement).getPropertyValue('--gold-soft');
+
+    if (hasData) {
+        indicator.textContent = '已載入';
+        indicator.style.background = posColor; // 綠色
+        indicator.style.borderColor = posColor;
+        indicator.style.color = deepColor;
+    } else {
+        indicator.textContent = '未載入';
+        indicator.style.background = '#283556'; // 中性深藍 (替代色)
+        indicator.style.borderColor = 'rgba(233,209,138,.35)';
+        indicator.style.color = goldSoftColor;
+    }
+}
+
+function importCorrFile(file){
+  const ext=(file.name.split('.').pop()||'').toLowerCase(); const fr=new FileReader();
+  fr.onload=(evt)=>{ 
+    try{ 
+        let csvText=''; 
+        const ab=evt.target.result;
+        
+        if(ext==='xlsx'||ext==='xls'){ 
+            const wb=XLSX.read(ab,{type:'array'}); 
+            const ws=wb.Sheets[wb.SheetNames[0]]; 
+            // 轉換為 CSV/TSV 格式，用於 parseCorrMatrix
+            const arr=XLSX.utils.sheet_to_json(ws,{header:1,defval:''}); 
+            csvText=arr.map(r=>r.map(v=>String(v)).join('\t')).join('\n'); 
+        } else { 
+            csvText=new TextDecoder('utf-8').decode(ab); 
+        }
+
+        // 修正：新增檢查，確保解析的內容不是空的
+        if (!csvText || csvText.trim().length === 0) {
+            throw new Error('匯入的檔案中沒有可用的相關係數數據。');
+        }
+
+        localStorage.setItem(LS_CORR_KEY,csvText);
+        updateCorrStatusIndicator(); // 更新燈號
+        proScheduleRun();
+        alert('相關係數已匯入並儲存。');
+        
+    }catch(err){ 
+        // 匯入失敗時，確認清空並更新燈號
+        localStorage.removeItem(LS_CORR_KEY);
+        updateCorrStatusIndicator();
+        alert('匯入相關係數失敗：'+err.message); 
+    }
+  }; 
+  fr.readAsArrayBuffer(file);
+}
+$('pro_corr_import_btn').addEventListener('click',()=>$('pro_corr_file').click());
+$('pro_corr_file').addEventListener('change',(e)=>{const f=e.target.files&&e.target.files[0]; if(!f) return; importCorrFile(f); e.target.value='';});
+$('pro_corr_load_btn').addEventListener('click',()=>{ const txt=localStorage.getItem(LS_CORR_KEY)||''; alert(txt? '已載入儲存的相關係數資料（已自動使用）':'目前沒有已儲存的相關係數資料'); proScheduleRun(); });
+$('pro_corr_clear_btn').addEventListener('click',()=>{ localStorage.removeItem(LS_CORR_KEY); alert('已清空相關係數資料。'); updateCorrStatusIndicator(); proScheduleRun(); }); // 清空後更新燈號
+
+// 新增：清理所有暫存的邏輯
+$('btn_clear_storage').addEventListener('click', () => {
+    if (confirm('確定要清除所有本地暫存數據嗎？包括所有輸入數據、常用清單和相關係數資料。')) {
+        localStorage.clear();
+        alert('所有暫存數據已清除。請重新整理頁面以使用預設值。');
+        window.location.reload(); // 重新載入頁面以反映預設狀態
+    }
+});
+
+
+/* ========= Pro 觸發 ========= */
+function runProNow(){
+  try{
+    const minDy=parseFloat($('pro_minDy').value)||0,
+          maxDiv=Math.max(1,parseInt($('pro_maxDiv').value)||1),
+          maxTotal=Math.max(1,parseInt($('pro_maxTotal').value)||1),
+          wCap=parseFloat($('pro_wCap').value)||40,
+          lambda=parseFloat($('pro_lambda').value)||0,
+          source=$('pro_source').value,
+          sortMode=$('pro_sort').value;
+
+    const list=proOptimize(source, minDy, maxDiv, maxTotal, wCap, lambda, sortMode);
+    if(!list||!list.length) $('pro_output').innerHTML='<p class="ai-mini">（沒有產生結果；請匯入相關係數或放寬條件）</p>'; else renderPro(list);
+  }catch(err){
+    console.error(err);
+    $('pro_output').innerHTML='<p class="ai-mini">最佳化運算發生錯誤：'+(err&&err.message?err.message:String(err))+'</p>';
+  }
+}
+let __proTimer=null;
+function isOnAiTab(){ return document.querySelector('#panel-ai').classList.contains('active'); }
+function proScheduleRun(force=false){
+  if(!$('pro_autorun')?.checked && !force) return;
+  if(!isOnAiTab() && !force) return;
+  clearTimeout(__proTimer);
+  __proTimer=setTimeout(()=>{ try{ $('pro_output').innerHTML=''; runProNow(); }catch(e){ console.error(e); } },300);
+}
+
+/* ========= 綁定與啟動 ========= */
+function bindInputs(){
+  $('loan2EnabledCk').addEventListener('change',()=>{refreshLoan2UI();computeCashflow();});
+  $('loan2Box').addEventListener('toggle',saveState);
+  $('ratio').addEventListener('change',()=>{ if($('ratio').value.startsWith('custom')) autoApplied=false; else autoApplied=true; computeCashflow(); });
+  $('pro_source').addEventListener('change',()=>{ syncExcludeList(); proScheduleRun(true); });
+  $('pro_sort').addEventListener('change',()=>proScheduleRun(true));
+}
+function boot(){
+  loadCatalog();
+  const loaded=loadState();
+  bindInputs();
+  refreshLoan2UI();
+  computeCashflow();
+  recomputePortfolio();
+  syncExcludeList();
+  updateCorrStatusIndicator(); // 啟動時更新燈號
+  if(!loaded) saveState();
+}
+document.addEventListener('DOMContentLoaded',boot,{once:true});
+window.addEventListener('pageshow',()=>{ refreshLoan2UI(); computeCashflow(); recomputePortfolio(); if(isOnAiTab()) proScheduleRun(true); });
+</script>
+</body>
+</html>
