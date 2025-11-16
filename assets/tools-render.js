@@ -1,99 +1,73 @@
+// assets/tools-render.js
 (function () {
-  if (!window.MOMO_TOOLS) {
-    console.warn("MOMO_TOOLS 未載入");
-    return;
-  }
+  const CONFIG = (window.MOMO_TOOLS_CONFIG || []).slice();
 
-  /**
-   * 產生一張工具卡片
-   */
-  function createToolCard(tool) {
+  function createCard(t) {
     const card = document.createElement("article");
     card.className = "tool-card";
-
-    // === 標籤列 ===
-    const tagRow = document.createElement("div");
-    tagRow.className = "tool-tag-row";
-
-    // 主標籤（例如：加密策略 / 基金工具 / 權證工具）
-    if (tool.mainTag) {
-      const mainTag = document.createElement("span");
-      mainTag.className = "pill pill-main";
-      mainTag.textContent = tool.mainTag;
-      tagRow.appendChild(mainTag);
-    }
-
-    // 其他標籤：過濾掉你不想看到的字樣
-    const hiddenLabels = ["本站工具", "外部服務", "外部工具", "外部連結"];
-    (tool.tags || [])
-      .filter((t) => !hiddenLabels.includes(t))
-      .forEach((label) => {
-        const pill = document.createElement("span");
-        pill.className = "pill pill-sub";
-        pill.textContent = label;
-        tagRow.appendChild(pill);
-      });
-
-    card.appendChild(tagRow);
-
-    // === 標題與描述 ===
-    const title = document.createElement("h3");
-    title.className = "tool-title";
-    title.textContent = tool.name || "-";
-    card.appendChild(title);
-
-    if (tool.description) {
-      const desc = document.createElement("p");
-      desc.className = "tool-desc";
-      desc.textContent = tool.description;
-      card.appendChild(desc);
-    }
-
-    // === Footer（只留按鈕，不再顯示「本站工具 / 外部服務」） ===
-    const footer = document.createElement("div");
-    footer.className = "tool-footer";
-
-    const btn = document.createElement("a");
-    btn.className = "btn-gold";
-    btn.href = tool.url;
-    btn.target = tool.external ? "_blank" : "_self";
-    if (tool.external) btn.rel = "noopener noreferrer";
-    btn.textContent = "開啟工具";
-
-    footer.appendChild(btn);
-    card.appendChild(footer);
-
+    card.innerHTML = `
+      <div class="tool-pill-row">
+        <span class="tool-pill">${mapCategory(t.category)}</span>
+      </div>
+      <h3 class="tool-title">${t.title}</h3>
+      <p class="tool-desc">${t.desc || ""}</p>
+      <div class="tool-footer">
+        <a class="btn btn-gold" href="${t.href}"
+           ${t.external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
+          開啟工具
+        </a>
+      </div>
+    `;
     return card;
   }
 
-  /**
-   * 渲染工具列表
-   * options:
-   *   - targetId: 容器 ID
-   *   - category: "fund" | "crypto" | "warrant" | null
-   */
-  window.renderMomoTools = function renderMomoTools(options) {
-    const { targetId, category = null } = options || {};
-    const container = document.getElementById(targetId);
-    if (!container) return;
+  function mapCategory(cat) {
+    switch (cat) {
+      case "crypto": return "加密策略";
+      case "fund": return "基金工具";
+      case "warrant": return "權證工具";
+      default: return "工具";
+    }
+  }
 
-    let list = Array.from(MOMO_TOOLS);
+  // 首頁「智能工具」區塊：只取 showOnHome = true 的前 3 個
+  function initHomeSection() {
+    const box = document.getElementById("home-tools-grid");
+    if (!box) return;
 
-    if (category) {
-      list = list.filter((t) => t.category === category);
+    box.innerHTML = "";
+    CONFIG.filter(t => t.showOnHome)
+          .slice(0, 3)
+          .forEach(t => box.appendChild(createCard(t)));
+  }
+
+  // 工具總覽頁：支援分類 tab
+  function initToolsPage() {
+    const grid = document.getElementById("tools-grid");
+    if (!grid) return;
+
+    const tabs = document.querySelectorAll("[data-tools-filter]");
+    function render(filter) {
+      grid.innerHTML = "";
+      CONFIG.filter(t => filter === "all" || t.category === filter)
+            .forEach(t => grid.appendChild(createCard(t)));
     }
 
-    container.innerHTML = "";
-    if (!list.length) {
-      const empty = document.createElement("p");
-      empty.className = "tool-empty";
-      empty.textContent = "目前這個分類還沒有工具。";
-      container.appendChild(empty);
-      return;
-    }
-
-    list.forEach((tool) => {
-      container.appendChild(createToolCard(tool));
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(x => x.classList.remove("is-active"));
+        tab.classList.add("is-active");
+        render(tab.dataset.toolsFilter || "all");
+      });
     });
+
+    // 預設顯示「全部」
+    render("all");
+  }
+
+  // 暴露給外面呼叫
+  window.MOMO_TOOLS = {
+    initHomeSection,
+    initToolsPage
   };
 })();
