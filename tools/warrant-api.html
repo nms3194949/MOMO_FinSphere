@@ -465,7 +465,6 @@ function recompute(){ render(compute()); }
   el.addEventListener("change",handler);
   el.addEventListener("input",handler);
 });
-document.addEventListener("DOMContentLoaded",()=>recompute());
 
 /* 匯出 PNG（解除捲動限制→截圖→恢復） */
 $("#btnExportPng").addEventListener("click",async()=>{
@@ -508,10 +507,30 @@ $("#btnExportPng").addEventListener("click",async()=>{
   }
 });
 
-/* ---------- 新增：從 API 取得 CSV 並載入 ---------- */
-// 換成這行 (新的)
-// 不論您之前改成什麼，請把它改回這行
+/* ---------- API 設定 & Render 暖機 ---------- */
+
+/* 這是實際抓 CSV 的 API（你現在用 Vercel proxy） */
 const API_URL = "https://warrant-proxy.vercel.app/api/get-warrants-csv";
+
+/* 這是用來「喚醒 Render」的 URL（填你原本的 Render 網址） */
+const WARMUP_URL = "https://warrant-render-proxy-1.onrender.com/";
+
+/* 開啟頁面時先打一次 Render，喚醒免費版後端 */
+async function warmupRender(){
+  const meta = $("#meta");
+  const origin = meta.innerHTML;
+  try{
+    meta.innerHTML = origin + "<br><span style='color:#E9D18A'>正在喚醒後端 Render 服務中…</span>";
+    // no-cors 避免 CORS 問題，不需要讀結果，只要 ping 一下
+    await fetch(WARMUP_URL, { method:"GET", mode:"no-cors", cache:"no-store" });
+    meta.innerHTML = origin + "<br><span style='color:#8ec07c'>後端 Render 已喚醒，隨時可按「從 API 取得資料」。</span>";
+  }catch(e){
+    console.warn("喚醒 Render 失敗，但仍可嘗試使用 API：", e);
+    meta.innerHTML = origin + "<br><span style='color:#FF6B6B'>喚醒 Render 可能失敗，但仍可直接按「從 API 取得資料」嘗試。</span>";
+  }
+}
+
+/* 「從 API 取得資料」按鈕：實際抓 CSV + 解析 */
 $("#btnFetch").addEventListener("click", async ()=>{
   const btn=$("#btnFetch");
   const original=btn.textContent;
@@ -544,6 +563,12 @@ $("#btnFetch").addEventListener("click", async ()=>{
     clearTimeout(timer);
     btn.disabled=false; btn.textContent=original;
   }
+});
+
+/* 頁面載入時：先做 Render 暖機，再初始化畫面 */
+document.addEventListener("DOMContentLoaded", ()=>{
+  warmupRender();
+  recompute(); // 雖然一開始沒有 RAW，這裡只是確保結構就緒
 });
 </script>
 </body>
