@@ -10,7 +10,7 @@ window.MOMO_TOOLS = [
     // 對於站內工具，用 path（不要加 ./ 或 ../）
     path: 'tools/btc-rebound-trigger.html',
     category: 'crypto',          // crypto | fund | warrant | other
-    featured: true,              // true：會出現在首頁「智能工具」區
+    featured: false,              // true：會出現在首頁「智能工具」區
     external: false,
     badge: '策略回測'
   },
@@ -30,7 +30,7 @@ window.MOMO_TOOLS = [
     desc: '用配息率 × 年化報酬 × 現金流矩陣，快速對比不同基金與組合的月配息與長期報酬。',
     path: 'tools/fund-yield-matrix.html',
     category: 'fund',
-    featured: false,        // 想讓它出現在首頁智能工具區就改成 true
+    featured: true,        // 想讓它出現在首頁智能工具區就改成 true
     external: false,
     badge: '配息矩陣'
   },
@@ -41,7 +41,7 @@ window.MOMO_TOOLS = [
     // 外部工具可直接用完整網址
     url: 'https://warrant-render-proxy-1.onrender.com/',
     category: 'warrant',
-    featured: false,             // 例如只在工具總覽頁顯示，不放首頁
+    featured: true,             // 例如只在工具總覽頁顯示，不放首頁
     external: true,
     badge: '外部工具'
   }
