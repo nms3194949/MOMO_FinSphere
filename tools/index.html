@@ -1,316 +1,113 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-  <title>智能工具總覽｜MOMO財商智庫</title>
-  <meta name="description" content="MOMO財商智庫智能工具總覽：基金分析、配息試算、加密貨幣回撤策略與權證篩選，一站式財商工具集合。">
-  <meta name="robots" content="index,follow" />
+  <title>MOMO財商智庫｜智能工具總覽</title>
+  <meta name="description" content="集中管理 MOMO 財商智庫相關的試算工具、策略模型與資料介面，一次瀏覽所有智能工具。">
   <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/tools/">
+  <meta name="robots" content="index,follow">
 
-  <meta property="og:title" content="智能工具總覽｜MOMO財商智庫">
-  <meta property="og:description" content="基金、配息、加密貨幣與權證相關的智能工具，一站式集中管理。">
+  <meta property="og:title" content="MOMO財商智庫｜智能工具總覽">
+  <meta property="og:description" content="基金工具、加密策略、權證工具一次瀏覽，搭配 MOMO 雙贏策略系統。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/tools/">
   <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
   <meta property="og:locale" content="zh_TW">
 
-  <meta name="theme-color" content="#0A1221" />
+  <meta name="theme-color" content="#0A1221">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
-  :root{
-    --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#AAB2BF;
-    --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
-    --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{
-    background:var(--deep);
-    color:var(--ink);
-    font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  }
-  a{color:inherit;text-decoration:none}
+    :root{
+      --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#AAB2BF;
+      --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
+      --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    a{color:inherit;text-decoration:none}
 
-  .wrap{max-width:1120px;margin:0 auto;padding:16px}
-  .header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
-  .logo::before{
-    content:"";width:32px;height:32px;border-radius:50%;
-    background:radial-gradient(120% 120% at 20% 20%, var(--gold) 0%, var(--gold-soft) 45%, transparent 46%), #1a1f2b;
-    border:1px solid var(--line)
-  }
-  .nav-link{font-size:14px;color:var(--muted)}
-  .nav-link:hover{color:var(--gold-soft)}
+    .page-wrap{max-width:1120px;margin:0 auto;padding:20px 16px 40px}
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .logo-row{display:flex;align-items:center;gap:10px;font-weight:800}
+    .logo-row::before{content:"";width:28px;height:28px;border-radius:50%;
+      background:radial-gradient(120% 120% at 20% 20%, var(--gold) 0%, var(--gold-soft) 45%, transparent 46%), #1a1f2b;
+      border:1px solid var(--line)}
+    .back-link{font-size:14px;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+    .back-link span{font-size:18px;line-height:1}
+    .back-link:hover{color:var(--gold-soft)}
 
-  h1{margin:8px 0 4px;font-size:26px}
-  .subtitle{margin:0 0 18px;color:var(--muted);font-size:14px}
+    h1{font-size:26px;margin:4px 0 4px}
+    .lead{margin:0 0 20px;color:var(--muted);font-size:14px}
 
-  .filter-bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
-  .filter-chip{
-    border-radius:999px;
-    border:1px solid var(--line);
-    padding:8px 16px;
-    font-size:13px;
-    background:#0e172b;
-    color:var(--muted);
-    cursor:pointer;
-  }
-  .filter-chip.is-active{
-    background:var(--gold-grad);
-    border-color:transparent;
-    color:#0A1221;
-    font-weight:700;
-  }
+    .tab-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+    .tool-tab{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#0D1528;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+    .tool-tab.is-active{background:var(--gold-grad);border-color:transparent;color:#0A1221}
 
-  .tools-grid{
-    display:grid;
-    gap:18px;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  }
+    .tools-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .tool-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px 18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 22px rgba(0,0,0,.45)}
+    .tool-pill-row{display:flex;gap:8px;margin-bottom:4px}
+    .tool-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;border:1px solid rgba(233,209,138,.45);font-size:11px;color:var(--gold-soft)}
+    .tool-title{font-size:19px;margin:0}
+    .tool-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+    .tool-footer{margin-top:8px}
+    .btn-gold{display:inline-block;padding:9px 16px;border-radius:10px;border:none;background:var(--gold-grad);color:#0A1221;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none}
+    .btn-gold:hover{filter:brightness(1.08)}
 
-  .tool-card{
-    background:var(--card);
-    border-radius:20px;
-    border:1px solid var(--line);
-    padding:20px 18px 18px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    box-shadow:0 10px 24px rgba(0,0,0,.45);
-  }
+    .page-footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
 
-  .tool-tag-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-bottom:2px;
-  }
-  .pill{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:999px;
-    padding:4px 10px;
-    font-size:12px;
-    border:1px solid rgba(233,209,138,.35);
-  }
-  .pill-main{
-    background:var(--gold-grad);
-    color:#0A1221;
-    border:none;
-    font-weight:700;
-  }
-  .pill-sub{
-    background:rgba(15,22,40,.9);
-    color:var(--gold-soft);
-  }
-
-  .tool-title{margin:0;font-size:20px}
-  .tool-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
-
-  .tool-footer{
-    margin-top:12px;
-    display:flex;
-    justify-content:flex-start;
-    align-items:center;
-    gap:10px;
-  }
-  .btn-gold{
-    display:inline-block;
-    padding:8px 18px;
-    border-radius:999px;
-    border:none;
-    background:var(--gold-grad);
-    color:#0A1221;
-    font-size:14px;
-    font-weight:700;
-    cursor:pointer;
-    text-decoration:none;
-  }
-  .btn-gold:hover{filter:brightness(1.06)}
-
-  .footer{
-    margin-top:40px;
-    padding:16px 0 8px;
-    border-top:1px solid var(--line);
-    font-size:12px;
-    color:var(--muted);
-    text-align:center;
-  }
-  .tool-empty{
-    color:var(--muted);
-    font-size:14px;
-    padding:12px 0;
-  }
+    @media (max-width:600px){
+      h1{font-size:22px}
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <header class="header">
-      <div class="logo">MOMO財商智庫</div>
-      <a href="../index.html" class="nav-link">← 回首頁</a>
+  <main class="page-wrap">
+    <header class="page-header">
+      <div class="logo-row">MOMO財商智庫</div>
+      <a href="../index.html" class="back-link">
+        <span>←</span> 回首頁
+      </a>
     </header>
 
     <section aria-labelledby="tools-title">
       <h1 id="tools-title">智能工具總覽</h1>
-      <p class="subtitle">集中管理 MOMO 財商智庫相關的試算工具、策略模型與資料介面，方便之後持續擴充與維護。</p>
+      <p class="lead">
+        集中管理 MOMO 財商智庫相關的試算工具、策略模型與資料介面，方便之後持續擴充與維護。
+      </p>
 
-      <!-- 類別篩選 -->
-      <div class="filter-bar" role="tablist" aria-label="工具分類篩選">
-        <button type="button" class="filter-chip is-active" data-filter="all" role="tab" aria-selected="true">全部</button>
-        <button type="button" class="filter-chip" data-filter="fund" role="tab" aria-selected="false">基金工具</button>
-        <button type="button" class="filter-chip" data-filter="crypto" role="tab" aria-selected="false">加密策略</button>
-        <button type="button" class="filter-chip" data-filter="warrant" role="tab" aria-selected="false">權證工具</button>
+      <!-- 分類 tab -->
+      <div class="tab-row" role="tablist" aria-label="工具分類篩選">
+        <button type="button" class="tool-tab is-active" data-tools-filter="all" role="tab" aria-selected="true">全部</button>
+        <button type="button" class="tool-tab" data-tools-filter="fund" role="tab" aria-selected="false">基金工具</button>
+        <button type="button" class="tool-tab" data-tools-filter="crypto" role="tab" aria-selected="false">加密策略</button>
+        <button type="button" class="tool-tab" data-tools-filter="warrant" role="tab" aria-selected="false">權證工具</button>
       </div>
 
-      <div class="tools-grid" id="tools-grid" aria-live="polite">
-        <!-- JS 產生卡片 -->
-      </div>
+      <!-- 工具卡片區：由共用 JS 注入 -->
+      <div class="tools-grid" id="tools-grid" aria-live="polite"></div>
     </section>
 
-    <footer class="footer">
-      © MOMO財商智庫｜所有工具僅供教育與模擬研究使用，不構成任何投資建議。
+    <footer class="page-footer">
+      © MOMO財商智庫｜所有工具僅供教育與模擬研究使用，不構成任何投資建議。請依自身風險承受度謹慎評估。
     </footer>
   </main>
 
+  <!-- 共用工具設定 + 渲染：工具總覽頁 -->
+  <script src="../assets/tools-config.js"></script>
+  <script src="../assets/tools-render.js"></script>
   <script>
-  // === 工具清單（之後要加新工具直接在這裡補一筆） ===
-  const MOMO_TOOLS = [
-    {
-      id: "btc-trigger",
-      name: "BTC/ETH 進場策略",
-      url: "./btc-rebound-trigger.html",
-      category: "crypto",
-      mainTag: "加密策略",
-      tags: ["策略回測"],
-      description: "即時監控加密市場回撤與進出場策略，支援槓桿模擬與回撤進場條件。"
-    },
-    {
-      id: "cagr-mobile",
-      name: "基金 AI 智能分析",
-      url: "./cagr-mobile.html",
-      category: "fund",
-      mainTag: "基金工具",
-      tags: ["CAGR","差異指標"],
-      description: "基金投組試算、CAGR、配息覆蓋與差異指標一鍵分析，支援匯出圖表。"
-    },
-    {
-      id: "fund-yield-matrix",
-      name: "基金配息矩陣",
-      url: "./fund-yield-matrix.html",
-      category: "fund",
-      mainTag: "基金工具",
-      tags: ["配息矩陣"],
-      description: "用配息率 × 年化報酬 × 現金流矩陣，快速對比不同基金組合的月配息與長期報酬。"
-    },
-    {
-      id: "warrant-api",
-      name: "權證篩選 API",
-      url: "https://warrant-render-proxy-1.onrender.com/",
-      category: "warrant",
-      mainTag: "權證工具",
-      tags: ["外部 API"],
-      description: "串接權證 API，自動解析與過濾異常數據，快速找到目標權證。",
-      external: true
-    }
-  ];
-
-  function createToolCard(tool){
-    const card = document.createElement("article");
-    card.className = "tool-card";
-
-    const tagRow = document.createElement("div");
-    tagRow.className = "tool-tag-row";
-
-    if (tool.mainTag){
-      const main = document.createElement("span");
-      main.className = "pill pill-main";
-      main.textContent = tool.mainTag;
-      tagRow.appendChild(main);
-    }
-
-    (tool.tags || []).forEach(t => {
-      const pill = document.createElement("span");
-      pill.className = "pill pill-sub";
-      pill.textContent = t;
-      tagRow.appendChild(pill);
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.MOMO_TOOLS && typeof MOMO_TOOLS.initToolsPage === 'function') {
+        MOMO_TOOLS.initToolsPage();
+      }
     });
-
-    card.appendChild(tagRow);
-
-    const h3 = document.createElement("h3");
-    h3.className = "tool-title";
-    h3.textContent = tool.name;
-    card.appendChild(h3);
-
-    if (tool.description){
-      const p = document.createElement("p");
-      p.className = "tool-desc";
-      p.textContent = tool.description;
-      card.appendChild(p);
-    }
-
-    const footer = document.createElement("div");
-    footer.className = "tool-footer";
-
-    const btn = document.createElement("a");
-    btn.className = "btn-gold";
-    btn.href = tool.url;
-    if (tool.external){
-      btn.target = "_blank";
-      btn.rel = "noopener noreferrer";
-    }
-    btn.textContent = "開啟工具";
-
-    footer.appendChild(btn);
-    card.appendChild(footer);
-
-    return card;
-  }
-
-  function renderTools(category){
-    const box = document.getElementById("tools-grid");
-    if (!box) return;
-
-    let list = MOMO_TOOLS.slice();
-    if (category && category !== "all"){
-      list = list.filter(t => t.category === category);
-    }
-
-    box.innerHTML = "";
-    if (!list.length){
-      const p = document.createElement("p");
-      p.className = "tool-empty";
-      p.textContent = "目前這個分類還沒有工具。";
-      box.appendChild(p);
-      return;
-    }
-
-    list.forEach(t => box.appendChild(createToolCard(t)));
-  }
-
-  // 首次載入：全部
-  renderTools("all");
-
-  // 篩選按鈕事件
-  document.querySelectorAll(".filter-chip").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".filter-chip").forEach(b => {
-        b.classList.remove("is-active");
-        b.setAttribute("aria-selected","false");
-      });
-      btn.classList.add("is-active");
-      btn.setAttribute("aria-selected","true");
-      const filter = btn.getAttribute("data-filter") || "all";
-      renderTools(filter);
-    });
-  });
   </script>
 </body>
 </html>
