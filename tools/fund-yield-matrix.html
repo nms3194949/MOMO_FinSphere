@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MOMO批量基金速選</title>
+<meta name="theme-color" content="#0A1221" />
+<style>
+:root{
+  --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#A7B0C0;
+  --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.22);
+  --ok:#2D7A77; --warn:#B6801E; --err:#C6535C;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,"PingFang TC","Microsoft JhengHei",sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 600px at 70% -10%, #132041 0%, #0A1221 40%, #07101F 100%);
+}
+header{padding:28px 16px 6px; text-align:center}
+h1{margin:0; font-size:26px}
+.sub{color:var(--muted); font-size:13px; margin-top:6px}
+.wrap{max-width:1200px; margin:16px auto 60px; padding:0 14px}
+.panel{background:linear-gradient(180deg, rgba(12,21,42,.85), rgba(10,18,33,.95)); border:1px solid var(--line); border-radius:14px; padding:16px;}
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.spread{display:flex; justify-content:space-between; align-items:center}
+button{background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%); color:#1A1404; border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer}
+button.secondary{background:transparent; color:var(--gold-soft); border:1px solid var(--line)}
+button.ghost{background:transparent; color:var(--muted); border:1px dashed var(--line)}
+.small{font-size:12px; color:var(--muted)}
+.badge{display:inline-block; padding:2px 8px; border:1px solid var(--line); border-radius:999px; color:var(--gold-soft); font-size:12px}
+table{width:100%; border-collapse:collapse; margin-top:10px; font-size:14px}
+th,td{border-bottom:1px dashed var(--line); padding:8px 6px; text-align:center}
+th{color:var(--gold-soft); font-weight:700}
+td input{width:100%; background:#0F1A34; color:var(--ink); border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:8px 8px; font-size:14px; outline:none;}
+td input:focus{border-color:var(--gold-soft)}
+/* 緊湊模式 */
+.compact th,.compact td{padding:4px 6px}
+.compact td input{padding:6px 8px; font-size:13px}
+
+.export-bar{display:flex; flex-wrap:wrap; gap:14px; align-items:center; border:1px dashed var(--line); border-radius:12px; padding:10px 12px; margin-top:14px}
+.export-bar label{display:flex; gap:6px; align-items:center; font-size:13px; color:var(--muted)}
+.export-bar input[type=checkbox]{transform:scale(1.05); accent-color:#D9B84B}
+.summary-box{margin-top:12px; padding:14px; background:linear-gradient(180deg, rgba(14,24,46,.92), rgba(9,16,29,.96)); border:1px solid var(--line); border-radius:14px;}
+.status{display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px dashed var(--line); border-radius:10px;}
+.lamp{width:10px; height:10px; border-radius:50%}
+.lamp.red{background:#C6535C; box-shadow:0 0 8px rgba(198,83,92,.8)}
+.lamp.green{background:#2D7A77; box-shadow:0 0 8px rgba(45,122,119,.8)}
+.lamp.amber{background:#B6801E; box-shadow:0 0 8px rgba(182,128,30,.8)}
+
+/* 輸入表：固定高度 + 垂直捲動軸 */
+#inputScroll{
+  max-height:520px; 
+  overflow-y:auto; 
+  overflow-x:hidden; 
+  border:1px dashed var(--line); 
+  border-radius:12px; 
+  padding:2px;
+  scrollbar-gutter: stable;
+}
+#tbl thead th{position:sticky; top:0; background:#0C152A; z-index:1}
+
+/* 控制列 */
+.controls{display:flex; gap:16px; flex-wrap:wrap; align-items:center}
+.sort-group{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.sort-group .chip{padding:8px 10px; border:1px solid var(--line); border-radius:999px; background:#0F1A34; color:#cfd7ea; cursor:pointer; font-size:13px}
+.sort-group .chip.active{color:#1A1404; background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%); border-color:transparent; font-weight:700}
+.input{background:#0F1A34; color:#EDEFF5; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:8px 10px; font-size:14px}
+.select{background:#0F1A34; color:#EDEFF5; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:8px 10px; font-size:14px}
+
+.hint{background:#0F1A34; border:1px dashed var(--line); border-radius:12px; padding:10px 12px; color:#cfd7ea; font-size:13px; line-height:1.6}
+.hint b{color:#E9D18A}
+.hidden-row{display:none!important}
+@media (max-width:980px){table{font-size:13px} td input{font-size:13px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>FundMetric Pro <span class="badge">Optimizer</span></h1>
+  <div class="sub">即時計算｜排序｜可捲動輸入表｜摘要/匯出同步勾選｜設定持久化</div>
+</header>
+
+<div class="wrap">
+  <!-- 工具列 + 燈號 -->
+  <div class="panel">
+    <div class="row" style="width:100%">
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none" />
+      <button id="btnImport">匯入 Excel</button>
+      <button class="secondary" id="btnAdd">新增一筆基金</button>
+      <button class="ghost" id="btnClear">清空</button>
+      <button id="btnCalc">計算全部</button>
+      <div style="flex:1"></div>
+      <div id="importStatus" class="status">
+        <div id="lamp" class="lamp red"></div>
+        <span id="lampText" class="small">未匯入</span>
+      </div>
+    </div>
+    <div class="small" style="margin-top:8px;color:var(--muted)">輸入表預設顯示 <b>10</b> 行，可改 5/10/15/20/全部。</div>
+  </div>
+
+  <!-- 排序 + 行數 + 篩選 -->
+  <div class="panel" style="margin-top:12px">
+    <div class="controls">
+      <div class="sort-group" id="sortGroup" aria-label="排序">
+        <span class="small" style="margin-right:4px">排序：</span>
+        <button class="chip" data-m="TWR">TWR</button>
+        <button class="chip" data-m="MWR">MWR</button>
+        <button class="chip" data-m="SAR">SAR</button>
+        <button class="chip" data-m="RSI">RSI</button>
+        <button class="chip active" data-m="MOMO">MOMO（預設）</button>
+      </div>
+
+      <div class="row" style="gap:10px">
+        <label class="small">輸入表顯示行數：</label>
+        <select id="rowsSelect" class="select" aria-label="顯示行數">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="all">全部</option>
+        </select>
+        <span class="small" id="rowsInfo"></span>
+      </div>
+
+      <div class="row" style="gap:10px">
+        <input id="filterName" class="input" placeholder="名稱篩選（關鍵字）">
+        <label class="small"><input type="checkbox" id="chkComputed"> 只顯示已計算列</label>
+        <label class="small"><input type="checkbox" id="chkCompact"> 緊湊模式</label>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:10px">
+      <b>TWR</b>：時間加權；<b>MWR</b>：資金加權；<b>SAR</b>：1Y/3Y/5Y 加權 × GC；<b>RSI</b>：平均報酬÷標準差；<b>MOMO</b>：0.4×TWRᵑ + 0.3×MWRᵑ + 0.3×GC（含 Coverage 微調）。
+    </div>
+  </div>
+
+  <!-- 指標說明 -->
+  <div class="panel" style="margin-top:12px">
+    <div class="spread">
+      <h3 style="margin:0;color:var(--gold-soft)">指標說明</h3>
+      <span class="small">五卡並排｜公式常駐｜ⓘ Tooltip 可點擊鎖定</span>
+    </div>
+    <div style="margin-top:8px">
+      <momo-metric title="基金評分指標說明"></momo-metric>
+    </div>
+  </div>
+
+  <!-- 輸入表 -->
+  <div class="panel" style="margin-top:12px">
+    <div class="spread">
+      <h3 style="margin:0;color:var(--gold-soft)">輸入資料表</h3>
+      <div class="small">欄位：基金名稱、3M、6M、1Y、3Y、5Y（顯示規則：一律視為「%」，計算用小數）。</div>
+    </div>
+
+    <div id="inputScroll">
+      <table id="tbl" aria-label="基金輸入表">
+        <thead>
+          <tr>
+            <th scope="col" style="min-width:220px">基金名稱</th>
+            <th scope="col">3M</th><th scope="col">6M</th><th scope="col">1Y</th><th scope="col">3Y</th><th scope="col">5Y</th>
+            <th scope="col">Coverage</th><th scope="col">GC</th><th scope="col">TWR</th><th scope="col">MWR</th><th scope="col">SAR</th><th scope="col">RSI</th><th scope="col">MOMO</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- 匯出欄位 -->
+    <div class="export-bar">
+      <strong style="color:var(--gold-soft);font-size:13px">匯出欄位（同步摘要表）</strong>
+      <label><input type="checkbox" class="ex-col" value="Coverage" checked> Coverage</label>
+      <label><input type="checkbox" class="ex-col" value="GC" checked> GC</label>
+      <label><input type="checkbox" class="ex-col" value="TWR" checked> TWR</label>
+      <label><input type="checkbox" class="ex-col" value="MWR" checked> MWR</label>
+      <label><input type="checkbox" class="ex-col" value="SAR" checked> SAR</label>
+      <label><input type="checkbox" class="ex-col" value="RSI" checked> RSI</label>
+      <label><input type="checkbox" class="ex-col" value="MOMO" checked> MOMO</label>
+      <div style="flex:1"></div>
+      <button id="btnExport" aria-label="匯出 Excel">匯出 Excel</button>
+    </div>
+
+    <div id="msg" class="small" style="margin-top:8px;color:var(--gold-soft)"></div>
+  </div>
+
+  <!-- 摘要表 -->
+  <div class="panel" style="margin-top:12px">
+    <div class="spread">
+      <h3 style="margin:0;color:var(--gold-soft)">自動摘要表（依勾選欄位顯示）</h3>
+      <button id="btnShot">匯出摘要表截圖</button>
+    </div>
+    <div id="summaryBox" class="summary-box">
+      <table id="summaryTable">
+        <thead><tr id="sumHead"></tr></thead>
+        <tbody id="summaryBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer>© MOMO 財商智庫｜雙贏策略：月配息 × 資產增值</footer>
+
+<!-- 設定 -->
+<script type="application/json" id="cfg">
+{
+  "weights": {
+    "TWR":[0.105263,0.157894,0.210526,0.263157,0.263157],
+    "MWR":[0.357143,0.285714,0.214286,0.142857,0.0]
+  },
+  "momo": {"twr":0.4, "mwr":0.3, "gc":0.3, "coverageBonusLow":0.85, "coverageBonusHigh":0.15}
+}
+</script>
+
+<!-- 動態載入 XLSX -->
+<script>
+const XLSX_URLS = [
+  "https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js",
+  "https://unpkg.com/xlsx@0.20.3/dist/xlsx.full.min.js",
+  "https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.20.3/xlsx.full.min.js",
+  "https://fastly.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js",
+  "https://gcore.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"
+];
+function loadScript(url, timeoutMs=12000){
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script'); let done=false;
+    const to=setTimeout(()=>{ if(done) return; done=true; s.remove(); reject(new Error("timeout")); }, timeoutMs);
+    s.src=url; s.onload=()=>{ if(done) return; done=true; clearTimeout(to); resolve(); };
+    s.onerror=()=>{ if(done) return; done=true; clearTimeout(to); reject(new Error("network/error")); };
+    document.head.appendChild(s);
+  });
+}
+async function ensureXLSX(){
+  if (window.XLSX) return true;
+  for (const u of XLSX_URLS){
+    try{ await loadScript(u, 12000); if (window.XLSX) return true; }catch(e){}
+  }
+  return false;
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+/* ========= 常數/設定 ========= */
+const CFG = JSON.parse(document.getElementById('cfg').textContent);
+const TWR_WEIGHTS = CFG.weights.TWR.slice();
+const MWR_WEIGHTS = CFG.weights.MWR.slice();
+const MOMO_W = CFG.momo;
+const COLIDX = {Coverage:"cov", GC:"gc", TWR:"twr", MWR:"mwr", SAR:"sar", RSI:"rsi", MOMO:"momo"};
+let currentSort = 'MOMO';
+let visibleRows = 10;
+let rowSeq = 0;
+
+/* ========= 欄位別名 ========= */
+const ALIASES = {
+  name:["基金名稱","名稱","fund","name","基金","標的名稱"],
+  m3:["近3月","近三月","三個月","近3個月","3m","3M","近3月%","近3月累積%","三個月％","三個月%","三個月％"],
+  m6:["近6月累積","近六月累積","六個月","近6個月","6m","6M","近6月累積%","近6月%","六個月％","六個月%"],
+  y1:["近1年","近一年","1y","1Y","一年","近1年%","一年％","一年%"],
+  y3:["近3年累積","近三年累積","三年累積","3y","3Y","近3年","三年","近3年累積%","三年％","三年%"],
+  y5:["近5年累積","近五年累積","五年累積","5y","5Y","近5年","五年","近5年累積%","五年％","五年%"]
+};
+const norm = s=> String(s||"").replace(/\s+/g,"").replace(/％/g,"%").toLowerCase();
+
+/* ========= 匯入數值專用：一律視為「百分點」 ========= */
+/* 例如：14.8 / 14.80% / "14.8" / "14.80%" → 0.148 */
+function importToDecimal(v){
+  if(v===undefined || v===null) return NaN;
+  let s = String(v).trim();
+  if(!s) return NaN;
+  s = s.replace(/％/g,'%');
+  let n;
+  if(s.includes('%')){
+    n = Number(s.replace('%',''));
+  }else{
+    n = Number(s);
+  }
+  if(!Number.isFinite(n)) return NaN;
+  return n/100;
+}
+
+/* ========= 手動輸入解析：保留原本邏輯 ========= */
+function parseUserEntryToDecimal(v){
+  if(v===undefined||v===null) return NaN;
+  let s=String(v).trim();
+  if(!s || s==='--') return NaN;
+  s = s.replace(/％/g,'%').replace(/\s+/g,'');
+  if (s.includes('%')){
+    const n = Number(s.replace('%',''));
+    return Number.isFinite(n) ? n/100 : NaN;
+  }
+  const n = Number(s);
+  if(!Number.isFinite(n)) return NaN;
+  // 無 %：<=1 視為小數；>1 視為百分點
+  return Math.abs(n) <= 1 ? n : n/100;
+}
+// 顯示：小數 → 12.34%
+function toPercentDisplay(v, dp=2){
+  if(v===undefined||v===null) return '';
+  const n = Number(v);
+  if(!Number.isFinite(n)) return '';
+  return (n*100).toFixed(dp) + '%';
+}
+
+function stdp(a){a=a.filter(Number.isFinite);if(a.length<2)return NaN;const m=a.reduce((s,v)=>s+v,0)/a.length;return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/a.length);}
+function calcGC(v){const a=v.filter(Number.isFinite);if(a.length<2)return NaN;let ok=0;for(let i=0;i<a.length-1;i++) if(a[i]<=a[i+1]) ok++; return ok/(a.length-1);}
+function normalize01(x,min,max){if(!Number.isFinite(x)||max<=min)return NaN;return (x-min)/(max-min);}
+function takeValid(vals,wts){const v=[],w=[];for(let i=0;i<vals.length;i++) if(Number.isFinite(vals[i])&&wts[i]>0){v.push(vals[i]);w.push(wts[i]);}const s=w.reduce((a,b)=>a+b,0)||1;return {v,w:w.map(x=>x/s)};}
+function setLamp(state,text){const lamp=document.getElementById('lamp');lamp.className='lamp '+(state==='green'?'green':state==='amber'?'amber':'red');document.getElementById('lampText').textContent=text||'';}
+function debounce(fn,ms){let t;return (...args)=>{clearTimeout(t);t=setTimeout(()=>fn(...args),ms);}}
+
+/* ========= 指標計算 ========= */
+function computeMetrics(rec){
+  const arr=[rec['三個月'],rec['六個月'],rec['一年'],rec['三年'],rec['五年']].map(x=>Number(x));
+  const cov = arr.filter(Number.isFinite).length/5;
+  const gc  = calcGC(arr);
+
+  const tw  = takeValid(arr,TWR_WEIGHTS);
+  const mw  = takeValid(arr,MWR_WEIGHTS);
+  const twr = tw.v.length? tw.v.reduce((s,v,i)=>s+v*tw.w[i],0):NaN;
+  const mwr = mw.v.length? mw.v.reduce((s,v,i)=>s+v*mw.w[i],0):NaN;
+
+  let sarB=NaN, y1=arr[2], y3=arr[3], y5=arr[4];
+  if(Number.isFinite(y1)&&Number.isFinite(y3)&&Number.isFinite(y5)) sarB=0.2*y1+0.4*y3+0.4*y5;
+  else if(Number.isFinite(y1)&&Number.isFinite(y3)) sarB=0.3*y1+0.7*y3;
+  else if(Number.isFinite(y1)) sarB=y1;
+  const sar=(Number.isFinite(sarB)&&Number.isFinite(gc))? sarB*gc : NaN;
+
+  const vals = arr.filter(Number.isFinite);
+  const avg = vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : NaN;
+  const std = stdp(arr);
+  const rsi = (Number.isFinite(avg)&&Number.isFinite(std)&&std>0)? avg/std : NaN;
+
+  const twrN=normalize01(twr,-0.5,0.5), mwrN=normalize01(mwr,-0.5,0.5);
+  const momoRaw=(MOMO_W.twr*twrN + MOMO_W.mwr*mwrN + MOMO_W.gc*(Number.isFinite(gc)?gc:0))*100;
+  const momo=momoRaw*(MOMO_W.coverageBonusLow + MOMO_W.coverageBonusHigh*cov);
+
+  return {cov,gc,twr,mwr,sar,rsi,momo};
+}
+
+/* ========= DOM 產生 ========= */
+function makeRowEl(obj={}, opts={}){
+  const fromImport = !!opts.fromImport;
+  const tr=document.createElement('tr');
+  tr.dataset.idx = (++rowSeq).toString();
+  tr.innerHTML=`
+    <td><input placeholder="基金名稱" value="${obj['基金名稱']||''}"></td>
+    <td><input placeholder="3M"></td>
+    <td><input placeholder="6M"></td>
+    <td><input placeholder="1Y"></td>
+    <td><input placeholder="3Y"></td>
+    <td><input placeholder="5Y"></td>
+    <td class="cov"></td><td class="gc"></td><td class="twr"></td><td class="mwr"></td><td class="sar"></td><td class="rsi"></td><td class="momo"></td>
+    <td><button class="ghost btnDel" aria-label="刪除此列">刪</button></td>`;
+  const fields=['三個月','六個月','一年','三年','五年'];
+  for(let i=0;i<fields.length;i++){
+    const val = obj[fields[i]];
+    if(val!==undefined && val!==''){
+      const inp = tr.querySelectorAll('td')[i+1].querySelector('input');
+      if(fromImport){
+        const raw = Number(val);
+        if(Number.isFinite(raw)){
+          inp.dataset.raw = String(raw);
+          inp.value = toPercentDisplay(raw);
+        }
+      }else{
+        const raw = parseUserEntryToDecimal(val);
+        if(Number.isFinite(raw)){
+          inp.dataset.raw = String(raw);
+          inp.value = toPercentDisplay(raw);
+        }else{
+          inp.value = String(val);
+        }
+      }
+    }
+  }
+  return tr;
+}
+function addRow(obj={}){ document.getElementById('tbody').appendChild(makeRowEl(obj)); updateRowsInfo(); }
+
+/* ========= 讀表格 ========= */
+function readTable(){
+  const rows=[]; document.querySelectorAll('#tbody tr').forEach(tr=>{
+    const t=tr.querySelectorAll('td');
+    const getRaw=(tdIdx)=>{
+      const inp=t[tdIdx].querySelector('input');
+      if(!inp) return NaN;
+      const raw = Number(inp.dataset.raw);
+      if(Number.isFinite(raw)) return raw;
+      const parsed = parseUserEntryToDecimal(inp.value);
+      if(Number.isFinite(parsed)){ inp.dataset.raw = String(parsed); return parsed; }
+      return NaN;
+    };
+    rows.push({
+      '基金名稱':t[0].querySelector('input').value.trim(),
+      '三個月':getRaw(1),
+      '六個月':getRaw(2),
+      '一年':getRaw(3),
+      '三年':getRaw(4),
+      '五年':getRaw(5),
+      _tr:tr
+    });
+  }); return rows;
+}
+
+/* ========= 寫入結果 ========= */
+function renderRowMetrics(tr, m){
+  tr.dataset.cov = Number.isFinite(m.cov)? m.cov : '';
+  tr.dataset.gc  = Number.isFinite(m.gc)?  m.gc  : '';
+  tr.dataset.twr = Number.isFinite(m.twr)? m.twr : '';
+  tr.dataset.mwr = Number.isFinite(m.mwr)? m.mwr : '';
+  tr.dataset.sar = Number.isFinite(m.sar)? m.sar : '';
+  tr.dataset.rsi = Number.isFinite(m.rsi)? m.rsi : '';
+  tr.dataset.momo= Number.isFinite(m.momo)?m.momo: '';
+
+  const tds=tr.querySelectorAll('td');
+  tds[6].textContent  = Number.isFinite(m.cov)? `${Math.round(m.cov*5)}/5` : '';
+  tds[7].textContent  = Number.isFinite(m.gc)?   m.gc.toFixed(2) : '';
+  tds[8].textContent  = Number.isFinite(m.twr)? (m.twr*100).toFixed(2)+'%' : '';
+  tds[9].textContent  = Number.isFinite(m.mwr)? (m.mwr*100).toFixed(2)+'%' : '';
+  tds[10].textContent = Number.isFinite(m.sar)? (m.sar*100).toFixed(2)+'%' : '';
+  tds[11].textContent = Number.isFinite(m.rsi)? m.rsi.toFixed(3) : '';
+  tds[12].textContent = Number.isFinite(m.momo)? m.momo.toFixed(1) : '';
+}
+
+/* ========= 主計算 ========= */
+function calcAll(){
+  const rows=readTable(); let n=0;
+  rows.forEach(r=>{
+    const m=computeMetrics(r);
+    renderRowMetrics(r._tr, m);
+    n++;
+  });
+  document.getElementById('msg').textContent=`共計算 ${n} 筆。`;
+  sortRowsByMetric(currentSort);
+  applyVisibility();
+  buildSummary();
+  setLamp(n>0?'green':'red', n>0?`已匯入/計算：${n} 筆`:'未匯入');
+}
+
+/* ========= 排序 ========= */
+const metricKey = { TWR:"twr", MWR:"mwr", SAR:"sar", RSI:"rsi", MOMO:"momo" };
+function getMetricValue(tr, key){
+  const v=Number(tr.dataset[key]);
+  return Number.isFinite(v) ? v : -Infinity;
+}
+function sortRowsByMetric(metric){
+  currentSort = metric;
+  const tb=document.getElementById('tbody');
+  const rows=Array.from(tb.querySelectorAll('tr'));
+  const key = metricKey[metric] || "momo";
+  rows.sort((a,b)=>{
+    const va=getMetricValue(a,key), vb=getMetricValue(b,key);
+    if(vb!==va) return vb-va;
+    return Number(a.dataset.idx)-Number(b.dataset.idx);
+  });
+  const frag=document.createDocumentFragment();
+  rows.forEach(r=>frag.appendChild(r));
+  tb.appendChild(frag);
+  document.querySelectorAll('#sortGroup .chip').forEach(c=> c.classList.toggle('active', c.dataset.m===metric));
+  saveUI();
+}
+
+/* ========= 顯示行數 + 篩選 ========= */
+function updateRowsInfo(){
+  const total = document.querySelectorAll('#tbody tr').length || 0;
+  const selVal = document.getElementById('rowsSelect').value;
+  visibleRows = (selVal==='all') ? 'all' : Math.max(1, parseInt(selVal,10));
+  const info = (visibleRows==='all') ? `（共 ${total} 列；顯示全部）` : `（共 ${total} 列；顯示 ${visibleRows} 行）`;
+  document.getElementById('rowsInfo').textContent = info;
+}
+function applyVisibility(){
+  const keyword = (document.getElementById('filterName').value||'').trim().toLowerCase();
+  const onlyComputed = document.getElementById('chkComputed').checked;
+  const trs = Array.from(document.querySelectorAll('#tbody tr'));
+  let filtered = trs.filter(tr=>{
+    const name = tr.querySelector('td:first-child input').value.trim().toLowerCase();
+    if(keyword && !name.includes(keyword)) return false;
+    if(onlyComputed && !Number.isFinite(Number(tr.dataset.momo))) return false;
+    return true;
+  });
+  trs.forEach(tr=>tr.classList.add('hidden-row'));
+  const limit = (visibleRows==='all') ? filtered.length : visibleRows;
+  filtered.slice(0, limit).forEach(tr=>tr.classList.remove('hidden-row'));
+  updateRowsInfo();
+}
+
+/* ========= 摘要表 ========= */
+function getCheckedCols(){ return Array.from(document.querySelectorAll('.ex-col:checked')).map(x=>x.value); }
+function buildSummary(){
+  const cols=getCheckedCols();
+  const head=document.getElementById('sumHead'); const body=document.getElementById('summaryBody');
+  head.innerHTML=''; body.innerHTML='';
+  const thName=document.createElement('th'); thName.textContent='基金名稱'; thName.style.minWidth='240px'; thName.style.textAlign='left'; head.appendChild(thName);
+  cols.forEach(c=>{ const th=document.createElement('th'); th.textContent=c; head.appendChild(th); });
+
+  const frag=document.createDocumentFragment();
+  document.querySelectorAll('#tbody tr').forEach(tr=>{
+    const name=tr.querySelector('td:nth-child(1) input').value.trim(); if(!name) return;
+    const trSum=document.createElement('tr');
+    const tdName=document.createElement('td'); tdName.style.textAlign='left'; tdName.textContent=name; trSum.appendChild(tdName);
+    cols.forEach(c=>{
+      const k = COLIDX[c];
+      const td=document.createElement('td');
+      const v=Number(tr.dataset[k]);
+      if(c==="RSI") td.textContent = Number.isFinite(v)? v.toFixed(3) : '';
+      else if(["TWR","MWR","SAR"].includes(c)) td.textContent = Number.isFinite(v)? (v*100).toFixed(2)+'%' : '';
+      else if(c==="MOMO") td.textContent = Number.isFinite(v)? v.toFixed(1) : '';
+      else if(c==="GC") td.textContent = Number.isFinite(v)? v.toFixed(2) : '';
+      else if(c==="Coverage") td.textContent = tr.dataset.cov? `${Math.round(Number(tr.dataset.cov)*5)}/5` : '';
+      trSum.appendChild(td);
+    });
+    frag.appendChild(trSum);
+  });
+  body.appendChild(frag);
+}
+
+/* ========= 匯出 Excel ========= */
+function exportExcel(){
+  if (!window.XLSX){ alert('XLSX 未載入，無法匯出。'); return; }
+  const cols=getCheckedCols();
+  const header=["基金名稱","3M","6M","1Y","3Y","5Y"].concat(cols);
+  const data=[header];
+  document.querySelectorAll('#tbody tr').forEach(tr=>{
+    const t=tr.querySelectorAll('td');
+    const row=[
+      t[0].querySelector('input').value.trim(),
+      t[1].querySelector('input').value.trim(),
+      t[2].querySelector('input').value.trim(),
+      t[3].querySelector('input').value.trim(),
+      t[4].querySelector('input').value.trim(),
+      t[5].querySelector('input').value.trim()
+    ];
+    cols.forEach(c=>{
+      const k=COLIDX[c]; const v=Number(tr.dataset[k]);
+      if(c==="RSI") row.push(Number.isFinite(v)? v.toFixed(3) : '');
+      else if(["TWR","MWR","SAR"].includes(c)) row.push(Number.isFinite(v)? (v*100).toFixed(2)+'%' : '');
+      else if(c==="MOMO") row.push(Number.isFinite(v)? v.toFixed(1) : '');
+      else if(c==="GC") row.push(Number.isFinite(v)? v.toFixed(2) : '');
+      else if(c==="Coverage") row.push(tr.dataset.cov? `${Math.round(Number(tr.dataset.cov)*5)}/5` : '');
+      else row.push('');
+    });
+    data.push(row);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(data); const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "CP值分析"); XLSX.writeFile(wb, "FundMetricPro_Export.xlsx");
+}
+
+/* ========= 解析 xlsx 表頭（支援兩列 header） ========= */
+function buildHeaderFromArray(arr){
+  if(!arr || arr.length<2) return {header:(arr[0]||[]).map(h=>String(h||"")), startRow:1};
+  const row0=(arr[0]||[]).map(h=>String(h||""));
+  const row1=(arr[1]||[]).map(h=>String(h||""));
+  const normRow1=row1.map(norm);
+  let hasMetric=false;
+  for(const key of ['m3','m6','y1','y3','y5']){
+    const targets = ALIASES[key].map(a=>norm(a));
+    if(targets.some(t=>normRow1.includes(t))){ hasMetric=true; break; }
+  }
+  if(!hasMetric){
+    return {header:row0,startRow:1};
+  }
+  const len=Math.max(row0.length,row1.length);
+  const combined=new Array(len).fill("");
+  for(let i=0;i<len;i++){
+    if(i<=1) combined[i]=row0[i] || row1[i] || "";
+    else combined[i]=row1[i] || row0[i] || "";
+  }
+  return {header:combined,startRow:2};
+}
+
+/* —— 映射（物件模式，支援「報酬率.三個月%」這種欄位） —— */
+function mapJsonRows(json){
+  const lookup = {};
+  for (const k in ALIASES){
+    ALIASES[k].forEach(a => lookup[norm(a)] = k);
+  }
+
+  const rows = [];
+
+  json.forEach(r => {
+    const tmp = {};
+
+    // 這裡關鍵：欄位名稱如果是「報酬率.三個月%」，只拿最後一段「三個月%」來判斷
+    Object.keys(r).forEach(c => {
+      const base = c.split('.').pop();          // 例如 "報酬率.三個月%" -> "三個月%"
+      const key  = lookup[norm(base)];          // 去對 ALIASES
+      if (key) tmp[key] = r[c];
+    });
+
+    const name =
+      tmp.name ||
+      r['標的名稱'] ||
+      r['基金名稱'] ||
+      r['名稱']     ||
+      '';
+
+    const rec = {
+      "基金名稱": String(name || ""),
+      "三個月":   importToDecimal(tmp.m3),
+      "六個月":   importToDecimal(tmp.m6),
+      "一年":     importToDecimal(tmp.y1),
+      "三年":     importToDecimal(tmp.y3),
+      "五年":     importToDecimal(tmp.y5)
+    };
+
+    const hasValues = ["三個月","六個月","一年","三年","五年"]
+      .some(k => Number.isFinite(rec[k]));
+
+    const keep = String(rec["基金名稱"] || "").trim() !== "" || hasValues;
+    if (keep) rows.push(rec);
+  });
+
+  // 如果完全沒有任何一筆有數值，回傳空陣列，讓外層自動 fallback 到 mapArrayRows
+  const anyValue = rows.some(rec =>
+    ["三個月","六個月","一年","三年","五年"]
+      .some(k => Number.isFinite(rec[k]))
+  );
+  return anyValue ? rows : [];
+}
+
+/* —— 映射（陣列模式，含兩列表頭） —— */
+function mapArrayRows(arr){
+  if(!arr || arr.length<2) return [];
+  const meta=buildHeaderFromArray(arr);
+  const header=meta.header;
+  const startRow=meta.startRow;
+
+  const idx={};
+  for(const key in ALIASES){
+    const targets = ALIASES[key].map(norm);
+    idx[key] = header.findIndex(h=>targets.includes(norm(h)));
+  }
+  const rows=[];
+  for(let i=startRow;i<arr.length;i++){
+    const row=arr[i]||[];
+    const rec={
+      "基金名稱": idx.name>=0? row[idx.name] :"",
+      "三個月":   importToDecimal(idx.m3>=0? row[idx.m3] :""),
+      "六個月":   importToDecimal(idx.m6>=0? row[idx.m6] :""),
+      "一年":     importToDecimal(idx.y1>=0? row[idx.y1] :""),
+      "三年":     importToDecimal(idx.y3>=0? row[idx.y3] :""),
+      "五年":     importToDecimal(idx.y5>=0? row[idx.y5] :"")
+    };
+    const hasValues = ["三個月","六個月","一年","三年","五年"].some(k => Number.isFinite(rec[k]));
+    const keep = String(rec["基金名稱"]||"").trim()!=="" || hasValues;
+    if(keep) rows.push(rec);
+  }
+  return rows;
+}
+
+/* ========= 匯入 ========= */
+async function importFile(file){
+  setLamp('amber','讀取中…');
+  const ok = await ensureXLSX();
+  if(!ok){ setLamp('red','未匯入'); document.getElementById('msg').textContent='匯入失敗：無法載入 XLSX。'; return; }
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      let json=XLSX.utils.sheet_to_json(ws,{defval:"",raw:false});
+      let rowsUse = mapJsonRows(json);
+      if(rowsUse.length===0){
+        const arr=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:false});
+        rowsUse = mapArrayRows(arr);
+      }
+      if(rowsUse.length===0){
+        setLamp('red','未匯入'); document.getElementById('msg').textContent='匯入失敗：表頭不符或內容為空。'; return;
+      }
+      document.getElementById('tbody').innerHTML='';
+      const frag=document.createDocumentFragment();
+      rowsUse.forEach(r=>frag.appendChild(makeRowEl(r,{fromImport:true})));
+      document.getElementById('tbody').appendChild(frag);
+
+      calcAll();
+      setLamp('green',`已匯入 ${rowsUse.length} 筆`);
+      document.getElementById('msg').textContent=`已匯入 ${rowsUse.length} 筆，自動計算完成。`;
+    }catch(err){
+      console.error(err);
+      setLamp('red','未匯入'); document.getElementById('msg').textContent='匯入失敗：檔案內容或格式無法解析。';
+    }finally{ saveUI(); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ========= 截圖 ========= */
+function shotSummary(){
+  html2canvas(document.getElementById('summaryBox'),{backgroundColor:'#0A1221',scale:2}).then(c=>{
+    const a=document.createElement('a'); a.href=c.toDataURL('image/png'); a.download=`FundMetricPro_Summary_${new Date().toISOString().slice(0,10)}.png`; a.click();
+  });
+}
+
+/* ========= UI 持久化 ========= */
+function saveUI(){
+  const payload = {
+    sort: currentSort,
+    rowsSel: document.getElementById('rowsSelect').value,
+    cols: getCheckedCols(),
+    keyword: document.getElementById('filterName').value || '',
+    computed: document.getElementById('chkComputed').checked,
+    compact: document.getElementById('chkCompact').checked
+  };
+  localStorage.setItem('fundmetric-ui', JSON.stringify(payload));
+}
+function loadUI(){
+  try{
+    const raw = localStorage.getItem('fundmetric-ui'); if(!raw) return;
+    const u = JSON.parse(raw)||{};
+    if(u.sort && metricKey[u.sort]) currentSort = u.sort;
+    if(u.rowsSel){ document.getElementById('rowsSelect').value = u.rowsSel; }
+    document.getElementById('filterName').value = u.keyword || '';
+    document.getElementById('chkComputed').checked = !!u.computed;
+    document.getElementById('chkCompact').checked = !!u.compact;
+    document.getElementById('tbl').classList.toggle('compact', !!u.compact);
+    if(Array.isArray(u.cols)){
+      document.querySelectorAll('.ex-col').forEach(cb=>{ cb.checked = u.cols.includes(cb.value); });
+    }
+    updateRowsInfo();
+    document.querySelectorAll('#sortGroup .chip').forEach(c=> c.classList.toggle('active', c.dataset.m===currentSort));
+  }catch(e){}
+}
+
+/* ========= 事件 ========= */
+const debouncedRecalc = debounce(()=>calcAll(), 300);
+
+document.getElementById('btnAdd').onclick=()=>{ addRow({}); setLamp('amber','手動輸入中'); applyVisibility(); saveUI(); };
+document.getElementById('btnClear').onclick=()=>{
+  document.getElementById('tbody').innerHTML='';
+  document.getElementById('fileInput').value='';
+  document.getElementById('sumHead').innerHTML='';
+  document.getElementById('summaryBody').innerHTML='';
+  document.getElementById('msg').textContent='';
+  setLamp('red','未匯入');
+  updateRowsInfo(); applyVisibility(); saveUI();
+};
+document.getElementById('btnCalc').onclick=calcAll;
+document.getElementById('btnExport').onclick=exportExcel;
+document.getElementById('btnShot').onclick=shotSummary;
+document.getElementById('btnImport').onclick=()=>document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange=e=>{const f=e.target.files[0]; if(f) importFile(f);};
+
+document.getElementById('sortGroup').addEventListener('click',e=>{
+  const btn=e.target.closest('.chip'); if(!btn) return;
+  const m=btn.dataset.m; if(!m) return;
+  sortRowsByMetric(m); applyVisibility(); buildSummary(); saveUI();
+});
+
+document.getElementById('tbody').addEventListener('click',e=>{
+  if(e.target.classList.contains('btnDel')){
+    const tr=e.target.closest('tr'); tr.remove(); updateRowsInfo(); applyVisibility(); buildSummary(); saveUI();
+  }
+});
+document.getElementById('tbody').addEventListener('input',e=>{
+  if(e.target.tagName==='INPUT'){ setLamp('amber','輸入變更中…'); }
+});
+// 失焦：更新 raw + 重新計算
+document.getElementById('tbody').addEventListener('blur', (e)=>{
+  if(e.target.tagName !== 'INPUT') return;
+  const td = e.target.closest('td'); if(!td) return;
+  const cellIdx = Array.from(td.parentElement.children).indexOf(td);
+  if (cellIdx >= 1 && cellIdx <= 5){ // 3M..5Y
+    const raw = parseUserEntryToDecimal(e.target.value);
+    if(Number.isFinite(raw)){
+      e.target.dataset.raw = String(raw);
+      e.target.value = toPercentDisplay(raw);
+      debouncedRecalc();
+    }
+  }
+}, true);
+
+document.querySelectorAll('.ex-col').forEach(cb=>cb.addEventListener('change',()=>{ buildSummary(); saveUI(); }));
+
+document.getElementById('rowsSelect').addEventListener('change',()=>{ updateRowsInfo(); applyVisibility(); saveUI(); });
+document.getElementById('filterName').addEventListener('input',()=>{ applyVisibility(); saveUI(); });
+document.getElementById('chkComputed').addEventListener('change',()=>{ applyVisibility(); saveUI(); });
+document.getElementById('chkCompact').addEventListener('change',e=>{
+  document.getElementById('tbl').classList.toggle('compact', e.target.checked);
+  saveUI();
+});
+
+/* ========= 初始 ========= */
+addRow({});
+loadUI();
+applyVisibility();
+setLamp('red','未匯入');
+</script>
+
+<!-- ===== momo-metric Web Component（指標說明） ===== -->
+<script>
+class MomoMetric extends HTMLElement{
+  static get observedAttributes(){ return ['title']; }
+  constructor(){
+    super();
+    const root = this.attachShadow({mode:'open'});
+    root.innerHTML = `
+      <style>
+      :host{
+        --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#A7B0C0;
+        --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.22);
+        display:block; font-family:inherit; color:var(--ink);
+      }
+      .wrap{margin:8px 0 0; padding:0; max-width:100%}
+      .title{margin:0 0 10px; font-size:18px; color:var(--gold-soft); letter-spacing:.5px}
+      .grid{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
+      .card{
+        background:linear-gradient(180deg, rgba(12,21,42,.88), rgba(10,18,33,.96));
+        border:1px solid var(--line);
+        border-radius:14px;
+        padding:14px;
+        color:var(--ink);
+        position:relative;
+      }
+      .head{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+      .emoji{font-size:20px; line-height:1}
+      .acr{font-weight:800; letter-spacing:.5px}
+      .sub{font-size:12px; color:var(--muted)}
+      .points{margin:10px 0 8px 18px; padding:0; line-height:1.6}
+      .points li{margin:4px 0}
+      .formula{
+        margin-top:8px; font-size:12px; color:var(--muted);
+        border-top:1px dashed var(--line); padding-top:8px
+      }
+      .formula span{white-space:nowrap}
+
+      .info{
+        margin-left:auto;
+        width:26px; height:26px; border-radius:50%;
+        border:1px solid var(--line); background:#0F1A34; color:#E9D18A;
+        display:inline-flex; align-items:center; justify-content:center;
+        cursor:pointer; font-weight:700;
+      }
+      .tooltip{
+        position:absolute; right:12px; top:46px; z-index:2;
+        max-width:320px; padding:10px 12px; border-radius:12px;
+        background:#0F1A34; color:var(--ink); border:1px solid var(--line);
+        box-shadow:0 6px 20px rgba(0,0,0,.35);
+        font-size:12px; line-height:1.6;
+        display:none;
+      }
+      .card:hover .info[data-tooltip]:hover + .tooltip,
+      .info[aria-expanded="true"] + .tooltip{display:block}
+
+      @media (max-width:1200px){ .grid{grid-template-columns:repeat(4,1fr);} }
+      @media (max-width:980px){ .grid{grid-template-columns:repeat(3,1fr);} }
+      @media (max-width:720px){ .grid{grid-template-columns:repeat(2,1fr);} }
+      @media (max-width:520px){ .grid{grid-template-columns:1fr;} .tooltip{right:10px; left:10px; max-width:unset} }
+      </style>
+
+      <section class="wrap" aria-labelledby="momo-metric-title">
+        <h2 id="momo-metric-title" class="title"></h2>
+
+        <div class="grid">
+          <!-- TWR -->
+          <article class="card">
+            <header class="head">
+              <span class="emoji" aria-hidden="true">🟡</span>
+              <div>
+                <div class="acr">TWR</div>
+                <div class="sub">時間加權報酬</div>
+              </div>
+              <button class="info" aria-describedby="tip-twr" aria-label="TWR 說明" data-tooltip>ⓘ</button>
+              <span role="tooltip" id="tip-twr" class="tooltip">
+                模擬「定期定額」的平均報酬；每段期間等權重，排除投入金額多寡影響。<br>
+                高 TWR ⇒ 長期趨勢佳、複利效果好。
+              </span>
+            </header>
+            <ul class="points">
+              <li>模擬<b>定期定額</b>的平均報酬。</li>
+              <li>每段期間<b>等權重</b>，不受金額影響。</li>
+              <li>TWR 高 → 長期趨勢與複利強。</li>
+            </ul>
+            <div class="formula">
+              (1+TWR) = ∏(1+Rₜ)^(1/n) − 1
+            </div>
+          </article>
+
+          <!-- MWR -->
+          <article class="card">
+            <header class="head">
+              <span class="emoji" aria-hidden="true">🟢</span>
+              <div>
+                <div class="acr">MWR</div>
+                <div class="sub">資金加權報酬</div>
+              </div>
+              <button class="info" aria-describedby="tip-mwr" aria-label="MWR 說明" data-tooltip>ⓘ</button>
+              <span role="tooltip" id="tip-mwr" class="tooltip">
+                模擬「一次投入或不等額投入」的實際資金報酬；各期間依資金比重加權。<br>
+                高 MWR ⇒ 近期投入績效表現亮眼。
+              </span>
+            </header>
+            <ul class="points">
+              <li>模擬<b>一次投入/不等額</b>績效。</li>
+              <li>各期依<b>投入金額</b>加權。</li>
+              <li>MWR 高 → 近期表現強。</li>
+            </ul>
+            <div class="formula">
+              IRR 解使 Σ CFₜ/(1+IRR)ᵗ = 0
+            </div>
+          </article>
+
+          <!-- SAR -->
+          <article class="card">
+            <header class="head">
+              <span class="emoji" aria-hidden="true">🟣</span>
+              <div>
+                <div class="acr">SAR</div>
+                <div class="sub">穩定報酬指標</div>
+              </div>
+              <button class="info" aria-describedby="tip-sar" aria-label="SAR 說明" data-tooltip>ⓘ</button>
+              <span role="tooltip" id="tip-sar" class="tooltip">
+                綜合 1Y/3Y/5Y 的中長期報酬，再乘上 GC（成長一致性）。<br>
+                高 SAR ⇒ 長線報酬「又快又穩」。
+              </span>
+            </header>
+            <ul class="points">
+              <li>綜合 <b>1Y/3Y/5Y</b> 表現。</li>
+              <li>乘上 <b>GC</b>（一致性）。</li>
+              <li>SAR 高 → 長線穩健。</li>
+            </ul>
+            <div class="formula">
+              SAR = (0.2×1Y + 0.4×3Y + 0.4×5Y) × GC
+            </div>
+          </article>
+
+          <!-- RSI -->
+          <article class="card">
+            <header class="head">
+              <span class="emoji" aria-hidden="true">🔵</span>
+              <div>
+                <div class="acr">RSI</div>
+                <div class="sub">報酬穩定指數</div>
+              </div>
+              <button class="info" aria-describedby="tip-rsi" aria-label="RSI 說明" data-tooltip>ⓘ</button>
+              <span role="tooltip" id="tip-rsi" class="tooltip">
+                平均報酬 ÷ 報酬標準差（波動）；類夏普概念，看「穩不穩」。<br>
+                高 RSI ⇒ 報酬平順穩健。
+              </span>
+            </header>
+            <ul class="points">
+              <li>平均報酬 ÷ <b>標準差</b>。</li>
+              <li>評估<b>穩定度</b>。</li>
+              <li>RSI 高 → 體質佳。</li>
+            </ul>
+            <div class="formula">
+              RSI = Avg(Return) / Std(Return)
+            </div>
+          </article>
+
+          <!-- MOMO -->
+          <article class="card">
+            <header class="head">
+              <span class="emoji" aria-hidden="true">🟠</span>
+              <div>
+                <div class="acr">MOMO</div>
+                <div class="sub">整體動能分數</div>
+              </div>
+              <button class="info" aria-describedby="tip-momo" aria-label="MOMO 說明" data-tooltip>ⓘ</button>
+              <span role="tooltip" id="tip-momo" class="tooltip">
+                綜合 TWR（長期）、MWR（近期）、GC（一致性），並以 Coverage 微調。<br>
+                高 MOMO ⇒ 穩健且動能強。
+              </span>
+            </header>
+            <ul class="points">
+              <li>綜合 <b>TWR</b>、<b>MWR</b>、<b>GC</b>。</li>
+              <li>含 <b>Coverage</b> 微調。</li>
+              <li>MOMO 高 → 強而穩。</li>
+            </ul>
+            <div class="formula">
+              MOMO = 0.4×TWRⁿ + 0.3×MWRⁿ + 0.3×GC（× Coverage）
+            </div>
+          </article>
+        </div>
+      </section>
+    `;
+  }
+  connectedCallback(){
+    const t = this.getAttribute('title') || '基金評分指標說明';
+    this.shadowRoot.getElementById('momo-metric-title').textContent = t;
+    this.shadowRoot.querySelectorAll('.info').forEach(info=>{
+      let locked=false;
+      info.addEventListener('click',(e)=>{
+        locked=!locked;
+        info.setAttribute('aria-expanded',locked?'true':'false');
+        const tip=info.nextElementSibling;
+        if(!tip||!tip.classList.contains('tooltip'))return;
+        tip.style.display=locked?'block':'';
+        e.stopPropagation();
+      });
+    });
+    document.addEventListener('click', (e)=>{
+      const root = this.shadowRoot;
+      if(!root) return;
+      const path = e.composedPath ? e.composedPath() : [];
+      if(path.includes(root)) return;
+      root.querySelectorAll('.info[aria-expanded="true"]').forEach(info=>{
+        info.setAttribute('aria-expanded','false');
+        const tip=info.nextElementSibling;
+        if(tip&&tip.classList.contains('tooltip')) tip.style.display='';
+      });
+    });
+  }
+  attributeChangedCallback(name, _o, n){
+    if(name==='title' && this.shadowRoot){
+      this.shadowRoot.getElementById('momo-metric-title').textContent = n || '基金評分指標說明';
+    }
+  }
+}
+customElements.define('momo-metric', MomoMetric);
+</script>
+<!-- ===== /momo-metric ===== -->
+
+</body>
+</html>
