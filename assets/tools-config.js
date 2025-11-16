@@ -25,6 +25,16 @@ window.MOMO_TOOLS = [
     badge: '基金工具'
   },
   {
+    id: 'fund-yield-matrix',
+    title: '基金配息矩陣',
+    desc: '用配息率 × 年化報酬 × 現金流矩陣，快速對比不同基金與組合的月配息與長期報酬。',
+    path: 'tools/fund-yield-matrix.html',
+    category: 'fund',
+    featured: false,        // 想讓它出現在首頁智能工具區就改成 true
+    external: false,
+    badge: '配息矩陣'
+  },
+  {
     id: 'warrant-api',
     title: '權證篩選 API',
     desc: '串接權證 API，自動解析與過濾異常數據，快速找到目標權證。',
@@ -49,4 +59,3 @@ window.MOMO_TOOLS = [
   //   badge: 'NEW'
   // }
 ];
-
