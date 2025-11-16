@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MOMO 權證篩選器｜後端啟動中</title>
+
+<style>
+  :root{
+    --deep:#0A1221;
+    --card:#0C152A;
+    --ink:#EDEFF5;
+    --muted:#9fb0d0;
+    --gold:#C9A227;
+    --gold-soft:#E9D18A;
+    --gold-grad:linear-gradient(135deg,#F9E27C 0%,#D9B84B 45%,#B88A1E 100%);
+    --line:rgba(233,209,138,.28);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:radial-gradient(circle at top,#182642 0,#0A1221 45%,#050712 100%);
+    color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px;
+  }
+
+  .shell{
+    max-width:460px;
+    width:100%;
+    background:var(--card);
+    border-radius:20px;
+    border:1px solid var(--line);
+    box-shadow:0 24px 60px rgba(0,0,0,.7);
+    padding:22px 20px 18px;
+    text-align:center;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .logo{
+    width:34px;
+    height:34px;
+    border-radius:12px;
+    background:var(--gold-grad);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:18px;
+    color:#1A1307;
+    box-shadow:0 0 14px rgba(233,209,138,.55);
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .brand-title{
+    font-size:13px;
+    letter-spacing:.18em;
+  }
+  .brand-sub{
+    font-size:11px;
+    color:var(--muted);
+  }
+
+  h1{
+    font-size:18px;
+    margin:4px 0 6px;
+  }
+  .kicker{
+    font-size:11px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+    margin-bottom:4px;
+  }
+  .desc{
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.7;
+    margin-bottom:14px;
+  }
+
+  .loader-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    margin:10px 0 6px;
+  }
+
+  .loader-ring{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    border:3px solid rgba(233,209,138,.18);
+    border-top-color:var(--gold-soft);
+    animation:spin 1s linear infinite;
+    box-shadow:0 0 18px rgba(233,209,138,.35);
+  }
+
+  .loader-text{
+    font-size:13px;
+    color:var(--gold-soft);
+  }
+
+  .hint{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:6px;
+    line-height:1.6;
+  }
+
+  .strong{
+    color:var(--gold-soft);
+  }
+
+  .link-row{
+    margin-top:14px;
+    font-size:12px;
+  }
+  .link-row a{
+    color:var(--gold-soft);
+    text-decoration:none;
+    border-bottom:1px dashed rgba(233,209,138,.7);
+  }
+  .link-row a:hover{
+    border-bottom-style:solid;
+  }
+
+  /* 隱藏用來喚醒 Render 的 iframe */
+  iframe{
+    width:1px;
+    height:1px;
+    opacity:0;
+    border:none;
+    position:absolute;
+    left:-9999px;
+    top:-9999px;
+  }
+
+  @keyframes spin{
+    to{transform:rotate(360deg);}
+  }
+
+  @media (max-width:480px){
+    .shell{padding:18px 16px 14px;}
+    h1{font-size:17px;}
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="brand">
+      <div class="logo">M</div>
+      <div class="brand-text">
+        <div class="brand-title">MOMO WEALTH LAB</div>
+        <div class="brand-sub">權證篩選 API｜後端啟動中</div>
+      </div>
+    </div>
+
+    <div class="kicker">WARRANT ENGINE WARM-UP</div>
+    <h1>正在喚醒權證後端服務…</h1>
+    <p class="desc">
+      Render 免費主機首次啟動需要一點時間。<br>
+      我們正在幫你熱機，完成後會自動進入
+      <span class="strong">MOMO 權證篩選器</span>。
+    </p>
+
+    <div class="loader-wrap">
+      <div class="loader-ring"></div>
+      <div id="statusText" class="loader-text">連線中，請稍候 3–10 秒…</div>
+    </div>
+
+    <p class="hint">
+      若超過 15 秒仍未自動跳轉，你可以重新整理頁面，<br>
+      或稍後再試一次。這只發生在 Render 冷啟動時。
+    </p>
+
+    <div class="link-row">
+      若未自動跳轉，可點這裡手動前往：
+      <br>
+      <a href="./warrant-api.html">直接進入 MOMO 權證篩選器</a>
+    </div>
+  </div>
+
+  <!-- 隱形 iframe：實際去載入 Render，觸發啟動 -->
+  <iframe id="warmFrame" src=""></iframe>
+
+<script>
+  // 你的 Render 後端（用來喚醒）
+  const WARMUP_URL = "https://warrant-render-proxy-1.onrender.com/";
+  // 啟動完成後要前往的工具頁
+  const TARGET_URL = "./warrant-api.html";
+
+  const statusText = document.getElementById("statusText");
+  const iframe = document.getElementById("warmFrame");
+
+  // 設定 iframe 來源，真正打到 Render 讓它啟動
+  iframe.src = WARMUP_URL;
+
+  // 安全機制：最多等 15 秒
+  const HARD_TIMEOUT = 15000;
+  // 預設嘗試在 5 秒後導向（大多數冷啟動會在這附近變快）
+  const SOFT_REDIRECT = 5000;
+
+  // 5 秒後先嘗試導到工具頁（大部分情況已經醒了）
+  setTimeout(() => {
+    statusText.textContent = "後端已啟動，正在帶你進入 MOMO 權證篩選器…";
+    window.location.href = TARGET_URL;
+  }, SOFT_REDIRECT);
+
+  // 15 秒保險提示（若還沒離開這頁，顯示更明確訊息）
+  setTimeout(() => {
+    statusText.textContent = "連線較久，可能是 Render 冷啟動較慢，建議稍候或重新整理再試。";
+  }, HARD_TIMEOUT);
+</script>
+</body>
+</html>
