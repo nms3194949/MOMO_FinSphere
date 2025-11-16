@@ -16,13 +16,12 @@
   <meta property="og:description" content="基金研究、回撤策略、權證篩選與智能工具一站完成。MOMO財商智庫打造的月配息 × AI智能決策平台。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/">
-  <!-- 請在專案根目錄放一張 og-cover.jpg 作為分享縮圖 -->
   <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
   <meta property="og:locale" content="zh_TW">
 
   <!-- ===== Twitter Card ===== -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="MOMO財商智庫｜月配息 × AI智能決決策系統">
+  <meta name="twitter:title" content="MOMO財商智庫｜月配息 × AI智能決策系統">
   <meta name="twitter:description" content="月配息 × 資產增值 × AI智能決策，一站完成基金與加密資產研究。">
   <meta name="twitter:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
 
@@ -46,10 +45,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- 上線再開啟（避免 file:// 測試環境報錯） -->
-  <!-- <link rel="manifest" href="/manifest.webmanifest"> -->
-
-  <!-- ===== 結構化資料：Organization & WebSite ===== -->
+  <!-- 結構化資料：Organization & WebSite -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -88,7 +84,6 @@
   body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
   a{color:inherit;text-decoration:none}
 
-  /* Layout */
   .wrap{max-width:1120px;margin:0 auto;padding:16px}
   .header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
   .logo{display:flex;align-items:center;gap:10px;font-weight:800}
@@ -98,6 +93,7 @@
   .nav{display:flex;gap:10px;flex-wrap:nowrap;overflow:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
   .nav a{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(180deg,#0e172b,#111a2f);font-weight:600;scroll-snap-align:start;flex:0 0 auto}
   .nav a[aria-current="page"], .nav a:hover{background:var(--gold-grad);color:#0A1221}
+
   .section{margin-top:24px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
   .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
@@ -105,7 +101,6 @@
   .btn-gold:hover{filter:brightness(1.1)}
   .footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center;border-top:1px solid var(--line);padding:20px 0}
 
-  /* Hero */
   .hero{border:1px solid var(--line);border-radius:16px;padding:24px;
     background:linear-gradient(120deg,rgba(201,162,39,.15),rgba(45,122,119,.12) 40%, transparent 100%), #0B1222;text-align:center}
   .hero h1{margin:6px 0 8px;font-size:clamp(22px, 2.6vw, 32px);background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
@@ -114,16 +109,13 @@
   .hero .btn-line{display:inline-block;margin-top:18px;padding:12px 20px;border-radius:999px;font-weight:800;background:var(--gold-grad);color:#0A1221;border:none;box-shadow:0 6px 14px rgba(0,0,0,.35);transition:filter .2s}
   .hero .btn-line:hover{filter:brightness(1.15)}
 
-  /* Tools grid */
   .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 
-  /* IG */
   #ig-section{margin-top:60px;padding:40px 0;background:#0A1221}
   #ig-section h2{font-size:22px;font-weight:700;margin:0 0 18px 0;color:var(--gold-soft)}
   .embedsocial-hashtag{border:1px solid rgba(201,162,39,0.2);border-radius:18px;background:#0C152A;box-shadow:0 6px 18px rgba(0,0,0,.35);padding:18px;min-height:420px;display:grid;place-items:center}
   @media(max-width:768px){.embedsocial-hashtag{padding:10px}}
 
-  /* Strategy gauges */
   #strategy .bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
   #strategy .bar-title{
     font-size:16px;font-weight:800;letter-spacing:.5px;margin:0;padding-bottom:6px;
@@ -144,19 +136,16 @@
   .readout{align-self:center;font-size:17px;font-weight:800;border:1px solid var(--gold-soft);border-radius:4px;padding:3px 10px;color:var(--ink)}
   .tick-label{font-size:9.5px;font-weight:700;fill:var(--ink)}
 
-  /* 呼吸（SVG gradient 2nd stop：白↔淡金） */
   @keyframes breatheGoldWhite{0%{stop-color:#FFFFFF;stop-opacity:.9}50%{stop-color:#E9D18A;stop-opacity:.82}100%{stop-color:#FFFFFF;stop-opacity:.9}}
   .gradient-stop-animated{animation:breatheGoldWhite 2.0s ease-in-out infinite alternate}
 
   @media(max-width:820px){.card2{width:100%}}
   @media (prefers-reduced-motion: reduce){.gradient-stop-animated{animation:none}}
 
-  /* Mobile fixed CTA */
   .cta-fixed{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(10,18,33,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);display:none}
   .cta-fixed .btn-line{display:block;text-align:center;padding:14px 18px;border-radius:999px;background:var(--gold-grad);color:#0A1221;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.35)}
   @media(max-width:768px){.cta-fixed{display:block} body.has-cta{padding-bottom:84px}}
 
-  /* Calculator */
   #calc .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
   #calc .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative}
   #calc h2{margin:0 0 6px;font-size:18px;color:var(--gold-soft)}
@@ -174,15 +163,13 @@
   #calc .out-row{display:flex;gap:10px;flex-wrap:wrap}
   #calc .out-row .kv{flex:1;min-width:240px}
   #calc .actions{position:absolute;top:16px;right:16px;display:flex;gap:8px}
-  .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px;cursor:pointer}
+  .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px}
   .btn-outline:hover{background:rgba(233,209,138,.08)}
 
-  /* 策略按鈕 */
   .strategy-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .strategy-btn{border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;background:#0e162a;color:var(--muted);cursor:pointer}
   .strategy-btn.is-active{background:var(--gold-grad);border-color:transparent;color:#0A1221}
 
-  /* 金色循環動畫（數值用） */
   .goldCycle{
     background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 40%,#B88A1E 70%,#F9E27C 100%);
     background-size:220% auto; -webkit-background-clip:text; color:transparent;
@@ -190,12 +177,19 @@
   }
   @keyframes goldSweep{0%{background-position:0% 50%}100%{background-position:220% 50%}}
 
-  /* ★ 截圖用：純色金文字，避免變成整塊色塊 ★ */
   .goldPlain{
     background:none !important;
     -webkit-background-clip:border-box !important;
     color:var(--gold-soft) !important;
   }
+
+  /* 首頁工具卡片（吃共用 JS 產出） */
+  .tool-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 18px rgba(0,0,0,.45)}
+  .tool-pill-row{display:flex;gap:8px;margin-bottom:4px}
+  .tool-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;border:1px solid rgba(233,209,138,.45);font-size:11px;color:var(--gold-soft)}
+  .tool-title{font-size:18px;margin:0}
+  .tool-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+  .tool-footer{margin-top:8px}
   </style>
 </head>
 <body>
@@ -252,7 +246,7 @@
       </div>
     </section>
 
-    <!-- ===== 互動小工具：配息率 ↔ 年均成長試算 ===== -->
+    <!-- ===== 互動試算：配息率 ↔ 年均成長 ===== -->
     <section id="calc" class="section" aria-labelledby="calc-title">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
         <h2 id="calc-title">配息許願</h2>
@@ -261,11 +255,9 @@
       <p class="desc">輸入本金，調整「配息率」拉桿，系統會即時計算：每月配息、<strong>每年的本金成長率</strong>、三年後本金、三年總領配息、三年總報酬與報酬率。</p>
 
       <div class="grid" id="calc-capture">
-        <!-- 左：輸入 -->
         <div class="panel" aria-labelledby="in-title">
           <h3 id="in-title" style="margin:0 0 10px">輸入</h3>
 
-          <!-- 策略三鍵 -->
           <label style="display:block;margin-bottom:6px">策略選擇</label>
           <div class="strategy-group" role="group" aria-label="策略選擇">
             <button type="button" class="strategy-btn" data-strategy="start" aria-pressed="false">雙贏起步</button>
@@ -288,7 +280,6 @@
           </div>
         </div>
 
-        <!-- 右：結果 -->
         <div class="panel" aria-labelledby="out-title">
           <h3 id="out-title" style="margin:0 0 10px">結果</h3>
           <div class="out" aria-live="polite">
@@ -305,18 +296,18 @@
       </div>
     </section>
 
-    <!-- ===== 智能工具 ===== -->
+    <!-- ===== 智能工具（首頁精選，吃共用設定） ===== -->
     <section class="section" id="tools" aria-labelledby="tools-title">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px">
         <h2 id="tools-title" style="margin:0;color:var(--gold-soft)">智能工具</h2>
-        <a href="./tools/index.html" class="btn-outline" style="white-space:nowrap;">查看全部工具 ▶</a>
+        <a href="./tools/" class="btn btn-gold" style="border-radius:999px;padding:10px 18px;font-size:14px">
+          查看全部工具 ▶
+        </a>
       </div>
-      <div class="tools" id="tools-grid-home">
-        <!-- 卡片由 JS 依 MOMO_TOOLS 設定自動產生 -->
-      </div>
+      <div class="tools" id="home-tools-grid"></div>
     </section>
 
-    <!-- ===== IG 最新貼文（官方原始嵌入） ===== -->
+    <!-- ===== IG 最新貼文 ===== -->
     <section id="ig-section" aria-labelledby="ig-title">
       <h2 id="ig-title">最新 IG 精選</h2>
       <div class="embedsocial-hashtag" data-ref="42032a17319b8cd123ca39bbcf94096c57c120b0">
@@ -335,9 +326,8 @@
     <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="立即加入 MOMO 財商智庫官方 LINE">加入官方 LINE ▶</a>
   </div>
 
-  <!-- ===== JS：儀表、計算器、PNG 匯出（巔峰＝月配息 ×2.5） ===== -->
+  <!-- 主功能 JS：儀表、計算器、PNG 匯出 -->
   <script>
-  /* ===== Utils ===== */
   const $ =(id)=>document.getElementById(id);
   const nfTW = new Intl.NumberFormat('zh-TW');
   const clamp =(v,min,max)=>Math.min(max,Math.max(min,v));
@@ -345,7 +335,6 @@
   const pct =(x)=>(Math.round(x*100)/100).toFixed(2)+'%';
   const passiveOpt={passive:true};
 
-  // 動態載入 html2canvas
   async function ensureCanvas(){
     if(!window.html2canvas){
       await new Promise((res,rej)=>{
@@ -358,7 +347,6 @@
     }
   }
 
-  /* ===== Gauges ===== */
   const MOMO_PROGRESS_CONFIG = { monthly:75658, principal:6277633, dist:14, annual:45 };
 
   function fmtAxis(v,u){
@@ -452,13 +440,12 @@
     ro.observe(gaugeEl); blockEl._destroy=()=>ro.disconnect();
   }
 
-  /* ===== Calculator（巔峰＝月配息 ×2.5） ===== */
-  const STRATEGY = { start:12.24, rise:27.29, peak:64.22 }; // 基準 CAGR
-  const SLOPE = 1; // 每 +1% 配息 → 年成長率 -1%
-  const MONTHLY_MULT = { start:1, rise:1, peak:2.5 }; // 巔峰放大係數
+  const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
+  const SLOPE = 1;
+  const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
 
   const state = {
-    baseCAGR: STRATEGY.rise, // 預設：雙贏躍升
+    baseCAGR: STRATEGY.rise,
     monthlyMul: MONTHLY_MULT.rise,
     principal: 1_000_000,
     dist: 8
@@ -471,7 +458,7 @@
     const monthly = monthlyBase * (monthlyMul ?? 1);
     const grow = Math.max(0, baseCAGR - SLOPE*dist);
     const after3y = principal*Math.pow(1+grow/100,3);
-    const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1); // 三年配息同倍率放大
+    const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1);
     const total = after3y + div3y;
     const totalRate = principal>0 ? (total/principal - 1)*100 : 0;
     return { monthly, grow, after3y, div3y, total, totalRate };
@@ -543,7 +530,7 @@
 
     document.querySelectorAll('[data-strategy]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        const key = btn.getAttribute('data-strategy'); // start|rise|peak
+        const key = btn.getAttribute('data-strategy');
         state.baseCAGR  = STRATEGY[key] ?? state.baseCAGR;
         state.monthlyMul = MONTHLY_MULT[key] ?? 1;
 
@@ -557,19 +544,14 @@
       }, passiveOpt);
     });
 
-    // 匯出 PNG（按需載入 html2canvas）
     const btn = $('btn-save-png');
     const target = $('calc-capture');
     if(btn && target){
       btn.addEventListener('click', async ()=>{
         const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background};
-
-        // ★ 1) 匯出前先把漸層文字改成純色 ★
         const goldEls = Array.from(document.querySelectorAll('.goldCycle'));
         const prevClasses = goldEls.map(el => el.className);
-        goldEls.forEach(el => {
-          el.classList.add('goldPlain');
-        });
+        goldEls.forEach(el => { el.classList.add('goldPlain'); });
 
         target.style.boxShadow='0 0 0 1px rgba(233,209,138,.18)';
         target.style.padding='8px';
@@ -595,10 +577,7 @@
           alert('匯出失敗，請再試一次');
         }
         finally{
-          // 還原 panel 樣式
           target.style.boxShadow=prev.boxShadow; target.style.padding=prev.padding; target.style.background=prev.bg;
-
-          // ★ 2) 匯出完成後，把 goldPlain 還原成原本的 class 設定（恢復漸層） ★
           const goldNow = Array.from(document.querySelectorAll('.goldPlain'));
           goldNow.forEach((el,idx) => {
             el.className = prevClasses[idx] || el.className.replace(' goldPlain','');
@@ -607,15 +586,11 @@
       }, passiveOpt);
     }
 
-    // 通用被動監聽
-    window.addEventListener('resize', ()=>{}, passiveOpt);
+    if (matchMedia('(max-width: 768px)').matches) document.body.classList.add('has-cta');
   }
 
-  /* ===== Boot ===== */
   function boot(){
     document.querySelectorAll('.block').forEach(mountBlock);
-    if (matchMedia('(max-width: 768px)').matches) document.body.classList.add('has-cta');
-
     restore();
     fromURL();
     bindEvents();
@@ -624,25 +599,24 @@
   document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
   </script>
 
-  <!-- IG 官方原始嵌入腳本：放在 section 後、body 結束前 -->
+  <!-- 共用工具設定 + 渲染：首頁智能工具區塊會自動長出卡片 -->
+  <script src="./assets/tools-config.js"></script>
+  <script src="./assets/tools-render.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      if (window.MOMO_TOOLS && typeof MOMO_TOOLS.initHomeSection === 'function') {
+        MOMO_TOOLS.initHomeSection();
+      }
+    });
+  </script>
+
+  <!-- IG 官方嵌入 -->
   <script>
   (function(d, s, id) {
     var js; if (d.getElementById(id)) return;
     js = d.createElement(s); js.id = id; js.src = "https://embedsocial.com/cdn/ht.js";
     d.getElementsByTagName("head")[0].appendChild(js);
   }(document, "script", "EmbedSocialHashtagScript"));
-  </script>
-
-  <!-- 共用工具設定 & 渲染腳本（首頁也用） -->
-  <script src="./assets/tools-config.js"></script>
-  <script src="./assets/tools-render.js"></script>
-  <script>
-    // 首頁：只顯示 featured 的工具，最多 3 個
-    renderMomoTools({
-      targetId: 'tools-grid-home',
-      onlyFeatured: true,
-      limit: 3
-    });
   </script>
 </body>
 </html>
