@@ -1,185 +1,202 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>MOMO財商智庫｜月配息 × AI智能決策系統</title>
-<meta name="description" content="MOMO財商智庫：月配息 × 資產增值 × AI智能決策。基金研究、回撤策略、權證篩選與智能工具一站完成。">
-<meta property="og:title" content="MOMO財商智庫｜月配息 × AI智能決策系統">
-<meta property="og:description" content="基金研究、回撤策略、權證篩選與智能工具一站完成。">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://your-domain.example/">
-<meta property="og:image" content="https://your-domain.example/og-cover.jpg">
-<meta name="theme-color" content="#0A1221" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 
-<!-- CSP：允許 inline script、EmbedSocial 腳本與 iframe（解決 IG 無法顯示） -->
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self' https: data: blob:;
-  img-src 'self' https: data: blob:;
-  style-src 'self' 'unsafe-inline' https:;
-  script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://embedsocial.com https://*.embedsocial.com;
-  connect-src 'self' https: data:;
-  frame-src https://embedsocial.com https://*.embedsocial.com https:;
-  child-src https://embedsocial.com https://*.embedsocial.com https:;
-  worker-src 'self' blob:;
-  font-src https: data:;
-  manifest-src 'self';
-">
+  <!-- ===== 基本 SEO ===== -->
+  <title>MOMO財商智庫｜月配息 × AI智能決策系統</title>
+  <meta name="description" content="MOMO財商智庫：月配息 × 資產增值 × AI智能決策。整合基金研究、回撤策略、虛擬貨幣進出場、權證篩選與智能工具的一站式財商系統。">
+  <meta name="keywords" content="MOMO財商智庫,MOMO FinSphere,月配息,基金研究,基金配息,回撤策略,AI智能決策,權證篩選,加密貨幣策略,投資工具">
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <!-- ===== Open Graph (FB / LINE / etc.) ===== -->
+  <meta property="og:title" content="MOMO財商智庫｜月配息 × AI智能決策系統">
+  <meta property="og:description" content="基金研究、回撤策略、權證篩選與智能工具一站完成。MOMO財商智庫打造的月配息 × AI智能決策平台。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/">
+  <!-- 請在專案根目錄放一張 og-cover.jpg 作為分享縮圖 -->
+  <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
+  <meta property="og:locale" content="zh_TW">
 
-<!-- 上線再開啟（避免 file:// 測試環境報錯） -->
-<!-- <link rel="manifest" href="/manifest.webmanifest"> -->
+  <!-- ===== Twitter Card ===== -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MOMO財商智庫｜月配息 × AI智能決策系統">
+  <meta name="twitter:description" content="月配息 × 資產增值 × AI智能決策，一站完成基金與加密資產研究。">
+  <meta name="twitter:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
 
-<!-- 結構化資料 -->
-<script type="application/ld+json">
-{
- "@context":"https://schema.org",
- "@type":"Organization",
- "name":"MOMO財商智庫",
- "url":"https://your-domain.example/",
- "logo":"https://your-domain.example/og-cover.jpg",
- "sameAs":["https://portaly.cc/momo_82786"]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context":"https://schema.org",
- "@type":"WebSite",
- "name":"MOMO財商智庫",
- "url":"https://your-domain.example/",
- "potentialAction":{
-   "@type":"SearchAction",
-   "target":"https://your-domain.example/?q={search_term_string}",
-   "query-input":"required name=search_term_string"
- }
-}
-</script>
+  <meta name="theme-color" content="#0A1221" />
 
-<style>
-:root{
-  --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#AAB2BF;
-  --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
-  --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
-  --accent:#2D7A77;
-}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-a{color:inherit;text-decoration:none}
+  <!-- CSP：允許 inline script、EmbedSocial 腳本與 iframe（解決 IG 無法顯示） -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' https: data: blob:;
+    img-src 'self' https: data: blob:;
+    style-src 'self' 'unsafe-inline' https:;
+    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://embedsocial.com https://*.embedsocial.com;
+    connect-src 'self' https: data:;
+    frame-src https://embedsocial.com https://*.embedsocial.com https:;
+    child-src https://embedsocial.com https://*.embedsocial.com https:;
+    worker-src 'self' blob:;
+    font-src https: data:;
+    manifest-src 'self';
+  ">
 
-/* Layout */
-.wrap{max-width:1120px;margin:0 auto;padding:16px}
-.header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800}
-.logo::before{content:"";width:28px;height:28px;border-radius:50%;
-  background:radial-gradient(120% 120% at 20% 20%, var(--gold) 0%, var(--gold-soft) 45%, transparent 46%), #1a1f2b;
-  border:1px solid var(--line)}
-.nav{display:flex;gap:10px;flex-wrap:nowrap;overflow:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
-.nav a{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(180deg,#0e172b,#111a2f);font-weight:600;scroll-snap-align:start;flex:0 0 auto}
-.nav a[aria-current="page"], .nav a:hover{background:var(--gold-grad);color:#0A1221}
-.section{margin-top:24px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
-.btn-gold{background:var(--gold-grad);color:#0A1221;border:none}
-.btn-gold:hover{filter:brightness(1.1)}
-.footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center;border-top:1px solid var(--line);padding:20px 0}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
-/* Hero */
-.hero{border:1px solid var(--line);border-radius:16px;padding:24px;
-  background:linear-gradient(120deg,rgba(201,162,39,.15),rgba(45,122,119,.12) 40%, transparent 100%), #0B1222;text-align:center}
-.hero h1{margin:6px 0 8px;font-size:clamp(22px, 2.6vw, 32px);background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
-.hero p{color:var(--muted);margin:0}
-.hero small{color:var(--gold-soft)}
-.hero .btn-line{display:inline-block;margin-top:18px;padding:12px 20px;border-radius:999px;font-weight:800;background:var(--gold-grad);color:#0A1221;border:none;box-shadow:0 6px 14px rgba(0,0,0,.35);transition:filter .2s}
-.hero .btn-line:hover{filter:brightness(1.15)}
+  <!-- 上線再開啟（避免 file:// 測試環境報錯） -->
+  <!-- <link rel="manifest" href="/manifest.webmanifest"> -->
 
-/* Tools grid */
-.tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  <!-- ===== 結構化資料：Organization & WebSite ===== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "MOMO財商智庫",
+    "url": "https://nms3194949.github.io/MOMO_FinSphere/",
+    "logo": "https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg",
+    "sameAs": [
+      "https://portaly.cc/momo_82786"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "MOMO財商智庫｜月配息 × AI智能決策系統",
+    "url": "https://nms3194949.github.io/MOMO_FinSphere/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://nms3194949.github.io/MOMO_FinSphere/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
 
-/* IG */
-#ig-section{margin-top:60px;padding:40px 0;background:#0A1221}
-#ig-section h2{font-size:22px;font-weight:700;margin:0 0 18px 0;color:var(--gold-soft)}
-.embedsocial-hashtag{border:1px solid rgba(201,162,39,0.2);border-radius:18px;background:#0C152A;box-shadow:0 6px 18px rgba(0,0,0,.35);padding:18px;min-height:420px;display:grid;place-items:center}
-@media(max-width:768px){.embedsocial-hashtag{padding:10px}}
+  <style>
+  :root{
+    --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#AAB2BF;
+    --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
+    --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
+    --accent:#2D7A77;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  a{color:inherit;text-decoration:none}
 
-/* Strategy gauges */
-#strategy .bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-#strategy .bar-title{
-  font-size:16px;font-weight:800;letter-spacing:.5px;margin:0;padding-bottom:6px;
-  border-bottom:1px solid var(--gold-soft);
-  background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 25%,#B88A1E 50%,#D9B84B 75%,#F9E27C 100%);
-  background-size:200% auto; -webkit-background-clip:text; color:transparent;
-  animation:goldflow 3s linear infinite;
-}
-@keyframes goldflow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+  /* Layout */
+  .wrap{max-width:1120px;margin:0 auto;padding:16px}
+  .header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800}
+  .logo::before{content:"";width:28px;height:28px;border-radius:50%;
+    background:radial-gradient(120% 120% at 20% 20%, var(--gold) 0%, var(--gold-soft) 45%, transparent 46%), #1a1f2b;
+    border:1px solid var(--line)}
+  .nav{display:flex;gap:10px;flex-wrap:nowrap;overflow:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
+  .nav a{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(180deg,#0e172b,#111a2f);font-weight:600;scroll-snap-align:start;flex:0 0 auto}
+  .nav a[aria-current="page"], .nav a:hover{background:var(--gold-grad);color:#0A1221}
+  .section{margin-top:24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
+  .btn-gold{background:var(--gold-grad);color:#0A1221;border:none}
+  .btn-gold:hover{filter:brightness(1.1)}
+  .footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center;border-top:1px solid var(--line);padding:20px 0}
 
-#strategy .row{display:flex;gap:16px;flex-wrap:wrap}
-.card2{background:var(--card);border:1px solid var(--line);border-radius:16px;width:calc(50% - 8px);min-width:300px;padding:18px 16px 20px;box-shadow:0 10px 22px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:18px}
-.card2 h3{margin:0 0 4px;font-size:20px;color:var(--gold-soft)}
-.block{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
-.block:last-child{padding-bottom:0;border-bottom:0}
-.block .label{font-size:13.5px;font-weight:800;color:rgba(233,209,138,.9)}
-.gauge{width:100%}
-.readout{align-self:center;font-size:17px;font-weight:800;border:1px solid var(--gold-soft);border-radius:4px;padding:3px 10px;color:var(--ink)}
-.tick-label{font-size:9.5px;font-weight:700;fill:var(--ink)}
+  /* Hero */
+  .hero{border:1px solid var(--line);border-radius:16px;padding:24px;
+    background:linear-gradient(120deg,rgba(201,162,39,.15),rgba(45,122,119,.12) 40%, transparent 100%), #0B1222;text-align:center}
+  .hero h1{margin:6px 0 8px;font-size:clamp(22px, 2.6vw, 32px);background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
+  .hero p{color:var(--muted);margin:0}
+  .hero small{color:var(--gold-soft)}
+  .hero .btn-line{display:inline-block;margin-top:18px;padding:12px 20px;border-radius:999px;font-weight:800;background:var(--gold-grad);color:#0A1221;border:none;box-shadow:0 6px 14px rgba(0,0,0,.35);transition:filter .2s}
+  .hero .btn-line:hover{filter:brightness(1.15)}
 
-/* 呼吸（SVG gradient 2nd stop：白↔淡金） */
-@keyframes breatheGoldWhite{0%{stop-color:#FFFFFF;stop-opacity:.9}50%{stop-color:#E9D18A;stop-opacity:.82}100%{stop-color:#FFFFFF;stop-opacity:.9}}
-.gradient-stop-animated{animation:breatheGoldWhite 2.0s ease-in-out infinite alternate}
+  /* Tools grid */
+  .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 
-@media(max-width:820px){.card2{width:100%}}
-@media (prefers-reduced-motion: reduce){.gradient-stop-animated{animation:none}}
+  /* IG */
+  #ig-section{margin-top:60px;padding:40px 0;background:#0A1221}
+  #ig-section h2{font-size:22px;font-weight:700;margin:0 0 18px 0;color:var(--gold-soft)}
+  .embedsocial-hashtag{border:1px solid rgba(201,162,39,0.2);border-radius:18px;background:#0C152A;box-shadow:0 6px 18px rgba(0,0,0,.35);padding:18px;min-height:420px;display:grid;place-items:center}
+  @media(max-width:768px){.embedsocial-hashtag{padding:10px}}
 
-/* Mobile fixed CTA */
-.cta-fixed{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(10,18,33,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);display:none}
-.cta-fixed .btn-line{display:block;text-align:center;padding:14px 18px;border-radius:999px;background:var(--gold-grad);color:#0A1221;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.35)}
-@media(max-width:768px){.cta-fixed{display:block} body.has-cta{padding-bottom:84px}}
+  /* Strategy gauges */
+  #strategy .bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  #strategy .bar-title{
+    font-size:16px;font-weight:800;letter-spacing:.5px;margin:0;padding-bottom:6px;
+    border-bottom:1px solid var(--gold-soft);
+    background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 25%,#B88A1E 50%,#D9B84B 75%,#F9E27C 100%);
+    background-size:200% auto; -webkit-background-clip:text; color:transparent;
+    animation:goldflow 3s linear infinite;
+  }
+  @keyframes goldflow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 
-/* Calculator */
-#calc .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-#calc .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative}
-#calc h2{margin:0 0 6px;font-size:18px;color:var(--gold-soft)}
-#calc p.desc{margin:0 0 12px;color:var(--muted)}
-#calc label{display:block;font-weight:800;font-size:13px;color:rgba(233,209,138,.9);margin-bottom:6px}
-#calc input[type="number"]{width:100%;background:#0e162a;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
-#calc .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#calc input[type="range"]{width:100%}
-#calc .out{display:flex;flex-direction:column;gap:8px}
-#calc .out .kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#0b1427}
-#calc .out .k{font-size:13px;color:rgba(233,209,138,.9);font-weight:800}
-#calc .out .v{font-size:18px;font-weight:800}
-#calc .mini{font-size:12px;color:var(--muted)}
-#calc .pill{border:1px solid var(--line);padding:4px 8px;border-radius:999px;font-size:12px;color:var(--muted);cursor:pointer}
-#calc .out-row{display:flex;gap:10px;flex-wrap:wrap}
-#calc .out-row .kv{flex:1;min-width:240px}
-#calc .actions{position:absolute;top:16px;right:16px;display:flex;gap:8px}
-.btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px}
-.btn-outline:hover{background:rgba(233,209,138,.08)}
+  #strategy .row{display:flex;gap:16px;flex-wrap:wrap}
+  .card2{background:var(--card);border:1px solid var(--line);border-radius:16px;width:calc(50% - 8px);min-width:300px;padding:18px 16px 20px;box-shadow:0 10px 22px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:18px}
+  .card2 h3{margin:0 0 4px;font-size:20px;color:var(--gold-soft)}
+  .block{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .block:last-child{padding-bottom:0;border-bottom:0}
+  .block .label{font-size:13.5px;font-weight:800;color:rgba(233,209,138,.9)}
+  .gauge{width:100%}
+  .readout{align-self:center;font-size:17px;font-weight:800;border:1px solid var(--gold-soft);border-radius:4px;padding:3px 10px;color:var(--ink)}
+  .tick-label{font-size:9.5px;font-weight:700;fill:var(--ink)}
 
-/* 策略按鈕 */
-.strategy-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.strategy-btn{border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;background:#0e162a;color:var(--muted);cursor:pointer}
-.strategy-btn.is-active{background:var(--gold-grad);border-color:transparent;color:#0A1221}
+  /* 呼吸（SVG gradient 2nd stop：白↔淡金） */
+  @keyframes breatheGoldWhite{0%{stop-color:#FFFFFF;stop-opacity:.9}50%{stop-color:#E9D18A;stop-opacity:.82}100%{stop-color:#FFFFFF;stop-opacity:.9}}
+  .gradient-stop-animated{animation:breatheGoldWhite 2.0s ease-in-out infinite alternate}
 
-/* 金色循環動畫（數值用） */
-.goldCycle{
-  background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 40%,#B88A1E 70%,#F9E27C 100%);
-  background-size:220% auto; -webkit-background-clip:text; color:transparent;
-  animation:goldSweep 1.8s linear infinite;
-}
-@keyframes goldSweep{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+  @media(max-width:820px){.card2{width:100%}}
+  @media (prefers-reduced-motion: reduce){.gradient-stop-animated{animation:none}}
 
-/* ★ 截圖用：純色金文字，避免變成整塊色塊 ★ */
-.goldPlain{
-  background:none !important;
-  -webkit-background-clip:border-box !important;
-  color:var(--gold-soft) !important;
-}
+  /* Mobile fixed CTA */
+  .cta-fixed{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(10,18,33,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);display:none}
+  .cta-fixed .btn-line{display:block;text-align:center;padding:14px 18px;border-radius:999px;background:var(--gold-grad);color:#0A1221;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.35)}
+  @media(max-width:768px){.cta-fixed{display:block} body.has-cta{padding-bottom:84px}}
 
-</style>
+  /* Calculator */
+  #calc .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  #calc .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative}
+  #calc h2{margin:0 0 6px;font-size:18px;color:var(--gold-soft)}
+  #calc p.desc{margin:0 0 12px;color:var(--muted)}
+  #calc label{display:block;font-weight:800;font-size:13px;color:rgba(233,209,138,.9);margin-bottom:6px}
+  #calc input[type="number"]{width:100%;background:#0e162a;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
+  #calc .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #calc input[type="range"]{width:100%}
+  #calc .out{display:flex;flex-direction:column;gap:8px}
+  #calc .out .kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#0b1427}
+  #calc .out .k{font-size:13px;color:rgba(233,209,138,.9);font-weight:800}
+  #calc .out .v{font-size:18px;font-weight:800}
+  #calc .mini{font-size:12px;color:var(--muted)}
+  #calc .pill{border:1px solid var(--line);padding:4px 8px;border-radius:999px;font-size:12px;color:var(--muted);cursor:pointer}
+  #calc .out-row{display:flex;gap:10px;flex-wrap:wrap}
+  #calc .out-row .kv{flex:1;min-width:240px}
+  #calc .actions{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+  .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px}
+  .btn-outline:hover{background:rgba(233,209,138,.08)}
+
+  /* 策略按鈕 */
+  .strategy-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .strategy-btn{border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;background:#0e162a;color:var(--muted);cursor:pointer}
+  .strategy-btn.is-active{background:var(--gold-grad);border-color:transparent;color:#0A1221}
+
+  /* 金色循環動畫（數值用） */
+  .goldCycle{
+    background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 40%,#B88A1E 70%,#F9E27C 100%);
+    background-size:220% auto; -webkit-background-clip:text; color:transparent;
+    animation:goldSweep 1.8s linear infinite;
+  }
+  @keyframes goldSweep{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+
+  /* ★ 截圖用：純色金文字，避免變成整塊色塊 ★ */
+  .goldPlain{
+    background:none !important;
+    -webkit-background-clip:border-box !important;
+    color:var(--gold-soft) !important;
+  }
+  </style>
 </head>
 <body>
 
@@ -292,23 +309,23 @@ a{color:inherit;text-decoration:none}
     <section class="section" id="tools" aria-labelledby="tools-title">
       <h2 id="tools-title" style="margin-bottom:16px;color:var(--gold-soft)">智能工具</h2>
       <div class="tools">
-      <div class="card">
-  <h3>BTC/ETH進場策略</h3>
-  <p style="color:var(--muted)">即時監控，加密市場回撤與進出場策略。</p>
-  <a class="btn btn-gold" href="./tools/btc-rebound-trigger.html">開啟</a>
-</div>
+        <div class="card">
+          <h3>BTC/ETH進場策略</h3>
+          <p style="color:var(--muted)">即時監控，加密市場回撤與進出場策略。</p>
+          <a class="btn btn-gold" href="./tools/btc-rebound-trigger.html">開啟</a>
+        </div>
 
-<div class="card">
-  <h3>基金AI智能分析</h3>
-  <p style="color:var(--muted)">基金投組試算，AI最佳化分析。</p>
-  <a class="btn btn-gold" href="./tools/cagr-mobile.html">開啟</a>
-</div>
+        <div class="card">
+          <h3>基金AI智能分析</h3>
+          <p style="color:var(--muted)">基金投組試算，AI最佳化分析。</p>
+          <a class="btn btn-gold" href="./tools/cagr-mobile.html">開啟</a>
+        </div>
 
-<div class="card">
-  <h3>權證篩選API</h3>
-  <p style="color:var(--muted)">串接權證API，一鍵篩選權證。</p>
-  <a class="btn btn-gold" href="https://warrant-render-proxy-1.onrender.com/" target="_blank" rel="noopener noreferrer">開啟</a>
-</div>
+        <div class="card">
+          <h3>權證篩選API</h3>
+          <p style="color:var(--muted)">串接權證API，一鍵篩選權證。</p>
+          <a class="btn btn-gold" href="https://warrant-render-proxy-1.onrender.com/" target="_blank" rel="noopener noreferrer">開啟</a>
+        </div>
       </div>
     </section>
 
@@ -615,19 +632,12 @@ a{color:inherit;text-decoration:none}
     document.querySelectorAll('.block').forEach(mountBlock);
     if (matchMedia('(max-width: 768px)').matches) document.body.classList.add('has-cta');
 
-    //（保留官方 IG 嵌入 script，放在 body 結尾；此處不再主動載入）
-
     restore();
     fromURL();
     bindEvents();
     update();
   }
   document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
-
-  // 上線再開啟 SW（避免本地 file:// 報錯）
-  // if('serviceWorker' in navigator){
-  //   navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  // }
   </script>
 
   <!-- IG 官方原始嵌入腳本：放在 section 後、body 結束前 -->
