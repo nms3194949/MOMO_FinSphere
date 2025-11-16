@@ -1,95 +1,99 @@
-// assets/tools-render.js
-// 共用渲染函式：把 window.MOMO_TOOLS 轉成卡片 HTML
-// 在首頁、tools/index.html 都可以呼叫 renderMomoTools(...)
-
 (function () {
-  const CATEGORY_LABEL = {
-    fund: '基金工具',
-    crypto: '加密策略',
-    warrant: '權證工具',
-    other: '其他工具'
-  };
-
-  function resolveHref(tool) {
-    // 外部工具 → 直接使用 url
-    if (tool.external && tool.url) return tool.url;
-
-    // 內部工具 → 用 path + 根據目前所在路徑決定前綴（./ 或 ../）
-    if (tool.path) {
-      const here = window.location.pathname || '';
-      const inToolsDir = /\/tools\//.test(here);
-      // 如果目前在 /tools/ 底下，就用 ../ 開頭；否則在 root 用 ./ 開頭
-      const prefix = inToolsDir ? '../' : './';
-      return prefix + String(tool.path).replace(/^\.?\//, '');
-    }
-
-    // 沒設定路徑就當作 #，避免掛掉
-    return '#';
-  }
-
-  function buildBadge(tool) {
-    const parts = [];
-    if (tool.badge) parts.push(tool.badge);
-    if (tool.external) parts.push('外部連結');
-    return parts.join(' · ');
-  }
-
-  function createCard(tool) {
-    const href = resolveHref(tool);
-    const targetAttr = tool.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-    const categoryLabel = CATEGORY_LABEL[tool.category] || '工具';
-    const badgeText = buildBadge(tool);
-
-    return `
-      <article class="card tool-card" data-category="${tool.category || 'other'}">
-        <div class="tool-tag-row">
-          <span class="tool-tag">${categoryLabel}</span>
-          ${badgeText ? `<span class="tool-tag" style="opacity:.85;font-size:10px;">${badgeText}</span>` : ''}
-        </div>
-        <h3>${tool.title}</h3>
-        <p class="tool-desc">${tool.desc || ''}</p>
-        <div class="card-footer">
-          <button class="btn btn-gold" onclick="window.open('${href}','${tool.external ? '_blank' : '_self'}')" type="button">
-            開啟工具
-          </button>
-          ${tool.external ? `<span class="badge-external">外部服務</span>` : '<span style="opacity:.7;">本站工具</span>'}
-        </div>
-      </article>
-    `;
+  if (!window.MOMO_TOOLS) {
+    console.warn("MOMO_TOOLS 未載入");
+    return;
   }
 
   /**
-   * 渲染 MOMO 智庫的工具卡片
-   * @param {Object} options
-   * @param {string} options.targetId   - 容器元素的 ID
-   * @param {boolean} [options.onlyFeatured] - 只顯示 featured=true
-   * @param {number} [options.limit]    - 限制顯示數量（如首頁顯示前 3 個）
+   * 產生一張工具卡片
+   */
+  function createToolCard(tool) {
+    const card = document.createElement("article");
+    card.className = "tool-card";
+
+    // === 標籤列 ===
+    const tagRow = document.createElement("div");
+    tagRow.className = "tool-tag-row";
+
+    // 主標籤（例如：加密策略 / 基金工具 / 權證工具）
+    if (tool.mainTag) {
+      const mainTag = document.createElement("span");
+      mainTag.className = "pill pill-main";
+      mainTag.textContent = tool.mainTag;
+      tagRow.appendChild(mainTag);
+    }
+
+    // 其他標籤：過濾掉你不想看到的字樣
+    const hiddenLabels = ["本站工具", "外部服務", "外部工具", "外部連結"];
+    (tool.tags || [])
+      .filter((t) => !hiddenLabels.includes(t))
+      .forEach((label) => {
+        const pill = document.createElement("span");
+        pill.className = "pill pill-sub";
+        pill.textContent = label;
+        tagRow.appendChild(pill);
+      });
+
+    card.appendChild(tagRow);
+
+    // === 標題與描述 ===
+    const title = document.createElement("h3");
+    title.className = "tool-title";
+    title.textContent = tool.name || "-";
+    card.appendChild(title);
+
+    if (tool.description) {
+      const desc = document.createElement("p");
+      desc.className = "tool-desc";
+      desc.textContent = tool.description;
+      card.appendChild(desc);
+    }
+
+    // === Footer（只留按鈕，不再顯示「本站工具 / 外部服務」） ===
+    const footer = document.createElement("div");
+    footer.className = "tool-footer";
+
+    const btn = document.createElement("a");
+    btn.className = "btn-gold";
+    btn.href = tool.url;
+    btn.target = tool.external ? "_blank" : "_self";
+    if (tool.external) btn.rel = "noopener noreferrer";
+    btn.textContent = "開啟工具";
+
+    footer.appendChild(btn);
+    card.appendChild(footer);
+
+    return card;
+  }
+
+  /**
+   * 渲染工具列表
+   * options:
+   *   - targetId: 容器 ID
+   *   - category: "fund" | "crypto" | "warrant" | null
    */
   window.renderMomoTools = function renderMomoTools(options) {
-    const { targetId, onlyFeatured, limit } = options || {};
+    const { targetId, category = null } = options || {};
     const container = document.getElementById(targetId);
     if (!container) return;
-    if (!Array.isArray(window.MOMO_TOOLS)) {
-      container.innerHTML = '<p style="color:var(--muted)">目前尚未設定任何工具。</p>';
-      return;
+
+    let list = Array.from(MOMO_TOOLS);
+
+    if (category) {
+      list = list.filter((t) => t.category === category);
     }
 
-    let list = window.MOMO_TOOLS.slice();
-
-    if (onlyFeatured) {
-      list = list.filter(t => t.featured);
-    }
-
-    if (typeof limit === 'number') {
-      list = list.slice(0, limit);
-    }
-
+    container.innerHTML = "";
     if (!list.length) {
-      container.innerHTML = '<p style="color:var(--muted)">目前沒有可顯示的工具。</p>';
+      const empty = document.createElement("p");
+      empty.className = "tool-empty";
+      empty.textContent = "目前這個分類還沒有工具。";
+      container.appendChild(empty);
       return;
     }
 
-    container.innerHTML = list.map(createCard).join('');
+    list.forEach((tool) => {
+      container.appendChild(createToolCard(tool));
+    });
   };
 })();
-
