@@ -1,1 +1,306 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>MOMO 財商智庫｜智能工具中心</title>
+  <meta name="description" content="MOMO 財商智庫智能工具中心：基金體檢、投組最佳化、配息試算、槓桿風險與 BTC Rebound Trigger，一站式雙贏策略平台。">
+
+  <style>
+    :root{
+      --deep:#0A1221;
+      --card:#0C152A;
+      --ink:#EDEFF5;
+      --muted:#A7B0C0;
+      --gold:#C9A227;
+      --gold-soft:#E9D18A;
+      --line:rgba(233,209,138,.16);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+      background:radial-gradient(circle at top,#17253F 0, #0A1221 45%, #050710 100%);
+      color:var(--ink);
+    }
+    a{color:inherit;text-decoration:none;}
+    .page{
+      max-width:1040px;
+      margin:0 auto;
+      padding:20px 16px 40px;
+    }
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:24px;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .logo-mark{
+      width:32px;height:32px;
+      border-radius:10px;
+      background:linear-gradient(150deg,#EFD88A,#C9A227 55%,#B8860B);
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;font-weight:800;color:#1A1205;
+      box-shadow:0 0 12px rgba(233,209,138,.45);
+    }
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .brand-title{
+      font-size:15px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .brand-sub{
+      font-size:11px;
+      color:var(--muted);
+    }
+    nav a{
+      font-size:13px;
+      margin-left:14px;
+      color:var(--muted);
+      padding-bottom:2px;
+      border-bottom:1px solid transparent;
+      white-space:nowrap;
+    }
+    nav a:hover,
+    nav a.active{
+      color:var(--gold-soft);
+      border-color:rgba(201,162,39,.8);
+    }
+
+    main{margin-top:4px;}
+
+    .hero{
+      margin-bottom:20px;
+    }
+    .hero-kicker{
+      font-size:11px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color:var(--gold-soft);
+      margin-bottom:6px;
+    }
+    h1{
+      font-size:26px;
+      letter-spacing:.04em;
+      margin-bottom:6px;
+    }
+    .hero-sub{
+      font-size:13px;
+      color:var(--muted);
+      max-width:640px;
+      line-height:1.6;
+    }
+
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:16px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:14px;
+      padding:16px 16px 14px;
+      border:1px solid var(--line);
+      box-shadow:0 12px 28px rgba(0,0,0,.45);
+      display:flex;
+      flex-direction:column;
+      height:100%;
+    }
+    .card-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:6px;
+      margin-bottom:8px;
+    }
+    .card-title{
+      font-size:17px;
+      font-weight:600;
+    }
+    .card-badge{
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(201,162,39,.7);
+      color:var(--gold-soft);
+      white-space:nowrap;
+    }
+    .card-desc{
+      font-size:13px;
+      color:#C0CADB;
+      line-height:1.6;
+      margin-bottom:10px;
+      flex:1;
+    }
+    .tags{
+      margin-bottom:10px;
+    }
+    .tags span{
+      display:inline-block;
+      font-size:11px;
+      padding:2px 8px;
+      margin:0 6px 6px 0;
+      border-radius:999px;
+      border:1px solid rgba(233,209,138,.32);
+      color:var(--gold-soft);
+    }
+    .card-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 14px;
+      border-radius:999px;
+      background:linear-gradient(180deg,#EFD88A,#C9A227 60%,#B8860B);
+      color:#1A1205;
+      font-size:13px;
+      font-weight:600;
+      border:none;
+      cursor:pointer;
+      box-shadow:0 4px 10px rgba(0,0,0,.6);
+    }
+    .btn span{
+      margin-left:4px;
+      font-size:12px;
+    }
+    .note{
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    footer{
+      margin-top:28px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+    footer a{
+      color:var(--gold-soft);
+    }
+
+    @media (max-width:600px){
+      header{flex-direction:column;align-items:flex-start;}
+      nav{display:flex;overflow-x:auto;}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand">
+        <div class="logo-mark">M</div>
+        <div class="brand-text">
+          <div class="brand-title">MOMO WEALTH LAB</div>
+          <div class="brand-sub">智能工具｜雙贏策略 × 月配息 × AI</div>
+        </div>
+      </div>
+      <nav>
+        <a href="../index.html">首頁</a>
+        <a href="./index.html" class="active">智能工具中心</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-kicker">SMART TOOL HUB</div>
+        <h1>智能工具中心</h1>
+        <p class="hero-sub">
+          這裡是 MOMO 財商智庫的量化工具入口：基金體檢、投組最佳化、配息試算與 BTC Rebound Trigger，
+          集中管理所有雙贏策略核心工具。
+        </p>
+      </section>
+
+      <section class="grid">
+
+        <!-- FundMetric Pro -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">FundMetric Pro｜基金體檢</div>
+            <div class="card-badge">Fund Analytics</div>
+          </div>
+          <p class="card-desc">
+            一鍵計算 CAGR、波動、Sharpe、MOMO 指標，協助判斷基金體質、穩定度與成長性，是你雙贏策略的第一步。
+          </p>
+          <div class="tags">
+            <span>基金研究</span><span>風險指標</span><span>體質分析</span>
+          </div>
+          <div class="card-footer">
+            <a class="btn" href="./cagr-mobile.html">
+              啟動工具<span>→</span>
+            </a>
+            <div class="note">支援多期間績效輸入。</div>
+          </div>
+        </article>
+
+        <!-- BTC Rebound Trigger -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">BTC Rebound Trigger</div>
+            <div class="card-badge">BTC Strategy</div>
+          </div>
+          <p class="card-desc">
+            採用你設定的回撤％與槓桿倍數，回測 ROI、安全邊際與爆倉風險，用來驗證你的 BTC 主策略最適回撤點。
+          </p>
+          <div class="tags">
+            <span>BTC 回撤</span><span>槓桿風險</span><span>歷史回測</span>
+          </div>
+          <div class="card-footer">
+            <a class="btn" href="./btc-rebound-trigger.html">
+              啟動工具<span>→</span>
+            </a>
+            <div class="note">支援季度高點與 90 日滾動高點。</div>
+          </div>
+        </article>
+
+        <!-- Warrant API -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">權證即時篩選｜Warrant API</div>
+            <div class="card-badge">Warrant</div>
+          </div>
+          <p class="card-desc">
+            使用權證 API 取得即時數據，提供快速查詢、方向判斷與基本篩選，適合當日盤中輔助工具。
+          </p>
+          <div class="tags">
+            <span>權證</span><span>即時數據</span><span>API</span>
+          </div>
+          <div class="card-footer">
+            <a class="btn" href="./warrant-api.html">
+              啟動工具<span>→</span>
+            </a>
+            <div class="note">符合 MOMO 的輕量快速決策工具理念。</div>
+          </div>
+        </article>
+
+      </section>
+    </main>
+
+    <footer>
+      <p>本工具中心僅供教育與模擬參考，不構成投資建議。投資有風險，使用前請先評估自身狀況。</p>
+      <p>
+        聯絡 MOMO｜LINE 官方帳號：
+        <a href="https://portaly.cc/momo_82786" target="_blank">加入好友</a>
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
 
