@@ -4,79 +4,65 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>MOMO權證篩選器</title>
+
 <!-- SheetJS -->
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/xlsx/dist/cpexcel.full.min.js"></script>
+
 <!-- html2canvas -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
   :root{
-    --deep:#0A1221;        /* 背景 */
-    --card:#0C152A;        /* 卡片 */
+    --deep:#0A1221;
+    --card:#0C152A;
     --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
     --gold-soft:#E9D18A;
     --gold-solid:#E5C45A;
-    --line:#E9D18A55;      /* 金色邊線(帶透明) */
+    --line:#E9D18A55;
     --muted:#9fb0d0;
     --red:#FF6B6B;
   }
 
-  html,body{
+  body{
     margin:0;background:var(--deep);color:#fff;
     font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   }
 
   .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
-
-  .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:14px;
-  }
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
 
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
   .field{
     flex:1 1 220px;background:#0b1630;color:#fff;
     border:1px solid var(--line);border-radius:10px;
-    padding:10px 12px;font-size:16px;outline:none;
+    padding:10px 12px;font-size:15px;outline:none;
   }
 
   label.chk{
     display:flex;align-items:center;gap:8px;
     background:#0b1630;border:1px solid var(--line);border-radius:10px;
-    padding:10px 12px;user-select:none;cursor:pointer;
+    padding:10px 12px;cursor:pointer;
   }
   label.chk input{accent-color:#e0c669}
 
   .btn-link{
     background:var(--gold-grad);color:#000;border:none;border-radius:10px;
-    padding:10px 16px;font-weight:700;cursor:pointer;white-space:nowrap
+    padding:10px 16px;font-weight:700;cursor:pointer;
   }
-  .btn-link:hover{background:linear-gradient(90deg,#FFEFA5 0%,#F4D97A 50%,#E0B94A 100%)}
-  .btn-link[disabled]{opacity:.6;cursor:not-allowed}
+  .btn-link[disabled]{opacity:.5;cursor:not-allowed}
 
-  table{
-    width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;
-    border:1px solid var(--line)
-  }
-  th,td{
-    border:1px solid var(--line);padding:10px 8px;text-align:left;white-space:nowrap
-  }
-  th{
-    position:sticky;top:0;z-index:1;background:#0f1b34;color:var(--gold-soft)
-  }
-  tbody tr:hover{background:#0f1b34}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;border:1px solid var(--line)}
+  th,td{border:1px solid var(--line);padding:8px 6px;white-space:nowrap}
+  th{position:sticky;top:0;background:#0f1b34;color:var(--gold-soft)}
 
-  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
-  .tag.C{background:#E25A5A;color:#fff}
-  .tag.P{background:#39C27A;color:#fff}
+  .tag{padding:2px 8px;border-radius:999px;font-size:11px}
+  .tag.C{background:#E25A5A}
+  .tag.P{background:#39C27A}
 
   .hint{font-size:12px;color:var(--muted)}
 
-  /* 金色文字（漸層） */
   .gold-text{
     background:var(--gold-grad);
     -webkit-background-clip:text;
@@ -85,298 +71,197 @@
   }
   .red-text{color:var(--red);font-weight:700}
 
-  /* 匯出 PNG 時把漸層文字轉實心金色避免失真 */
   .exporting .gold-text{
     background:none !important;
     -webkit-text-fill-color:var(--gold-solid) !important;
-    color:var(--gold-solid) !important
-  }
-
-  @media (max-width:540px){
-    .field{flex:1 1 160px}
-    .btn-link{padding:10px 14px}
+    color:var(--gold-solid) !important;
   }
 </style>
 </head>
 
 <body>
 <div class="wrap">
+
   <div class="card">
     <h3 style="margin:0">MOMO權證篩選器</h3>
-    <p id="meta" class="hint">
-      可按「從 API 取得資料」快速載入；或手動上傳 CSV / XLSX。<br>
-      預設：認購、排序 S1 升冪、排除價差比=0、距到期 &gt; 60 天、只顯示有隱波。
-    </p>
+    <p id="meta" class="hint">按「從 API 取得資料」取得最新權證資料。</p>
 
     <div class="row">
-      <!-- 新增：API 抓取資料 -->
-      <button id="btnFetch" class="btn-link" title="從 API 取得最新權證清單">從 API 取得資料</button>
+      <button id="btnFetch" class="btn-link">從 API 取得資料</button>
+      <input id="fileInput" type="file" class="field" accept=".csv,.xlsx" />
 
-      <!-- 保留：手動上傳（選用） -->
-      <input id="fileInput" type="file" class="field" accept=".csv,.xlsx,.xls" title="選擇本機檔案（選用）"/>
-
-      <!-- 名稱關鍵字篩選 -->
-      <input id="nameFilter" type="text" class="field" placeholder="輸入名稱關鍵字（空白可分隔多個）"/>
-
+      <input id="nameFilter" type="text" class="field" placeholder="名稱關鍵字（空白分隔）"/>
       <select id="selType" class="field" style="max-width:160px">
         <option value="C" selected>認購 (C)</option>
         <option value="P">認售 (P)</option>
       </select>
 
-      <select id="selSortKey" class="field" style="max-width:280px">
+      <select id="selSortKey" class="field" style="max-width:260px">
         <option value="code">代號</option>
         <option value="spread">價差比</option>
         <option value="leverage">槓桿</option>
-        <option value="s1" selected>S1 = 價差比/槓桿</option>
-        <option value="s2">S2 = 價差比/槓桿/行使比例</option>
-        <option value="days_left">距到期天數</option>
-        <option value="iv">成交價隱波</option>
+        <option value="s1" selected>S1 = 價差/槓桿</option>
+        <option value="s2">S2 = 價差/槓桿/行使</option>
       </select>
 
       <select id="selOrder" class="field" style="max-width:140px">
-        <option value="asc" selected>升冪</option>
+        <option value="asc">升冪</option>
         <option value="desc">降冪</option>
       </select>
 
       <select id="selLimit" class="field" style="max-width:160px">
-        <option value="5">顯示 5 列</option>
-        <option value="10" selected>顯示 10 列</option>
-        <option value="15">顯示 15 列</option>
-        <option value="20">顯示 20 列</option>
-        <option value="all">顯示全部</option>
+        <option value="5">5 列</option>
+        <option value="10" selected>10 列</option>
+        <option value="20">20 列</option>
+        <option value="all">全部</option>
       </select>
 
-      <label class="chk"><input type="checkbox" id="chkFilterZeroSpread" checked/>排除價差比=0</label>
+      <label class="chk"><input type="checkbox" id="chkFilterZeroSpread" checked/>排除價差=0</label>
       <label class="chk"><input type="checkbox" id="chkHasIV" checked/>只顯示有隱波</label>
 
-      <!-- 已移除：前往元大權證搜尋 -->
       <button id="btnExportPng" class="btn-link">匯出 PNG</button>
     </div>
   </div>
 
   <div id="resultCard" class="card" style="margin-top:12px;display:none">
-    <div class="hint" id="meta2"></div>
+    <div id="meta2" class="hint"></div>
 
     <div id="resultScroll" style="overflow:auto;max-height:70vh;margin-top:6px">
       <table id="resultTable">
         <thead>
           <tr>
-            <th>代號</th>
-            <th>名稱</th>
-            <th>認購/售</th>
-            <th>價差比</th>
-            <th>槓桿</th>
-            <th>行使比例</th>
-            <th>S1 = 價差比/槓桿</th>
-            <th>S2 = 價差比/槓桿/行使比例</th>
-            <th>距到期天數</th>
-            <th>履約價</th>
-            <th>權證成交價</th>
-            <th>成交價隱波</th>
-            <th>價內外程度</th>
-            <th>流通在外比率</th>
+            <th>代號</th><th>名稱</th><th>CP</th><th>價差比</th><th>槓桿</th>
+            <th>行使比例</th><th>S1</th><th>S2</th><th>剩餘天數</th>
+            <th>履約價</th><th>成交價</th><th>隱波</th><th>價內外</th><th>流通比</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
   </div>
+
 </div>
 
 <script>
-/* ---------- 小工具 ---------- */
+/* ========== 預留：改成你 Render 上的完整 CSV API ========== */
+const API_URL = "👉 在這裡填入 Render CSV 端點 👈";
+
+/* DOM */
 const $=s=>document.querySelector(s);
+
+/* 數字工具 */
 const fmtNum=(v,d=2)=>(v==null||!isFinite(v))?"—":(+v).toFixed(d);
-const showPct100=(v,d=2)=>(v==null||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
+const pct=(v,d=2)=>(v==null||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
 
-/* 全形→半形 + 刪千分號/百分比字尾 → 轉數字 */
-function toHalfWidth(s){
-  return String(s)
-    .replace(/[\uFF01-\uFF5E]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0))
-    .replace(/\u3000/g,' ');
+/* 半形轉換 */
+function toHalf(s){
+  return String(s).replace(/[\uFF01-\uFF5E]/g, ch => 
+    String.fromCharCode(ch.charCodeAt(0)-0xFEE0)
+  );
 }
-function normText(s){
-  return toHalfWidth(String(s||"")).toLowerCase();
-}
-function num(x){
-  if(x==null) return null;
-  let s=String(x).trim(); if(!s) return null;
-  s=toHalfWidth(s).replace(/,/g,"").replace(/%$/,"");
-  if(/^\.\d+$/.test(s)) s="0"+s;
-  const v=parseFloat(s);
-  return isNaN(v)?null:v;
-}
+function norm(s){ return toHalf(String(s||"")).trim().toLowerCase(); }
 
-/* 欄名正規化與對照 */
-function normalizeKey(k){
-  if(k==null) return "";
-  let s=String(k).replace(/\uFEFF/g,"");
-  s=toHalfWidth(s).trim().replace(/\s+/g,"").replace(/\([^)]*\)/g,"").replace(/%/g,"");
-  if(s.startsWith("Unnamed")||s==="__EMPTY") return "";
-  return s.toLowerCase();
-}
-const ALIAS={
-  "權證代碼":["權證代碼","代碼"],
-  "權證名稱":["權證名稱","名稱"],
-  "買賣價差比":["買賣價差比","價差比"],
-  "實質槓桿":["實質槓桿","槓桿"],
-  "行使比例":["行使比例","轉換比率"],
-  "距到期天數":["距到期天數","剩餘天數"],
-  "履約價":["履約價"],
-  "權證成交價":["權證成交價","成交價"],
-  "成交價隱波":["成交價隱波","隱含波動率"],
-  "價內外程度":["價內外程度"],
-  "流通在外比率":["流通在外比率"]
-};
-const N2STD=(()=>{const m=new Map();for(const s in ALIAS){ALIAS[s].forEach(a=>m.set(normalizeKey(a),s));}return m;})();
-
-/* 粗略偵測欄位亂碼 */
-function mojibake(keys){
-  if(!keys||!keys.length) return true;
-  const s=keys.join("|");
-  return / /.test(s) || (!/[\u4E00-\u9FFF]/.test(s) && /[\u00C0-\u024F]/.test(s));
-}
-
-/* ---------- 資料流 ---------- */
-let RAW=[];
-
-/* 透過 SheetJS 正規化為 JSON 陣列 */
+/* 解析上傳 */
 function sheetToArray(wb){
   const ws=wb.Sheets[wb.SheetNames[0]];
   return XLSX.utils.sheet_to_json(ws,{defval:""});
 }
 
-/* 載入完成 → 設定 RAW 並觸發 render */
-function doneLoad(arr,label,srcName){
-  RAW=arr.map(normRow).filter(r=>Object.keys(r).length);
-  const now=new Date();
-  const ts=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,"0")}/${String(now.getDate()).padStart(2,"0")} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
-  $("#meta").innerHTML=`資料來源：<b>${srcName}</b>（${label}），筆數 <b>${RAW.length}</b>。更新時間 ${ts}`;
-  recompute();
+/* 全域 RAW */
+let RAW=[];
+
+/* 規格化欄位名稱 */
+function normalizeKey(k){
+  if(!k) return "";
+  let s=toHalf(k).replace(/\s+/g,"").replace(/\([^)]*\)/g,"").toLowerCase();
+  return s;
 }
 
-/* 正規化每列欄位名稱 */
-function normRow(row){
+/* 欄位映射 */
+const MAP={
+  "權證代碼":"code",
+  "代碼":"code",
+  "權證名稱":"name",
+  "買賣價差比":"spread",
+  "實質槓桿":"lev",
+  "行使比例":"exr",
+  "距到期天數":"days",
+  "履約價":"strike",
+  "權證成交價":"price",
+  "成交價":"price",
+  "成交價隱波":"iv",
+  "隱含波動率":"iv",
+  "價內外程度":"mny",
+  "流通在外比率":"flow"
+};
+
+function mapRow(row){
   const o={};
   for(const k in row){
-    const nk=normalizeKey(k);
+    const nk = normalizeKey(k);
     if(!nk) continue;
-    o[N2STD.get(nk)||k]=row[k];
+
+    for(const raw in MAP){
+      if(nk.includes(normalizeKey(raw))){
+        o[MAP[raw]] = row[k];
+      }
+    }
   }
   return o;
 }
 
-/* 檔案上傳（保留） */
-$("#fileInput").addEventListener("change",()=>{
-  const f=$("#fileInput").files[0]; if(!f) return;
+/* 完成載入 */
+function done(arr,label){
+  RAW = arr.map(mapRow);
+  $("#meta").innerHTML = `資料來源：<b>${label}</b>／共 <b>${RAW.length}</b> 筆`;
 
-  const onDone=(arr,label)=>doneLoad(arr,label,`本機檔案：${f.name}`);
-
-  if(/\.csv$/i.test(f.name)){
-    const r1=new FileReader();
-    r1.onload=e=>{
-      try{
-        const wb=XLSX.read(e.target.result,{type:"binary",codepage:950});
-        const arr=sheetToArray(wb);
-        if(mojibake(Object.keys(arr[0]||{}))) throw 0;
-        onDone(arr,"Big5 CSV");
-      }catch{
-        const r2=new FileReader();
-        r2.onload=e2=>{
-          const wb=XLSX.read(e2.target.result,{type:"string",codepage:65001});
-          onDone(sheetToArray(wb),"UTF-8 CSV");
-        };
-        r2.readAsText(f,"utf-8");
-      }
-    };
-    r1.readAsBinaryString(f);
-  }else{
-    const r=new FileReader();
-    r.onload=e=>{
-      const wb=XLSX.read(e.target.result,{type:"array"});
-      onDone(sheetToArray(wb),"XLSX");
-    };
-    r.readAsArrayBuffer(f);
-  }
-});
-
-/* 顯示行數（支援 all） */
-function getLimit(total){
-  const v=$("#selLimit").value;
-  if(v==="all") return total;
-  const n=parseInt(v,10);
-  return isNaN(n)?10:Math.max(1,Math.min(10000,n));
+  recompute();
 }
 
-/* 主計算（含名稱關鍵字篩選） */
+/* 計算 */
 function compute(){
-  if(!RAW.length) return [];
-  const want=$("#selType").value;
-  const dropZero=$("#chkFilterZeroSpread").checked;
-  const mustHaveIV=$("#chkHasIV").checked;
+  const want = $("#selType").value;
+  const dropZero = $("#chkFilterZeroSpread").checked;
+  const wantIV = $("#chkHasIV").checked;
 
-  // 名稱關鍵字（多個以空白分隔，AND 條件）
-  const qRaw=$("#nameFilter").value||"";
-  const qTokens=normText(qRaw).split(/\s+/).filter(Boolean);
+  const qTokens = norm($("#nameFilter").value).split(/\s+/).filter(Boolean);
 
-  const rows=RAW.map(r=>{
-    const name=r["權證名稱"]??"",code=r["權證代碼"];
-    // 判斷 C/P
-    let cp="";
-    if(/[售]/.test(name)||/\bP\b/i.test(name)||/PUT/i.test(name)) cp="P";
-    else if(/[購]/.test(name)||/\bC\b/i.test(name)||/CALL/i.test(name)) cp="C";
+  const rows = RAW.map(r=>{
+    const cp = (r.name||"").includes("售") ? "P" : "C";
 
-    const spread=num(r["買賣價差比"]);
-    const lev=num(r["實質槓桿"]);
-    const exr=num(r["行使比例"]);
-    const days=num(r["距到期天數"]);
-    const iv=num(r["成交價隱波"]);
+    const spread = parseFloat(r.spread);
+    const lev = parseFloat(r.lev);
+    const exr = parseFloat(r.exr);
+    const days = parseFloat(r.days);
+    const iv = parseFloat(r.iv);
 
-    const s1=(spread!=null && isFinite(spread) && Math.abs(lev)>0) ? spread/Math.abs(lev) : null;
-    const s2=(s1!=null && isFinite(s1) && exr>0) ? s1/exr : null;
+    const s1 = (spread && lev) ? spread/Math.abs(lev) : null;
+    const s2 = (s1 && exr) ? s1/exr : null;
 
-    return{
-      code,name,cp,
-      spread,
-      leverage:lev,
-      exercise:exr,
-      s1,s2,
-      days_left:isFinite(days)?Math.round(days):null,
-      strike:r["履約價"],
-      price:r["權證成交價"]??r["成交價"],
-      iv,
-      moneyness:r["價內外程度"],
-      float_rate:r["流通在外比率"],
-      _nameNorm: normText(name)
+    return {
+      code:r.code, name:r.name, cp,
+      spread, lev, exr, s1, s2,
+      days: isFinite(days)?days:null,
+      strike:r.strike,
+      price:r.price,
+      iv, mny:r.mny, flow:r.flow,
+      _n: norm(r.name)
     };
-  }).filter(x=>{
-    if(x.cp!==want) return false;
-    if(!(x.days_left==null || x.days_left>60)) return false;      // 距到期 > 60
-    if(dropZero && x.spread!=null && +x.spread===0) return false; // 排除價差=0
-    if(mustHaveIV && (x.iv==null || !isFinite(x.iv))) return false; // 必須有 IV
+  }).filter(r=>{
+    if(r.cp !== want) return false;
+    if(dropZero && r.spread===0) return false;
+    if(wantIV && !isFinite(r.iv)) return false;
 
-    // 名稱 AND 篩選：每個 token 都要包含在名稱中
-    if(qTokens.length){
-      for(const t of qTokens){ if(!x._nameNorm.includes(t)) return false; }
-    }
+    for(const t of qTokens){ if(!r._n.includes(t)) return false; }
     return true;
   });
 
-  // 排序
+  /* 排序 */
   const key=$("#selSortKey").value;
   const dir=$("#selOrder").value==="desc"?-1:1;
 
   rows.sort((a,b)=>{
-    let va=a[key], vb=b[key];
-
-    // 代號以數字優先
-    if(key==="code"){
-      const na=parseInt(a.code,10), nb=parseInt(b.code,10);
-      if(!isNaN(na) && !isNaN(nb)){ va=na; vb=nb; }
-      else { va=(a.code||""); vb=(b.code||""); }
-    }
-
-    if(va==null&&vb==null) return 0;
+    const va=a[key], vb=b[key];
     if(va==null) return 1;
     if(vb==null) return -1;
     return (va>vb?1:(va<vb?-1:0))*dir;
@@ -385,166 +270,105 @@ function compute(){
   return rows;
 }
 
-/* 顏色規則 */
-function clsLev(lev){
-  if(lev==null||!isFinite(lev))return"";
-  const v=Math.abs(lev);
-  if(v>5)return"gold-text";
-  if(v<2)return"red-text";
-  return"";
-}
-function clsS1(s1){
-  if(s1==null||!isFinite(s1))return"";
-  return (s1<0.10)?"gold-text":"";
-}
-function clsExr(exr){
-  if(exr==null||!isFinite(exr))return"";
-  if(exr<0.01)return"red-text";
-  if(exr>=0.10)return"gold-text";
-  return"";
-}
-function clsS2(s2){
-  if(s2==null||!isFinite(s2))return"";
-  if(s2>5)return"red-text";
-  if(s2<2)return"gold-text";
-  return"";
-}
-
-/* 列出一行 HTML */
-function rowHTML(r){
-  return `
-    <td><b>${r.code??""}</b></td>
-    <td>${r.name??""}</td>
-    <td><span class="tag ${r.cp??""}">${r.cp??""}</span></td>
-    <td>${fmtNum(r.spread,3)}</td>
-    <td class="${clsLev(r.leverage)}">${fmtNum(Math.abs(r.leverage),3)}</td>
-    <td class="${clsExr(r.exercise)}">${fmtNum(r.exercise,3)}</td>
-    <td class="${clsS1(r.s1)}">${showPct100(r.s1,2)}</td>
-    <td class="${clsS2(r.s2)}">${showPct100(r.s2,2)}</td>
-    <td>${r.days_left??"—"}</td>
-    <td>${r.strike??""}</td>
-    <td>${r.price==null?"":fmtNum(r.price,3)}</td>
-    <td>${r.iv==null?"—":fmtNum(r.iv,3)}</td>
-    <td>${r.moneyness??""}</td>
-    <td>${r.float_rate??""}</td>
-  `;
-}
-
-/* 渲染表格 */
+/* 渲染 */
 function render(rows){
   $("#resultCard").style.display="block";
-  const limit=getLimit(rows.length);
-  const shown=rows.slice(0,limit);
 
-  const q=$("#nameFilter").value.trim();
-  const metaFilter = q ? `，名稱包含「${q}」` : "";
+  const limit = $("#selLimit").value==="all"
+    ? rows.length
+    : parseInt($("#selLimit").value,10);
 
-  $("#meta2").textContent=
-    `筆數：顯示 ${shown.length} / 總 ${rows.length}（${$("#selType").value}、距到期>60、`+
-    `${$("#chkFilterZeroSpread").checked?"排除價差=0":"含價差=0"}、`+
-    `${$("#chkHasIV").checked?"只顯示有隱波":"含無隱波"}${metaFilter}）`;
+  const list = rows.slice(0,limit);
+
+  $("#meta2").innerHTML = `顯示 ${list.length} / ${rows.length} 筆`;
 
   const tb=$("#tbody");
   tb.innerHTML="";
-  shown.forEach(r=>{
+
+  list.forEach(r=>{
     const tr=document.createElement("tr");
-    tr.innerHTML=rowHTML(r);
+    tr.innerHTML = `
+      <td><b>${r.code}</b></td>
+      <td>${r.name}</td>
+      <td><span class="tag ${r.cp}">${r.cp}</span></td>
+      <td>${fmtNum(r.spread,3)}</td>
+      <td>${fmtNum(r.lev,3)}</td>
+      <td>${fmtNum(r.exr,3)}</td>
+      <td>${pct(r.s1,2)}</td>
+      <td>${pct(r.s2,2)}</td>
+      <td>${r.days??"—"}</td>
+      <td>${r.strike??""}</td>
+      <td>${fmtNum(r.price,3)}</td>
+      <td>${fmtNum(r.iv,3)}</td>
+      <td>${r.mny??""}</td>
+      <td>${r.flow??""}</td>
+    `;
     tb.appendChild(tr);
   });
 }
 
-/* 重新計算 + 渲染（含輸入節流） */
-let _deb=null;
-function recompute(){ render(compute()); }
-["selType","selSortKey","selOrder","chkFilterZeroSpread","selLimit","chkHasIV","nameFilter"].forEach(id=>{
-  const el=$(`#${id}`);
-  const handler=()=>{
-    clearTimeout(_deb);
-    _deb=setTimeout(recompute,150);
-  };
-  el.addEventListener("change",handler);
-  el.addEventListener("input",handler);
+let tm=null;
+function recompute(){
+  clearTimeout(tm);
+  tm=setTimeout(()=>{
+    render(compute());
+  },100);
+}
+
+/* 監聽項目 */
+["nameFilter","selType","selSortKey","selOrder","selLimit","chkFilterZeroSpread","chkHasIV"]
+.forEach(id=>{
+  $(`#${id}`).addEventListener("input", recompute);
+  $(`#${id}`).addEventListener("change", recompute);
 });
-document.addEventListener("DOMContentLoaded",()=>recompute());
 
-/* 匯出 PNG（解除捲動限制→截圖→恢復） */
+/* 匯出 PNG */
 $("#btnExportPng").addEventListener("click",async()=>{
-  const rows=compute();
-  const limit=getLimit(rows.length);
-  const picked=rows.slice(0,limit);
-  if(!picked.length) return;
-
+  const wrap = $("#resultCard");
   document.body.classList.add("exporting");
 
-  // 複製卡片，解除高度限制，填入目前顯示資料
-  const clone=$("#resultCard").cloneNode(true);
-  clone.id="exportClone";
-  const sc=clone.querySelector("#resultScroll");
-  if(sc){ sc.style.maxHeight="unset"; sc.style.overflow="visible"; }
-  const tb=clone.querySelector("#tbody");
-  tb.innerHTML="";
-  picked.forEach(r=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=rowHTML(r);
-    tb.appendChild(tr);
-  });
+  const canvas = await html2canvas(wrap,{scale:2});
+  const link = document.createElement("a");
 
-  const wrap=document.createElement("div");
-  wrap.style.position="absolute";
-  wrap.style.left="-9999px";
-  wrap.appendChild(clone);
-  document.body.appendChild(wrap);
+  link.download = "momo_warrant.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
 
-  try{
-    const canvas=await html2canvas(clone,{backgroundColor:null,scale:2});
-    const a=document.createElement("a");
-    const dt=new Date();
-    a.download=`momo_warrant_${dt.getFullYear()}${String(dt.getMonth()+1).padStart(2,"0")}${String(dt.getDate()).padStart(2,"0")}.png`;
-    a.href=canvas.toDataURL("image/png");
-    a.click();
-  }finally{
-    wrap.remove();
-    document.body.classList.remove("exporting");
-  }
+  document.body.classList.remove("exporting");
 });
 
-/* ---------- 新增：從 API 取得 CSV 並載入 ---------- */
-// 換成這行 (新的)
-// 不論您之前改成什麼，請把它改回這行
-const API_URL = "https://warrant-proxy.vercel.app/api/get-warrants-csv";
-$("#btnFetch").addEventListener("click", async ()=>{
+/* 從 API 抓取 */
+$("#btnFetch").addEventListener("click",async()=>{
   const btn=$("#btnFetch");
-  const original=btn.textContent;
-  btn.disabled=true; btn.textContent="抓取中…";
+  const old=btn.textContent;
 
-  // 超時控制（20 秒）
-  const ctrl = new AbortController();
-  const timer = setTimeout(()=>ctrl.abort(), 20000);
+  btn.disabled=true;
+  btn.textContent="抓取中…";
 
   try{
-    const res = await fetch(API_URL, { cache:"no-store", signal: ctrl.signal });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const csv = await res.text();
+    const res = await fetch(API_URL,{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
 
-    // 用 SheetJS 解析 CSV（UTF-8 預設）
-    const wb = XLSX.read(csv, { type:"string", codepage:65001 });
+    const csv = await res.text();
+    const wb = XLSX.read(csv,{type:"string"});
     const arr = sheetToArray(wb);
 
-    // 簡單檢查欄位
     if(!arr.length) throw new Error("CSV 無資料");
-    if(mojibake(Object.keys(arr[0]||{}))){
-      console.warn("可能的欄位亂碼：", Object.keys(arr[0]||{}));
-    }
 
-    doneLoad(arr, "CSV", "API：warrant-proxy");
+    done(arr,"API（Render）");
+
   }catch(err){
     console.error(err);
-    alert("抓取失敗，請稍後再試。\n原因："+ (err?.message||err));
+    alert("抓取失敗："+err.message);
   }finally{
-    clearTimeout(timer);
-    btn.disabled=false; btn.textContent=original;
+    btn.disabled=false;
+    btn.textContent=old;
   }
 });
+
+/* 初始化 */
+document.addEventListener("DOMContentLoaded",()=>recompute());
 </script>
+
 </body>
 </html>
