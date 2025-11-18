@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>MCS 景氣循環儀表板｜MOMO 財商智庫</title>
+  <meta name="theme-color" content="#0A1221" />
+  <style>
+    :root {
+      --deep: #0A1221;
+      --card: #0C152A;
+      --ink: #EDEFF5;
+      --muted: #9fb1cc;
+      --gold: #C9A227;
+      --gold-soft: #E9D18A;
+      --danger: #ff6b6b;
+      --safe: #3dd68c;
+      --border: rgba(233,209,138,0.3);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+      background: radial-gradient(circle at top, #172133 0, #050814 50%, #02040A 100%);
+      color:var(--ink);
+      padding:16px;
+    }
+    .page {
+      max-width:1100px;
+      margin:0 auto;
+    }
+    h1 {
+      margin:0 0 4px;
+      font-size:24px;
+      letter-spacing:0.04em;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    h1 span.badge {
+      font-size:12px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(201,162,39,0.6);
+      color:var(--gold-soft);
+      text-transform:uppercase;
+    }
+    .subtitle {
+      margin:0 0 12px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .top-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:16px;
+      align-items:stretch;
+    }
+    .score-card {
+      flex:1 1 260px;
+      padding:14px 16px;
+      border-radius:16px;
+      background: radial-gradient(circle at top left, rgba(233,209,138,0.16), #0B1224 55%, #050814 100%);
+      border:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:0;
+    }
+
+    /* 新增：甜甜圈 + 四象限布局 */
+    .score-layout {
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .gauge-wrapper {
+      position:relative;
+      width:130px;
+      height:130px;
+      flex:0 0 auto;
+    }
+    .gauge-wrapper canvas {
+      width:100% !important;
+      height:100% !important;
+    }
+    .gauge-center {
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+    }
+    .gauge-center-main {
+      font-size:28px;
+      font-weight:700;
+      line-height:1;
+    }
+    .gauge-center-label {
+      margin-top:2px;
+      font-size:11px;
+      letter-spacing:0.09em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    .score-right {
+      flex:1 1 160px;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:flex-start;
+    }
+    .stage-pill {
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      border:1px solid rgba(233,209,138,0.5);
+      background:linear-gradient(120deg,rgba(233,209,138,0.22),rgba(10,18,33,0.9));
+    }
+    .stage-pill.recession { border-color:rgba(248,113,113,0.9); color:#ffdada; }
+    .stage-pill.slowdown { border-color:rgba(251,146,60,0.9); color:#ffe5bf; }
+    .stage-pill.growth   { border-color:rgba(34,197,94,0.9); color:#d6ffea; }
+    .stage-pill.heat     { border-color:rgba(234,179,8,0.9); color:#fff1b5; }
+
+    .score-right-title {
+      font-size:13px;
+      font-weight:600;
+      color:var(--gold-soft);
+    }
+    .score-right-desc {
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .meta-row {
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      gap:8px;
+      font-size:11px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .chip {
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(156,163,175,0.4);
+      font-size:11px;
+      color:var(--muted);
+    }
+    .status-ok { color:var(--safe); border-color:rgba(61,214,140,0.5); }
+
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:18px;
+    }
+    @media (max-width:900px){
+      .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:640px){
+      .grid { grid-template-columns:1fr; }
+      .top-row { flex-direction:column; }
+      .gauge-wrapper { margin:0 auto; }
+      .score-right { align-items:flex-start; }
+    }
+    .factor-card {
+      border-radius:14px;
+      background:var(--card);
+      border:1px solid rgba(148,163,184,0.3);
+      padding:12px 12px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-height:0;
+    }
+    .factor-title {
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:0.09em;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .factor-score {
+      font-size:20px;
+      font-weight:600;
+    }
+    .factor-bar {
+      position:relative;
+      height:5px;
+      border-radius:999px;
+      background:rgba(30,41,59,0.9);
+      overflow:hidden;
+    }
+    .factor-bar-fill {
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#EFD88A,#C9A227,#B8860B);
+      transform-origin:left center;
+      transform:scaleX(0);
+      transition:transform .4s ease-out;
+    }
+    .factor-meta {
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    /* 建議策略配比區塊 */
+    .alloc-section {
+      margin-top:4px;
+      padding:14px 14px 16px;
+      border-radius:16px;
+      background:radial-gradient(circle at top left,rgba(57,78,118,0.6),#050814);
+      border:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .alloc-header {
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:0.1em;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:center;
+    }
+    .alloc-header span.main {
+      color:var(--gold-soft);
+      font-weight:600;
+    }
+
+    .profile-toggle-group {
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .profile-toggle {
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.6);
+      background:transparent;
+      color:var(--muted);
+      font-size:11px;
+      cursor:pointer;
+      letter-spacing:0.08em;
+    }
+    .profile-toggle.active {
+      border-color:rgba(201,162,39,0.9);
+      background:linear-gradient(120deg,rgba(239,216,138,0.25),rgba(10,18,33,0.95));
+      color:var(--gold-soft);
+    }
+
+    .alloc-chip-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .alloc-detail-list {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:12px;
+      margin-top:6px;
+    }
+    .alloc-item-row {
+      padding:6px 8px 8px;
+      border-radius:10px;
+      background:rgba(15,23,42,0.9);
+      border:1px solid rgba(148,163,184,0.4);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .alloc-item-label {
+      display:flex;
+      flex-direction:column;
+      gap:1px;
+    }
+    .alloc-item-label span.sub {
+      font-size:11px;
+      color:var(--muted);
+    }
+    .alloc-item-bottom {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .alloc-bar-track {
+      position:relative;
+      flex:1;
+      height:10px;
+      border-radius:999px;
+      background:rgba(15,23,42,1);
+      overflow:hidden;
+    }
+    .alloc-bar-fill {
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      transform-origin:left center;
+      transform:scaleX(0);
+      transition:transform .4s ease-out;
+    }
+    #allocEquityBar    { background:linear-gradient(90deg,#EFD88A,#C9A227); }
+    #allocIncomeBar    { background:linear-gradient(90deg,#4ADE80,#22C55E); }
+    #allocDefensiveBar { background:linear-gradient(90deg,#60A5FA,#3B82F6); }
+
+    .alloc-item-value {
+      font-size:14px;
+      font-weight:600;
+      color:var(--gold-soft);
+      min-width:40px;
+      text-align:right;
+    }
+    .footnote {
+      margin-top:4px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    /* MCS 6M 走勢區塊 */
+    .history-section {
+      margin-top:12px;
+      padding:14px 14px 16px;
+      border-radius:16px;
+      background:radial-gradient(circle at top left,rgba(15,23,42,0.9),#020617);
+      border:1px solid var(--border);
+    }
+
+    .history-header {
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      margin-bottom:8px;
+    }
+
+    .history-header .main {
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      color:var(--gold-soft);
+    }
+
+    .history-header .sub {
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .history-legend {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:4px;
+      font-size:11px;
+      color:var(--muted);
+      align-items:center;
+    }
+    .legend-pill {
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+    .legend-color {
+      width:12px;
+      height:6px;
+      border-radius:999px;
+    }
+
+    #mcsHistoryChart {
+      max-width:100%;
+      height:230px;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="page">
+  <h1>
+    MCS 景氣循環儀表板
+    <span class="badge">MACRO CYCLE SCANNER</span>
+  </h1>
+  <p class="subtitle">結合利差、殖利率曲線、股市動能、EPS 成長與波動指標，動態評估景氣階段，並給出基金策略配比建議。</p>
+
+  <div class="top-row">
+    <div class="score-card">
+      <div class="score-layout">
+        <!-- 圓餅四象限 -->
+        <div class="gauge-wrapper">
+          <canvas id="mcsGaugeChart"></canvas>
+          <div class="gauge-center">
+            <div class="gauge-center-main" id="gaugeScoreText">--</div>
+            <div class="gauge-center-label">MCS SCORE</div>
+          </div>
+        </div>
+
+        <!-- 右側 Stage & 說明 -->
+        <div class="score-right">
+          <div class="stage-pill recession" id="mcsStagePill">--</div>
+          <div class="score-right-title" id="mcsStageTitle">景氣象限：--</div>
+          <div class="score-right-desc" id="mcsStageDesc">
+            依 MCS 分數對應四大景氣區間：Recession / Slowdown / Growth / Heat。
+          </div>
+        </div>
+      </div>
+      <div class="meta-row">
+        <div id="mcsAsOf">更新時間：--</div>
+        <div class="chip status-ok" id="mcsSource">來源：--</div>
+        <div class="chip" id="allocScoreChip">Score：--/100</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五大因子卡片 -->
+  <div class="grid">
+    <div class="factor-card" id="factor-credit">
+      <div class="factor-title">
+        <span>CREDIT</span>
+        <span class="factor-score" id="creditScore">--</span>
+      </div>
+      <div class="factor-bar"><div class="factor-bar-fill" id="creditBar"></div></div>
+      <div class="factor-meta" id="creditMeta">
+        <span>HY Spread：--</span>
+        <span>IG Spread：--</span>
+      </div>
+    </div>
+
+    <div class="factor-card" id="factor-rates">
+      <div class="factor-title">
+        <span>RATES</span>
+        <span class="factor-score" id="ratesScore">--</span>
+      </div>
+      <div class="factor-bar"><div class="factor-bar-fill" id="ratesBar"></div></div>
+      <div class="factor-meta" id="ratesMeta">
+        <span>10Y：--</span>
+        <span>2Y &amp; Curve：--</span>
+      </div>
+    </div>
+
+    <div class="factor-card" id="factor-equity">
+      <div class="factor-title">
+        <span>EQUITY</span>
+        <span class="factor-score" id="equityScore">--</span>
+      </div>
+      <div class="factor-bar"><div class="factor-bar-fill" id="equityBar"></div></div>
+      <div class="factor-meta" id="equityMeta">
+        <span>S&amp;P 500 6M 動能：--</span>
+        <span>指數水位：--</span>
+      </div>
+    </div>
+
+    <div class="factor-card" id="factor-eps">
+      <div class="factor-title">
+        <span>EPS</span>
+        <span class="factor-score" id="epsScore">--</span>
+      </div>
+      <div class="factor-bar"><div class="factor-bar-fill" id="epsBar"></div></div>
+      <div class="factor-meta" id="epsMeta">
+        <span>EPS YoY：--</span>
+      </div>
+    </div>
+
+    <div class="factor-card" id="factor-sentiment">
+      <div class="factor-title">
+        <span>SENTIMENT</span>
+        <span class="factor-score" id="sentimentScore">--</span>
+      </div>
+      <div class="factor-bar"><div class="factor-bar-fill" id="sentimentBar"></div></div>
+      <div class="factor-meta" id="sentimentMeta">
+        <span>VIX：--</span>
+        <span>MOVE：--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 建議策略配比 -->
+  <section class="alloc-section">
+    <div class="alloc-header">
+      <span class="main">建議策略配比</span>
+      <div class="profile-toggle-group">
+        <button class="profile-toggle" data-profile="conservative">保守型</button>
+        <button class="profile-toggle active" data-profile="balanced">平衡型</button>
+        <button class="profile-toggle" data-profile="aggressive">積極型</button>
+      </div>
+    </div>
+
+    <div class="alloc-chip-row">
+      <span class="chip">即時 MCS × 資產配置引擎</span>
+      <span class="chip" id="allocProfileLabel">屬性：平衡型</span>
+      <span class="chip" id="allocStageChip">Stage：--</span>
+    </div>
+
+    <div class="alloc-detail-list">
+      <div class="alloc-item-row">
+        <div class="alloc-item-label">
+          <span>股票型 / 成長型基金</span>
+          <span class="sub">大盤、主題、科技、成長股基金等</span>
+        </div>
+        <div class="alloc-item-bottom">
+          <div class="alloc-bar-track">
+            <div class="alloc-bar-fill" id="allocEquityBar"></div>
+          </div>
+          <div class="alloc-item-value" id="allocEquityText">--%</div>
+        </div>
+      </div>
+      <div class="alloc-item-row">
+        <div class="alloc-item-label">
+          <span>收益 / 多重資產基金</span>
+          <span class="sub">股債平衡、多重收益、配息策略</span>
+        </div>
+        <div class="alloc-item-bottom">
+          <div class="alloc-bar-track">
+            <div class="alloc-bar-fill" id="allocIncomeBar"></div>
+          </div>
+          <div class="alloc-item-value" id="allocIncomeText">--%</div>
+        </div>
+      </div>
+      <div class="alloc-item-row">
+        <div class="alloc-item-label">
+          <span>防禦 / 現金等部位</span>
+          <span class="sub">投資級債、短債、貨幣市場、現金</span>
+        </div>
+        <div class="alloc-item-bottom">
+          <div class="alloc-bar-track">
+            <div class="alloc-bar-fill" id="allocDefensiveBar"></div>
+          </div>
+          <div class="alloc-item-value" id="allocDefensiveText">--%</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="footnote">
+      此配比為系統依當前 MCS 景氣分數與階段推估之「策略參考區間」，實際投組仍需搭配個人風險承受度與既有部位調整。
+    </p>
+  </section>
+
+  <!-- MCS 6M 走勢 + Stage 區間 + S&P 價格 -->
+  <section class="history-section">
+    <div class="history-header">
+      <span class="main">MCS 6M 走勢</span>
+      <span class="sub">觀察景氣分數在最近六個月的變化，並對照 S&amp;P 500 價格走勢與景氣階段區間。</span>
+      <div class="history-legend">
+        <span class="legend-pill"><span class="legend-color" style="background:rgba(248,113,113,0.35);"></span>Recession</span>
+        <span class="legend-pill"><span class="legend-color" style="background:rgba(251,146,60,0.3);"></span>Slowdown</span>
+        <span class="legend-pill"><span class="legend-color" style="background:rgba(34,197,94,0.25);"></span>Growth</span>
+        <span class="legend-pill"><span class="legend-color" style="background:rgba(234,179,8,0.22);"></span>Heat</span>
+        <span class="legend-pill"><span class="legend-color" style="background:#EFD88A;"></span>MCS Score</span>
+        <span class="legend-pill"><span class="legend-color" style="background:#38BDF8;"></span>S&amp;P 500</span>
+      </div>
+    </div>
+    <canvas id="mcsHistoryChart"></canvas>
+    <p class="footnote">
+      背景色帶為各日 MCS 判定之景氣階段；線條為 MCS 分數（左軸）與 S&amp;P 500 指數（右軸），協助判斷「景氣 × 大盤」動態關係。
+    </p>
+  </section>
+</div>
+
+<script>
+  const API_BASE = 'https://mcs-worker.nms3194949.workers.dev';
+  let currentProfile = 'balanced';
+  let historyChart = null;
+  let gaugeChart = null;
+
+  function formatPctPlain(x, digits = 0) {
+    if (x == null || Number.isNaN(x)) return '--';
+    return x.toFixed(digits) + '%';
+  }
+  function clamp(x, min, max) {
+    return Math.min(max, Math.max(min, x));
+  }
+
+  function setStagePill(stage) {
+    const pill = document.getElementById('mcsStagePill');
+    const chip = document.getElementById('allocStageChip');
+    const titleEl = document.getElementById('mcsStageTitle');
+    const descEl  = document.getElementById('mcsStageDesc');
+
+    const mapTitle = {
+      Recession: '景氣象限：Recession（衰退區）',
+      Slowdown:  '景氣象限：Slowdown（放緩區）',
+      Growth:    '景氣象限：Growth（成長區）',
+      Heat:      '景氣象限：Heat（過熱區）'
+    };
+    const mapDesc = {
+      Recession: '信用利差放大、風險偏好下降，資產配置以防禦與現金管理為主。',
+      Slowdown:  '成長動能放緩但未全面衰退，適合保守調整高波動資產部位。',
+      Growth:    '經濟與企業獲利維持成長，適合核心長期持有與逢回布局。',
+      Heat:      '景氣與市場情緒偏熱，須注意估值與風險累積，逢高調整。'
+    };
+
+    pill.classList.remove('recession','slowdown','growth','heat');
+    if (!stage) {
+      pill.textContent = '--';
+      chip.textContent = 'Stage：--';
+      titleEl.textContent = '景氣象限：--';
+      descEl.textContent  = '依 MCS 分數對應四大景氣區間：Recession / Slowdown / Growth / Heat。';
+      return;
+    }
+    pill.classList.add(stage.toLowerCase());
+    pill.textContent = stage;
+    chip.textContent = 'Stage：' + stage;
+    titleEl.textContent = mapTitle[stage] || ('景氣象限：' + stage);
+    descEl.textContent  = mapDesc[stage]  || '依 MCS 分數對應四大景氣區間。';
+  }
+
+  function updateFactorCard(factorKey, factor) {
+    const scoreEl = document.getElementById(factorKey + 'Score');
+    const barEl   = document.getElementById(factorKey + 'Bar');
+    const metaEl  = document.getElementById(factorKey + 'Meta');
+    if (!factor) return;
+
+    scoreEl.textContent = factor.score ?? '--';
+    const ratio = (factor.score ?? 0) / 20;
+    barEl.style.transform = 'scaleX(' + ratio.toFixed(2) + ')';
+
+    if (factorKey === 'credit') {
+      metaEl.innerHTML = `
+        <span>HY Spread：${factor.hy_spread?.toFixed(2) ?? '--'}%</span>
+        <span>IG Spread：${factor.ig_spread?.toFixed(2) ?? '--'}%</span>
+      `;
+    } else if (factorKey === 'rates') {
+      metaEl.innerHTML = `
+        <span>10Y：${factor.us10y?.toFixed(2) ?? '--'}%</span>
+        <span>2Y：${factor.us2y?.toFixed(2) ?? '--'}%，Curve：${factor.ycc?.toFixed(2) ?? '--'}%</span>
+      `;
+    } else if (factorKey === 'equity') {
+      metaEl.innerHTML = `
+        <span>S&amp;P 500 6M 動能：${factor.sp500_momo_6m != null ? (factor.sp500_momo_6m*100).toFixed(1) + '%' : '--'}</span>
+        <span>指數水位：${factor.sp500_today?.toFixed(2) ?? '--'}</span>
+      `;
+    } else if (factorKey === 'eps') {
+      metaEl.innerHTML = `
+        <span>EPS YoY：${factor.eps_yoy != null ? (factor.eps_yoy*100).toFixed(1) + '%' : '--'}</span>
+      `;
+    } else if (factorKey === 'sentiment') {
+      metaEl.innerHTML = `
+        <span>VIX：${factor.vix?.toFixed(1) ?? '--'}</span>
+        <span>MOVE：${factor.move?.toFixed(1) ?? '--'}</span>
+      `;
+    }
+  }
+
+  function setAllocBar(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = clamp(value ?? 0, 0, 100) / 100;
+    el.style.transform = 'scaleX(' + v.toFixed(2) + ')';
+  }
+
+  function setActiveProfileButton(profile) {
+    document.querySelectorAll('.profile-toggle').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.profile === profile);
+    });
+    const labelMap = {
+      balanced:     '屬性：平衡型',
+      conservative: '屬性：保守型',
+      aggressive:   '屬性：積極型'
+    };
+    document.getElementById('allocProfileLabel').textContent =
+      labelMap[profile] || ('屬性：' + profile);
+  }
+
+  // 新增：四象限甜甜圈圖
+  function updateMcsGauge(score, stage) {
+    const canvas = document.getElementById('mcsGaugeChart');
+    const centerText = document.getElementById('gaugeScoreText');
+    if (score == null || Number.isNaN(score)) {
+      centerText.textContent = '--';
+    } else {
+      centerText.textContent = Math.round(score);
+    }
+
+    const labels = ['Recession','Slowdown','Growth','Heat'];
+    const baseColors = {
+      Recession: 'rgba(248,113,113,0.22)',
+      Slowdown:  'rgba(251,146,60,0.20)',
+      Growth:    'rgba(34,197,94,0.18)',
+      Heat:      'rgba(234,179,8,0.16)'
+    };
+    const activeColors = {
+      Recession: 'rgba(248,113,113,0.9)',
+      Slowdown:  'rgba(251,146,60,0.9)',
+      Growth:    'rgba(34,197,94,0.9)',
+      Heat:      'rgba(234,179,8,0.9)'
+    };
+
+    const bgColors = labels.map(s => {
+      if (!stage) return baseColors[s];
+      return s === stage ? activeColors[s] : baseColors[s];
+    });
+
+    const borderColors = labels.map(s => {
+      if (!stage) return 'rgba(15,23,42,1)';
+      return s === stage ? 'rgba(15,23,42,1)' : 'rgba(15,23,42,0.6)';
+    });
+
+    // 四象限等分
+    const dataVals = [25,25,25,25];
+
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if (!gaugeChart) {
+      gaugeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: dataVals,
+            backgroundColor: bgColors,
+            borderColor: borderColors,
+            borderWidth: 1.5,
+            hoverOffset: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '68%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const label = ctx.label || '';
+                  return label ? label : '';
+                }
+              }
+            }
+          }
+        }
+      });
+    } else {
+      gaugeChart.data.datasets[0].data = dataVals;
+      gaugeChart.data.datasets[0].backgroundColor = bgColors;
+      gaugeChart.data.datasets[0].borderColor = borderColors;
+      gaugeChart.update();
+    }
+  }
+
+  async function loadMcs(profile = 'balanced') {
+    try {
+      const res  = await fetch(`${API_BASE}/api/mcs/allocation?profile=${profile}`, { cache:'no-store' });
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error('MCS error', data);
+        document.getElementById('mcsSource').textContent = '來源：API 錯誤';
+        return;
+      }
+
+      document.getElementById('mcsAsOf').textContent   = '更新時間：' + (data.asOf || '--');
+      document.getElementById('mcsSource').textContent = '來源：' + (data.raw?.source || 'FRED + SHEET');
+      document.getElementById('allocScoreChip').textContent = 'Score：' + (data.score ?? '--') + '/100';
+
+      setStagePill(data.stage);
+      updateMcsGauge(data.score, data.stage);
+
+      const f = data.factors || {};
+      updateFactorCard('credit',    f.credit);
+      updateFactorCard('rates',     f.rates);
+      updateFactorCard('equity',    f.equity);
+      updateFactorCard('eps',       f.eps);
+      updateFactorCard('sentiment', f.sentiment);
+
+      const alloc = data.allocation || {};
+      document.getElementById('allocEquityText').textContent    = formatPctPlain(alloc.equity ?? null, 0);
+      document.getElementById('allocIncomeText').textContent    = formatPctPlain(alloc.income ?? null, 0);
+      document.getElementById('allocDefensiveText').textContent = formatPctPlain(alloc.defensive ?? null, 0);
+
+      setAllocBar('allocEquityBar',    alloc.equity);
+      setAllocBar('allocIncomeBar',    alloc.income);
+      setAllocBar('allocDefensiveBar', alloc.defensive);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('mcsSource').textContent = '來源：連線錯誤';
+    }
+  }
+
+  // 建景氣區段 band：連續同一 Stage 視為一個區間
+  function buildStageBands(points) {
+    if (!points.length) return [];
+    const bands = [];
+    let currentStage = points[0].stage || 'Unknown';
+    let startIndex   = 0;
+
+    for (let i = 1; i < points.length; i++) {
+      const s = points[i].stage || 'Unknown';
+      if (s !== currentStage) {
+        bands.push({ stage: currentStage, startIndex, endIndex: i - 1 });
+        currentStage = s;
+        startIndex   = i;
+      }
+    }
+    bands.push({ stage: currentStage, startIndex: points.length - 1 });
+    return bands;
+  }
+
+  const stageBandsPlugin = {
+    id: 'stageBands',
+    beforeDraw(chart, args, opts) {
+      const bands = (opts && opts.bands) || [];
+      if (!bands.length) return;
+      const { ctx, chartArea, scales } = chart;
+      const xScale = scales.x;
+      if (!xScale) return;
+
+      const colorMap = {
+        Recession: 'rgba(248,113,113,0.28)',
+        Slowdown:  'rgba(251,146,60,0.24)',
+        Growth:    'rgba(34,197,94,0.2)',
+        Heat:      'rgba(234,179,8,0.18)',
+        Unknown:   'rgba(148,163,184,0.12)'
+      };
+
+      ctx.save();
+      for (const band of bands) {
+        const color = colorMap[band.stage] || colorMap.Unknown;
+        const startPixel = xScale.getPixelForValue(band.startIndex);
+        const endPixel   = xScale.getPixelForValue(band.endIndex);
+        const left  = Math.min(startPixel, endPixel);
+        const right = Math.max(startPixel, endPixel);
+        ctx.fillStyle = color;
+        ctx.fillRect(left, chartArea.top, right - left, chartArea.bottom - chartArea.top);
+      }
+      ctx.restore();
+    }
+  };
+
+  async function loadMcsHistory() {
+    try {
+      const res  = await fetch(`${API_BASE}/api/mcs/history?days=180`, { cache: 'no-store' });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error('MCS history error', data);
+        return;
+      }
+
+      const points = data.points || [];
+      if (!points.length) return;
+
+      const labels   = points.map(p => p.date);
+      const scores   = points.map(p => p.score);
+      const spLevels = points.map(p => (p.sp500 == null || Number.isNaN(p.sp500) ? null : p.sp500));
+
+      const bands = buildStageBands(points);
+
+      const ctx = document.getElementById('mcsHistoryChart')?.getContext('2d');
+      if (!ctx) return;
+
+      if (historyChart) {
+        historyChart.options.plugins.stageBands.bands = bands;
+        historyChart.data.labels = labels;
+        historyChart.data.datasets[0].data = scores;
+        historyChart.data.datasets[1].data = spLevels;
+        historyChart.update();
+        return;
+      }
+
+      historyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'MCS Score',
+              data: scores,
+              yAxisID: 'y',
+              tension: 0.25,
+              fill: false,
+              borderWidth: 2,
+              pointRadius: 0,
+              borderColor: '#EFD88A'
+            },
+            {
+              label: 'S&P 500',
+              data: spLevels,
+              yAxisID: 'y1',
+              tension: 0.25,
+              fill: false,
+              borderWidth: 1.5,
+              pointRadius: 0,
+              borderColor: '#38BDF8'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                label(ctx) {
+                  if (ctx.datasetIndex === 0) {
+                    return `MCS：${ctx.parsed.y}`;
+                  } else {
+                    return `S&P 500：${ctx.parsed.y?.toFixed(2)}`;
+                  }
+                }
+              }
+            },
+            stageBands: {
+              bands
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: '#9fb1cc',
+                maxTicksLimit: 6
+              },
+              grid: { color: 'rgba(30,41,59,0.4)' }
+            },
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                color: '#9fb1cc',
+                stepSize: 20
+              },
+              grid: { color: 'rgba(30,41,59,0.4)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: {
+                color: '#38BDF8',
+                maxTicksLimit: 5
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        },
+        plugins: [stageBandsPlugin]
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setActiveProfileButton(currentProfile);
+    loadMcs(currentProfile);
+    loadMcsHistory();
+
+    document.querySelectorAll('.profile-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.profile;
+        if (p === currentProfile) return;
+        currentProfile = p;
+        setActiveProfileButton(p);
+        loadMcs(p);
+      });
+    });
+  });
+</script>
+</body>
+</html>
