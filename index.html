@@ -19,18 +19,7 @@
 
   <meta name="theme-color" content="#0A1221" />
 
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self' https: data: blob:;
-    img-src 'self' https: data: blob:;
-    style-src 'self' 'unsafe-inline' https:;
-    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://embedsocial.com https://*.embedsocial.com;
-    connect-src 'self' https: data:;
-    frame-src https://embedsocial.com https://*.embedsocial.com https:;
-    child-src https://embedsocial.com https://*.embedsocial.com https:;
-    worker-src 'self' blob:;
-    font-src https: data:;
-    manifest-src 'self';
-  ">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,6 +31,7 @@
     --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
     --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
     --accent:#2D7A77;
+    --danger: #ff6b6b; --safe: #3dd68c;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -60,40 +50,21 @@
 
   .section{margin-top:24px}
   
-  /* ===== 卡片懸浮與流光特效 ===== */
-  .card, .card2, .tool-card, .panel {
+  .card, .card2, .tool-card, .panel, .factor-card {
     background:var(--card);
     border:1px solid var(--line);
     border-radius:16px;
     padding:16px;
     position: relative;
     overflow: hidden; 
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                box-shadow 0.3s ease, 
-                border-color 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   }
-  .card:hover, .card2:hover, .tool-card:hover, .panel:hover {
+  .card:hover, .card2:hover, .tool-card:hover, .panel:hover, .factor-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 12px 30px rgba(201, 162, 39, 0.15);
     border-color: rgba(233, 209, 138, 0.6);
   }
-  .card::after, .card2::after, .tool-card::after, .panel::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
-    transform: skewX(-25deg);
-    transition: none;
-    pointer-events: none;
-  }
-  .card:hover::after, .card2:hover::after, .tool-card:hover::after, .panel:hover::after {
-    left: 150%;
-    transition: left 0.6s ease-in-out;
-  }
-
+  
   .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
   .btn-gold{background:var(--gold-grad);color:#0A1221;border:none}
   .btn-gold:hover{filter:brightness(1.1)}
@@ -105,7 +76,6 @@
   .hero p{color:var(--muted);margin:0}
   .hero small{color:var(--gold-soft)}
   
-  /* 按鈕脈衝特效 */
   @keyframes pulse-gold-glow {
     0% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.7); transform: scale(1); }
     70% { box-shadow: 0 0 0 15px rgba(201, 162, 39, 0); transform: scale(1.02); }
@@ -121,8 +91,78 @@
   }
   .hero .btn-line:hover{filter:brightness(1.15); animation: none; transform: scale(1.05);}
 
-  .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  /* --- MCS 戰情中心樣式 (Hero Section) --- */
+  .mcs-hero-section {
+    margin-bottom: 24px;
+    border-radius: 20px;
+    background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 60%, #020617 100%);
+    border: 1px solid rgba(201, 162, 39, 0.25);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+    position: relative;
+  }
+  .mcs-hero-section::before {
+    content:""; position:absolute; top:0; left:0; right:0; height:1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.6;
+  }
+  .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 24px; }
+  
+  .hero-gauge-col {
+    flex: 0 0 180px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-right: 1px solid rgba(255,255,255,0.08); padding-right: 20px;
+  }
+  .gauge-container { position: relative; width: 140px; height: 140px; }
+  .gauge-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .gauge-val { font-size: 32px; font-weight: 800; line-height: 1; color: #fff; text-shadow: 0 0 15px rgba(201,162,39,0.3); }
+  .gauge-lbl { font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; font-weight: 600; }
+  .hero-meta-row {
+    margin-top: 16px; font-size: 11px; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .source-tag { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 10px; letter-spacing: 0.5px; transition: all 0.3s; }
 
+  .hero-info-col { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+  .status-group { display: flex; flex-direction: column; gap: 6px; }
+  .stage-badge {
+    align-self: flex-start; padding: 4px 12px; border-radius: 99px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;
+  }
+  .stage-badge.growth { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); color: #4ade80; }
+  .stage-badge.recession { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.5); color: #f87171; }
+  .stage-badge.slowdown { background: rgba(251,146,60,0.15); border-color: rgba(251,146,60,0.5); color: #fb923c; }
+  .stage-badge.heat { background: rgba(234,179,8,0.15); border-color: rgba(234,179,8,0.5); color: #facc15; }
+  .stage-title { margin: 0; font-size: 18px; font-weight: 700; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .stage-desc { margin: 0; font-size: 13px; color: #cbd5e1; line-height: 1.5; opacity: 0.9; }
+  .hero-divider { height: 1px; background: rgba(255,255,255,0.1); width: 100%; }
+
+  .ai-insight-box {
+    background: rgba(0, 0, 0, 0.2); border-left: 3px solid var(--gold);
+    padding: 10px 16px; border-radius: 0 8px 8px 0;
+  }
+  .ai-label { font-size: 12px; color: var(--gold); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .ai-label .icon { animation: pulse 2s infinite; }
+  .ai-content { font-size: 13px; line-height: 1.6; color: #e2e8f0; }
+  .highlight { color: var(--gold); font-weight: 600; }
+  .warn { color: var(--danger); font-weight: 600; }
+  @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+  @media (max-width: 700px) {
+    .mcs-hero-inner { flex-direction: column; align-items: center; text-align: center; gap: 24px; }
+    .hero-gauge-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 24px; width: 100%; }
+    .hero-info-col { width: 100%; }
+    .stage-badge { align-self: center; }
+    .ai-insight-box { text-align: left; }
+  }
+  
+  /* 通用 Grid */
+  .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
   #ig-section{margin-top:60px;padding:40px 0;background:#0A1221}
   #ig-section h2{font-size:22px;font-weight:700;margin:0 0 18px 0;color:var(--gold-soft)}
   .embedsocial-hashtag{border:1px solid rgba(201,162,39,0.2);border-radius:18px;background:#0C152A;box-shadow:0 6px 18px rgba(0,0,0,.35);padding:18px;min-height:420px;display:grid;place-items:center}
@@ -274,6 +314,7 @@
       <div class="logo">MOMO財商智庫</div>
       <nav class="nav" role="navigation" aria-label="主選單">
         <a href="#" aria-current="page">首頁</a>
+        <a href="#mcs-dashboard">景氣戰情</a>
         <a href="#strategy">策略進度</a>
         <a href="#calc">互動試算</a>
         <a href="#tools">智能工具</a>
@@ -288,6 +329,42 @@
       <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="加入 MOMO 財商智庫官方 LINE" title="點擊加入 MOMO 官方 LINE 領取月配息策略">加入官方 LINE ▶</a>
     </section>
 
+    <section id="mcs-dashboard" class="section fade-in-section" aria-labelledby="mcs-title">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px">
+          <h2 id="mcs-title" style="margin:0;color:var(--gold-soft)">MCS 景氣戰情中心</h2>
+          <a href="./tools/mcs-dashboard.html" class="btn-outline" style="font-size:12px;padding:6px 12px">查看完整圖表 ▶</a>
+      </div>
+
+      <div class="mcs-hero-section">
+        <div class="mcs-hero-inner">
+          <div class="hero-gauge-col">
+            <div class="gauge-container">
+              <canvas id="mcsGaugeChart"></canvas>
+              <div class="gauge-overlay">
+                <div class="gauge-val" id="gaugeScoreText">--</div>
+                <div class="gauge-lbl">MCS SCORE</div>
+              </div>
+            </div>
+            <div class="hero-meta-row">
+              <span id="mcsAsOf">更新：--</span>
+              <span class="source-tag" id="mcsSource">SOURCE: FRED</span>
+            </div>
+          </div>
+          <div class="hero-info-col">
+            <div class="status-group">
+              <div class="stage-badge" id="mcsStagePill">--</div>
+              <h2 class="stage-title" id="mcsStageTitle">景氣象限：--</h2>
+              <p class="stage-desc" id="mcsStageDesc">正在載入景氣數據...</p>
+            </div>
+            <div class="hero-divider"></div>
+            <div class="ai-insight-box">
+              <div class="ai-label"><span class="icon">✦</span> AI 策略觀點</div>
+              <div class="ai-content" id="aiSummaryText">正在運算策略建議...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </section>
     <section id="strategy" class="section" aria-labelledby="strategy-title">
       <div class="bar-header fade-in-section"><h2 id="strategy-title" class="bar-title">MOMO「雙贏巔峰」策略（進行中）</h2></div>
       <div class="row">
@@ -448,9 +525,6 @@
     }
   };
 
-  /* ==========================================================================
-     系統邏輯區
-     ========================================================================== */
   function initSEO() {
     const faqContainer = document.getElementById('seo-faq-container');
     if (faqContainer && SEO_DATA.faq.length > 0) {
@@ -490,6 +564,7 @@
     }
   }
 
+  /* === Gauge logic === */
   const MOMO_PROGRESS_CONFIG = { monthly:75658, principal:6277633, dist:14, annual:45 };
   function fmtAxis(v,u){ if(u=='%') return Math.round(v); if(u=='M') return (v/1e6).toFixed(0)+'M'; if(u=='K') return (v/1e3).toFixed(0)+'K'; return nfTW.format(v); }
   function fmtRead(v,u){ return u=='%'?Number(v).toFixed(2)+'%':'＄'+nfTW.format(Math.round(v))+' 元' }
@@ -551,6 +626,7 @@
     ro.observe(gaugeEl); blockEl._destroy=()=>{ ro.disconnect(); if(blockEl._resizeTimer) clearTimeout(blockEl._resizeTimer); };
   }
 
+  /* === Calc logic === */
   const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
   const SLOPE = 1; const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
   const state = { baseCAGR: STRATEGY.rise, monthlyMul: MONTHLY_MULT.rise, principal: 1_000_000, dist: 8 };
@@ -600,7 +676,6 @@
       }, passiveOpt);
     }
 
-    // ===== 2. 複製連結功能 (新加入) =====
     const btnShare = $('btn-share-link');
     if(btnShare){
       btnShare.addEventListener('click', async () => {
@@ -608,25 +683,9 @@
         params.set('principal', state.principal);
         params.set('dist', state.dist);
         const activeStrategyBtn = document.querySelector('.strategy-btn.is-active');
-        if(activeStrategyBtn) {
-            params.set('strategy', activeStrategyBtn.dataset.strategy);
-        }
+        if(activeStrategyBtn) { params.set('strategy', activeStrategyBtn.dataset.strategy); }
         const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-        
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-          const originalText = btnShare.textContent;
-          btnShare.textContent = "已複製！✅";
-          btnShare.style.borderColor = "#06C755";
-          btnShare.style.color = "#06C755";
-          setTimeout(() => {
-            btnShare.textContent = originalText;
-            btnShare.style.borderColor = "";
-            btnShare.style.color = "";
-          }, 2000);
-        } catch (err) {
-          alert('複製失敗，請手動複製網址');
-        }
+        try { await navigator.clipboard.writeText(shareUrl); const originalText = btnShare.textContent; btnShare.textContent = "已複製！✅"; btnShare.style.borderColor = "#06C755"; btnShare.style.color = "#06C755"; setTimeout(() => { btnShare.textContent = originalText; btnShare.style.borderColor = ""; btnShare.style.color = ""; }, 2000); } catch (err) { alert('複製失敗，請手動複製網址'); }
       }, passiveOpt);
     }
 
@@ -637,7 +696,113 @@
     const igObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { loadIgScript(); igObserver.disconnect(); } }); }, { rootMargin: "200px" }); if(igSection) igObserver.observe(igSection);
   }
 
-  function boot(){ initSEO(); document.querySelectorAll('.block').forEach(mountBlock); restore(); fromURL(); bindEvents(); update(); }
+  /* =========================================
+     MCS 儀表板邏輯 (首頁精簡版)
+     ========================================= */
+  const API_BASE = 'https://mcs-worker.nms3194949.workers.dev';
+  let gaugeChart = null;
+
+  function setStagePill(stage) {
+    const pill = document.getElementById('mcsStagePill');
+    const titleEl = document.getElementById('mcsStageTitle');
+    const descEl  = document.getElementById('mcsStageDesc');
+    if(!pill) return;
+
+    const mapTitle = { Recession:'Recession (衰退區)', Slowdown:'Slowdown (放緩區)', Growth:'Growth (成長區)', Heat:'Heat (過熱區)' };
+    const mapDesc = { Recession:'風險偏好下降，信用利差放大。資產配置建議以「防禦與現金管理」為主，等待落底訊號。', Slowdown:'成長動能放緩但未全面衰退。建議保守調整高波動部位，關注高品質收益資產。', Growth:'經濟與企業獲利維持成長。適合核心長期持有，並於回檔時布局成長型資產。', Heat:'市場情緒偏熱，需注意估值與風險累積。建議適度停利，保留現金彈性。' };
+
+    pill.classList.remove('recession','slowdown','growth','heat');
+    if (!stage) {
+      pill.textContent = '--'; titleEl.textContent = '景氣象限：--'; descEl.textContent = '正在讀取 MCS 景氣數據...';
+      return;
+    }
+    pill.classList.add(stage.toLowerCase());
+    pill.textContent = stage;
+    titleEl.textContent = mapTitle[stage] || ('Stage: ' + stage);
+    descEl.textContent  = mapDesc[stage]  || '依 MCS 分數對應四大景氣區間。';
+  }
+
+  function updateAiSummary(data) {
+    const el = document.getElementById('aiSummaryText');
+    if (!el || !data || !data.factors) return;
+    const f = data.factors; const score = data.score || 0; let summary = "";
+    if (score >= 60) summary += `目前景氣處於 <span class="highlight">強勁成長期 (Growth)</span>，基本面數據穩健。`;
+    else if (score >= 40) summary += `目前景氣處於 <span class="highlight">震盪調整期</span>，多空力道拉鋸。`;
+    else summary += `目前景氣面臨 <span class="warn">修正風險 (Slowdown/Recession)</span>，基本面動能轉弱。`;
+
+    const isLiquidityStrong = (f.liquidity?.score >= 12); const isCreditStrong = (f.credit?.score >= 12);
+    if (isLiquidityStrong && isCreditStrong) summary += `受惠於 <span class="highlight">資金充沛</span> 與信用風險偏好維持高檔，市場具備「資金行情」支撐。`;
+    else if (!isLiquidityStrong && isCreditStrong) summary += `雖然信用利差穩定，但資金水位正在下降，需留意動能延續性。`;
+    else if (!isCreditStrong) summary += `且信用利差擴大，顯示市場避險情緒正在升溫，需提高警覺。`;
+    
+    summary += `<br><br><strong>✦ 操作建議：</strong>`;
+    if (score >= 60 && isLiquidityStrong) summary += `順勢操作。因流動性強勁，<span class="highlight">科技股、成長股與加密貨幣</span> 表現將優於防禦型資產。但需留意 Equity 分數若過高，切勿過度追價，建議逢回布局。`;
+    else if (score >= 60 && !isLiquidityStrong) summary += `回歸基本面。資金潮退去，選股將重於選市，聚焦 <span class="highlight">高 EPS 成長</span> 之實質業績股，避開無基之彈的投機標的。`;
+    else if (score < 40) summary += `防禦為主。建議拉高 <span class="highlight">現金與投資級債 (IG Bond)</span> 部位，降低股票曝險，直至 MACRO 指標落底回升。`;
+    else summary += `區間操作。市場缺乏明確方向，建議採取 <span class="highlight">股債平衡</span> 配置，並透過網格交易或定期定額分散波動風險。`;
+    el.innerHTML = summary;
+  }
+
+  function updateMcsGauge(score, stage) {
+    const canvas = document.getElementById('mcsGaugeChart');
+    const centerText = document.getElementById('gaugeScoreText');
+    if(!canvas || !centerText) return;
+    centerText.textContent = (score == null || Number.isNaN(score)) ? '--' : Math.round(score);
+    const labels = ['Recession','Slowdown','Growth','Heat'];
+    const bgColors = ['rgba(248,113,113,0.22)','rgba(251,146,60,0.20)','rgba(34,197,94,0.18)','rgba(234,179,8,0.16)'];
+    const activeColors = { Recession:'rgba(248,113,113,0.9)', Slowdown:'rgba(251,146,60,0.9)', Growth:'rgba(34,197,94,0.9)', Heat:'rgba(234,179,8,0.9)' };
+    const baseColorsMap = { Recession:bgColors[0], Slowdown:bgColors[1], Growth:bgColors[2], Heat:bgColors[3] };
+    const finalBg = labels.map(s => (stage && s===stage) ? activeColors[s] : baseColorsMap[s]);
+    const finalBorder = labels.map(s => (stage && s===stage) ? 'rgba(15,23,42,1)' : 'rgba(15,23,42,0.6)');
+    const ctx = canvas.getContext('2d');
+    if (!gaugeChart) {
+      gaugeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data: [25,25,25,25], backgroundColor: finalBg, borderColor: finalBorder, borderWidth: 1.5, hoverOffset: 2 }] },
+        options: { responsive: true, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled:false } } }
+      });
+    } else {
+      gaugeChart.data.datasets[0].backgroundColor = finalBg;
+      gaugeChart.data.datasets[0].borderColor = finalBorder;
+      gaugeChart.update();
+    }
+  }
+
+  async function loadMcs(profile = 'balanced') {
+    try {
+      let data = {}; let isFallback = false;
+      const sourceEl = document.getElementById('mcsSource');
+      const asOfEl = document.getElementById('mcsAsOf');
+      try {
+        const res  = await fetch(`${API_BASE}/api/mcs/allocation?profile=${profile}`, { cache:'no-store' });
+        if (!res.ok) throw new Error('API error');
+        data = await res.json();
+        if(sourceEl) { sourceEl.textContent = 'SOURCE: ' + (data.raw?.source || 'FRED'); sourceEl.style.cssText = "background:rgba(255,255,255,0.08);color:var(--muted);border:none;"; }
+      } catch(e) {
+        isFallback = true;
+        if(sourceEl) { sourceEl.innerHTML = '⚠ 連線失敗 (顯示模擬數據)'; sourceEl.style.cssText = "background:rgba(220,38,38,0.2);color:#fca5a5;border:1px solid #ef4444;font-weight:bold;"; }
+        data = { score: 66, stage: 'Growth', asOf: new Date().toISOString().slice(0,10), factors: {} };
+      }
+      if (!data.factors) data.factors = {};
+      // 模擬數據補全 (為了讓 AI 總結文字能正常生成)
+      if(!data.factors.macro) data.factors.macro = { score: 12, pmi: 47.2, claims: 230000, change: -0.5 };
+      if(!data.factors.liquidity) data.factors.liquidity = { score: 16, change: 1.5, net_liq: 6.35, net_liq_note: "資金寬鬆", cu_au: 4.15, cu_au_note: "溫和復甦" };
+      if(!data.factors.credit) data.factors.credit = { score: 18, change: 1.2, hy_spread: 3.17, ig_spread: 0.84 };
+
+      if(asOfEl) asOfEl.textContent = '更新：' + (data.asOf || '--');
+      setStagePill(data.stage);
+      updateMcsGauge(data.score, data.stage);
+      updateAiSummary(data);
+    } catch (err) { console.error(err); }
+  }
+
+  function boot(){
+    initSEO();
+    document.querySelectorAll('.block').forEach(mountBlock);
+    restore(); fromURL(); bindEvents(); update();
+    // MCS Init
+    loadMcs('balanced');
+  }
   document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
   </script>
 
