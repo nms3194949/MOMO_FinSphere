@@ -62,8 +62,8 @@
   
   /* --- 體驗優化：卡片玻璃擬態與懸浮效果 --- */
   .card, .card2, .tool-card, .panel, .factor-card, .mcs-hero-section {
-    background: rgba(12, 21, 42, 0.75); /* 降低不透明度 */
-    backdrop-filter: blur(12px);         /* 毛玻璃 */
+    background: rgba(12, 21, 42, 0.75);
+    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(233, 209, 138, 0.18);
     border-radius: 16px;
@@ -118,7 +118,6 @@
     85% { opacity: 1; } 
     100% { top: 110%; opacity: 0; } 
   }
-  /* 修正層級，讓文字在掃描線上 */
   .mcs-hero-inner, .gauge-overlay { position: relative; z-index: 3; }
 
   .mcs-hero-section::before {
@@ -168,7 +167,7 @@
   }
   .ai-label { font-size: 12px; color: var(--gold); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
   .ai-label .icon { animation: pulse 2s infinite; }
-  .ai-content { font-size: 13px; line-height: 1.6; color: #e2e8f0; opacity: 0; transform: translateY(10px); /* 為了動畫預設隱藏 */ }
+  .ai-content { font-size: 13px; line-height: 1.6; color: #e2e8f0; opacity: 0; transform: translateY(10px); }
   .highlight { color: var(--gold); font-weight: 600; }
   .warn { color: var(--danger); font-weight: 600; }
   @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
@@ -360,6 +359,9 @@
   summary::after { content:"+"; color:var(--gold-soft); font-weight:800; font-size:18px; }
   details[open] summary::after { content:"-"; }
   .faq-content { padding:0 14px 14px; color:var(--muted); line-height:1.6; font-size:14px; }
+
+  /* 誘餌解鎖樣式 */
+  .unlock-overlay:hover > div { transform: scale(1.05); transition: transform 0.2s; }
   </style>
 </head>
 <body>
@@ -507,7 +509,21 @@
           <div class="out" aria-live="polite">
             <div class="kv"><div class="k">預估月配息</div><div class="v" id="out-monthly">—</div></div>
             
-            <div id="life-mapping" style="padding:10px; background:rgba(233,209,138,0.05); border-radius:8px; display:flex; align-items:center; gap:12px; transition:all 0.3s;">
+            <div class="kv locked-row" style="position:relative; overflow:hidden; border-color:rgba(201,162,39,0.4); background:linear-gradient(90deg, rgba(201,162,39,0.08), transparent); margin-top:8px;">
+                <div class="k" style="color:var(--gold);">
+                    <span style="margin-right:4px;">🔥</span>AI 智能優化後配息
+                </div>
+                <div class="v" id="out-optimized" style="filter:blur(5px); opacity:0.8; user-select:none;">$99,999</div>
+                
+                <a href="https://portaly.cc/momo_82786" target="_blank" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); text-decoration:none; cursor:pointer; transition:0.3s; z-index:10;" class="unlock-overlay">
+                    <div style="background:var(--gold); color:#0A1221; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:800; box-shadow:0 4px 12px rgba(0,0,0,0.6); display:flex; align-items:center; gap:4px;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-9-2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+                        加入 LINE 解鎖
+                    </div>
+                </a>
+            </div>
+
+            <div id="life-mapping" style="padding:10px; background:rgba(233,209,138,0.05); border-radius:8px; display:flex; align-items:center; gap:12px; transition:all 0.3s; margin-top:12px;">
                 <div id="life-icon" style="font-size:24px;">☕</div>
                 <div style="flex:1;">
                     <div style="font-size:12px; color:var(--muted);">相當於生活品質：</div>
@@ -774,6 +790,12 @@
     }
     
     $('out-total-rate').textContent = pct(o.totalRate); 
+
+    /* --- 解鎖神秘黑箱邏輯 --- */
+    // 計算一個優化後的誘餌數值 (例如+25%)
+    const optimizedVal = o.monthly * 1.25; 
+    const optEl = document.getElementById('out-optimized');
+    if(optEl) optEl.textContent = money(optimizedVal);
 
     /* --- 體驗優化：生活場景對照邏輯 --- */
     const m = o.monthly;
