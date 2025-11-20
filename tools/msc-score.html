@@ -50,6 +50,66 @@
       font-size:13px;
       color:var(--muted);
     }
+    
+    /* 新增：AI 策略總結區塊樣式 */
+    .summary-section {
+      margin-bottom: 18px;
+      padding: 16px 20px;
+      border-radius: 16px;
+      background: linear-gradient(90deg, rgba(12, 21, 42, 0.9) 0%, rgba(23, 33, 51, 0.9) 100%);
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .summary-section::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--gold);
+    }
+    .summary-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .summary-icon {
+      color: var(--gold);
+      font-size: 18px;
+      animation: pulse 2s infinite;
+    }
+    .summary-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .summary-content {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      font-weight: 400;
+    }
+    .highlight {
+      color: var(--gold);
+      font-weight: 600;
+      padding: 0 2px;
+    }
+    .warn {
+      color: var(--danger);
+      font-weight: 600;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
     .top-row {
       display:flex;
       flex-wrap:wrap;
@@ -158,7 +218,7 @@
     }
     .status-ok { color:var(--safe); border-color:rgba(61,214,140,0.5); }
 
-    /* GRID 設定：3列適配 6 張卡片 */
+    /* GRID 設定 */
     .grid {
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr)); 
@@ -195,7 +255,7 @@
       align-items:center;
     }
 
-    /* 中英標題群組 */
+    /* 標題群組 */
     .title-group {
       display:flex;
       align-items:baseline;
@@ -249,7 +309,26 @@
       color:var(--muted);
       display:flex;
       flex-direction:column;
-      gap:2px;
+      gap:3px;
+    }
+    .meta-note {
+        color: var(--gold-soft);
+        opacity: 0.8;
+        margin-left: 4px;
+    }
+    /* 卡片操作小結 */
+    .factor-summary {
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(233,209,138,0.15);
+      font-size: 11px;
+      line-height: 1.4;
+      color: #dbeafe;
+    }
+    .factor-summary strong {
+      color: var(--gold-soft);
+      font-weight: 600;
+      margin-right: 4px;
     }
 
     .alloc-section {
@@ -363,6 +442,16 @@
     </div>
   </div>
 
+  <div class="summary-section">
+    <div class="summary-header">
+      <span class="summary-icon">✦</span>
+      <span class="summary-title">AI 策略總結</span>
+    </div>
+    <div class="summary-content" id="aiSummaryText">
+      正在分析所有指標數據...
+    </div>
+  </div>
+
   <div class="grid">
     <div class="factor-card" id="factor-credit">
       <div class="factor-title">
@@ -380,6 +469,7 @@
         <span>HY Spread：--</span>
         <span>IG Spread：--</span>
       </div>
+      <div class="factor-summary" id="creditSummary"></div>
     </div>
 
     <div class="factor-card" id="factor-rates">
@@ -398,6 +488,7 @@
         <span>10Y：--</span>
         <span>2Y &amp; Curve：--</span>
       </div>
+      <div class="factor-summary" id="ratesSummary"></div>
     </div>
 
     <div class="factor-card" id="factor-macro">
@@ -416,6 +507,7 @@
         <span>ISM PMI：--</span>
         <span>Jobless Claims：--</span>
       </div>
+      <div class="factor-summary" id="macroSummary"></div>
     </div>
 
     <div class="factor-card" id="factor-equity">
@@ -434,6 +526,7 @@
         <span>Momo 6M：--</span>
         <span>Level：--</span>
       </div>
+      <div class="factor-summary" id="equitySummary"></div>
     </div>
 
     <div class="factor-card" id="factor-eps">
@@ -451,6 +544,7 @@
       <div class="factor-meta" id="epsMeta">
         <span>EPS YoY：--</span>
       </div>
+      <div class="factor-summary" id="epsSummary"></div>
     </div>
 
     <div class="factor-card" id="factor-sentiment">
@@ -469,7 +563,29 @@
         <span>VIX：--</span>
         <span>MOVE：--</span>
       </div>
+      <div class="factor-summary" id="sentimentSummary"></div>
     </div>
+
+    <div class="factor-card" id="factor-liquidity">
+      <div class="factor-title">
+        <div class="title-group">
+          <span>LIQUIDITY</span>
+          <span class="zh-label">流動性與實質</span>
+        </div>
+        <div class="score-wrap">
+          <span class="factor-score" id="liquidityScore">--</span>
+          <span class="factor-trend" id="liquidityTrend"></span>
+        </div>
+      </div>
+      <div class="factor-bar"><div class="factor-bar-fill" id="liquidityBar"></div></div>
+      <div class="factor-meta" id="liquidityMeta">
+        <span>Net Liq：--</span>
+        <span>Cu/Au：--</span>
+        <span>Permits：--</span>
+      </div>
+      <div class="factor-summary" id="liquiditySummary"></div>
+    </div>
+
   </div>
 
   <section class="alloc-section">
@@ -600,11 +716,53 @@
     descEl.textContent  = mapDesc[stage]  || '依 MCS 分數對應四大景氣區間。';
   }
 
+  // 根據分數回傳卡片操作建議 (模擬邏輯)
+  function getFactorSummary(key, score) {
+    if (score == null) return '';
+    if (key === 'credit') {
+      if (score >= 14) return '<strong>利差收斂：</strong>風險偏好佳，有利股/高收債。';
+      if (score <= 8)  return '<strong>利差擴大：</strong>避險情緒升溫，減碼信用債。';
+      return '<strong>中性觀察：</strong>利差持平，維持現有部位。';
+    }
+    if (key === 'rates') {
+      if (score <= 6)  return '<strong>曲線倒掛：</strong>警示衰退風險，關注公債/防禦。';
+      if (score >= 14) return '<strong>環境寬鬆：</strong>利率壓力減輕，有利科技成長。';
+      return '<strong>利率盤整：</strong>等待央行訊號，平衡配置。';
+    }
+    if (key === 'macro') {
+      if (score >= 12) return '<strong>經濟擴張：</strong>數據穩健，核心持股續抱。';
+      if (score <= 8)  return '<strong>數據疲軟：</strong>動能減弱，適度提高現金/債券。';
+      return '<strong>景氣溫和：</strong>軟著陸預期，區間操作。';
+    }
+    if (key === 'equity') {
+      if (score >= 14) return '<strong>多頭排列：</strong>動能強勁，順勢操作不追高。';
+      if (score <= 6)  return '<strong>動能轉弱：</strong>跌破支撐，嚴設停損或避險。';
+      return '<strong>高檔震盪：</strong>指數乖離，等待拉回買點。';
+    }
+    if (key === 'eps') {
+      if (score >= 12) return '<strong>獲利成長：</strong>基本面支撐，逢回買進績優股。';
+      if (score <= 8)  return '<strong>獲利衰退：</strong>基本面逆風，保守觀望。';
+      return '<strong>財報持平：</strong>個股表現分歧，選股不選市。';
+    }
+    if (key === 'sentiment') {
+      if (score >= 15) return '<strong>市場平穩：</strong>恐慌指數低，適合波段操作。';
+      if (score <= 6)  return '<strong>極度恐慌：</strong>波動加劇，留意超跌反彈機會。';
+      return '<strong>情緒中性：</strong>市場觀望，減少槓桿操作。';
+    }
+    if (key === 'liquidity') {
+      if (score >= 12) return '<strong>資金寬鬆：</strong>有利加密貨幣與風險資產。';
+      if (score <= 8)  return '<strong>資金緊縮：</strong>資產價格承壓，現金為王。';
+      return '<strong>流動性持平：</strong>資金中性，關注實質基本面。';
+    }
+    return '';
+  }
+
   function updateFactorCard(factorKey, factor) {
     const scoreEl = document.getElementById(factorKey + 'Score');
     const barEl   = document.getElementById(factorKey + 'Bar');
     const metaEl  = document.getElementById(factorKey + 'Meta');
     const trendEl = document.getElementById(factorKey + 'Trend');
+    const summaryEl = document.getElementById(factorKey + 'Summary');
     
     if (!factor) return;
 
@@ -612,9 +770,8 @@
     const ratio = (factor.score ?? 0) / 20;
     barEl.style.transform = 'scaleX(' + ratio.toFixed(2) + ')';
 
-    // 趨勢箭頭邏輯
+    // 趨勢
     if (trendEl) {
-      // 若無 change 則預設 0 (上線後請確保 API 有回傳 change)
       const chg = factor.change || 0;
       trendEl.classList.remove('trend-up', 'trend-down', 'trend-neutral');
       if (chg > 0) {
@@ -627,6 +784,11 @@
         trendEl.textContent = '-';
         trendEl.classList.add('trend-neutral');
       }
+    }
+
+    // 操作小結
+    if (summaryEl) {
+      summaryEl.innerHTML = getFactorSummary(factorKey, factor.score);
     }
 
     // 內容格式化
@@ -658,6 +820,12 @@
       metaEl.innerHTML = `
         <span>VIX：${factor.vix?.toFixed(1) ?? '--'}</span>
         <span>MOVE：${factor.move?.toFixed(1) ?? '--'}</span>
+      `;
+    } else if (factorKey === 'liquidity') {
+      metaEl.innerHTML = `
+        <span>Net Liq：${factor.net_liq}T <span class="meta-note">(${factor.net_liq_note})</span></span>
+        <span>Cu/Au：${factor.cu_au} <span class="meta-note">(${factor.cu_au_note})</span></span>
+        <span>Permits：${factor.permits}M <span class="meta-note">(${factor.permits_note})</span></span>
       `;
     }
   }
@@ -743,7 +911,51 @@
     }
   }
 
-  // 1. 讀取即時 MCS 分數，並回傳 score 供歷史圖表同步使用
+  // 產生綜合策略總結
+  function updateAiSummary(data) {
+    const el = document.getElementById('aiSummaryText');
+    if (!data || !data.factors) return;
+
+    const f = data.factors;
+    const score = data.score || 0;
+    let summary = "";
+
+    // 1. 定調主戰場
+    if (score >= 60) {
+      summary += `目前景氣處於 <span class="highlight">強勁成長期 (Growth)</span>，基本面數據穩健。`;
+    } else if (score >= 40) {
+      summary += `目前景氣處於 <span class="highlight">震盪調整期</span>，多空力道拉鋸。`;
+    } else {
+      summary += `目前景氣面臨 <span class="warn">修正風險 (Slowdown/Recession)</span>，基本面動能轉弱。`;
+    }
+
+    // 2. 判斷驅動力
+    const isLiquidityStrong = (f.liquidity?.score >= 12);
+    const isCreditStrong = (f.credit?.score >= 12);
+    
+    if (isLiquidityStrong && isCreditStrong) {
+      summary += `受惠於 <span class="highlight">資金充沛</span> 與信用風險偏好維持高檔，市場具備「資金行情」支撐。`;
+    } else if (!isLiquidityStrong && isCreditStrong) {
+      summary += `雖然信用利差穩定，但資金水位正在下降，需留意動能延續性。`;
+    } else if (!isCreditStrong) {
+      summary += `且信用利差擴大，顯示市場避險情緒正在升溫，需提高警覺。`;
+    }
+
+    // 3. 操作結論
+    summary += `<br><strong>✦ 操作建議：</strong>`;
+    if (score >= 60 && isLiquidityStrong) {
+      summary += `順勢操作。因流動性強勁，<span class="highlight">科技股、成長股與加密貨幣</span> 表現將優於防禦型資產。但需留意 Equity 分數若過高，切勿過度追價，建議逢回布局。`;
+    } else if (score >= 60 && !isLiquidityStrong) {
+      summary += `回歸基本面。資金潮退去，選股將重於選市，聚焦 <span class="highlight">高 EPS 成長</span> 之實質業績股，避開無基之彈的投機標的。`;
+    } else if (score < 40) {
+      summary += `防禦為主。建議拉高 <span class="highlight">現金與投資級債 (IG Bond)</span> 部位，降低股票曝險，直至 MACRO 指標落底回升。`;
+    } else {
+      summary += `區間操作。市場缺乏明確方向，建議採取 <span class="highlight">股債平衡</span> 配置，並透過網格交易或定期定額分散波動風險。`;
+    }
+
+    el.innerHTML = summary;
+  }
+
   async function loadMcs(profile = 'balanced') {
     try {
       const res  = await fetch(`${API_BASE}/api/mcs/allocation?profile=${profile}`, { cache:'no-store' });
@@ -755,11 +967,21 @@
       }
 
       // ============================================================
-      // [DEMO] 模擬數據注入 (讓您看到新增的 MACRO 卡片與 Trend 效果)
+      // [DEMO] 模擬數據 (確保有足夠資料跑出總結)
       // ============================================================
       if(data.factors) {
         data.factors.macro = { score: 12, pmi: 47.2, claims: 230000, change: -0.5 };
-        // 模擬各因子變化量
+        data.factors.liquidity = {
+          score: 16,
+          change: 1.5,
+          net_liq: 6.35,
+          net_liq_note: "資金寬鬆",
+          cu_au: 4.15,
+          cu_au_note: "溫和復甦",
+          permits: 1.52,
+          permits_note: "需求持穩"
+        };
+        // 模擬變化量
         if(data.factors.credit) data.factors.credit.change = 1.2;
         if(data.factors.rates)  data.factors.rates.change = -0.2;
         if(data.factors.equity) data.factors.equity.change = 2.5;
@@ -778,10 +1000,11 @@
       const f = data.factors || {};
       updateFactorCard('credit',    f.credit);
       updateFactorCard('rates',     f.rates);
-      updateFactorCard('macro',     f.macro); // 新增
+      updateFactorCard('macro',     f.macro); 
       updateFactorCard('equity',    f.equity);
       updateFactorCard('eps',       f.eps);
       updateFactorCard('sentiment', f.sentiment);
+      updateFactorCard('liquidity', f.liquidity); 
 
       const alloc = data.allocation || {};
       document.getElementById('allocEquityText').textContent    = formatPctPlain(alloc.equity ?? null, 0);
@@ -792,7 +1015,10 @@
       setAllocBar('allocIncomeBar',    alloc.income);
       setAllocBar('allocDefensiveBar', alloc.defensive);
 
-      return data.score; // 回傳最新分數
+      // 更新 AI 總結
+      updateAiSummary(data);
+
+      return data.score; 
 
     } catch (err) {
       console.error(err);
@@ -850,7 +1076,6 @@
     }
   };
 
-  // 2. 載入歷史數據，並強制修正最後一個點的分數
   async function loadMcsHistory(latestScore = null) {
     try {
       const res  = await fetch(`${API_BASE}/api/mcs/history?days=180`, { cache: 'no-store' });
@@ -860,11 +1085,9 @@
       const points = data.points || [];
       if (!points.length) return;
 
-      // === 強制同步邏輯：讓圖表最後一點 = 儀表板分數 ===
       if (latestScore != null && !Number.isNaN(latestScore)) {
         points[points.length - 1].score = latestScore;
       }
-      // ==============================================
 
       const labels   = points.map(p => p.date);
       const scores   = points.map(p => p.score);
@@ -953,7 +1176,6 @@
   document.addEventListener('DOMContentLoaded', async () => {
     setActiveProfileButton(currentProfile);
     
-    // 3. 先取得即時分數，再畫圖，確保資料同步
     const latestScore = await loadMcs(currentProfile);
     loadMcsHistory(latestScore);
 
@@ -963,9 +1185,7 @@
         if (p === currentProfile) return;
         currentProfile = p;
         setActiveProfileButton(p);
-        const s = await loadMcs(p);
-        // 切換 profile 不影響歷史走勢，所以此處不一定要重畫 History，但若未來有影響可加：
-        // loadMcsHistory(s);
+        await loadMcs(p);
       });
     });
   });
