@@ -35,8 +35,18 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; position: relative;}
   a{color:inherit;text-decoration:none}
+
+  /* --- 體驗優化：背景動態光暈 --- */
+  body::before {
+    content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.05), transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(45, 122, 119, 0.05), transparent 50%);
+    animation: backgroundMove 25s linear infinite;
+    z-index: -1; pointer-events: none;
+  }
+  @keyframes backgroundMove { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   .wrap{max-width:1120px;margin:0 auto;padding:16px}
   .header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
@@ -50,19 +60,22 @@
 
   .section{margin-top:24px}
   
-  .card, .card2, .tool-card, .panel, .factor-card {
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:16px;
+  /* --- 體驗優化：卡片玻璃擬態與懸浮效果 --- */
+  .card, .card2, .tool-card, .panel, .factor-card, .mcs-hero-section {
+    background: rgba(12, 21, 42, 0.75); /* 降低不透明度 */
+    backdrop-filter: blur(12px);         /* 毛玻璃 */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(233, 209, 138, 0.18);
+    border-radius: 16px;
+    padding: 16px;
     position: relative;
     overflow: hidden; 
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   }
   .card:hover, .card2:hover, .tool-card:hover, .panel:hover, .factor-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(201, 162, 39, 0.15);
-    border-color: rgba(233, 209, 138, 0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(201, 162, 39, 0.12), inset 0 0 20px rgba(201, 162, 39, 0.03);
+    border-color: rgba(233, 209, 138, 0.5);
   }
   
   .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
@@ -91,22 +104,13 @@
   }
   .hero .btn-line:hover{filter:brightness(1.15); animation: none; transform: scale(1.05);}
 
-  /* --- MCS 戰情中心樣式 (Hero Section) --- */
-  .mcs-hero-section {
-    margin-bottom: 24px;
-    border-radius: 20px;
-    background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 60%, #020617 100%);
-    border: 1px solid rgba(201, 162, 39, 0.25);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    overflow: hidden;
-    position: relative;
-  }
+  /* MCS Hero Styles */
   .mcs-hero-section::before {
     content:""; position:absolute; top:0; left:0; right:0; height:1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
     opacity: 0.6;
   }
-  .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 24px; }
+  .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 8px; }
   
   .hero-gauge-col {
     flex: 0 0 180px;
@@ -148,7 +152,7 @@
   }
   .ai-label { font-size: 12px; color: var(--gold); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
   .ai-label .icon { animation: pulse 2s infinite; }
-  .ai-content { font-size: 13px; line-height: 1.6; color: #e2e8f0; }
+  .ai-content { font-size: 13px; line-height: 1.6; color: #e2e8f0; opacity: 0; transform: translateY(10px); /* 為了動畫預設隱藏 */ }
   .highlight { color: var(--gold); font-weight: 600; }
   .warn { color: var(--danger); font-weight: 600; }
   @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
@@ -161,8 +165,6 @@
     .ai-insight-box { text-align: left; }
   }
 
-  /* MCS 因子卡片 Grid (首頁精簡版) */
-  /* 如果不想在首頁顯示卡片，這段CSS可以不用，但保留以防未來需要 */
   .mcs-grid {
     display:grid; gap:12px;
     grid-template-columns:repeat(3, minmax(0, 1fr));
@@ -171,11 +173,10 @@
   @media (max-width:900px){ .mcs-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media (max-width:600px){ .mcs-grid { grid-template-columns:1fr; } }
   
-  /* 通用 Grid */
   .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-  #ig-section{margin-top:60px;padding:40px 0;background:#0A1221}
+  #ig-section{margin-top:60px;padding:40px 0;background: transparent}
   #ig-section h2{font-size:22px;font-weight:700;margin:0 0 18px 0;color:var(--gold-soft)}
-  .embedsocial-hashtag{border:1px solid rgba(201,162,39,0.2);border-radius:18px;background:#0C152A;box-shadow:0 6px 18px rgba(0,0,0,.35);padding:18px;min-height:420px;display:grid;place-items:center}
+  .embedsocial-hashtag{border:1px solid rgba(201,162,39,0.2);border-radius:18px;background:rgba(12,21,42,0.6);backdrop-filter:blur(10px);box-shadow:0 6px 18px rgba(0,0,0,.35);padding:18px;min-height:420px;display:grid;place-items:center}
   @media(max-width:768px){.embedsocial-hashtag{padding:10px}}
 
   #strategy .bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -193,7 +194,6 @@
   .card2{
     width:calc(50% - 8px);min-width:300px;
     display:flex;flex-direction:column;gap:18px;
-    box-shadow:0 10px 22px rgba(0,0,0,.45);
   }
   .card2 h3{margin:0 0 4px;font-size:20px;color:var(--gold-soft)}
   .block{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -229,11 +229,32 @@
   #calc h2{margin:0 0 6px;font-size:18px;color:var(--gold-soft)}
   #calc p.desc{margin:0 0 12px;color:var(--muted)}
   #calc label{display:block;font-weight:800;font-size:13px;color:rgba(233,209,138,.9);margin-bottom:6px}
-  #calc input[type="number"]{width:100%;background:#0e162a;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
+  #calc input[type="number"]{width:100%;background:rgba(14, 22, 42, 0.5);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
   #calc .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  #calc input[type="range"]{width:100%}
+  
+  /* --- 體驗優化：美化 Range Slider (金色質感) --- */
+  #calc input[type="range"]{
+    -webkit-appearance: none; width:100%; background: transparent; margin: 10px 0;
+  }
+  #calc input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; cursor: pointer;
+  }
+  #calc input[type="range"]::-webkit-slider-thumb {
+    height: 24px; width: 24px; border-radius: 50%;
+    background: radial-gradient(circle, #F9E27C 0%, #B88A1E 100%);
+    box-shadow: 0 0 10px rgba(201, 162, 39, 0.8);
+    cursor: grab; -webkit-appearance: none; margin-top: -9px; transition: transform 0.1s;
+  }
+  #calc input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.2); cursor: grabbing; }
+  #calc input[type="range"]::-moz-range-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; cursor: pointer; }
+  #calc input[type="range"]::-moz-range-thumb {
+    height: 24px; width: 24px; border:none; border-radius: 50%;
+    background: radial-gradient(circle, #F9E27C 0%, #B88A1E 100%);
+    box-shadow: 0 0 10px rgba(201, 162, 39, 0.8); cursor: grab;
+  }
+
   #calc .out{display:flex;flex-direction:column;gap:8px}
-  #calc .out .kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#0b1427}
+  #calc .out .kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(11, 20, 39, 0.5)}
   #calc .out .k{font-size:13px;color:rgba(233,209,138,.9);font-weight:800}
   #calc .out .v{font-size:18px;font-weight:800}
   #calc .mini{font-size:12px;color:var(--muted)}
@@ -243,6 +264,14 @@
   #calc .actions{position:absolute;top:16px;right:16px;display:flex;gap:8px}
   .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px; cursor:pointer; transition:.2s;}
   .btn-outline:hover{background:rgba(233,209,138,.08)}
+
+  /* --- 體驗優化：數值閃爍動畫 --- */
+  @keyframes flashGold {
+    0% { color: #fff; text-shadow: 0 0 5px #fff; transform: scale(1); }
+    50% { color: #F9E27C; text-shadow: 0 0 20px #F9E27C; transform: scale(1.05); }
+    100% { color: inherit; transform: scale(1); }
+  }
+  .flash-anim { animation: flashGold 0.4s ease-out; }
 
   .strategy-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .strategy-btn{border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;background:#0e162a;color:var(--muted);cursor:pointer}
@@ -469,6 +498,15 @@
               <div class="kv"><div class="k">三年累積報酬率</div><div class="v goldCycle" id="out-total-rate">—</div></div>
             </div>
           </div>
+
+          <div id="calc-cta" style="width:100%; margin-top:16px; display:none; text-align:center;">
+            <p style="font-size:13px; color:#E9D18A; margin-bottom:8px;">
+                ✨ 試算結果不錯？想知道如何配置出這個現金流？
+            </p>
+            <a href="https://portaly.cc/momo_82786" target="_blank" class="btn-line" style="width:100%; display:block; text-align:center; padding:12px; box-sizing: border-box; font-size: 14px;">
+                詢問 MOMO 雙贏策略配置 ▶
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -516,8 +554,8 @@
 
   <script>
   /* ==========================================================================
-     SEO 與 內容維護區
-     ========================================================================== */
+      SEO 與 內容維護區
+      ========================================================================== */
   const SEO_DATA = {
     faq: [
       {
@@ -661,7 +699,36 @@
     const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1); const total = after3y + div3y;
     const totalRate = principal>0 ? (total/principal - 1)*100 : 0; return { monthly, grow, after3y, div3y, total, totalRate };
   }
-  function renderOutputs(o){ $('out-monthly').textContent = money(o.monthly); $('out-grow').textContent = pct(o.grow); $('out-3y').textContent = money(o.after3y); $('out-3y-div').textContent = money(o.div3y); $('out-total').textContent = money(o.total); $('out-total-rate').textContent = pct(o.totalRate); }
+  
+  function renderOutputs(o){ 
+    $('out-monthly').textContent = money(o.monthly); 
+    $('out-grow').textContent = pct(o.grow); 
+    $('out-3y').textContent = money(o.after3y); 
+    $('out-3y-div').textContent = money(o.div3y); 
+    
+    const totalEl = $('out-total');
+    const newTotal = money(o.total);
+    if(totalEl.textContent !== newTotal) {
+        totalEl.textContent = newTotal;
+        totalEl.classList.remove('flash-anim');
+        void totalEl.offsetWidth; 
+        totalEl.classList.add('flash-anim');
+    }
+    
+    $('out-total-rate').textContent = pct(o.totalRate); 
+
+    /* 裂變行銷邏輯：當月配息 > 10000 顯示強力 CTA */
+    const ctaEl = document.getElementById('calc-cta');
+    if(ctaEl){
+        if(o.monthly > 10000) {
+            ctaEl.style.display = 'block';
+            setTimeout(() => { ctaEl.classList.add('fade-in-section', 'visible'); }, 10);
+        } else {
+            ctaEl.style.display = 'none';
+        }
+    }
+  }
+  
   function persist(){ try{ localStorage.setItem('momo-calc', JSON.stringify(state)); }catch(_){} }
   function restore(){ try{ const s = JSON.parse(localStorage.getItem('momo-calc')); if(s && typeof s==='object'){ if(typeof s.baseCAGR==='number') state.baseCAGR=s.baseCAGR; if(typeof s.monthlyMul==='number') state.monthlyMul=s.monthlyMul; if(typeof s.principal==='number') state.principal=s.principal; if(typeof s.dist==='number') state.dist=s.dist; } }catch(_){} }
   
@@ -721,8 +788,8 @@
   }
 
   /* =========================================
-     MCS 儀表板邏輯 (首頁精簡版：只有Hero + 隱藏的資料讀取)
-     ========================================= */
+      MCS 儀表板邏輯
+      ========================================= */
   const API_BASE = 'https://mcs-worker.nms3194949.workers.dev';
   let gaugeChart = null;
 
@@ -758,13 +825,19 @@
     if (isLiquidityStrong && isCreditStrong) summary += `受惠於 <span class="highlight">資金充沛</span> 與信用風險偏好維持高檔，市場具備「資金行情」支撐。`;
     else if (!isLiquidityStrong && isCreditStrong) summary += `雖然信用利差穩定，但資金水位正在下降，需留意動能延續性。`;
     else if (!isCreditStrong) summary += `且信用利差擴大，顯示市場避險情緒正在升溫，需提高警覺。`;
-    
+     
     summary += `<br><br><strong>✦ 操作建議：</strong>`;
     if (score >= 60 && isLiquidityStrong) summary += `順勢操作。因流動性強勁，<span class="highlight">科技股、成長股與加密貨幣</span> 表現將優於防禦型資產。但需留意 Equity 分數若過高，切勿過度追價，建議逢回布局。`;
     else if (score >= 60 && !isLiquidityStrong) summary += `回歸基本面。資金潮退去，選股將重於選市，聚焦 <span class="highlight">高 EPS 成長</span> 之實質業績股，避開無基之彈的投機標的。`;
     else if (score < 40) summary += `防禦為主。建議拉高 <span class="highlight">現金與投資級債 (IG Bond)</span> 部位，降低股票曝險，直至 MACRO 指標落底回升。`;
     else summary += `區間操作。市場缺乏明確方向，建議採取 <span class="highlight">股債平衡</span> 配置，並透過網格交易或定期定額分散波動風險。`;
+    
+    // 體驗優化：淡入動畫
     el.innerHTML = summary;
+    el.animate([
+        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+    ], { duration: 800, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' });
   }
 
   function updateMcsGauge(score, stage) {
@@ -792,24 +865,14 @@
     }
   }
 
-  // 為了讓 AI 總結能正常運作，我們需要一個隱藏的更新函數來處理數據
-  // 雖然首頁不顯示卡片，但這個邏輯能確保數據被正確解析
   function updateFactorCard(factorKey, factor) {
-    // 這裡只保留對 hidden 元素的更新，防止報錯
-    // 實際首頁並不顯示這些卡片
     const metaEl = document.getElementById(factorKey + 'Meta');
     const summaryEl = document.getElementById(factorKey + 'Summary');
     if (!factor) return;
-
-    if (factorKey === 'credit') {
-      if(metaEl) metaEl.innerHTML = `<span>HY Spread：${factor.hy_spread?.toFixed(2) ?? '--'}%</span>`;
-    } else if (factorKey === 'eps') {
-      if(metaEl) metaEl.innerHTML = `<span>評估模型：股價動能推估</span>`;
-    } else if (factorKey === 'sentiment') {
-      if(metaEl) metaEl.innerHTML = `<span>VIX：${factor.vix?.toFixed(1) ?? '--'}</span>`;
-    } else if (factorKey === 'liquidity') {
-      if(metaEl) metaEl.innerHTML = `<span>Permits：${factor.permits}M <span class="meta-note">(${factor.permits_note})</span></span>`;
-    }
+    if (factorKey === 'credit') { if(metaEl) metaEl.innerHTML = `<span>HY Spread：${factor.hy_spread?.toFixed(2) ?? '--'}%</span>`; }
+    else if (factorKey === 'eps') { if(metaEl) metaEl.innerHTML = `<span>評估模型：股價動能推估</span>`; }
+    else if (factorKey === 'sentiment') { if(metaEl) metaEl.innerHTML = `<span>VIX：${factor.vix?.toFixed(1) ?? '--'}</span>`; }
+    else if (factorKey === 'liquidity') { if(metaEl) metaEl.innerHTML = `<span>Permits：${factor.permits}M <span class="meta-note">(${factor.permits_note})</span></span>`; }
   }
 
   async function loadMcs(profile = 'balanced') {
@@ -828,7 +891,6 @@
         data = { score: 66, stage: 'Growth', asOf: new Date().toISOString().slice(0,10), factors: {} };
       }
       if (!data.factors) data.factors = {};
-      // 模擬數據補全
       if(!data.factors.macro) data.factors.macro = { score: 12, pmi: 47.2, claims: 230000, change: -0.5 };
       if(!data.factors.liquidity) data.factors.liquidity = { score: 16, change: 1.5, net_liq: 6.35, net_liq_note: "資金寬鬆", cu_au: 4.15, cu_au_note: "溫和復甦" };
       if(!data.factors.credit) data.factors.credit = { score: 18, change: 1.2, hy_spread: 3.17, ig_spread: 0.84 };
@@ -838,7 +900,6 @@
       updateMcsGauge(data.score, data.stage);
       updateAiSummary(data);
       
-      // 雖然首頁不顯示卡片，但為了邏輯完整性，若有隱藏元素則更新
       const f = data.factors;
       ['credit','rates','macro','equity','eps','sentiment','liquidity'].forEach(k=>updateFactorCard(k, f[k]));
 
@@ -849,7 +910,6 @@
     initSEO();
     document.querySelectorAll('.block').forEach(mountBlock);
     restore(); fromURL(); bindEvents(); update();
-    // MCS Init
     loadMcs('balanced');
   }
   document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
