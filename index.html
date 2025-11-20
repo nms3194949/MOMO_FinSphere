@@ -4,14 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 
-  <!-- ===== 基本 SEO ===== -->
   <title>MOMO財商智庫｜月配息 × AI智能決策系統</title>
   <meta name="description" content="MOMO財商智庫：月配息 × 資產增值 × AI智能決策。整合基金研究、回撤策略、虛擬貨幣進出場、權證篩選與智能工具的一站式財商系統。">
   <meta name="keywords" content="MOMO財商智庫,MOMO FinSphere,月配息,基金研究,基金配息,回撤策略,AI智能決策,權證篩選,加密貨幣策略,投資工具">
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/">
 
-  <!-- ===== Open Graph (FB / LINE / etc.) ===== -->
   <meta property="og:title" content="MOMO財商智庫｜月配息 × AI智能決策系統">
   <meta property="og:description" content="基金研究、回撤策略、權證篩選與智能工具一站完成。MOMO財商智庫打造的月配息 × AI智能決策平台。">
   <meta property="og:type" content="website">
@@ -19,7 +17,6 @@
   <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
   <meta property="og:locale" content="zh_TW">
 
-  <!-- ===== Twitter Card ===== -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="MOMO財商智庫｜月配息 × AI智能決策系統">
   <meta name="twitter:description" content="月配息 × 資產增值 × AI智能決策，一站完成基金與加密資產研究。">
@@ -27,7 +24,6 @@
 
   <meta name="theme-color" content="#0A1221" />
 
-  <!-- CSP：允許 inline script、EmbedSocial 腳本與 iframe（解決 IG 無法顯示） -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self' https: data: blob:;
     img-src 'self' https: data: blob:;
@@ -45,7 +41,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- 結構化資料：Organization & WebSite -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -53,9 +48,7 @@
     "name": "MOMO財商智庫",
     "url": "https://nms3194949.github.io/MOMO_FinSphere/",
     "logo": "https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg",
-    "sameAs": [
-      "https://portaly.cc/momo_82786"
-    ]
+    "sameAs": [ "https://portaly.cc/momo_82786" ]
   }
   </script>
   <script type="application/ld+json">
@@ -95,7 +88,50 @@
   .nav a[aria-current="page"], .nav a:hover{background:var(--gold-grad);color:#0A1221}
 
   .section{margin-top:24px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  
+  /* ===== 2. 卡片懸浮與流光特效 (Hover Shimmer) ===== */
+  .card, .card2, .tool-card, .panel {
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+    position: relative;
+    overflow: hidden; /* 避免流光溢出 */
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                box-shadow 0.3s ease, 
+                border-color 0.3s ease;
+  }
+  
+  .card:hover, .card2:hover, .tool-card:hover, .panel:hover {
+    transform: translateY(-5px); /* 微微上浮 */
+    box-shadow: 0 12px 30px rgba(201, 162, 39, 0.15); /* 金色光暈 */
+    border-color: rgba(233, 209, 138, 0.6);
+  }
+
+  /* 流光掃過的效果 */
+  .card::after, .card2::after, .tool-card::after, .panel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 100%
+    );
+    transform: skewX(-25deg);
+    transition: none;
+    pointer-events: none; /* 確保不影響點擊 */
+  }
+  
+  .card:hover::after, .card2:hover::after, .tool-card:hover::after, .panel:hover::after {
+    left: 150%;
+    transition: left 0.6s ease-in-out;
+  }
+
   .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
   .btn-gold{background:var(--gold-grad);color:#0A1221;border:none}
   .btn-gold:hover{filter:brightness(1.1)}
@@ -123,16 +159,29 @@
     background:linear-gradient(90deg,#F9E27C 0%,#D9B84B 25%,#B88A1E 50%,#D9B84B 75%,#F9E27C 100%);
     background-size:200% auto; -webkit-background-clip:text; color:transparent;
     animation:goldflow 3s linear infinite;
+    will-change: background-position; 
   }
   @keyframes goldflow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 
   #strategy .row{display:flex;gap:16px;flex-wrap:wrap}
-  .card2{background:var(--card);border:1px solid var(--line);border-radius:16px;width:calc(50% - 8px);min-width:300px;padding:18px 16px 20px;box-shadow:0 10px 22px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:18px}
+  .card2{
+    /* card2 的樣式已經合併到上方的 .card2, .card 共用區塊，這裡保留特定排版 */
+    width:calc(50% - 8px);min-width:300px;
+    display:flex;flex-direction:column;gap:18px;
+    box-shadow:0 10px 22px rgba(0,0,0,.45);
+  }
+  
   .card2 h3{margin:0 0 4px;font-size:20px;color:var(--gold-soft)}
   .block{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
   .block:last-child{padding-bottom:0;border-bottom:0}
   .block .label{font-size:13.5px;font-weight:800;color:rgba(233,209,138,.9)}
   .gauge{width:100%}
+  
+  .gauge-bar {
+    transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: width;
+  }
+
   .readout{align-self:center;font-size:17px;font-weight:800;border:1px solid var(--gold-soft);border-radius:4px;padding:3px 10px;color:var(--ink)}
   .tick-label{font-size:9.5px;font-weight:700;fill:var(--ink)}
 
@@ -144,10 +193,13 @@
 
   .cta-fixed{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(10,18,33,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);display:none}
   .cta-fixed .btn-line{display:block;text-align:center;padding:14px 18px;border-radius:999px;background:var(--gold-grad);color:#0A1221;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.35)}
-  @media(max-width:768px){.cta-fixed{display:block} body.has-cta{padding-bottom:84px}}
+  @media(max-width:768px){
+    .cta-fixed{display:block} 
+    body.has-cta{padding-bottom:84px}
+  }
 
   #calc .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-  #calc .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative}
+  /* #calc .panel 樣式合併到上方 hover 區塊 */
   #calc h2{margin:0 0 6px;font-size:18px;color:var(--gold-soft)}
   #calc p.desc{margin:0 0 12px;color:var(--muted)}
   #calc label{display:block;font-weight:800;font-size:13px;color:rgba(233,209,138,.9);margin-bottom:6px}
@@ -183,19 +235,32 @@
     color:var(--gold-soft) !important;
   }
 
-  /* 首頁工具卡片（吃共用 JS 產出） */
-  .tool-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 18px rgba(0,0,0,.45)}
+  /* 首頁工具卡片 */
+  /* .tool-card 樣式合併到上方 hover 區塊 */
+  .tool-card{display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 18px rgba(0,0,0,.45)}
   .tool-pill-row{display:flex;gap:8px;margin-bottom:4px}
   .tool-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;border:1px solid rgba(233,209,138,.45);font-size:11px;color:var(--gold-soft)}
   .tool-title{font-size:18px;margin:0}
   .tool-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
   .tool-footer{margin-top:8px}
+
+  /* ===== 3. 捲動漸顯 (Scroll Reveal) CSS ===== */
+  .fade-in-section {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: opacity, transform;
+  }
+  .fade-in-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
   </style>
 </head>
 <body>
 
   <main id="main" class="wrap" role="main">
-    <header class="header" role="banner">
+    <header class="header fade-in-section" role="banner">
       <div class="logo">MOMO財商智庫</div>
       <nav class="nav" role="navigation" aria-label="主選單">
         <a href="#" aria-current="page">首頁</a>
@@ -206,18 +271,17 @@
       </nav>
     </header>
 
-    <section class="hero" aria-labelledby="hero-title">
+    <section class="hero fade-in-section" aria-labelledby="hero-title">
       <small>雙贏策略品牌中心</small>
       <h1 id="hero-title">MOMO財商智庫｜月配息 × AI智能決策系統</h1>
       <p>整合基金智能分析、虛擬貨幣策略與權證分析，打造全方位財商系統。</p>
       <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="加入 MOMO 財商智庫官方 LINE">加入官方 LINE ▶</a>
     </section>
 
-    <!-- ===== 策略進度 ===== -->
     <section id="strategy" class="section" aria-labelledby="strategy-title">
-      <div class="bar-header"><h2 id="strategy-title" class="bar-title">MOMO「雙贏巔峰」策略（進行中）</h2></div>
+      <div class="bar-header fade-in-section"><h2 id="strategy-title" class="bar-title">MOMO「雙贏巔峰」策略（進行中）</h2></div>
       <div class="row">
-        <div class="card2">
+        <div class="card2 fade-in-section">
           <h3>資產狀況</h3>
           <div class="block" data-key="principal" data-min="0" data-max="10000000" data-step="1000000" data-unit="M">
             <div class="label">基金規模</div>
@@ -230,7 +294,7 @@
             <div class="readout" id="r-monthly"></div>
           </div>
         </div>
-        <div class="card2">
+        <div class="card2 fade-in-section">
           <h3>收益率</h3>
           <div class="block" data-key="dist" data-min="0" data-max="30" data-step="5" data-unit="%">
             <div class="label">配息率(%)</div>
@@ -246,8 +310,7 @@
       </div>
     </section>
 
-    <!-- ===== 互動試算：配息率 ↔ 年均成長 ===== -->
-    <section id="calc" class="section" aria-labelledby="calc-title">
+    <section id="calc" class="section fade-in-section" aria-labelledby="calc-title">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
         <h2 id="calc-title">配息許願</h2>
         <button id="btn-save-png" class="btn-outline" type="button" aria-label="匯出目前互動試算為 PNG">匯出 PNG</button>
@@ -296,8 +359,7 @@
       </div>
     </section>
 
-    <!-- ===== 智能工具（首頁精選，吃共用設定） ===== -->
-    <section class="section" id="tools" aria-labelledby="tools-title">
+    <section class="section fade-in-section" id="tools" aria-labelledby="tools-title">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px">
         <h2 id="tools-title" style="margin:0;color:var(--gold-soft)">智能工具</h2>
         <a href="./tools/" class="btn btn-gold" style="border-radius:999px;padding:10px 18px;font-size:14px">
@@ -307,8 +369,7 @@
       <div class="tools" id="home-tools-grid"></div>
     </section>
 
-    <!-- ===== IG 最新貼文 ===== -->
-    <section id="ig-section" aria-labelledby="ig-title">
+    <section id="ig-section" class="fade-in-section" aria-labelledby="ig-title">
       <h2 id="ig-title">最新 IG 精選</h2>
       <div class="embedsocial-hashtag" data-ref="42032a17319b8cd123ca39bbcf94096c57c120b0">
         <a class="feed-powered-by-es feed-powered-by-es-feed-img es-widget-branding" href="https://embedsocial.com/social-media-aggregator/" target="_blank" title="Instagram widget">
@@ -321,12 +382,10 @@
     <footer class="footer">© MOMO財商智庫｜投資有風險，基金與加密資產無保證報酬，淨值可能因市場波動而變化，請依自身風險承受度謹慎評估。</footer>
   </main>
 
-  <!-- Mobile 固定 CTA -->
   <div class="cta-fixed" role="region" aria-label="加入官方 LINE">
     <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="立即加入 MOMO 財商智庫官方 LINE">加入官方 LINE ▶</a>
   </div>
 
-  <!-- 主功能 JS：儀表、計算器、PNG 匯出 -->
   <script>
   const $ =(id)=>document.getElementById(id);
   const nfTW = new Intl.NumberFormat('zh-TW');
@@ -365,79 +424,131 @@
   }
   const uniqueId=(p='id')=>`${p}-${Math.random().toString(36).slice(2,9)}`;
 
-  function drawGauge(el,{min,max,step,unit,value,breath=false}){
-    const parentWidth=Math.max(260,el.clientWidth||300);
-    const W=parentWidth,H=64,BH=14,X0=10,WB=W-2*X0,Y=42,TYO=10,TL=6;
-    const stepUsed=autoStep(min,max,step,parentWidth);
-    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.setAttribute('viewBox',`0 0 ${W} ${H}`); el.innerHTML=''; el.appendChild(svg);
+  // ===== 1. 數字滾動特效 (CountUp) 輔助函式 =====
+  function animateValue(callback, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress); // EaseOutExpo
+      const currentVal = Math.floor(easeProgress * (end - start) + start);
+      callback(currentVal);
+      if (progress < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+  }
 
-    let gradId;
-    if(breath){
-      gradId=uniqueId('goldGrad');
-      const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
-      const g=document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
-      g.setAttribute('id',gradId); g.setAttribute('x1','0%'); g.setAttribute('y1','0%'); g.setAttribute('x2','100%'); g.setAttribute('y2','0%');
-      const s1=document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','0%'); s1.setAttribute('style','stop-color:#E9D18A;stop-opacity:1');
-      const s2=document.createElementNS('http://www.w3.org/2000/svg','stop'); s2.setAttribute('offset','100%'); s2.setAttribute('class','gradient-stop-animated');
-      g.append(s1,s2); defs.append(g); svg.append(defs);
+  // SVG 繪製邏輯
+  function createGauge(el, { min, max, step, unit, breath = false }) {
+    const parentWidth = Math.max(260, el.clientWidth || 300);
+    const W = parentWidth, H = 64, BH = 14, X0 = 10, WB = W - 2 * X0, Y = 42, TYO = 10, TL = 6;
+    const stepUsed = autoStep(min, max, step, parentWidth);
+    const valueToX = v => { 
+      const t = (clamp(v, min, max) - min) / (max - min || 1); 
+      return X0 + t * WB; 
+    };
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    el.innerHTML = ''; 
+    el.appendChild(svg);
+
+    let fillAttr = '#E9D18A';
+    if (breath) {
+      const gradId = uniqueId('goldGrad');
+      const defs = document.createElementNS(NS, 'defs');
+      const g = document.createElementNS(NS, 'linearGradient');
+      g.setAttribute('id', gradId); g.setAttribute('x1', '0%'); g.setAttribute('y1', '0%'); g.setAttribute('x2', '100%'); g.setAttribute('y2', '0%');
+      const s1 = document.createElementNS(NS, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('style', 'stop-color:#E9D18A;stop-opacity:1');
+      const s2 = document.createElementNS(NS, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('class', 'gradient-stop-animated');
+      g.append(s1, s2); defs.append(g); svg.append(defs);
+      fillAttr = `url(#${gradId})`;
     }
-    const valueToX=v=>{ const t=(clamp(v,min,max)-min)/(max-min||1); return X0+t*WB; };
 
-    const lblStep=stepUsed*2;
-    let lastMajorX=-1e9;
-    for(let v=min; v<=max; v+=stepUsed){
-      const x=valueToX(v);
-      const major=(Math.abs(((v-min)%lblStep))<1e-6)||v===min||v===max;
-      const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
-      ln.setAttribute('x1',x); ln.setAttribute('y1',Y-BH/2-TYO);
-      ln.setAttribute('x2',x); ln.setAttribute('y2',Y-BH/2-TYO+TL);
-      ln.setAttribute('stroke',major?'#E9D18A':'rgba(233,209,138,.7)');
-      ln.setAttribute('stroke-width',major?'2.6':'1'); svg.append(ln);
-      if(major){
-        if(Math.abs(x-lastMajorX)>36){
-          const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-          t.setAttribute('x',x); t.setAttribute('y',Y-BH/2-TYO-3);
-          t.setAttribute('text-anchor','middle'); t.setAttribute('class','tick-label');
-          t.textContent=fmtAxis(v,unit); svg.append(t);
-          lastMajorX=x;
+    const lblStep = stepUsed * 2;
+    let lastMajorX = -1e9;
+    for (let v = min; v <= max; v += stepUsed) {
+      const x = valueToX(v);
+      const isMajor = (Math.abs(((v - min) % lblStep)) < 1e-6) || v === min || v === max;
+      
+      const ln = document.createElementNS(NS, 'line');
+      ln.setAttribute('x1', x); ln.setAttribute('y1', Y - BH / 2 - TYO);
+      ln.setAttribute('x2', x); ln.setAttribute('y2', Y - BH / 2 - TYO + TL);
+      ln.setAttribute('stroke', isMajor ? '#E9D18A' : 'rgba(233,209,138,.7)');
+      ln.setAttribute('stroke-width', isMajor ? '2.6' : '1');
+      svg.append(ln);
+
+      if (isMajor) {
+        if (Math.abs(x - lastMajorX) > 36) {
+          const t = document.createElementNS(NS, 'text');
+          t.setAttribute('x', x); t.setAttribute('y', Y - BH / 2 - TYO - 3);
+          t.setAttribute('text-anchor', 'middle'); 
+          t.setAttribute('class', 'tick-label');
+          t.textContent = fmtAxis(v, unit);
+          svg.append(t);
+          lastMajorX = x;
         }
       }
     }
 
-    const tr=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    tr.setAttribute('x',X0); tr.setAttribute('y',Y-BH/2);
-    tr.setAttribute('width',WB); tr.setAttribute('height',BH);
-    tr.setAttribute('rx',BH/2); tr.setAttribute('fill','#1a2337'); svg.append(tr);
+    const tr = document.createElementNS(NS, 'rect');
+    tr.setAttribute('x', X0); tr.setAttribute('y', Y - BH / 2);
+    tr.setAttribute('width', WB); tr.setAttribute('height', BH);
+    tr.setAttribute('rx', BH / 2); tr.setAttribute('fill', '#1a2337');
+    svg.append(tr);
 
-    const pr=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    pr.setAttribute('x',X0); pr.setAttribute('y',Y-BH/2);
-    pr.setAttribute('height',BH); pr.setAttribute('rx',BH/2);
-    pr.setAttribute('fill',breath?`url(#${gradId})`:'#E9D18A');
-    pr.style.transition='width .5s ease-out'; svg.append(pr);
-    pr.setAttribute('width',Math.max(0,valueToX(value)-X0));
-    return nv=>pr.setAttribute('width',Math.max(0,valueToX(nv)-X0));
+    const pr = document.createElementNS(NS, 'rect');
+    pr.setAttribute('class', 'gauge-bar'); 
+    pr.setAttribute('x', X0); pr.setAttribute('y', Y - BH / 2);
+    pr.setAttribute('height', BH); pr.setAttribute('rx', BH / 2);
+    pr.setAttribute('fill', fillAttr);
+    pr.setAttribute('width', 0);
+    svg.append(pr);
+
+    return function updateBarWidth(val) {
+      const currentW = Math.max(0, valueToX(val) - X0);
+      pr.setAttribute('width', currentW);
+    };
   }
 
   function mountBlock(blockEl){
     const key=blockEl.dataset.key; const min=+blockEl.dataset.min; const max=+blockEl.dataset.max;
     const step=+blockEl.dataset.step; const unit=blockEl.dataset.unit;
     const gaugeEl=blockEl.querySelector('.gauge'); const readEl=blockEl.querySelector('.readout');
+    
     const initVal=clamp(Number(MOMO_PROGRESS_CONFIG[key]??0),min,max);
-    let updateWidth=drawGauge(gaugeEl,{min,max,step,unit,value:initVal,breath:(key==='monthly')});
-    blockEl._value=initVal; readEl.textContent=fmtRead(initVal,unit);
-    blockEl._update=(v)=>{ const nv=clamp(v,min,max); blockEl._value=nv; updateWidth(nv); readEl.textContent=fmtRead(nv,unit); };
+    blockEl._value=initVal;
 
-    let rafId=null;
+    let updateView = null;
+    const init = () => {
+      updateView = createGauge(gaugeEl, { min, max, step, unit, value: blockEl._value, breath: (key==='monthly') });
+      updateView(blockEl._value);
+    };
+    init();
+
+    // 優化：初始載入時執行動畫 (針對本金和配息)
+    if(key === 'principal' || key === 'monthly') {
+      animateValue((val) => {
+         readEl.textContent = fmtRead(val, unit);
+      }, 0, initVal, 1500);
+    } else {
+      readEl.textContent = fmtRead(initVal, unit);
+    }
+
+    blockEl._update=(v)=>{ 
+      const nv=clamp(v,min,max); 
+      blockEl._value=nv; 
+      if(updateView) updateView(nv); 
+      readEl.textContent=fmtRead(nv,unit); 
+    };
+
     const ro=new ResizeObserver(()=>{
-      if(rafId) cancelAnimationFrame(rafId);
-      rafId=requestAnimationFrame(()=>{
-        const curr=blockEl._value??initVal;
-        updateWidth=drawGauge(gaugeEl,{min,max,step,unit,value:curr,breath:(key==='monthly')});
-        readEl.textContent=fmtRead(curr,unit);
-      });
+      if(blockEl._resizeTimer) clearTimeout(blockEl._resizeTimer);
+      blockEl._resizeTimer=setTimeout(init, 100);
     });
-    ro.observe(gaugeEl); blockEl._destroy=()=>ro.disconnect();
+    ro.observe(gaugeEl); 
+    blockEl._destroy=()=>{ ro.disconnect(); if(blockEl._resizeTimer) clearTimeout(blockEl._resizeTimer); };
   }
 
   const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
@@ -548,7 +659,11 @@
     const target = $('calc-capture');
     if(btn && target){
       btn.addEventListener('click', async ()=>{
-        const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background};
+        const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background, transform: target.style.transform};
+        
+        // 截圖時暫時移除 hover 上浮效果，避免切圖
+        target.style.transform = 'none'; 
+        
         const goldEls = Array.from(document.querySelectorAll('.goldCycle'));
         const prevClasses = goldEls.map(el => el.className);
         goldEls.forEach(el => { el.classList.add('goldPlain'); });
@@ -577,7 +692,7 @@
           alert('匯出失敗，請再試一次');
         }
         finally{
-          target.style.boxShadow=prev.boxShadow; target.style.padding=prev.padding; target.style.background=prev.bg;
+          target.style.boxShadow=prev.boxShadow; target.style.padding=prev.padding; target.style.background=prev.bg; target.style.transform=prev.transform;
           const goldNow = Array.from(document.querySelectorAll('.goldPlain'));
           goldNow.forEach((el,idx) => {
             el.className = prevClasses[idx] || el.className.replace(' goldPlain','');
@@ -587,6 +702,18 @@
     }
 
     if (matchMedia('(max-width: 768px)').matches) document.body.classList.add('has-cta');
+    
+    // ===== 3. 捲動漸顯 (Scroll Reveal) 初始化 =====
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
   }
 
   function boot(){
@@ -599,7 +726,6 @@
   document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
   </script>
 
-  <!-- 共用工具設定 + 渲染：首頁智能工具區塊會自動長出卡片 -->
   <script src="./assets/tools-config.js"></script>
   <script src="./assets/tools-render.js"></script>
   <script>
@@ -610,7 +736,6 @@
     });
   </script>
 
-  <!-- IG 官方嵌入 -->
   <script>
   (function(d, s, id) {
     var js; if (d.getElementById(id)) return;
