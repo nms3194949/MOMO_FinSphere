@@ -25,6 +25,14 @@ window.MOMO_TOOLS_CONFIG = [
     showOnHome: true
   },
   {
+    id: "fund-yield-matrix",
+    category: "fund",
+    title: "MCS 景氣循環儀表板",
+    desc: "依照景氣循環來做資產配置",
+    href: "/MOMO_FinSphere/tools/msc-score.html",
+    showOnHome: true
+  },
+  {
     id: "warrant-api",
     category: "warrant",
     title: "權證篩選 API",
