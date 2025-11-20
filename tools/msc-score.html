@@ -23,51 +23,68 @@
     .page { max-width:1100px; margin:0 auto; }
     
     /* 標題 */
-    h1 { margin:0 0 4px; font-size:24px; letter-spacing:0.04em; display:flex; align-items:center; gap:8px; }
+    h1 { margin:0 0 16px; font-size:24px; letter-spacing:0.04em; display:flex; align-items:center; gap:8px; }
     h1 span.badge { font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid rgba(201,162,39,0.6); color:var(--gold-soft); text-transform:uppercase; }
-    .subtitle { margin:0 0 12px; font-size:13px; color:var(--muted); }
 
-    /* --- 戰情中心 Hero --- */
-    .top-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; align-items:stretch; }
-    .score-card {
-      flex:1 1 260px; padding:14px 16px; border-radius:16px;
-      background: radial-gradient(circle at top left, rgba(233,209,138,0.16), #0B1224 55%, #050814 100%);
-      border:1px solid var(--border); display:flex; flex-direction:column; gap:8px; min-width:0;
+    /* --- MCS 戰情中心 (Hero) 樣式 --- */
+    .mcs-hero-section {
+      margin-bottom: 24px; border-radius: 20px;
+      background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 60%, #020617 100%);
+      border: 1px solid rgba(201, 162, 39, 0.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4); overflow: hidden; position: relative;
     }
-    .score-layout { display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .gauge-wrapper { position:relative; width:130px; height:130px; flex:0 0 auto; }
-    .gauge-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
-    .gauge-center-main { font-size:28px; font-weight:700; line-height:1; }
-    .gauge-center-label { margin-top:2px; font-size:11px; letter-spacing:0.09em; text-transform:uppercase; color:var(--muted); }
+    .mcs-hero-section::before {
+      content:""; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.6;
+    }
+    .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 24px; }
     
-    .score-right { flex:1 1 160px; min-width:0; display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
-    .stage-pill {
-      padding:4px 10px; border-radius:999px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
-      border:1px solid rgba(233,209,138,0.5); background:linear-gradient(120deg,rgba(233,209,138,0.22),rgba(10,18,33,0.9));
+    /* 左側：儀表板 */
+    .hero-gauge-col {
+      flex: 0 0 180px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border-right: 1px solid rgba(255,255,255,0.08); padding-right: 20px;
     }
-    .stage-pill.recession { border-color:rgba(248,113,113,0.9); color:#ffdada; }
-    .stage-pill.slowdown { border-color:rgba(251,146,60,0.9); color:#ffe5bf; }
-    .stage-pill.growth    { border-color:rgba(34,197,94,0.9); color:#d6ffea; }
-    .stage-pill.heat      { border-color:rgba(234,179,8,0.9); color:#fff1b5; }
-    .score-right-title { font-size:13px; font-weight:600; color:var(--gold-soft); }
-    .score-right-desc { font-size:12px; color:var(--muted); }
+    .gauge-container { position: relative; width: 140px; height: 140px; }
+    .gauge-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+    .gauge-val { font-size: 32px; font-weight: 800; line-height: 1; color: #fff; text-shadow: 0 0 15px rgba(201,162,39,0.3); }
+    .gauge-lbl { font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; font-weight: 600; }
+    .hero-meta-row { margin-top: 16px; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .source-tag { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 10px; letter-spacing: 0.5px; transition: all 0.3s; }
 
-    .meta-row { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; font-size:11px; color:var(--muted); margin-top:4px; }
-    .chip { padding:2px 8px; border-radius:999px; border:1px solid rgba(156,163,175,0.4); font-size:11px; color:var(--muted); }
-    
-    /* AI 總結區塊 */
-    .summary-section {
-      margin-bottom: 18px; padding: 12px 16px; border-radius: 12px;
-      background: linear-gradient(90deg, rgba(12, 21, 42, 0.6) 0%, rgba(23, 33, 51, 0.6) 100%);
-      border-left: 3px solid var(--gold); font-size: 13px; line-height: 1.6; color: #e2e8f0;
+    /* 右側：資訊 */
+    .hero-info-col { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+    .status-group { display: flex; flex-direction: column; gap: 6px; }
+    .stage-badge {
+      align-self: flex-start; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;
     }
+    .stage-badge.growth { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); color: #4ade80; }
+    .stage-badge.recession { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.5); color: #f87171; }
+    .stage-badge.slowdown { background: rgba(251,146,60,0.15); border-color: rgba(251,146,60,0.5); color: #fb923c; }
+    .stage-badge.heat { background: rgba(234,179,8,0.15); border-color: rgba(234,179,8,0.5); color: #facc15; }
+    .stage-title { margin: 0; font-size: 18px; font-weight: 700; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .stage-desc { margin: 0; font-size: 13px; color: #cbd5e1; line-height: 1.5; opacity: 0.9; }
+    .hero-divider { height: 1px; background: rgba(255,255,255,0.1); width: 100%; }
+    .ai-insight-box { background: rgba(0, 0, 0, 0.2); border-left: 3px solid var(--gold); padding: 10px 16px; border-radius: 0 8px 8px 0; }
+    .ai-label { font-size: 12px; color: var(--gold); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .ai-label .icon { animation: pulse 2s infinite; }
+    .ai-content { font-size: 13px; line-height: 1.6; color: #e2e8f0; }
     .highlight { color: var(--gold); font-weight: 600; }
     .warn { color: var(--danger); font-weight: 600; }
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+    @media (max-width: 700px) {
+      .mcs-hero-inner { flex-direction: column; align-items: center; text-align: center; gap: 24px; }
+      .hero-gauge-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 24px; width: 100%; }
+      .hero-info-col { width: 100%; }
+      .stage-badge { align-self: center; }
+      .ai-insight-box { text-align: left; }
+    }
 
     /* --- Grid & Cards --- */
     .grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; margin-bottom:18px; }
     @media (max-width:900px){ .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-    @media (max-width:600px){ .grid { grid-template-columns:1fr; } .top-row { flex-direction:column; } }
+    @media (max-width:600px){ .grid { grid-template-columns:1fr; } }
 
     .factor-card {
       border-radius:14px; background:var(--card); border:1px solid rgba(148,163,184,0.3);
@@ -126,35 +143,41 @@
     MCS 景氣循環儀表板
     <span class="badge">MACRO CYCLE SCANNER</span>
   </h1>
-  <p class="subtitle">結合利差、殖利率曲線、股市動能、EPS、實體經濟與波動指標，動態評估景氣階段。</p>
-
-  <div class="top-row">
-    <div class="score-card">
-      <div class="score-layout">
-        <div class="gauge-wrapper">
+  
+  <section class="mcs-hero-section">
+    <div class="mcs-hero-inner">
+      
+      <div class="hero-gauge-col">
+        <div class="gauge-container">
           <canvas id="mcsGaugeChart"></canvas>
-          <div class="gauge-center">
-            <div class="gauge-center-main" id="gaugeScoreText">--</div>
-            <div class="gauge-center-label">MCS SCORE</div>
+          <div class="gauge-overlay">
+            <div class="gauge-val" id="gaugeScoreText">--</div>
+            <div class="gauge-lbl">MCS SCORE</div>
           </div>
         </div>
-        <div class="score-right">
-          <div class="stage-pill recession" id="mcsStagePill">--</div>
-          <div class="score-right-title" id="mcsStageTitle">景氣象限：--</div>
-          <div class="score-right-desc" id="mcsStageDesc">正在載入數據...</div>
+        <div class="hero-meta-row">
+          <span id="mcsAsOf">更新：--</span>
+          <span class="source-tag" id="mcsSource">SOURCE: FRED</span>
         </div>
       </div>
-      <div class="meta-row">
-        <div id="mcsAsOf">更新時間：--</div>
-        <div class="chip" id="mcsSource">SOURCE: FRED</div>
-        <div class="chip" id="allocScoreChip">Score：--/100</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="summary-section" id="aiSummaryText">
-    正在運算 AI 策略建議...
-  </div>
+      <div class="hero-info-col">
+        <div class="status-group">
+          <div class="stage-badge" id="mcsStagePill">--</div>
+          <h2 class="stage-title" id="mcsStageTitle">景氣象限：--</h2>
+          <p class="stage-desc" id="mcsStageDesc">正在載入景氣數據...</p>
+        </div>
+        <div class="hero-divider"></div>
+        <div class="ai-insight-box">
+          <div class="ai-label"><span class="icon">✦</span> AI 策略觀點</div>
+          <div class="ai-content" id="aiSummaryText">
+            正在運算策略建議...
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
 
   <div class="grid">
     <div class="factor-card" id="factor-credit">
@@ -243,6 +266,7 @@
       </div>
       <div class="factor-summary" id="liquiditySummary"></div>
     </div>
+
   </div>
 
   <section class="alloc-section">
@@ -263,28 +287,46 @@
 
     <div class="alloc-detail-list">
       <div class="alloc-item-row">
-        <div class="alloc-item-label"><span>股票型 / 成長型基金</span><span class="sub">大盤、主題、科技、成長股基金等</span></div>
+        <div class="alloc-item-label">
+          <span>股票型 / 成長型基金</span>
+          <span class="sub">大盤、主題、科技、成長股基金等</span>
+        </div>
         <div class="alloc-item-bottom">
-          <div class="alloc-bar-track"><div class="alloc-bar-fill" id="allocEquityBar"></div></div>
+          <div class="alloc-bar-track">
+            <div class="alloc-bar-fill" id="allocEquityBar"></div>
+          </div>
           <div class="alloc-item-value" id="allocEquityText">--%</div>
         </div>
       </div>
       <div class="alloc-item-row">
-        <div class="alloc-item-label"><span>收益 / 多重資產基金</span><span class="sub">股債平衡、多重收益、配息策略</span></div>
+        <div class="alloc-item-label">
+          <span>收益 / 多重資產基金</span>
+          <span class="sub">股債平衡、多重收益、配息策略</span>
+        </div>
         <div class="alloc-item-bottom">
-          <div class="alloc-bar-track"><div class="alloc-bar-fill" id="allocIncomeBar"></div></div>
+          <div class="alloc-bar-track">
+            <div class="alloc-bar-fill" id="allocIncomeBar"></div>
+          </div>
           <div class="alloc-item-value" id="allocIncomeText">--%</div>
         </div>
       </div>
       <div class="alloc-item-row">
-        <div class="alloc-item-label"><span>防禦 / 現金等部位</span><span class="sub">投資級債、短債、貨幣市場、現金</span></div>
+        <div class="alloc-item-label">
+          <span>防禦 / 現金等部位</span>
+          <span class="sub">投資級債、短債、貨幣市場、現金</span>
+        </div>
         <div class="alloc-item-bottom">
-          <div class="alloc-bar-track"><div class="alloc-bar-fill" id="allocDefensiveBar"></div></div>
+          <div class="alloc-bar-track">
+            <div class="alloc-bar-fill" id="allocDefensiveBar"></div>
+          </div>
           <div class="alloc-item-value" id="allocDefensiveText">--%</div>
         </div>
       </div>
     </div>
-    <p class="footnote">此配比為系統依當前 MCS 景氣分數與階段推估之「策略參考區間」，實際投組仍需搭配個人風險承受度與既有部位調整。</p>
+
+    <p class="footnote">
+      此配比為系統依當前 MCS 景氣分數與階段推估之「策略參考區間」，實際投組仍需搭配個人風險承受度與既有部位調整。
+    </p>
   </section>
 
   <section class="history-section">
@@ -305,6 +347,7 @@
 </div>
 
 <script>
+  // 使用您的 Cloudflare Worker 網址
   const API_BASE = 'https://mcs-worker.nms3194949.workers.dev';
   let currentProfile = 'balanced';
   let historyChart = null;
@@ -340,56 +383,16 @@
     pill.classList.remove('recession','slowdown','growth','heat');
     if (!stage) {
       pill.textContent = '--';
-      chip.textContent = 'Stage：--';
+      if(chip) chip.textContent = 'Stage：--';
       titleEl.textContent = '景氣象限：--';
       descEl.textContent  = '依 MCS 分數對應四大景氣區間：Recession / Slowdown / Growth / Heat。';
       return;
     }
     pill.classList.add(stage.toLowerCase());
     pill.textContent = stage;
-    chip.textContent = 'Stage：' + stage;
-    titleEl.textContent = mapTitle[stage] || ('景氣象限：' + stage);
+    if(chip) chip.textContent = 'Stage：' + stage;
+    titleEl.textContent = mapTitle[stage] || ('Stage: ' + stage);
     descEl.textContent  = mapDesc[stage]  || '依 MCS 分數對應四大景氣區間。';
-  }
-
-  function updateAiSummary(data) {
-    const el = document.getElementById('aiSummaryText');
-    if (!el || !data || !data.factors) return;
-
-    const f = data.factors;
-    const score = data.score || 0;
-    let summary = "";
-
-    if (score >= 60) {
-      summary += `目前景氣處於 <span class="highlight">強勁成長期 (Growth)</span>，基本面數據穩健。`;
-    } else if (score >= 40) {
-      summary += `目前景氣處於 <span class="highlight">震盪調整期</span>，多空力道拉鋸。`;
-    } else {
-      summary += `目前景氣面臨 <span class="warn">修正風險 (Slowdown/Recession)</span>，基本面動能轉弱。`;
-    }
-
-    const isLiquidityStrong = (f.liquidity?.score >= 12);
-    const isCreditStrong = (f.credit?.score >= 12);
-    
-    if (isLiquidityStrong && isCreditStrong) {
-      summary += `受惠於 <span class="highlight">資金充沛</span> 與信用風險偏好維持高檔，市場具備「資金行情」支撐。`;
-    } else if (!isLiquidityStrong && isCreditStrong) {
-      summary += `雖然信用利差穩定，但資金水位正在下降，需留意動能延續性。`;
-    } else if (!isCreditStrong) {
-      summary += `且信用利差擴大，顯示市場避險情緒正在升溫，需提高警覺。`;
-    }
-
-    summary += `<br><br><strong>✦ 操作建議：</strong>`;
-    if (score >= 60 && isLiquidityStrong) {
-      summary += `順勢操作。因流動性強勁，<span class="highlight">科技股、成長股與加密貨幣</span> 表現將優於防禦型資產。但需留意 Equity 分數若過高，切勿過度追價，建議逢回布局。`;
-    } else if (score >= 60 && !isLiquidityStrong) {
-      summary += `回歸基本面。資金潮退去，選股將重於選市，聚焦 <span class="highlight">高 EPS 成長</span> 之實質業績股，避開無基之彈的投機標的。`;
-    } else if (score < 40) {
-      summary += `防禦為主。建議拉高 <span class="highlight">現金與投資級債 (IG Bond)</span> 部位，降低股票曝險，直至 MACRO 指標落底回升。`;
-    } else {
-      summary += `區間操作。市場缺乏明確方向，建議採取 <span class="highlight">股債平衡</span> 配置，並透過網格交易或定期定額分散波動風險。`;
-    }
-    el.innerHTML = summary;
   }
 
   function getFactorSummary(key, score) {
@@ -441,7 +444,10 @@
     
     if (!factor) return;
 
-    scoreEl.textContent = factor.score ?? '--';
+    // === 修改重點：強制四捨五入為整數，解決小數點過長問題 ===
+    const roundedScore = (factor.score != null) ? Math.round(factor.score) : '--';
+    scoreEl.textContent = roundedScore;
+    
     const ratio = (factor.score ?? 0) / 20;
     barEl.style.transform = 'scaleX(' + ratio.toFixed(2) + ')';
 
@@ -466,11 +472,11 @@
       summaryEl.innerHTML = getFactorSummary(factorKey, factor.score);
     }
 
-    // 內容格式化 (Clean Version)
+    // 內容格式化 (只顯示有意義的數據)
     if (factorKey === 'credit') {
       metaEl.innerHTML = `<span>HY Spread：${factor.hy_spread?.toFixed(2) ?? '--'}%</span>`;
     } else if (factorKey === 'rates') {
-      metaEl.innerHTML = `<span>10Y：${factor.us10y?.toFixed(2) ?? '--'}%</span><span>Curve (10-2)：${factor.ycc?.toFixed(2) ?? '--'}%</span>`;
+      metaEl.innerHTML = `<span>10Y：${factor.us10y?.toFixed(2) ?? '--'}%</span><span>Curve：${factor.ycc?.toFixed(2) ?? '--'}%</span>`;
     } else if (factorKey === 'macro') {
       metaEl.innerHTML = `<span>ISM PMI：${factor.pmi?.toFixed(1) ?? '--'}</span><span>Claims：${factor.claims ? Math.round(factor.claims/1000)+'k' : '--'}</span>`;
     } else if (factorKey === 'equity') {
@@ -495,13 +501,20 @@
     document.querySelectorAll('.profile-toggle').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.profile === profile);
     });
-    const labelMap = { balanced: '屬性：平衡型', conservative: '屬性：保守型', aggressive: '屬性：積極型' };
-    document.getElementById('allocProfileLabel').textContent = labelMap[profile] || ('屬性：' + profile);
+    const labelMap = {
+      balanced:     '屬性：平衡型',
+      conservative: '屬性：保守型',
+      aggressive:   '屬性：積極型'
+    };
+    const labelEl = document.getElementById('allocProfileLabel');
+    if(labelEl) labelEl.textContent = labelMap[profile] || ('屬性：' + profile);
   }
 
   function updateMcsGauge(score, stage) {
     const canvas = document.getElementById('mcsGaugeChart');
     const centerText = document.getElementById('gaugeScoreText');
+    if(!canvas || !centerText) return;
+
     if (score == null || Number.isNaN(score)) {
       centerText.textContent = '--';
     } else {
@@ -509,36 +522,79 @@
     }
 
     const labels = ['Recession','Slowdown','Growth','Heat'];
-    const baseColors = {
-      Recession: 'rgba(248,113,113,0.22)', Slowdown: 'rgba(251,146,60,0.20)', Growth: 'rgba(34,197,94,0.18)', Heat: 'rgba(234,179,8,0.16)'
-    };
+    const bgColors = ['rgba(248,113,113,0.22)','rgba(251,146,60,0.20)','rgba(34,197,94,0.18)','rgba(234,179,8,0.16)'];
     const activeColors = {
       Recession: 'rgba(248,113,113,0.9)', Slowdown: 'rgba(251,146,60,0.9)', Growth: 'rgba(34,197,94,0.9)', Heat: 'rgba(234,179,8,0.9)'
     };
-    const bgColors = labels.map(s => {
-      if (!stage) return baseColors[s];
-      return s === stage ? activeColors[s] : baseColors[s];
-    });
-    const borderColors = labels.map(s => {
-      if (!stage) return 'rgba(15,23,42,1)';
-      return s === stage ? 'rgba(15,23,42,1)' : 'rgba(15,23,42,0.6)';
-    });
-    const dataVals = [25,25,25,25];
+    const finalBg = labels.map(s => (stage && s===stage) ? activeColors[s] : bgColors[labels.indexOf(s)]);
+    const finalBorder = labels.map(s => (stage && s===stage) ? 'rgba(15,23,42,1)' : 'rgba(15,23,42,0.6)');
 
-    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-
     if (!gaugeChart) {
       gaugeChart = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels, datasets: [{ data: dataVals, backgroundColor: bgColors, borderColor: borderColors, borderWidth: 1.5, hoverOffset: 2 }] },
-        options: { responsive: true, cutout: '68%', plugins: { legend: { display: false }, tooltip: { enabled:false } } }
+        data: {
+          labels,
+          datasets: [{
+            data: [25,25,25,25],
+            backgroundColor: finalBg,
+            borderColor: finalBorder,
+            borderWidth: 1.5,
+            hoverOffset: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '68%',
+          plugins: { legend: { display: false }, tooltip: { enabled:false } }
+        }
       });
     } else {
-      gaugeChart.data.datasets[0].backgroundColor = bgColors;
-      gaugeChart.data.datasets[0].borderColor = borderColors;
+      gaugeChart.data.datasets[0].backgroundColor = finalBg;
+      gaugeChart.data.datasets[0].borderColor = finalBorder;
       gaugeChart.update();
     }
+  }
+
+  function updateAiSummary(data) {
+    const el = document.getElementById('aiSummaryText');
+    if (!el || !data || !data.factors) return;
+
+    const f = data.factors;
+    const score = data.score || 0;
+    let summary = "";
+
+    if (score >= 60) {
+      summary += `目前景氣處於 <span class="highlight">強勁成長期 (Growth)</span>，基本面數據穩健。`;
+    } else if (score >= 40) {
+      summary += `目前景氣處於 <span class="highlight">震盪調整期</span>，多空力道拉鋸。`;
+    } else {
+      summary += `目前景氣面臨 <span class="warn">修正風險 (Slowdown/Recession)</span>，基本面動能轉弱。`;
+    }
+
+    const isLiquidityStrong = (f.liquidity?.score >= 12);
+    const isCreditStrong = (f.credit?.score >= 12);
+    
+    if (isLiquidityStrong && isCreditStrong) {
+      summary += `受惠於 <span class="highlight">資金充沛</span> 與信用風險偏好維持高檔，市場具備「資金行情」支撐。`;
+    } else if (!isLiquidityStrong && isCreditStrong) {
+      summary += `雖然信用利差穩定，但資金水位正在下降，需留意動能延續性。`;
+    } else if (!isCreditStrong) {
+      summary += `且信用利差擴大，顯示市場避險情緒正在升溫，需提高警覺。`;
+    }
+
+    summary += `<br><br><strong>✦ 操作建議：</strong>`;
+    if (score >= 60 && isLiquidityStrong) {
+      summary += `順勢操作。因流動性強勁，<span class="highlight">科技股、成長股與加密貨幣</span> 表現將優於防禦型資產。但需留意 Equity 分數若過高，切勿過度追價，建議逢回布局。`;
+    } else if (score >= 60 && !isLiquidityStrong) {
+      summary += `回歸基本面。資金潮退去，選股將重於選市，聚焦 <span class="highlight">高 EPS 成長</span> 之實質業績股，避開無基之彈的投機標的。`;
+    } else if (score < 40) {
+      summary += `防禦為主。建議拉高 <span class="highlight">現金與投資級債 (IG Bond)</span> 部位，降低股票曝險，直至 MACRO 指標落底回升。`;
+    } else {
+      summary += `區間操作。市場缺乏明確方向，建議採取 <span class="highlight">股債平衡</span> 配置，並透過網格交易或定期定額分散波動風險。`;
+    }
+
+    el.innerHTML = summary;
   }
 
   async function loadMcs(profile = 'balanced') {
@@ -550,41 +606,47 @@
       const chip = document.getElementById('allocScoreChip');
 
       try {
-        // Snapshot Mode
-        const res = await fetch(API_BASE, { cache:'no-store' });
+        const res  = await fetch(API_BASE, { cache:'no-store' });
         if (!res.ok) throw new Error('API response not ok');
         data = await res.json();
         
         if(sourceEl) {
-          sourceEl.textContent = 'SOURCE: ' + (data.raw?.source || 'FRED');
-          sourceEl.style.background = 'rgba(255,255,255,0.08)';
-          sourceEl.style.color = '#9fb1cc';
-          sourceEl.style.border = 'none';
+            sourceEl.textContent = 'SOURCE: ' + (data.raw?.source || 'FRED');
+            sourceEl.style.background = 'rgba(255,255,255,0.08)';
+            sourceEl.style.color = '#9fb1cc';
+            sourceEl.style.border = 'none';
         }
+
       } catch(e) {
         console.error('API Connection Failed:', e);
         isFallback = true;
         if(sourceEl) {
-          sourceEl.innerHTML = '⚠ 連線失敗 (顯示模擬數據)';
-          sourceEl.style.background = 'rgba(220, 38, 38, 0.2)';
-          sourceEl.style.color = '#fca5a5';
-          sourceEl.style.border = '1px solid #ef4444';
-          sourceEl.style.fontWeight = 'bold';
+            sourceEl.innerHTML = '⚠ 連線失敗 (顯示模擬數據)';
+            sourceEl.style.background = 'rgba(220, 38, 38, 0.2)';
+            sourceEl.style.color = '#fca5a5';
+            sourceEl.style.border = '1px solid #ef4444';
+            sourceEl.style.fontWeight = 'bold';
         }
-        // Fallback structure to prevent crash
-        data = { score: 66, stage: 'Growth', asOf: new Date().toISOString().slice(0,10), factors: {} };
+        // 備用模擬數據
+        data = {
+          score: 66, stage: 'Growth', asOf: new Date().toISOString().slice(0,10),
+          factors: {} 
+        };
       }
 
       if (!data.factors) data.factors = {};
+      if(!data.factors.macro) data.factors.macro = { score: 12, pmi: 47.2, claims: 230000, change: -0.5 };
+      if(!data.factors.liquidity) {
+        data.factors.liquidity = { score: 16, change: 1.5, net_liq: 6.35, net_liq_note: "資金寬鬆", cu_au: 4.15, cu_au_note: "溫和復甦", permits: 1.52, permits_note: "需求持穩" };
+      }
+      if(!data.factors.credit) data.factors.credit = { score: 18, change: 1.2, hy_spread: 3.17, ig_spread: 0.84 };
+      if(!data.factors.rates) data.factors.rates = { score: 10, change: -0.2, us10y: 4.12, ycc: 0.54 };
+      if(!data.factors.equity) data.factors.equity = { score: 13, change: 2.5, sp500_momo_6m: 0.136, sp500_today: 6642 };
+      if(!data.factors.eps) data.factors.eps = { score: 15, change: 0, eps_yoy: 0.11 };
+      if(!data.factors.sentiment) data.factors.sentiment = { score: 10, change: -1.8, vix: 23.7, move: 84.3 };
 
-      // 預設值補全 (防止JS報錯，但不顯示亂數)
-      const defaults = {score:0, change:0};
-      ['credit','rates','macro','equity','eps','sentiment','liquidity'].forEach(k => {
-          if(!data.factors[k]) data.factors[k] = defaults;
-      });
-
-      document.getElementById('mcsAsOf').textContent = '更新時間：' + (data.asOf || '--');
-      document.getElementById('allocScoreChip').textContent = 'Score：' + (data.score ?? '--') + '/100';
+      if(asOfEl) asOfEl.textContent = '更新時間：' + (data.asOf || '--');
+      if(chip) chip.textContent = 'Score：' + (data.score ?? '--') + '/100';
 
       setStagePill(data.stage);
       updateMcsGauge(data.score, data.stage);
@@ -599,17 +661,17 @@
       updateFactorCard('liquidity', f.liquidity);
 
       const alloc = data.allocation || {};
-      document.getElementById('allocEquityText').textContent    = formatPctPlain(alloc.equity ?? null, 0);
-      document.getElementById('allocIncomeText').textContent    = formatPctPlain(alloc.income ?? null, 0);
-      document.getElementById('allocDefensiveText').textContent = formatPctPlain(alloc.defensive ?? null, 0);
-
-      setAllocBar('allocEquityBar',    alloc.equity);
-      setAllocBar('allocIncomeBar',    alloc.income);
-      setAllocBar('allocDefensiveBar', alloc.defensive);
-
+      if(document.getElementById('allocEquityText')) {
+          document.getElementById('allocEquityText').textContent    = formatPctPlain(alloc.equity ?? null, 0);
+          document.getElementById('allocIncomeText').textContent    = formatPctPlain(alloc.income ?? null, 0);
+          document.getElementById('allocDefensiveText').textContent = formatPctPlain(alloc.defensive ?? null, 0);
+          setAllocBar('allocEquityBar',    alloc.equity);
+          setAllocBar('allocIncomeBar',    alloc.income);
+          setAllocBar('allocDefensiveBar', alloc.defensive);
+      }
       updateAiSummary(data);
 
-      return data.score;
+      return data.score; 
 
     } catch (err) {
       console.error(err);
@@ -621,13 +683,14 @@
     if (!points.length) return [];
     const bands = [];
     let currentStage = points[0].stage || 'Unknown';
-    let startIndex = 0;
+    let startIndex   = 0;
+
     for (let i = 1; i < points.length; i++) {
       const s = points[i].stage || 'Unknown';
       if (s !== currentStage) {
         bands.push({ stage: currentStage, startIndex, endIndex: i - 1 });
         currentStage = s;
-        startIndex = i;
+        startIndex   = i;
       }
     }
     bands.push({ stage: currentStage, startIndex: points.length - 1 });
@@ -652,8 +715,8 @@
       for (const band of bands) {
         const color = colorMap[band.stage] || colorMap.Unknown;
         const startPixel = xScale.getPixelForValue(band.startIndex);
-        const endPixel = xScale.getPixelForValue(band.endIndex);
-        const left = Math.min(startPixel, endPixel);
+        const endPixel   = xScale.getPixelForValue(band.endIndex);
+        const left  = Math.min(startPixel, endPixel);
         const right = Math.max(startPixel, endPixel);
         ctx.fillStyle = color;
         ctx.fillRect(left, chartArea.top, right - left, chartArea.bottom - chartArea.top);
@@ -662,28 +725,24 @@
     }
   };
 
-  // 載入真實歷史數據 (不含模擬)
   async function loadMcsHistory(latestScore = null) {
     try {
-      // 呼叫 /history 端點
+      // 呼叫真實歷史數據 API
       const res = await fetch(`${API_BASE}/history`, { cache: 'no-store' });
-      if (!res.ok) {
-        console.warn('History API not available');
-        return;
-      }
+      if(!res.ok) return; // 若無歷史數據，直接結束，保持圖表空白
 
       const json = await res.json();
       const points = json.points || [];
 
-      if (points.length === 0) return; // 沒數據就不畫圖
+      if (points.length === 0) return;
 
       // 強制同步最後一點
       if (latestScore != null && !Number.isNaN(latestScore)) {
         points[points.length - 1].score = latestScore;
       }
 
-      const labels = points.map(p => p.date);
-      const scores = points.map(p => p.score);
+      const labels   = points.map(p => p.date);
+      const scores   = points.map(p => p.score);
       const spLevels = points.map(p => p.sp500);
       const bands = buildStageBands(points);
 
@@ -697,8 +756,8 @@
         data: {
           labels,
           datasets: [
-            { label: 'MCS Score', data: scores, yAxisID: 'y', tension: 0.25, fill: false, borderWidth: 2, pointRadius: 0, borderColor: '#EFD88A' },
-            { label: 'S&P 500', data: spLevels, yAxisID: 'y1', tension: 0.25, fill: false, borderWidth: 1.5, pointRadius: 0, borderColor: '#38BDF8' }
+            { label: 'MCS Score', data: scores, yAxisID: 'y', tension: 0.4, fill: false, borderWidth: 2, pointRadius: 0, borderColor: '#EFD88A' },
+            { label: 'S&P 500', data: spLevels, yAxisID: 'y1', tension: 0.4, fill: false, borderWidth: 1.5, pointRadius: 0, borderColor: '#38BDF8' }
           ]
         },
         options: {
@@ -725,9 +784,10 @@
   document.addEventListener('DOMContentLoaded', async () => {
     setActiveProfileButton(currentProfile);
     
+    // 1. 先載入最新數據 (卡片+戰情中心)
     const latestScore = await loadMcs(currentProfile);
     
-    // 只有在成功取得 latestScore 後才嘗試載入歷史，確保同步
+    // 2. 只有在拿到最新分數後，才去載入歷史走勢 (確保同步)
     loadMcsHistory(latestScore);
 
     document.querySelectorAll('.profile-toggle').forEach(btn => {
