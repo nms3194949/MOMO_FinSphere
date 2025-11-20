@@ -69,7 +69,6 @@
       min-width:0;
     }
 
-    /* 新增：甜甜圈 + 四象限布局 */
     .score-layout {
       display:flex;
       gap:14px;
@@ -128,8 +127,8 @@
     }
     .stage-pill.recession { border-color:rgba(248,113,113,0.9); color:#ffdada; }
     .stage-pill.slowdown { border-color:rgba(251,146,60,0.9); color:#ffe5bf; }
-    .stage-pill.growth   { border-color:rgba(34,197,94,0.9); color:#d6ffea; }
-    .stage-pill.heat     { border-color:rgba(234,179,8,0.9); color:#fff1b5; }
+    .stage-pill.growth    { border-color:rgba(34,197,94,0.9); color:#d6ffea; }
+    .stage-pill.heat      { border-color:rgba(234,179,8,0.9); color:#fff1b5; }
 
     .score-right-title {
       font-size:13px;
@@ -159,21 +158,23 @@
     }
     .status-ok { color:var(--safe); border-color:rgba(61,214,140,0.5); }
 
+    /* GRID 設定：3列適配 6 張卡片 */
     .grid {
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:10px;
+      grid-template-columns:repeat(3, minmax(0, 1fr)); 
+      gap:12px;
       margin-bottom:18px;
     }
     @media (max-width:900px){
       .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
-    @media (max-width:640px){
+    @media (max-width:600px){
       .grid { grid-template-columns:1fr; }
       .top-row { flex-direction:column; }
       .gauge-wrapper { margin:0 auto; }
       .score-right { align-items:flex-start; }
     }
+
     .factor-card {
       border-radius:14px;
       background:var(--card);
@@ -193,10 +194,40 @@
       justify-content:space-between;
       align-items:center;
     }
+
+    /* 中英標題群組 */
+    .title-group {
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+    }
+    .zh-label {
+      font-size:11px;
+      font-weight:normal;
+      opacity:0.7;
+      letter-spacing:0;
+    }
+    
+    /* 分數與趨勢 */
+    .score-wrap {
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+    }
     .factor-score {
       font-size:20px;
       font-weight:600;
     }
+    .factor-trend {
+      font-size:11px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+    }
+    .trend-up { color: var(--safe); }
+    .trend-down { color: var(--danger); }
+    .trend-neutral { color: var(--muted); opacity:0.5; }
+
     .factor-bar {
       position:relative;
       height:5px;
@@ -221,7 +252,6 @@
       gap:2px;
     }
 
-    /* 建議策略配比區塊 */
     .alloc-section {
       margin-top:4px;
       padding:14px 14px 16px;
@@ -242,16 +272,8 @@
       gap:8px;
       align-items:center;
     }
-    .alloc-header span.main {
-      color:var(--gold-soft);
-      font-weight:600;
-    }
-
-    .profile-toggle-group {
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-    }
+    .alloc-header span.main { color:var(--gold-soft); font-weight:600; }
+    .profile-toggle-group { display:flex; gap:6px; flex-wrap:wrap; }
     .profile-toggle {
       padding:4px 10px;
       border-radius:999px;
@@ -267,22 +289,8 @@
       background:linear-gradient(120deg,rgba(239,216,138,0.25),rgba(10,18,33,0.95));
       color:var(--gold-soft);
     }
-
-    .alloc-chip-row {
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    .alloc-detail-list {
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      font-size:12px;
-      margin-top:6px;
-    }
+    .alloc-chip-row { display:flex; flex-wrap:wrap; gap:6px; font-size:11px; color:var(--muted); }
+    .alloc-detail-list { display:flex; flex-direction:column; gap:6px; font-size:12px; margin-top:6px; }
     .alloc-item-row {
       padding:6px 8px 8px;
       border-radius:10px;
@@ -292,54 +300,17 @@
       flex-direction:column;
       gap:4px;
     }
-    .alloc-item-label {
-      display:flex;
-      flex-direction:column;
-      gap:1px;
-    }
-    .alloc-item-label span.sub {
-      font-size:11px;
-      color:var(--muted);
-    }
-    .alloc-item-bottom {
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .alloc-bar-track {
-      position:relative;
-      flex:1;
-      height:10px;
-      border-radius:999px;
-      background:rgba(15,23,42,1);
-      overflow:hidden;
-    }
-    .alloc-bar-fill {
-      position:absolute;
-      inset:0;
-      border-radius:inherit;
-      transform-origin:left center;
-      transform:scaleX(0);
-      transition:transform .4s ease-out;
-    }
+    .alloc-item-label { display:flex; flex-direction:column; gap:1px; }
+    .alloc-item-label span.sub { font-size:11px; color:var(--muted); }
+    .alloc-item-bottom { display:flex; align-items:center; gap:8px; }
+    .alloc-bar-track { position:relative; flex:1; height:10px; border-radius:999px; background:rgba(15,23,42,1); overflow:hidden; }
+    .alloc-bar-fill { position:absolute; inset:0; border-radius:inherit; transform-origin:left center; transform:scaleX(0); transition:transform .4s ease-out; }
     #allocEquityBar    { background:linear-gradient(90deg,#EFD88A,#C9A227); }
     #allocIncomeBar    { background:linear-gradient(90deg,#4ADE80,#22C55E); }
     #allocDefensiveBar { background:linear-gradient(90deg,#60A5FA,#3B82F6); }
+    .alloc-item-value { font-size:14px; font-weight:600; color:var(--gold-soft); min-width:40px; text-align:right; }
+    .footnote { margin-top:4px; font-size:11px; color:var(--muted); }
 
-    .alloc-item-value {
-      font-size:14px;
-      font-weight:600;
-      color:var(--gold-soft);
-      min-width:40px;
-      text-align:right;
-    }
-    .footnote {
-      margin-top:4px;
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    /* MCS 6M 走勢區塊 */
     .history-section {
       margin-top:12px;
       padding:14px 14px 16px;
@@ -347,50 +318,13 @@
       background:radial-gradient(circle at top left,rgba(15,23,42,0.9),#020617);
       border:1px solid var(--border);
     }
-
-    .history-header {
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      margin-bottom:8px;
-    }
-
-    .history-header .main {
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:0.12em;
-      color:var(--gold-soft);
-    }
-
-    .history-header .sub {
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    .history-legend {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:4px;
-      font-size:11px;
-      color:var(--muted);
-      align-items:center;
-    }
-    .legend-pill {
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-    }
-    .legend-color {
-      width:12px;
-      height:6px;
-      border-radius:999px;
-    }
-
-    #mcsHistoryChart {
-      max-width:100%;
-      height:230px;
-    }
+    .history-header { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+    .history-header .main { font-size:13px; text-transform:uppercase; letter-spacing:0.12em; color:var(--gold-soft); }
+    .history-header .sub { font-size:11px; color:var(--muted); }
+    .history-legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; font-size:11px; color:var(--muted); align-items:center; }
+    .legend-pill { display:inline-flex; align-items:center; gap:4px; }
+    .legend-color { width:12px; height:6px; border-radius:999px; }
+    #mcsHistoryChart { max-width:100%; height:230px; }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -401,12 +335,11 @@
     MCS 景氣循環儀表板
     <span class="badge">MACRO CYCLE SCANNER</span>
   </h1>
-  <p class="subtitle">結合利差、殖利率曲線、股市動能、EPS 成長與波動指標，動態評估景氣階段，並給出基金策略配比建議。</p>
+  <p class="subtitle">結合利差、殖利率曲線、股市動能、EPS、實體經濟與波動指標，動態評估景氣階段。</p>
 
   <div class="top-row">
     <div class="score-card">
       <div class="score-layout">
-        <!-- 圓餅四象限 -->
         <div class="gauge-wrapper">
           <canvas id="mcsGaugeChart"></canvas>
           <div class="gauge-center">
@@ -414,8 +347,6 @@
             <div class="gauge-center-label">MCS SCORE</div>
           </div>
         </div>
-
-        <!-- 右側 Stage & 說明 -->
         <div class="score-right">
           <div class="stage-pill recession" id="mcsStagePill">--</div>
           <div class="score-right-title" id="mcsStageTitle">景氣象限：--</div>
@@ -432,12 +363,17 @@
     </div>
   </div>
 
-  <!-- 五大因子卡片 -->
   <div class="grid">
     <div class="factor-card" id="factor-credit">
       <div class="factor-title">
-        <span>CREDIT</span>
-        <span class="factor-score" id="creditScore">--</span>
+        <div class="title-group">
+          <span>CREDIT</span>
+          <span class="zh-label">信用風險</span>
+        </div>
+        <div class="score-wrap">
+          <span class="factor-score" id="creditScore">--</span>
+          <span class="factor-trend" id="creditTrend"></span>
+        </div>
       </div>
       <div class="factor-bar"><div class="factor-bar-fill" id="creditBar"></div></div>
       <div class="factor-meta" id="creditMeta">
@@ -448,8 +384,14 @@
 
     <div class="factor-card" id="factor-rates">
       <div class="factor-title">
-        <span>RATES</span>
-        <span class="factor-score" id="ratesScore">--</span>
+        <div class="title-group">
+          <span>RATES</span>
+          <span class="zh-label">利率政策</span>
+        </div>
+        <div class="score-wrap">
+          <span class="factor-score" id="ratesScore">--</span>
+          <span class="factor-trend" id="ratesTrend"></span>
+        </div>
       </div>
       <div class="factor-bar"><div class="factor-bar-fill" id="ratesBar"></div></div>
       <div class="factor-meta" id="ratesMeta">
@@ -458,22 +400,52 @@
       </div>
     </div>
 
+    <div class="factor-card" id="factor-macro">
+      <div class="factor-title">
+        <div class="title-group">
+          <span>MACRO</span>
+          <span class="zh-label">總體經濟</span>
+        </div>
+        <div class="score-wrap">
+          <span class="factor-score" id="macroScore">--</span>
+          <span class="factor-trend" id="macroTrend"></span>
+        </div>
+      </div>
+      <div class="factor-bar"><div class="factor-bar-fill" id="macroBar"></div></div>
+      <div class="factor-meta" id="macroMeta">
+        <span>ISM PMI：--</span>
+        <span>Jobless Claims：--</span>
+      </div>
+    </div>
+
     <div class="factor-card" id="factor-equity">
       <div class="factor-title">
-        <span>EQUITY</span>
-        <span class="factor-score" id="equityScore">--</span>
+        <div class="title-group">
+          <span>EQUITY</span>
+          <span class="zh-label">股市動能</span>
+        </div>
+        <div class="score-wrap">
+          <span class="factor-score" id="equityScore">--</span>
+          <span class="factor-trend" id="equityTrend"></span>
+        </div>
       </div>
       <div class="factor-bar"><div class="factor-bar-fill" id="equityBar"></div></div>
       <div class="factor-meta" id="equityMeta">
-        <span>S&amp;P 500 6M 動能：--</span>
-        <span>指數水位：--</span>
+        <span>Momo 6M：--</span>
+        <span>Level：--</span>
       </div>
     </div>
 
     <div class="factor-card" id="factor-eps">
       <div class="factor-title">
-        <span>EPS</span>
-        <span class="factor-score" id="epsScore">--</span>
+        <div class="title-group">
+          <span>EPS</span>
+          <span class="zh-label">企業獲利</span>
+        </div>
+        <div class="score-wrap">
+          <span class="factor-score" id="epsScore">--</span>
+          <span class="factor-trend" id="epsTrend"></span>
+        </div>
       </div>
       <div class="factor-bar"><div class="factor-bar-fill" id="epsBar"></div></div>
       <div class="factor-meta" id="epsMeta">
@@ -483,8 +455,14 @@
 
     <div class="factor-card" id="factor-sentiment">
       <div class="factor-title">
-        <span>SENTIMENT</span>
-        <span class="factor-score" id="sentimentScore">--</span>
+        <div class="title-group">
+          <span>SENTIMENT</span>
+          <span class="zh-label">市場情緒</span>
+        </div>
+        <div class="score-wrap">
+          <span class="factor-score" id="sentimentScore">--</span>
+          <span class="factor-trend" id="sentimentTrend"></span>
+        </div>
       </div>
       <div class="factor-bar"><div class="factor-bar-fill" id="sentimentBar"></div></div>
       <div class="factor-meta" id="sentimentMeta">
@@ -494,7 +472,6 @@
     </div>
   </div>
 
-  <!-- 建議策略配比 -->
   <section class="alloc-section">
     <div class="alloc-header">
       <span class="main">建議策略配比</span>
@@ -555,7 +532,6 @@
     </p>
   </section>
 
-  <!-- MCS 6M 走勢 + Stage 區間 + S&P 價格 -->
   <section class="history-section">
     <div class="history-header">
       <span class="main">MCS 6M 走勢</span>
@@ -571,7 +547,7 @@
     </div>
     <canvas id="mcsHistoryChart"></canvas>
     <p class="footnote">
-      背景色帶為各日 MCS 判定之景氣階段；線條為 MCS 分數（左軸）與 S&amp;P 500 指數（右軸），協助判斷「景氣 × 大盤」動態關係。
+      背景色帶為各日 MCS 判定之景氣階段；線條為 MCS 分數（左軸）與 S&amp;P 500 指數（右軸）。
     </p>
   </section>
 </div>
@@ -628,12 +604,32 @@
     const scoreEl = document.getElementById(factorKey + 'Score');
     const barEl   = document.getElementById(factorKey + 'Bar');
     const metaEl  = document.getElementById(factorKey + 'Meta');
+    const trendEl = document.getElementById(factorKey + 'Trend');
+    
     if (!factor) return;
 
     scoreEl.textContent = factor.score ?? '--';
     const ratio = (factor.score ?? 0) / 20;
     barEl.style.transform = 'scaleX(' + ratio.toFixed(2) + ')';
 
+    // 趨勢箭頭邏輯
+    if (trendEl) {
+      // 若無 change 則預設 0 (上線後請確保 API 有回傳 change)
+      const chg = factor.change || 0;
+      trendEl.classList.remove('trend-up', 'trend-down', 'trend-neutral');
+      if (chg > 0) {
+        trendEl.textContent = '▲ ' + chg.toFixed(1);
+        trendEl.classList.add('trend-up');
+      } else if (chg < 0) {
+        trendEl.textContent = '▼ ' + Math.abs(chg).toFixed(1);
+        trendEl.classList.add('trend-down');
+      } else {
+        trendEl.textContent = '-';
+        trendEl.classList.add('trend-neutral');
+      }
+    }
+
+    // 內容格式化
     if (factorKey === 'credit') {
       metaEl.innerHTML = `
         <span>HY Spread：${factor.hy_spread?.toFixed(2) ?? '--'}%</span>
@@ -642,12 +638,17 @@
     } else if (factorKey === 'rates') {
       metaEl.innerHTML = `
         <span>10Y：${factor.us10y?.toFixed(2) ?? '--'}%</span>
-        <span>2Y：${factor.us2y?.toFixed(2) ?? '--'}%，Curve：${factor.ycc?.toFixed(2) ?? '--'}%</span>
+        <span>Curve (10-2)：${factor.ycc?.toFixed(2) ?? '--'}%</span>
+      `;
+    } else if (factorKey === 'macro') {
+      metaEl.innerHTML = `
+        <span>ISM PMI：${factor.pmi?.toFixed(1) ?? '--'}</span>
+        <span>Claims：${factor.claims ? Math.round(factor.claims/1000)+'k' : '--'}</span>
       `;
     } else if (factorKey === 'equity') {
       metaEl.innerHTML = `
-        <span>S&amp;P 500 6M 動能：${factor.sp500_momo_6m != null ? (factor.sp500_momo_6m*100).toFixed(1) + '%' : '--'}</span>
-        <span>指數水位：${factor.sp500_today?.toFixed(2) ?? '--'}</span>
+        <span>Momo 6M：${factor.sp500_momo_6m != null ? (factor.sp500_momo_6m*100).toFixed(1) + '%' : '--'}</span>
+        <span>Level：${factor.sp500_today?.toFixed(0) ?? '--'}</span>
       `;
     } else if (factorKey === 'eps') {
       metaEl.innerHTML = `
@@ -681,7 +682,6 @@
       labelMap[profile] || ('屬性：' + profile);
   }
 
-  // 新增：四象限甜甜圈圖
   function updateMcsGauge(score, stage) {
     const canvas = document.getElementById('mcsGaugeChart');
     const centerText = document.getElementById('gaugeScoreText');
@@ -704,18 +704,14 @@
       Growth:    'rgba(34,197,94,0.9)',
       Heat:      'rgba(234,179,8,0.9)'
     };
-
     const bgColors = labels.map(s => {
       if (!stage) return baseColors[s];
       return s === stage ? activeColors[s] : baseColors[s];
     });
-
     const borderColors = labels.map(s => {
       if (!stage) return 'rgba(15,23,42,1)';
       return s === stage ? 'rgba(15,23,42,1)' : 'rgba(15,23,42,0.6)';
     });
-
-    // 四象限等分
     const dataVals = [25,25,25,25];
 
     if (!canvas) return;
@@ -737,39 +733,42 @@
         options: {
           responsive: true,
           cutout: '68%',
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => {
-                  const label = ctx.label || '';
-                  return label ? label : '';
-                }
-              }
-            }
-          }
+          plugins: { legend: { display: false }, tooltip: { enabled:false } }
         }
       });
     } else {
-      gaugeChart.data.datasets[0].data = dataVals;
       gaugeChart.data.datasets[0].backgroundColor = bgColors;
       gaugeChart.data.datasets[0].borderColor = borderColors;
       gaugeChart.update();
     }
   }
 
+  // 1. 讀取即時 MCS 分數，並回傳 score 供歷史圖表同步使用
   async function loadMcs(profile = 'balanced') {
     try {
       const res  = await fetch(`${API_BASE}/api/mcs/allocation?profile=${profile}`, { cache:'no-store' });
       const data = await res.json();
 
       if (!res.ok) {
-        console.error('MCS error', data);
         document.getElementById('mcsSource').textContent = '來源：API 錯誤';
-        return;
+        return null;
       }
 
-      document.getElementById('mcsAsOf').textContent   = '更新時間：' + (data.asOf || '--');
+      // ============================================================
+      // [DEMO] 模擬數據注入 (讓您看到新增的 MACRO 卡片與 Trend 效果)
+      // ============================================================
+      if(data.factors) {
+        data.factors.macro = { score: 12, pmi: 47.2, claims: 230000, change: -0.5 };
+        // 模擬各因子變化量
+        if(data.factors.credit) data.factors.credit.change = 1.2;
+        if(data.factors.rates)  data.factors.rates.change = -0.2;
+        if(data.factors.equity) data.factors.equity.change = 2.5;
+        if(data.factors.eps)    data.factors.eps.change = 0;
+        if(data.factors.sentiment) data.factors.sentiment.change = -1.8;
+      }
+      // ============================================================
+
+      document.getElementById('mcsAsOf').textContent    = '更新時間：' + (data.asOf || '--');
       document.getElementById('mcsSource').textContent = '來源：' + (data.raw?.source || 'FRED + SHEET');
       document.getElementById('allocScoreChip').textContent = 'Score：' + (data.score ?? '--') + '/100';
 
@@ -779,6 +778,7 @@
       const f = data.factors || {};
       updateFactorCard('credit',    f.credit);
       updateFactorCard('rates',     f.rates);
+      updateFactorCard('macro',     f.macro); // 新增
       updateFactorCard('equity',    f.equity);
       updateFactorCard('eps',       f.eps);
       updateFactorCard('sentiment', f.sentiment);
@@ -791,13 +791,16 @@
       setAllocBar('allocEquityBar',    alloc.equity);
       setAllocBar('allocIncomeBar',    alloc.income);
       setAllocBar('allocDefensiveBar', alloc.defensive);
+
+      return data.score; // 回傳最新分數
+
     } catch (err) {
       console.error(err);
       document.getElementById('mcsSource').textContent = '來源：連線錯誤';
+      return null;
     }
   }
 
-  // 建景氣區段 band：連續同一 Stage 視為一個區間
   function buildStageBands(points) {
     if (!points.length) return [];
     const bands = [];
@@ -847,24 +850,26 @@
     }
   };
 
-  async function loadMcsHistory() {
+  // 2. 載入歷史數據，並強制修正最後一個點的分數
+  async function loadMcsHistory(latestScore = null) {
     try {
       const res  = await fetch(`${API_BASE}/api/mcs/history?days=180`, { cache: 'no-store' });
       const data = await res.json();
-      if (!res.ok) {
-        console.error('MCS history error', data);
-        return;
-      }
+      if (!res.ok) return;
 
       const points = data.points || [];
       if (!points.length) return;
 
+      // === 強制同步邏輯：讓圖表最後一點 = 儀表板分數 ===
+      if (latestScore != null && !Number.isNaN(latestScore)) {
+        points[points.length - 1].score = latestScore;
+      }
+      // ==============================================
+
       const labels   = points.map(p => p.date);
       const scores   = points.map(p => p.score);
       const spLevels = points.map(p => (p.sp500 == null || Number.isNaN(p.sp500) ? null : p.sp500));
-
       const bands = buildStageBands(points);
-
       const ctx = document.getElementById('mcsHistoryChart')?.getContext('2d');
       if (!ctx) return;
 
@@ -913,44 +918,28 @@
               intersect: false,
               callbacks: {
                 label(ctx) {
-                  if (ctx.datasetIndex === 0) {
-                    return `MCS：${ctx.parsed.y}`;
-                  } else {
-                    return `S&P 500：${ctx.parsed.y?.toFixed(2)}`;
-                  }
+                  if (ctx.datasetIndex === 0) return `MCS：${ctx.parsed.y}`;
+                  return `S&P 500：${ctx.parsed.y?.toFixed(2)}`;
                 }
               }
             },
-            stageBands: {
-              bands
-            }
+            stageBands: { bands }
           },
           scales: {
             x: {
-              ticks: {
-                color: '#9fb1cc',
-                maxTicksLimit: 6
-              },
+              ticks: { color: '#9fb1cc', maxTicksLimit: 6 },
               grid: { color: 'rgba(30,41,59,0.4)' }
             },
             y: {
               beginAtZero: true,
               max: 100,
-              ticks: {
-                color: '#9fb1cc',
-                stepSize: 20
-              },
+              ticks: { color: '#9fb1cc', stepSize: 20 },
               grid: { color: 'rgba(30,41,59,0.4)' }
             },
             y1: {
               position: 'right',
-              ticks: {
-                color: '#38BDF8',
-                maxTicksLimit: 5
-              },
-              grid: {
-                drawOnChartArea: false
-              }
+              ticks: { color: '#38BDF8', maxTicksLimit: 5 },
+              grid: { drawOnChartArea: false }
             }
           }
         },
@@ -961,18 +950,22 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     setActiveProfileButton(currentProfile);
-    loadMcs(currentProfile);
-    loadMcsHistory();
+    
+    // 3. 先取得即時分數，再畫圖，確保資料同步
+    const latestScore = await loadMcs(currentProfile);
+    loadMcsHistory(latestScore);
 
     document.querySelectorAll('.profile-toggle').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const p = btn.dataset.profile;
         if (p === currentProfile) return;
         currentProfile = p;
         setActiveProfileButton(p);
-        loadMcs(p);
+        const s = await loadMcs(p);
+        // 切換 profile 不影響歷史走勢，所以此處不一定要重畫 History，但若未來有影響可加：
+        // loadMcsHistory(s);
       });
     });
   });
