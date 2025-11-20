@@ -444,7 +444,7 @@
     
     if (!factor) return;
 
-    // === 修改重點：強制四捨五入為整數，解決小數點過長問題 ===
+    // === 強制四捨五入 ===
     const roundedScore = (factor.score != null) ? Math.round(factor.score) : '--';
     scoreEl.textContent = roundedScore;
     
@@ -480,7 +480,12 @@
     } else if (factorKey === 'macro') {
       metaEl.innerHTML = `<span>ISM PMI：${factor.pmi?.toFixed(1) ?? '--'}</span><span>Claims：${factor.claims ? Math.round(factor.claims/1000)+'k' : '--'}</span>`;
     } else if (factorKey === 'equity') {
-      metaEl.innerHTML = `<span>Momo 6M：${factor.sp500_momo_6m != null ? (factor.sp500_momo_6m*100).toFixed(1) + '%' : '--'}</span><span>Level：${factor.sp500_today?.toFixed(0) ?? '--'}</span>`;
+      // Momo 6M 若非 null，則轉為百分比
+      let momoStr = '--';
+      if(factor.sp500_momo_6m != null) {
+         momoStr = (factor.sp500_momo_6m * 100).toFixed(1) + '%';
+      }
+      metaEl.innerHTML = `<span>Momo 6M：${momoStr}</span><span>Level：${factor.sp500_today?.toFixed(0) ?? '--'}</span>`;
     } else if (factorKey === 'eps') {
       metaEl.innerHTML = `<span>評估模型：股價動能推估</span>`;
     } else if (factorKey === 'sentiment') {
@@ -522,23 +527,39 @@
     }
 
     const labels = ['Recession','Slowdown','Growth','Heat'];
-    const bgColors = ['rgba(248,113,113,0.22)','rgba(251,146,60,0.20)','rgba(34,197,94,0.18)','rgba(234,179,8,0.16)'];
-    const activeColors = {
-      Recession: 'rgba(248,113,113,0.9)', Slowdown: 'rgba(251,146,60,0.9)', Growth: 'rgba(34,197,94,0.9)', Heat: 'rgba(234,179,8,0.9)'
+    const baseColors = {
+      Recession: 'rgba(248,113,113,0.22)',
+      Slowdown:  'rgba(251,146,60,0.20)',
+      Growth:    'rgba(34,197,94,0.18)',
+      Heat:      'rgba(234,179,8,0.16)'
     };
-    const finalBg = labels.map(s => (stage && s===stage) ? activeColors[s] : bgColors[labels.indexOf(s)]);
-    const finalBorder = labels.map(s => (stage && s===stage) ? 'rgba(15,23,42,1)' : 'rgba(15,23,42,0.6)');
+    const activeColors = {
+      Recession: 'rgba(248,113,113,0.9)',
+      Slowdown:  'rgba(251,146,60,0.9)',
+      Growth:    'rgba(34,197,94,0.9)',
+      Heat:      'rgba(234,179,8,0.9)'
+    };
+    const bgColors = labels.map(s => {
+      if (!stage) return baseColors[s];
+      return s === stage ? activeColors[s] : baseColors[s];
+    });
+    const borderColors = labels.map(s => {
+      if (!stage) return 'rgba(15,23,42,1)';
+      return s === stage ? 'rgba(15,23,42,1)' : 'rgba(15,23,42,0.6)';
+    });
+    const dataVals = [25,25,25,25];
 
     const ctx = canvas.getContext('2d');
+
     if (!gaugeChart) {
       gaugeChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels,
           datasets: [{
-            data: [25,25,25,25],
-            backgroundColor: finalBg,
-            borderColor: finalBorder,
+            data: dataVals,
+            backgroundColor: bgColors,
+            borderColor: borderColors,
             borderWidth: 1.5,
             hoverOffset: 2
           }]
@@ -550,8 +571,8 @@
         }
       });
     } else {
-      gaugeChart.data.datasets[0].backgroundColor = finalBg;
-      gaugeChart.data.datasets[0].borderColor = finalBorder;
+      gaugeChart.data.datasets[0].backgroundColor = bgColors;
+      gaugeChart.data.datasets[0].borderColor = borderColors;
       gaugeChart.update();
     }
   }
@@ -606,7 +627,8 @@
       const chip = document.getElementById('allocScoreChip');
 
       try {
-        const res  = await fetch(API_BASE, { cache:'no-store' });
+        // 這裡需要帶入 profile 參數，以確保配比能連動
+        const res  = await fetch(`${API_BASE}?profile=${profile}`, { cache:'no-store' });
         if (!res.ok) throw new Error('API response not ok');
         data = await res.json();
         
@@ -627,7 +649,6 @@
             sourceEl.style.border = '1px solid #ef4444';
             sourceEl.style.fontWeight = 'bold';
         }
-        // 備用模擬數據
         data = {
           score: 66, stage: 'Growth', asOf: new Date().toISOString().slice(0,10),
           factors: {} 
@@ -661,14 +682,14 @@
       updateFactorCard('liquidity', f.liquidity);
 
       const alloc = data.allocation || {};
-      if(document.getElementById('allocEquityText')) {
-          document.getElementById('allocEquityText').textContent    = formatPctPlain(alloc.equity ?? null, 0);
-          document.getElementById('allocIncomeText').textContent    = formatPctPlain(alloc.income ?? null, 0);
-          document.getElementById('allocDefensiveText').textContent = formatPctPlain(alloc.defensive ?? null, 0);
-          setAllocBar('allocEquityBar',    alloc.equity);
-          setAllocBar('allocIncomeBar',    alloc.income);
-          setAllocBar('allocDefensiveBar', alloc.defensive);
-      }
+      document.getElementById('allocEquityText').textContent    = formatPctPlain(alloc.equity ?? null, 0);
+      document.getElementById('allocIncomeText').textContent    = formatPctPlain(alloc.income ?? null, 0);
+      document.getElementById('allocDefensiveText').textContent = formatPctPlain(alloc.defensive ?? null, 0);
+
+      setAllocBar('allocEquityBar',    alloc.equity);
+      setAllocBar('allocIncomeBar',    alloc.income);
+      setAllocBar('allocDefensiveBar', alloc.defensive);
+
       updateAiSummary(data);
 
       return data.score; 
@@ -684,7 +705,6 @@
     const bands = [];
     let currentStage = points[0].stage || 'Unknown';
     let startIndex   = 0;
-
     for (let i = 1; i < points.length; i++) {
       const s = points[i].stage || 'Unknown';
       if (s !== currentStage) {
@@ -707,8 +727,11 @@
       if (!xScale) return;
 
       const colorMap = {
-        Recession: 'rgba(248,113,113,0.28)', Slowdown: 'rgba(251,146,60,0.24)',
-        Growth: 'rgba(34,197,94,0.2)', Heat: 'rgba(234,179,8,0.18)', Unknown: 'rgba(148,163,184,0.12)'
+        Recession: 'rgba(248,113,113,0.28)',
+        Slowdown:  'rgba(251,146,60,0.24)',
+        Growth:    'rgba(34,197,94,0.2)',
+        Heat:      'rgba(234,179,8,0.18)',
+        Unknown:   'rgba(148,163,184,0.12)'
       };
 
       ctx.save();
@@ -729,14 +752,13 @@
     try {
       // 呼叫真實歷史數據 API
       const res = await fetch(`${API_BASE}/history`, { cache: 'no-store' });
-      if(!res.ok) return; // 若無歷史數據，直接結束，保持圖表空白
-
+      if(!res.ok) return; 
+      
       const json = await res.json();
       const points = json.points || [];
 
       if (points.length === 0) return;
 
-      // 強制同步最後一點
       if (latestScore != null && !Number.isNaN(latestScore)) {
         points[points.length - 1].score = latestScore;
       }
@@ -784,10 +806,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     setActiveProfileButton(currentProfile);
     
-    // 1. 先載入最新數據 (卡片+戰情中心)
     const latestScore = await loadMcs(currentProfile);
-    
-    // 2. 只有在拿到最新分數後，才去載入歷史走勢 (確保同步)
     loadMcsHistory(latestScore);
 
     document.querySelectorAll('.profile-toggle').forEach(btn => {
