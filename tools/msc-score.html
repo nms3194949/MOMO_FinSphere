@@ -20,11 +20,31 @@
       background: radial-gradient(circle at top, #172133 0, #050814 50%, #02040A 100%);
       color:var(--ink); padding:16px;
     }
+    a { text-decoration: none; color: inherit; }
     .page { max-width:1100px; margin:0 auto; }
     
-    /* 標題 */
-    h1 { margin:0 0 16px; font-size:24px; letter-spacing:0.04em; display:flex; align-items:center; gap:8px; }
+    /* --- 標題與導航列 --- */
+    .page-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+    }
+    h1 { margin:0; font-size:24px; letter-spacing:0.04em; display:flex; align-items:center; gap:8px; }
     h1 span.badge { font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid rgba(201,162,39,0.6); color:var(--gold-soft); text-transform:uppercase; }
+
+    /* 回首頁按鈕樣式 */
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--muted); font-weight: 600;
+      padding: 8px 16px; border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+    .btn-back:hover {
+      color: var(--gold-soft);
+      border-color: var(--gold-soft);
+      background: rgba(233, 209, 138, 0.1);
+    }
 
     /* --- MCS 戰情中心 (Hero) 樣式 --- */
     .mcs-hero-section {
@@ -139,10 +159,14 @@
 </head>
 <body>
 <div class="page">
-  <h1>
-    MCS 景氣循環儀表板
-    <span class="badge">MACRO CYCLE SCANNER</span>
-  </h1>
+  
+  <div class="page-header-row">
+    <h1>
+      MCS 景氣循環儀表板
+      <span class="badge">MACRO CYCLE SCANNER</span>
+    </h1>
+    <a href="../index.html" class="btn-back"><span>←</span> 回首頁</a>
+  </div>
   
   <section class="mcs-hero-section">
     <div class="mcs-hero-inner">
@@ -649,6 +673,7 @@
             sourceEl.style.border = '1px solid #ef4444';
             sourceEl.style.fontWeight = 'bold';
         }
+        // 備用數據
         data = {
           score: 66, stage: 'Growth', asOf: new Date().toISOString().slice(0,10),
           factors: {} 
@@ -705,6 +730,7 @@
     const bands = [];
     let currentStage = points[0].stage || 'Unknown';
     let startIndex   = 0;
+
     for (let i = 1; i < points.length; i++) {
       const s = points[i].stage || 'Unknown';
       if (s !== currentStage) {
@@ -752,13 +778,14 @@
     try {
       // 呼叫真實歷史數據 API
       const res = await fetch(`${API_BASE}/history`, { cache: 'no-store' });
-      if(!res.ok) return; 
-      
+      if(!res.ok) return; // 若無歷史數據，直接結束
+
       const json = await res.json();
       const points = json.points || [];
 
       if (points.length === 0) return;
 
+      // 強制同步最後一點
       if (latestScore != null && !Number.isNaN(latestScore)) {
         points[points.length - 1].score = latestScore;
       }
@@ -806,7 +833,10 @@
   document.addEventListener('DOMContentLoaded', async () => {
     setActiveProfileButton(currentProfile);
     
+    // 1. 先載入最新數據
     const latestScore = await loadMcs(currentProfile);
+    
+    // 2. 只有在拿到最新分數後，才去載入歷史走勢
     loadMcsHistory(latestScore);
 
     document.querySelectorAll('.profile-toggle').forEach(btn => {
