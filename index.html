@@ -17,11 +17,6 @@
   <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
   <meta property="og:locale" content="zh_TW">
 
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="MOMO財商智庫｜月配息 × AI智能決策系統">
-  <meta name="twitter:description" content="月配息 × 資產增值 × AI智能決策，一站完成基金與加密資產研究。">
-  <meta name="twitter:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
-
   <meta name="theme-color" content="#0A1221" />
 
   <meta http-equiv="Content-Security-Policy" content="
@@ -40,30 +35,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "MOMO財商智庫",
-    "url": "https://nms3194949.github.io/MOMO_FinSphere/",
-    "logo": "https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg",
-    "sameAs": [ "https://portaly.cc/momo_82786" ]
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "MOMO財商智庫｜月配息 × AI智能決策系統",
-    "url": "https://nms3194949.github.io/MOMO_FinSphere/",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://nms3194949.github.io/MOMO_FinSphere/?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
 
   <style>
   :root{
@@ -89,7 +60,7 @@
 
   .section{margin-top:24px}
   
-  /* ===== 卡片懸浮與流光特效 (Hover Shimmer) ===== */
+  /* ===== 卡片懸浮與流光特效 ===== */
   .card, .card2, .tool-card, .panel {
     background:var(--card);
     border:1px solid var(--line);
@@ -101,13 +72,11 @@
                 box-shadow 0.3s ease, 
                 border-color 0.3s ease;
   }
-  
   .card:hover, .card2:hover, .tool-card:hover, .panel:hover {
     transform: translateY(-5px);
     box-shadow: 0 12px 30px rgba(201, 162, 39, 0.15);
     border-color: rgba(233, 209, 138, 0.6);
   }
-
   .card::after, .card2::after, .tool-card::after, .panel::after {
     content: "";
     position: absolute;
@@ -115,17 +84,11 @@
     left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(
-      to right,
-      transparent 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
     transform: skewX(-25deg);
     transition: none;
     pointer-events: none;
   }
-  
   .card:hover::after, .card2:hover::after, .tool-card:hover::after, .panel:hover::after {
     left: 150%;
     transition: left 0.6s ease-in-out;
@@ -142,22 +105,19 @@
   .hero p{color:var(--muted);margin:0}
   .hero small{color:var(--gold-soft)}
   
-  /* ===== 方案一：按鈕脈衝呼吸特效 ===== */
+  /* 按鈕脈衝特效 */
   @keyframes pulse-gold-glow {
     0% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.7); transform: scale(1); }
     70% { box-shadow: 0 0 0 15px rgba(201, 162, 39, 0); transform: scale(1.02); }
     100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); transform: scale(1); }
   }
-  
   .hero .btn-line{
     display:inline-block;margin-top:18px;padding:12px 20px;border-radius:999px;font-weight:800;
     background:var(--gold-grad);color:#0A1221;border:none;
     box-shadow:0 6px 14px rgba(0,0,0,.35);
     transition:filter .2s;
-    /* 加入動畫 */
     animation: pulse-gold-glow 2s infinite;
-    position: relative;
-    z-index: 1;
+    position: relative; z-index: 1;
   }
   .hero .btn-line:hover{filter:brightness(1.15); animation: none; transform: scale(1.05);}
 
@@ -185,7 +145,6 @@
     display:flex;flex-direction:column;gap:18px;
     box-shadow:0 10px 22px rgba(0,0,0,.45);
   }
-  
   .card2 h3{margin:0 0 4px;font-size:20px;color:var(--gold-soft)}
   .block{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
   .block:last-child{padding-bottom:0;border-bottom:0}
@@ -209,7 +168,7 @@
   .cta-fixed{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(10,18,33,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);display:none}
   .cta-fixed .btn-line{
     display:block;text-align:center;padding:14px 18px;border-radius:999px;background:var(--gold-grad);color:#0A1221;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.35);
-    animation: pulse-gold-glow 2s infinite; /* 手機版下方固定按鈕也加脈衝 */
+    animation: pulse-gold-glow 2s infinite;
   }
   @media(max-width:768px){
     .cta-fixed{display:block} 
@@ -245,14 +204,8 @@
     animation:goldSweep 1.8s linear infinite;
   }
   @keyframes goldSweep{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+  .goldPlain{background:none !important;-webkit-background-clip:border-box !important;color:var(--gold-soft) !important;}
 
-  .goldPlain{
-    background:none !important;
-    -webkit-background-clip:border-box !important;
-    color:var(--gold-soft) !important;
-  }
-
-  /* 首頁工具卡片 */
   .tool-card{display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 18px rgba(0,0,0,.45)}
   .tool-pill-row{display:flex;gap:8px;margin-bottom:4px}
   .tool-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;border:1px solid rgba(233,209,138,.45);font-size:11px;color:var(--gold-soft)}
@@ -260,84 +213,41 @@
   .tool-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
   .tool-footer{margin-top:8px}
 
-  /* ===== 捲動漸顯 (Scroll Reveal) ===== */
+  /* 捲動漸顯 */
   .fade-in-section {
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 0; transform: translateY(30px);
     transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     will-change: opacity, transform;
   }
-  .fade-in-section.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .fade-in-section.visible { opacity: 1; transform: translateY(0); }
 
-  /* ===== 方案二：右下角懸浮 LINE 按鈕 CSS ===== */
+  /* 懸浮 LINE 按鈕 */
   .float-line-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: #06C755; /* LINE 官方綠 */
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #06C755; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: float-shake 5s infinite; /* 晃動動畫 */
+    animation: float-shake 5s infinite;
   }
-  .float-line-btn:hover {
-    transform: scale(1.1) rotate(-5deg);
-    filter: brightness(1.1);
-  }
-
+  .float-line-btn:hover { transform: scale(1.1) rotate(-5deg); filter: brightness(1.1); }
   .notification-dot {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    background: #FF3B30; /* 紅色通知 */
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #0A1221;
+    position: absolute; top: -2px; right: -2px;
+    background: #FF3B30; color: white; font-size: 12px; font-weight: bold;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; border: 2px solid #0A1221;
   }
-
   .chat-tooltip {
-    position: absolute;
-    right: 75px;
-    background: white;
-    color: #0A1221;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 800;
-    white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    opacity: 0;
-    transform: translateX(10px);
-    animation: fade-in-tooltip 0.5s forwards 1.5s; /* 延遲出現 */
-    pointer-events: none;
+    position: absolute; right: 75px; background: white; color: #0A1221;
+    padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 800;
+    white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0; transform: translateX(10px);
+    animation: fade-in-tooltip 0.5s forwards 1.5s; pointer-events: none;
   }
   .chat-tooltip::after {
-    content: "";
-    position: absolute;
-    right: -6px;
-    top: 50%;
-    transform: translateY(-50%);
-    border-width: 6px 0 6px 8px;
-    border-style: solid;
-    border-color: transparent transparent transparent white;
+    content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+    border-width: 6px 0 6px 8px; border-style: solid; border-color: transparent transparent transparent white;
   }
-
   @keyframes float-shake {
     0%, 80% { transform: rotate(0); }
     85% { transform: rotate(-15deg); }
@@ -345,15 +255,16 @@
     95% { transform: rotate(-5deg); }
     100% { transform: rotate(0); }
   }
-
-  @keyframes fade-in-tooltip {
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  /* 手機版調整位置，避免擋住底部固定選單 */
-  @media(max-width: 768px) {
-    .float-line-btn { bottom: 90px; right: 16px; width: 54px; height: 54px; }
-  }
+  @keyframes fade-in-tooltip { to { opacity: 1; transform: translateX(0); } }
+  @media(max-width: 768px) { .float-line-btn { bottom: 90px; right: 16px; width: 54px; height: 54px; } }
+  
+  /* FAQ 樣式 (SEO區塊) */
+  details { margin-bottom:10px; background:rgba(255,255,255,0.03); border-radius:10px; overflow:hidden; transition:background .2s; }
+  details:hover { background:rgba(255,255,255,0.05); }
+  summary { font-weight:bold; padding:14px; color:var(--ink); cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; }
+  summary::after { content:"+"; color:var(--gold-soft); font-weight:800; font-size:18px; }
+  details[open] summary::after { content:"-"; }
+  .faq-content { padding:0 14px 14px; color:var(--muted); line-height:1.6; font-size:14px; }
   </style>
 </head>
 <body>
@@ -374,7 +285,7 @@
       <small>雙贏策略品牌中心</small>
       <h1 id="hero-title">MOMO財商智庫｜月配息 × AI智能決策系統</h1>
       <p>整合基金智能分析、虛擬貨幣策略與權證分析，打造全方位財商系統。</p>
-      <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="加入 MOMO 財商智庫官方 LINE">加入官方 LINE ▶</a>
+      <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="加入 MOMO 財商智庫官方 LINE" title="點擊加入 MOMO 官方 LINE 領取月配息策略">加入官方 LINE ▶</a>
     </section>
 
     <section id="strategy" class="section" aria-labelledby="strategy-title">
@@ -468,6 +379,10 @@
       <div class="tools" id="home-tools-grid"></div>
     </section>
 
+    <section id="seo-article-container" class="section fade-in-section" style="margin-bottom:20px;"></section>
+
+    <section id="seo-faq-container" class="section fade-in-section" style="margin-bottom:40px;"></section>
+
     <section id="ig-section" class="fade-in-section" aria-labelledby="ig-title">
       <h2 id="ig-title">最新 IG 精選</h2>
       <div class="embedsocial-hashtag" data-ref="42032a17319b8cd123ca39bbcf94096c57c120b0">
@@ -485,7 +400,7 @@
     <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="立即加入 MOMO 財商智庫官方 LINE">加入官方 LINE ▶</a>
   </div>
 
-  <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="float-line-btn" aria-label="加入 LINE 好友">
+  <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="float-line-btn" aria-label="加入 LINE 好友" title="加入 LINE 好友領取雙贏策略">
     <div class="line-icon">
       <svg viewBox="0 0 24 24" fill="#FFFFFF" width="32" height="32">
         <path d="M12 2C6.48 2 2 5.58 2 10c0 2.38 1.19 4.47 3 6.16V20c0 .55.45 1 1 1 .34 0 .65-.17.84-.44L9.6 18.3c.76.22 1.56.36 2.4.36 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
@@ -496,6 +411,110 @@
   </a>
 
   <script>
+  /* ==========================================================================
+     SEO 與 內容維護區 (請在此修改文字與關鍵字，會自動更新到畫面上與結構化資料中)
+     ========================================================================== */
+  const SEO_DATA = {
+    // 1. FAQ 設定：增加關鍵字密度，搶佔 Google 搜尋版面
+    faq: [
+      {
+        q: "MOMO 雙贏策略適合新手嗎？",
+        a: "非常適合。我們的策略包含「雙贏起步」模組，專為初入市場的投資人設計，透過低波動的月配息基金配置，降低市場震盪的心理壓力，同時建立穩定的現金流。"
+      },
+      {
+        q: "這個試算工具準確嗎？",
+        a: "此工具基於歷史回測數據與 MOMO 財商智庫的 AI 模型運算。雖然過去績效不代表未來表現，但透過「年均成長率」與「配息率」的動態試算，能幫助您更具體地規劃退休目標與現金流需求。"
+      },
+      {
+        q: "如何開始使用 MOMO 的財商工具？",
+        a: "您可以直接點擊右下角的 LINE 按鈕加入官方帳號，我們會提供您專屬的配置建議與工具使用教學。"
+      }
+    ],
+    
+    // 2. SEO 文章區塊：放在頁面下方，用於增加長尾關鍵字 (支援 HTML 標籤如 <strong>)
+    article: {
+      title: "為什麼需要月配息複利試算？",
+      content: `
+        在規劃<strong>被動收入</strong>時，許多投資人忽略了<strong>本金成長</strong>的重要性。
+        MOMO FinSphere 系統整合了<strong>基金智能分析</strong>與<strong>加密貨幣策略</strong>，
+        不同於傳統的儲蓄險或定存，我們透過 AI 監控市場回撤，協助您在領取<strong>月配息</strong>的同時，確保資產能抵抗通膨。
+        無論是退休規劃、現金流管理，透過本站的<strong>複利計算機</strong>，您能一鍵預覽未來三年的資產變化。
+      `
+    },
+
+    // 3. 應用程式資訊 (SoftwareApp Schema)：告訴 Google 這是一個好用的工具
+    app: {
+      name: "MOMO 月配息 AI 試算工具",
+      desc: "輸入本金與預期配息率，AI 系統即時計算每月現金流、本金成長與三年總報酬的免費財商工具。",
+      url: "https://nms3194949.github.io/MOMO_FinSphere/"
+    }
+  };
+
+  /* ==========================================================================
+     系統邏輯區 (以下程式碼負責功能運作，不需要經常修改)
+     ========================================================================== */
+  
+  // 自動生成 SEO 內容與 JSON-LD
+  function initSEO() {
+    // A. 渲染 FAQ 到畫面
+    const faqContainer = document.getElementById('seo-faq-container');
+    if (faqContainer && SEO_DATA.faq.length > 0) {
+      let html = `<h2 style="color:var(--gold-soft); margin-bottom:16px;">常見問題</h2><div class="card">`;
+      SEO_DATA.faq.forEach(item => {
+        html += `
+          <details>
+            <summary>${item.q}</summary>
+            <div class="faq-content">${item.a}</div>
+          </details>`;
+      });
+      html += `</div>`;
+      faqContainer.innerHTML = html;
+    }
+
+    // B. 渲染 SEO 文章到畫面
+    const articleContainer = document.getElementById('seo-article-container');
+    if (articleContainer && SEO_DATA.article.content) {
+      articleContainer.innerHTML = `
+        <article style="color:var(--muted); font-size:14px; line-height:1.8;">
+          <h3 style="color:var(--gold-soft); font-size:16px;">${SEO_DATA.article.title}</h3>
+          <p>${SEO_DATA.article.content}</p>
+        </article>`;
+    }
+
+    // C. 注入 JSON-LD (FAQ Schema)
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": SEO_DATA.faq.map(item => ({
+        "@type": "Question",
+        "name": item.q,
+        "acceptedAnswer": { "@type": "Answer", "text": item.a }
+      }))
+    };
+    injectJSONLD(faqSchema);
+
+    // D. 注入 JSON-LD (SoftwareApplication Schema)
+    const appSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": SEO_DATA.app.name,
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+      "description": SEO_DATA.app.desc,
+      "author": { "@type": "Person", "name": "MOMO", "url": "https://portaly.cc/momo_82786" }
+    };
+    injectJSONLD(appSchema);
+  }
+
+  function injectJSONLD(data) {
+    const script = document.createElement('script');
+    script.type = "application/ld+json";
+    script.text = JSON.stringify(data);
+    document.head.appendChild(script);
+  }
+
+  // --- 原有的功能函式 ---
   const $ =(id)=>document.getElementById(id);
   const nfTW = new Intl.NumberFormat('zh-TW');
   const clamp =(v,min,max)=>Math.min(max,Math.max(min,v));
@@ -533,7 +552,7 @@
   }
   const uniqueId=(p='id')=>`${p}-${Math.random().toString(36).slice(2,9)}`;
 
-  // ===== 數字滾動特效 (CountUp) =====
+  // CountUp 動畫
   function animateValue(callback, start, end, duration) {
     let startTimestamp = null;
     const step = (timestamp) => {
@@ -547,21 +566,16 @@
     window.requestAnimationFrame(step);
   }
 
-  // SVG 繪製邏輯
+  // Gauge 繪製
   function createGauge(el, { min, max, step, unit, breath = false }) {
     const parentWidth = Math.max(260, el.clientWidth || 300);
     const W = parentWidth, H = 64, BH = 14, X0 = 10, WB = W - 2 * X0, Y = 42, TYO = 10, TL = 6;
     const stepUsed = autoStep(min, max, step, parentWidth);
-    const valueToX = v => { 
-      const t = (clamp(v, min, max) - min) / (max - min || 1); 
-      return X0 + t * WB; 
-    };
-
+    const valueToX = v => { const t = (clamp(v, min, max) - min) / (max - min || 1); return X0 + t * WB; };
     const NS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    el.innerHTML = ''; 
-    el.appendChild(svg);
+    el.innerHTML = ''; el.appendChild(svg);
 
     let fillAttr = '#E9D18A';
     if (breath) {
@@ -580,20 +594,17 @@
     for (let v = min; v <= max; v += stepUsed) {
       const x = valueToX(v);
       const isMajor = (Math.abs(((v - min) % lblStep)) < 1e-6) || v === min || v === max;
-      
       const ln = document.createElementNS(NS, 'line');
       ln.setAttribute('x1', x); ln.setAttribute('y1', Y - BH / 2 - TYO);
       ln.setAttribute('x2', x); ln.setAttribute('y2', Y - BH / 2 - TYO + TL);
       ln.setAttribute('stroke', isMajor ? '#E9D18A' : 'rgba(233,209,138,.7)');
       ln.setAttribute('stroke-width', isMajor ? '2.6' : '1');
       svg.append(ln);
-
       if (isMajor) {
         if (Math.abs(x - lastMajorX) > 36) {
           const t = document.createElementNS(NS, 'text');
           t.setAttribute('x', x); t.setAttribute('y', Y - BH / 2 - TYO - 3);
-          t.setAttribute('text-anchor', 'middle'); 
-          t.setAttribute('class', 'tick-label');
+          t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'tick-label');
           t.textContent = fmtAxis(v, unit);
           svg.append(t);
           lastMajorX = x;
@@ -625,7 +636,6 @@
     const key=blockEl.dataset.key; const min=+blockEl.dataset.min; const max=+blockEl.dataset.max;
     const step=+blockEl.dataset.step; const unit=blockEl.dataset.unit;
     const gaugeEl=blockEl.querySelector('.gauge'); const readEl=blockEl.querySelector('.readout');
-    
     const initVal=clamp(Number(MOMO_PROGRESS_CONFIG[key]??0),min,max);
     blockEl._value=initVal;
 
@@ -637,18 +647,14 @@
     init();
 
     if(key === 'principal' || key === 'monthly') {
-      animateValue((val) => {
-         readEl.textContent = fmtRead(val, unit);
-      }, 0, initVal, 1500);
+      animateValue((val) => { readEl.textContent = fmtRead(val, unit); }, 0, initVal, 1500);
     } else {
       readEl.textContent = fmtRead(initVal, unit);
     }
 
     blockEl._update=(v)=>{ 
-      const nv=clamp(v,min,max); 
-      blockEl._value=nv; 
-      if(updateView) updateView(nv); 
-      readEl.textContent=fmtRead(nv,unit); 
+      const nv=clamp(v,min,max); blockEl._value=nv; 
+      if(updateView) updateView(nv); readEl.textContent=fmtRead(nv,unit); 
     };
 
     const ro=new ResizeObserver(()=>{
@@ -662,16 +668,9 @@
   const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
   const SLOPE = 1;
   const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
-
-  const state = {
-    baseCAGR: STRATEGY.rise,
-    monthlyMul: MONTHLY_MULT.rise,
-    principal: 1_000_000,
-    dist: 8
-  };
+  const state = { baseCAGR: STRATEGY.rise, monthlyMul: MONTHLY_MULT.rise, principal: 1_000_000, dist: 8 };
 
   function safeNum(v,def=0){ v=+v; return Number.isFinite(v)?v:def; }
-
   function compute({principal, dist, baseCAGR, monthlyMul}){
     const monthlyBase = principal*(dist/100)/12;
     const monthly = monthlyBase * (monthlyMul ?? 1);
@@ -733,17 +732,12 @@
     const r = $('distRange');
     r.addEventListener('input',  ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt);
     r.addEventListener('change', ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt);
-
     [['dist5',5],['dist10',10],['dist15',15]].forEach(([id,v])=>{
       $(id)?.addEventListener('click', ()=>{ state.dist=v; r.value=v; update(); }, passiveOpt);
     });
-
     const a = $('amt');
     a.addEventListener('input',  ()=>{
-      const raw=safeNum(a.value,0);
-      state.principal=clamp(raw,0,1_000_000_000);
-      a.value=state.principal;
-      update();
+      const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update();
     }, passiveOpt);
     a.addEventListener('change', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update(); }, passiveOpt);
 
@@ -752,14 +746,10 @@
         const key = btn.getAttribute('data-strategy');
         state.baseCAGR  = STRATEGY[key] ?? state.baseCAGR;
         state.monthlyMul = MONTHLY_MULT[key] ?? 1;
-
         document.querySelectorAll('[data-strategy]').forEach(b=>{
-          b.classList.remove('is-active');
-          b.setAttribute('aria-pressed','false');
+          b.classList.remove('is-active'); b.setAttribute('aria-pressed','false');
         });
-        btn.classList.add('is-active');
-        btn.setAttribute('aria-pressed','true');
-        update();
+        btn.classList.add('is-active'); btn.setAttribute('aria-pressed','true'); update();
       }, passiveOpt);
     });
 
@@ -768,66 +758,59 @@
     if(btn && target){
       btn.addEventListener('click', async ()=>{
         const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background, transform: target.style.transform};
-        target.style.transform = 'none'; // 修正截圖位移
-        
+        target.style.transform = 'none'; 
         const goldEls = Array.from(document.querySelectorAll('.goldCycle'));
         const prevClasses = goldEls.map(el => el.className);
         goldEls.forEach(el => { el.classList.add('goldPlain'); });
-
-        target.style.boxShadow='0 0 0 1px rgba(233,209,138,.18)';
-        target.style.padding='8px';
-        target.style.background='transparent';
+        target.style.boxShadow='0 0 0 1px rgba(233,209,138,.18)'; target.style.padding='8px'; target.style.background='transparent';
         try{
           await ensureCanvas();
           const canvas = await html2canvas(target,{
-            backgroundColor:'#0A1221',
-            scale: Math.min(2, window.devicePixelRatio || 1),
-            useCORS:true,
-            logging:false
+            backgroundColor:'#0A1221', scale: Math.min(2, window.devicePixelRatio || 1), useCORS:true, logging:false
           });
           canvas.toBlob(blob=>{
             if(blob){
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
+              const url = URL.createObjectURL(blob); const a = document.createElement('a');
               a.href=url; a.download=`MOMO_calc_${new Date().toISOString().replace(/[:T]/g,'-').slice(0,19)}.png`;
-              document.body.appendChild(a); a.click();
-              setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 250);
+              document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 250);
             }
           });
-        }catch(e){
-          alert('匯出失敗，請再試一次');
-        }
+        }catch(e){ alert('匯出失敗，請再試一次'); }
         finally{
           target.style.boxShadow=prev.boxShadow; target.style.padding=prev.padding; target.style.background=prev.bg; target.style.transform=prev.transform;
           const goldNow = Array.from(document.querySelectorAll('.goldPlain'));
-          goldNow.forEach((el,idx) => {
-            el.className = prevClasses[idx] || el.className.replace(' goldPlain','');
-          });
+          goldNow.forEach((el,idx) => { el.className = prevClasses[idx] || el.className.replace(' goldPlain',''); });
         }
       }, passiveOpt);
     }
-
     if (matchMedia('(max-width: 768px)').matches) document.body.classList.add('has-cta');
     
-    // ===== Scroll Reveal 初始化 =====
+    // Scroll Reveal
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
+        if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
       });
     }, { threshold: 0.1 });
-
     document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
+
+    // IG Lazy Load Optimization
+    const igSection = document.getElementById('ig-section');
+    const loadIgScript = () => {
+        if(window.igScriptLoaded) return;
+        var js = document.createElement("script");
+        js.src = "https://embedsocial.com/cdn/ht.js"; js.id = "EmbedSocialHashtagScript";
+        document.head.appendChild(js); window.igScriptLoaded = true;
+    };
+    const igObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { loadIgScript(); igObserver.disconnect(); } });
+    }, { rootMargin: "200px" });
+    if(igSection) igObserver.observe(igSection);
   }
 
   function boot(){
+    initSEO(); // 初始化 SEO 內容
     document.querySelectorAll('.block').forEach(mountBlock);
-    restore();
-    fromURL();
-    bindEvents();
-    update();
+    restore(); fromURL(); bindEvents(); update();
   }
   document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
   </script>
@@ -836,18 +819,8 @@
   <script src="./assets/tools-render.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
-      if (window.MOMO_TOOLS && typeof MOMO_TOOLS.initHomeSection === 'function') {
-        MOMO_TOOLS.initHomeSection();
-      }
+      if (window.MOMO_TOOLS && typeof MOMO_TOOLS.initHomeSection === 'function') { MOMO_TOOLS.initHomeSection(); }
     });
-  </script>
-
-  <script>
-  (function(d, s, id) {
-    var js; if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id; js.src = "https://embedsocial.com/cdn/ht.js";
-    d.getElementsByTagName("head")[0].appendChild(js);
-  }(document, "script", "EmbedSocialHashtagScript"));
   </script>
 </body>
 </html>
