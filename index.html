@@ -160,6 +160,16 @@
     .stage-badge { align-self: center; }
     .ai-insight-box { text-align: left; }
   }
+
+  /* MCS 因子卡片 Grid (首頁精簡版) */
+  /* 如果不想在首頁顯示卡片，這段CSS可以不用，但保留以防未來需要 */
+  .mcs-grid {
+    display:grid; gap:12px;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    margin-bottom:18px;
+  }
+  @media (max-width:900px){ .mcs-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width:600px){ .mcs-grid { grid-template-columns:1fr; } }
   
   /* 通用 Grid */
   .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
@@ -332,7 +342,7 @@
     <section id="mcs-dashboard" class="section fade-in-section" aria-labelledby="mcs-title">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px">
           <h2 id="mcs-title" style="margin:0;color:var(--gold-soft)">MCS 景氣戰情中心</h2>
-          <a href="./tools/msc-score.html" class="btn-outline" style="font-size:12px;padding:6px 12px">查看完整圖表 ▶</a>
+          <a href="./tools/mcs-dashboard.html" class="btn-outline" style="font-size:12px;padding:6px 12px">查看完整圖表 ▶</a>
       </div>
 
       <div class="mcs-hero-section">
@@ -364,7 +374,21 @@
           </div>
         </div>
       </div>
-      </section>
+
+      <div style="display:none;">
+        <div id="factor-credit"><span id="creditScore"></span><span id="creditBar"></span><span id="creditMeta"></span><span id="creditTrend"></span><span id="creditSummary"></span></div>
+        <div id="factor-rates"><span id="ratesScore"></span><span id="ratesBar"></span><span id="ratesMeta"></span><span id="ratesTrend"></span><span id="ratesSummary"></span></div>
+        <div id="factor-macro"><span id="macroScore"></span><span id="macroBar"></span><span id="macroMeta"></span><span id="macroTrend"></span><span id="macroSummary"></span></div>
+        <div id="factor-equity"><span id="equityScore"></span><span id="equityBar"></span><span id="equityMeta"></span><span id="equityTrend"></span><span id="equitySummary"></span></div>
+        <div id="factor-eps"><span id="epsScore"></span><span id="epsBar"></span><span id="epsMeta"></span><span id="epsTrend"></span><span id="epsSummary"></span></div>
+        <div id="factor-sentiment"><span id="sentimentScore"></span><span id="sentimentBar"></span><span id="sentimentMeta"></span><span id="sentimentTrend"></span><span id="sentimentSummary"></span></div>
+        <div id="factor-liquidity"><span id="liquidityScore"></span><span id="liquidityBar"></span><span id="liquidityMeta"></span><span id="liquidityTrend"></span><span id="liquiditySummary"></span></div>
+        <div id="allocEquityText"></div><div id="allocIncomeText"></div><div id="allocDefensiveText"></div>
+        <div id="allocEquityBar"></div><div id="allocIncomeBar"></div><div id="allocDefensiveBar"></div>
+        <div id="allocScoreChip"></div><div id="allocStageChip"></div>
+      </div>
+
+    </section>
     <section id="strategy" class="section" aria-labelledby="strategy-title">
       <div class="bar-header fade-in-section"><h2 id="strategy-title" class="bar-title">MOMO「雙贏巔峰」策略（進行中）</h2></div>
       <div class="row">
@@ -697,7 +721,7 @@
   }
 
   /* =========================================
-     MCS 儀表板邏輯 (首頁精簡版)
+     MCS 儀表板邏輯 (首頁精簡版：只有Hero + 隱藏的資料讀取)
      ========================================= */
   const API_BASE = 'https://mcs-worker.nms3194949.workers.dev';
   let gaugeChart = null;
@@ -768,6 +792,26 @@
     }
   }
 
+  // 為了讓 AI 總結能正常運作，我們需要一個隱藏的更新函數來處理數據
+  // 雖然首頁不顯示卡片，但這個邏輯能確保數據被正確解析
+  function updateFactorCard(factorKey, factor) {
+    // 這裡只保留對 hidden 元素的更新，防止報錯
+    // 實際首頁並不顯示這些卡片
+    const metaEl = document.getElementById(factorKey + 'Meta');
+    const summaryEl = document.getElementById(factorKey + 'Summary');
+    if (!factor) return;
+
+    if (factorKey === 'credit') {
+      if(metaEl) metaEl.innerHTML = `<span>HY Spread：${factor.hy_spread?.toFixed(2) ?? '--'}%</span>`;
+    } else if (factorKey === 'eps') {
+      if(metaEl) metaEl.innerHTML = `<span>評估模型：股價動能推估</span>`;
+    } else if (factorKey === 'sentiment') {
+      if(metaEl) metaEl.innerHTML = `<span>VIX：${factor.vix?.toFixed(1) ?? '--'}</span>`;
+    } else if (factorKey === 'liquidity') {
+      if(metaEl) metaEl.innerHTML = `<span>Permits：${factor.permits}M <span class="meta-note">(${factor.permits_note})</span></span>`;
+    }
+  }
+
   async function loadMcs(profile = 'balanced') {
     try {
       let data = {}; let isFallback = false;
@@ -784,7 +828,7 @@
         data = { score: 66, stage: 'Growth', asOf: new Date().toISOString().slice(0,10), factors: {} };
       }
       if (!data.factors) data.factors = {};
-      // 模擬數據補全 (為了讓 AI 總結文字能正常生成)
+      // 模擬數據補全
       if(!data.factors.macro) data.factors.macro = { score: 12, pmi: 47.2, claims: 230000, change: -0.5 };
       if(!data.factors.liquidity) data.factors.liquidity = { score: 16, change: 1.5, net_liq: 6.35, net_liq_note: "資金寬鬆", cu_au: 4.15, cu_au_note: "溫和復甦" };
       if(!data.factors.credit) data.factors.credit = { score: 18, change: 1.2, hy_spread: 3.17, ig_spread: 0.84 };
@@ -793,6 +837,11 @@
       setStagePill(data.stage);
       updateMcsGauge(data.score, data.stage);
       updateAiSummary(data);
+      
+      // 雖然首頁不顯示卡片，但為了邏輯完整性，若有隱藏元素則更新
+      const f = data.factors;
+      ['credit','rates','macro','equity','eps','sentiment','liquidity'].forEach(k=>updateFactorCard(k, f[k]));
+
     } catch (err) { console.error(err); }
   }
 
