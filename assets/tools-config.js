@@ -6,7 +6,7 @@ window.MOMO_TOOLS_CONFIG = [
     title: "BTC/ETH 進場策略",
     desc: "即時監控加密市場回撤與進出場策略。",
     href: "/MOMO_FinSphere/tools/btc-rebound-trigger.html",
-    showOnHome: true
+    showOnHome: false
   },
   {
     id: "fund-cagr",
