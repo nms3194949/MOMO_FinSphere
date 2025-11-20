@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>MOMO財商智庫｜ETF 績效排行榜（列表版）</title>
+
+  <style>
+    :root {
+      --deep: #0A1221;
+      --card: #111827;
+      --gold: #C9A227;
+      --gold-light: rgba(201,162,39,0.4);
+      --muted: #9CA3AF;
+      --text: #F3F4F6;
+      --danger: #F87171;
+      --success: #4ADE80;
+    }
+
+    body {
+      margin: 0;
+      background: var(--deep);
+      font-family: "Noto Sans TC", system-ui, sans-serif;
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h1 {
+      color: var(--gold);
+      font-size: 26px;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    thead {
+      background: linear-gradient(90deg, #C9A227 0%, #EFD88A 70%, #C9A227 100%);
+      color: #000;
+    }
+
+    th {
+      padding: 10px 8px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    td {
+      padding: 10px 8px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .symbol {
+      font-weight: bold;
+      color: var(--gold);
+      font-size: 15px;
+      letter-spacing: 0.03em;
+    }
+
+    .name {
+      color: var(--text);
+      text-align: left;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .pos { color: var(--success); font-weight: 600; }
+    .neg { color: var(--danger); font-weight: 600; }
+    .muted { color: var(--muted); }
+
+    .error-row {
+      background: rgba(255,0,0,0.1);
+      color: #FCA5A5;
+      font-size: 13px;
+    }
+
+    .loading {
+      margin-top: 20px;
+      color: var(--muted);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <h1>ETF 績效排行榜（列表版）</h1>
+  <div class="desc">
+    整合 FinMind（價格）與 TWSE（配息），以「有效年數」計算更準確的年化績效。<br>
+    支援排序：年化總報酬、殖利率、Sharpe 值。
+  </div>
+
+  <div id="status" class="loading">資料載入中…</div>
+
+  <table id="etf-table" style="display:none;">
+    <thead>
+      <tr>
+        <th data-sort="symbol">代碼</th>
+        <th>名稱</th>
+        <th data-sort="eff">有效年數</th>
+        <th data-sort="total">年化總報酬</th>
+        <th data-sort="price">年化價差</th>
+        <th data-sort="yield1">殖利率(1Y)</th>
+        <th data-sort="yann">年化配息率</th>
+        <th data-sort="vol">波動度</th>
+        <th data-sort="sharpe">Sharpe</th>
+        <th>備註</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+const WORKER_URL = "https://etf-metrics-worker.nms3194949.workers.dev/etf-metrics";
+const YEARS = 3;
+
+const ETF_META = {
+  "0056": "元大台灣高股息",
+  "00713": "元大高股息低波動",
+  "00878": "國泰永續高股息",
+  "00918": "大華優選高填息30",
+  "00919": "群益台灣精選高息",
+  "00929": "復華科技優息",
+  "00940": "元大台灣價值高息",
+  "00915": "凱基台灣優選高股息30",
+  "0050": "元大台灣50",
+  "0052": "富邦科技",
+  "00881": "國泰科技龍頭",
+  "00757": "統一NYSE FANG+"
+};
+
+const BATCHES = [
+  ["0056","00713","00878","00918","00919","00929"],
+  ["00940","00915","0050","0052","00881","00757"]
+];
+
+let dataRows = [];
+let currentSort = "symbol";
+
+function pct(v){ return v==null||isNaN(v)?"–":(v*100).toFixed(2)+"%"; }
+function num(v){ return v==null||isNaN(v)?"–":v.toFixed(2); }
+
+function note(symbol,total,y1){
+  if(symbol==="0050") return "大盤核心";
+  if(symbol==="0056") return "經典高股息";
+  if(symbol==="00940") return "新掛牌";
+  if(y1>0.07 && total>0.05) return "息＋價差均衡";
+  if(y1>0.07 && total<=0.02) return "注意吃本金";
+  if(y1<0.03 && total>0.08) return "成長型 ETF";
+  return "—";
+}
+
+function render(){
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+
+  dataRows.forEach(r=>{
+    if(r.error){
+      tbody.innerHTML+=`
+      <tr class="error-row">
+        <td class="symbol">${r.symbol}</td>
+        <td colspan="9">無法取得資料：${r.error}</td>
+      </tr>`;
+      return;
+    }
+
+    const total = (r.price?.annualized_return_ex_div||0) + (r.dividend?.yield_period_annualized||0);
+    const price = r.price?.annualized_return_ex_div;
+    const y1 = r.dividend?.yield_1y;
+    const yann = r.dividend?.yield_period_annualized;
+    const vol = r.risk?.annualized_vol;
+    const sharpe = r.risk?.sharpe;
+
+    tbody.innerHTML+=`
+    <tr>
+      <td class="symbol">${r.symbol}</td>
+      <td class="name">${ETF_META[r.symbol]||""}</td>
+      <td>${r.effective_years?.toFixed(1)||"–"}</td>
+
+      <td class="${total>=0?'pos':'neg'}">${pct(total)}</td>
+      <td class="${price>=0?'pos':'neg'}">${pct(price)}</td>
+      <td class="${y1>=0?'pos':'neg'}">${pct(y1)}</td>
+      <td class="${yann>=0?'pos':'neg'}">${pct(yann)}</td>
+
+      <td>${pct(vol)}</td>
+      <td>${sharpe==null?'–':num(sharpe)}</td>
+
+      <td class="muted">${note(r.symbol,total,y1)}</td>
+    </tr>`;
+  });
+}
+
+// Sorting
+function sortBy(key){
+  currentSort=key;
+  dataRows.sort((a,b)=>{
+    const av=a[key], bv=b[key];
+    if(av==null) return 1;
+    if(bv==null) return -1;
+    return bv-av;
+  });
+  render();
+}
+
+document.querySelectorAll("th[data-sort]").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const key=th.dataset.sort;
+    let mapKey="";
+    if(key==="symbol") mapKey="symbol";
+    if(key==="eff") mapKey="effective_years";
+    if(key==="total") mapKey="total";
+    if(key==="price") mapKey="annualized_return_ex_div";
+    if(key==="yield1") mapKey="yield_1y";
+    if(key==="yann") mapKey="yield_period_annualized";
+    if(key==="vol") mapKey="annualized_vol";
+    if(key==="sharpe") mapKey="sharpe";
+
+    if(mapKey==="total"){
+      dataRows.forEach(r=>{
+        r.total = (r.price?.annualized_return_ex_div||0)+(r.dividend?.yield_period_annualized||0);
+      });
+    }
+    if(mapKey==="annualized_return_ex_div"){
+      dataRows.forEach(r=>r.annualized_return_ex_div = r.price?.annualized_return_ex_div);
+    }
+    if(mapKey==="yield_1y"){
+      dataRows.forEach(r=>r.yield_1y = r.dividend?.yield_1y);
+    }
+    if(mapKey==="yield_period_annualized"){
+      dataRows.forEach(r=>r.yield_period_annualized = r.dividend?.yield_period_annualized);
+    }
+    if(mapKey==="annualized_vol"){
+      dataRows.forEach(r=>r.annualized_vol = r.risk?.annualized_vol);
+    }
+    if(mapKey==="sharpe"){
+      dataRows.forEach(r=>r.sharpe = r.risk?.sharpe);
+    }
+
+    sortBy(mapKey);
+  });
+});
+
+// Load data
+async function load(){
+  const status=document.getElementById("status");
+  try{
+    const list=[];
+    for(const batch of BATCHES){
+      const url=`${WORKER_URL}?symbols=${batch.join(",")}&years=${YEARS}`;
+      const resp=await fetch(url);
+      const json=await resp.json();
+      if(json.etfs) list.push(...json.etfs);
+    }
+    dataRows=list;
+    status.style.display="none";
+    document.getElementById("etf-table").style.display="table";
+    render();
+  }catch(e){
+    status.innerHTML="❌ 無法載入資料";
+  }
+}
+
+load();
+</script>
+
+</body>
+</html>
