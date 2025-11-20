@@ -35,10 +35,10 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; position: relative;}
+  body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; position: relative; overflow-x: hidden;}
   a{color:inherit;text-decoration:none}
 
-  /* --- 體驗優化：背景動態光暈 --- */
+  /* --- 體驗優化：極光背景動態光暈 --- */
   body::before {
     content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
     background: radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.05), transparent 60%),
@@ -104,13 +104,29 @@
   }
   .hero .btn-line:hover{filter:brightness(1.15); animation: none; transform: scale(1.05);}
 
-  /* MCS Hero Styles */
+  /* --- 體驗優化：MCS 戰情室 雷射掃描光束 --- */
+  .mcs-hero-section::after {
+    content: ""; position: absolute; top: -50%; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+    box-shadow: 0 0 15px var(--gold);
+    animation: scan-move 4s ease-in-out infinite;
+    pointer-events: none; z-index: 2; opacity: 0.6;
+  }
+  @keyframes scan-move { 
+    0% { top: -10%; opacity: 0; } 
+    15% { opacity: 1; } 
+    85% { opacity: 1; } 
+    100% { top: 110%; opacity: 0; } 
+  }
+  /* 修正層級，讓文字在掃描線上 */
+  .mcs-hero-inner, .gauge-overlay { position: relative; z-index: 3; }
+
   .mcs-hero-section::before {
     content:""; position:absolute; top:0; left:0; right:0; height:1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
     opacity: 0.6;
   }
-  .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 8px; }
+  .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 24px; }
   
   .hero-gauge-col {
     flex: 0 0 180px;
@@ -490,6 +506,15 @@
           <h3 id="out-title" style="margin:0 0 10px">結果</h3>
           <div class="out" aria-live="polite">
             <div class="kv"><div class="k">預估月配息</div><div class="v" id="out-monthly">—</div></div>
+            
+            <div id="life-mapping" style="padding:10px; background:rgba(233,209,138,0.05); border-radius:8px; display:flex; align-items:center; gap:12px; transition:all 0.3s;">
+                <div id="life-icon" style="font-size:24px;">☕</div>
+                <div style="flex:1;">
+                    <div style="font-size:12px; color:var(--muted);">相當於生活品質：</div>
+                    <div id="life-text" style="font-size:14px; font-weight:bold; color:var(--gold-soft);">每天一杯拿鐵</div>
+                </div>
+            </div>
+
             <div class="kv"><div class="k">每年本金成長率</div><div class="v" id="out-grow">—</div></div>
             <div class="kv"><div class="k">三年後本金（不含配息）</div><div class="v" id="out-3y">—</div></div>
             <div class="kv"><div class="k">三年總領配息</div><div class="v" id="out-3y-div">—</div></div>
@@ -700,6 +725,39 @@
     const totalRate = principal>0 ? (total/principal - 1)*100 : 0; return { monthly, grow, after3y, div3y, total, totalRate };
   }
   
+  /* --- 體驗優化：金色粒子爆炸特效 --- */
+  function explodeGold(x, y) {
+    const colors = ['#F9E27C', '#D9B84B', '#B88A1E', '#FFFFFF'];
+    const particles = [];
+    const particleCount = 30;
+    for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement('div');
+        p.style.position = 'fixed'; p.style.left = x + 'px'; p.style.top = y + 'px';
+        p.style.width = (Math.random() * 6 + 2) + 'px'; p.style.height = p.style.width;
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.borderRadius = '50%'; p.style.pointerEvents = 'none'; p.style.zIndex = '9999';
+        document.body.appendChild(p);
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 100 + 50;
+        particles.push({ el: p, vx: Math.cos(angle) * velocity, vy: Math.sin(angle) * velocity, life: 1 });
+    }
+    let lastTime = Date.now();
+    function update() {
+        const now = Date.now(); const dt = (now - lastTime) / 1000; lastTime = now;
+        let alive = false;
+        particles.forEach(p => {
+            if (p.life > 0) {
+                alive = true; p.life -= 2 * dt;
+                p.el.style.left = (parseFloat(p.el.style.left) + p.vx * dt) + 'px';
+                p.el.style.top = (parseFloat(p.el.style.top) + p.vy * dt) + 'px';
+                p.el.style.opacity = p.life; p.el.style.transform = `scale(${p.life})`;
+            } else { if(p.el.parentNode) p.el.parentNode.removeChild(p.el); }
+        });
+        if (alive) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
   function renderOutputs(o){ 
     $('out-monthly').textContent = money(o.monthly); 
     $('out-grow').textContent = pct(o.grow); 
@@ -716,6 +774,28 @@
     }
     
     $('out-total-rate').textContent = pct(o.totalRate); 
+
+    /* --- 體驗優化：生活場景對照邏輯 --- */
+    const m = o.monthly;
+    const mapEl = document.getElementById('life-mapping');
+    const iconEl = document.getElementById('life-icon');
+    const textEl = document.getElementById('life-text');
+    
+    let icon = '🌱', text = '累積種子期';
+    if(m > 150 && m <= 3000) { icon='☕'; text='每天一杯星巴克'; }
+    else if(m > 3000 && m <= 10000) { icon='🍱'; text='每月加菜金 + 水電費全免'; }
+    else if(m > 10000 && m <= 25000) { icon='🚗'; text='支付國產車貸 + 停車費'; }
+    else if(m > 25000 && m <= 50000) { icon='✈️'; text='每季出國旅遊基金'; }
+    else if(m > 50000 && m <= 100000) { icon='🏠'; text='支付房貸，邁向財富自由'; }
+    else if(m > 100000) { icon='👑'; text='雙贏巔峰，被動收入大於支出'; }
+
+    if(textEl.textContent !== text) {
+        mapEl.style.transform = "scale(0.95)";
+        setTimeout(()=>{
+            iconEl.textContent = icon; textEl.textContent = text;
+            mapEl.style.transform = "scale(1)";
+        }, 100);
+    }
 
     /* 裂變行銷邏輯：當月配息 > 10000 顯示強力 CTA */
     const ctaEl = document.getElementById('calc-cta');
@@ -758,7 +838,8 @@
 
     const btn = $('btn-save-png'); const target = $('calc-capture');
     if(btn && target){
-      btn.addEventListener('click', async ()=>{
+      btn.addEventListener('click', async (e)=>{
+        explodeGold(e.clientX, e.clientY); // 粒子特效
         const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background, transform: target.style.transform}; target.style.transform = 'none';
         const goldEls = Array.from(document.querySelectorAll('.goldCycle')); const prevClasses = goldEls.map(el => el.className); goldEls.forEach(el => { el.classList.add('goldPlain'); });
         target.style.boxShadow='0 0 0 1px rgba(233,209,138,.18)'; target.style.padding='8px'; target.style.background='transparent';
@@ -769,7 +850,8 @@
 
     const btnShare = $('btn-share-link');
     if(btnShare){
-      btnShare.addEventListener('click', async () => {
+      btnShare.addEventListener('click', async (e) => {
+        explodeGold(e.clientX, e.clientY); // 粒子特效
         const params = new URLSearchParams();
         params.set('principal', state.principal);
         params.set('dist', state.dist);
