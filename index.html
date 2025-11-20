@@ -89,26 +89,25 @@
 
   .section{margin-top:24px}
   
-  /* ===== 2. 卡片懸浮與流光特效 (Hover Shimmer) ===== */
+  /* ===== 卡片懸浮與流光特效 (Hover Shimmer) ===== */
   .card, .card2, .tool-card, .panel {
     background:var(--card);
     border:1px solid var(--line);
     border-radius:16px;
     padding:16px;
     position: relative;
-    overflow: hidden; /* 避免流光溢出 */
+    overflow: hidden; 
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 box-shadow 0.3s ease, 
                 border-color 0.3s ease;
   }
   
   .card:hover, .card2:hover, .tool-card:hover, .panel:hover {
-    transform: translateY(-5px); /* 微微上浮 */
-    box-shadow: 0 12px 30px rgba(201, 162, 39, 0.15); /* 金色光暈 */
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(201, 162, 39, 0.15);
     border-color: rgba(233, 209, 138, 0.6);
   }
 
-  /* 流光掃過的效果 */
   .card::after, .card2::after, .tool-card::after, .panel::after {
     content: "";
     position: absolute;
@@ -124,7 +123,7 @@
     );
     transform: skewX(-25deg);
     transition: none;
-    pointer-events: none; /* 確保不影響點擊 */
+    pointer-events: none;
   }
   
   .card:hover::after, .card2:hover::after, .tool-card:hover::after, .panel:hover::after {
@@ -142,8 +141,25 @@
   .hero h1{margin:6px 0 8px;font-size:clamp(22px, 2.6vw, 32px);background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
   .hero p{color:var(--muted);margin:0}
   .hero small{color:var(--gold-soft)}
-  .hero .btn-line{display:inline-block;margin-top:18px;padding:12px 20px;border-radius:999px;font-weight:800;background:var(--gold-grad);color:#0A1221;border:none;box-shadow:0 6px 14px rgba(0,0,0,.35);transition:filter .2s}
-  .hero .btn-line:hover{filter:brightness(1.15)}
+  
+  /* ===== 方案一：按鈕脈衝呼吸特效 ===== */
+  @keyframes pulse-gold-glow {
+    0% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.7); transform: scale(1); }
+    70% { box-shadow: 0 0 0 15px rgba(201, 162, 39, 0); transform: scale(1.02); }
+    100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); transform: scale(1); }
+  }
+  
+  .hero .btn-line{
+    display:inline-block;margin-top:18px;padding:12px 20px;border-radius:999px;font-weight:800;
+    background:var(--gold-grad);color:#0A1221;border:none;
+    box-shadow:0 6px 14px rgba(0,0,0,.35);
+    transition:filter .2s;
+    /* 加入動畫 */
+    animation: pulse-gold-glow 2s infinite;
+    position: relative;
+    z-index: 1;
+  }
+  .hero .btn-line:hover{filter:brightness(1.15); animation: none; transform: scale(1.05);}
 
   .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 
@@ -165,7 +181,6 @@
 
   #strategy .row{display:flex;gap:16px;flex-wrap:wrap}
   .card2{
-    /* card2 的樣式已經合併到上方的 .card2, .card 共用區塊，這裡保留特定排版 */
     width:calc(50% - 8px);min-width:300px;
     display:flex;flex-direction:column;gap:18px;
     box-shadow:0 10px 22px rgba(0,0,0,.45);
@@ -192,14 +207,16 @@
   @media (prefers-reduced-motion: reduce){.gradient-stop-animated{animation:none}}
 
   .cta-fixed{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(10,18,33,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);display:none}
-  .cta-fixed .btn-line{display:block;text-align:center;padding:14px 18px;border-radius:999px;background:var(--gold-grad);color:#0A1221;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.35)}
+  .cta-fixed .btn-line{
+    display:block;text-align:center;padding:14px 18px;border-radius:999px;background:var(--gold-grad);color:#0A1221;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.35);
+    animation: pulse-gold-glow 2s infinite; /* 手機版下方固定按鈕也加脈衝 */
+  }
   @media(max-width:768px){
     .cta-fixed{display:block} 
     body.has-cta{padding-bottom:84px}
   }
 
   #calc .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-  /* #calc .panel 樣式合併到上方 hover 區塊 */
   #calc h2{margin:0 0 6px;font-size:18px;color:var(--gold-soft)}
   #calc p.desc{margin:0 0 12px;color:var(--muted)}
   #calc label{display:block;font-weight:800;font-size:13px;color:rgba(233,209,138,.9);margin-bottom:6px}
@@ -236,7 +253,6 @@
   }
 
   /* 首頁工具卡片 */
-  /* .tool-card 樣式合併到上方 hover 區塊 */
   .tool-card{display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 18px rgba(0,0,0,.45)}
   .tool-pill-row{display:flex;gap:8px;margin-bottom:4px}
   .tool-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;border:1px solid rgba(233,209,138,.45);font-size:11px;color:var(--gold-soft)}
@@ -244,7 +260,7 @@
   .tool-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
   .tool-footer{margin-top:8px}
 
-  /* ===== 3. 捲動漸顯 (Scroll Reveal) CSS ===== */
+  /* ===== 捲動漸顯 (Scroll Reveal) ===== */
   .fade-in-section {
     opacity: 0;
     transform: translateY(30px);
@@ -254,6 +270,89 @@
   .fade-in-section.visible {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  /* ===== 方案二：右下角懸浮 LINE 按鈕 CSS ===== */
+  .float-line-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #06C755; /* LINE 官方綠 */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: float-shake 5s infinite; /* 晃動動畫 */
+  }
+  .float-line-btn:hover {
+    transform: scale(1.1) rotate(-5deg);
+    filter: brightness(1.1);
+  }
+
+  .notification-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #FF3B30; /* 紅色通知 */
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0A1221;
+  }
+
+  .chat-tooltip {
+    position: absolute;
+    right: 75px;
+    background: white;
+    color: #0A1221;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateX(10px);
+    animation: fade-in-tooltip 0.5s forwards 1.5s; /* 延遲出現 */
+    pointer-events: none;
+  }
+  .chat-tooltip::after {
+    content: "";
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px 0 6px 8px;
+    border-style: solid;
+    border-color: transparent transparent transparent white;
+  }
+
+  @keyframes float-shake {
+    0%, 80% { transform: rotate(0); }
+    85% { transform: rotate(-15deg); }
+    90% { transform: rotate(10deg); }
+    95% { transform: rotate(-5deg); }
+    100% { transform: rotate(0); }
+  }
+
+  @keyframes fade-in-tooltip {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* 手機版調整位置，避免擋住底部固定選單 */
+  @media(max-width: 768px) {
+    .float-line-btn { bottom: 90px; right: 16px; width: 54px; height: 54px; }
   }
   </style>
 </head>
@@ -386,6 +485,16 @@
     <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="btn-line" aria-label="立即加入 MOMO 財商智庫官方 LINE">加入官方 LINE ▶</a>
   </div>
 
+  <a href="https://portaly.cc/momo_82786" target="_blank" rel="noopener noreferrer" class="float-line-btn" aria-label="加入 LINE 好友">
+    <div class="line-icon">
+      <svg viewBox="0 0 24 24" fill="#FFFFFF" width="32" height="32">
+        <path d="M12 2C6.48 2 2 5.58 2 10c0 2.38 1.19 4.47 3 6.16V20c0 .55.45 1 1 1 .34 0 .65-.17.84-.44L9.6 18.3c.76.22 1.56.36 2.4.36 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+      </svg>
+    </div>
+    <div class="notification-dot">1</div>
+    <div class="chat-tooltip">領取雙贏策略 🎁</div>
+  </a>
+
   <script>
   const $ =(id)=>document.getElementById(id);
   const nfTW = new Intl.NumberFormat('zh-TW');
@@ -424,13 +533,13 @@
   }
   const uniqueId=(p='id')=>`${p}-${Math.random().toString(36).slice(2,9)}`;
 
-  // ===== 1. 數字滾動特效 (CountUp) 輔助函式 =====
+  // ===== 數字滾動特效 (CountUp) =====
   function animateValue(callback, start, end, duration) {
     let startTimestamp = null;
     const step = (timestamp) => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress); // EaseOutExpo
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       const currentVal = Math.floor(easeProgress * (end - start) + start);
       callback(currentVal);
       if (progress < 1) window.requestAnimationFrame(step);
@@ -527,7 +636,6 @@
     };
     init();
 
-    // 優化：初始載入時執行動畫 (針對本金和配息)
     if(key === 'principal' || key === 'monthly') {
       animateValue((val) => {
          readEl.textContent = fmtRead(val, unit);
@@ -660,9 +768,7 @@
     if(btn && target){
       btn.addEventListener('click', async ()=>{
         const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background, transform: target.style.transform};
-        
-        // 截圖時暫時移除 hover 上浮效果，避免切圖
-        target.style.transform = 'none'; 
+        target.style.transform = 'none'; // 修正截圖位移
         
         const goldEls = Array.from(document.querySelectorAll('.goldCycle'));
         const prevClasses = goldEls.map(el => el.className);
@@ -703,7 +809,7 @@
 
     if (matchMedia('(max-width: 768px)').matches) document.body.classList.add('has-cta');
     
-    // ===== 3. 捲動漸顯 (Scroll Reveal) 初始化 =====
+    // ===== Scroll Reveal 初始化 =====
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
