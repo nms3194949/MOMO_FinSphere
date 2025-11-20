@@ -87,8 +87,15 @@
     background:linear-gradient(120deg,rgba(201,162,39,.15),rgba(45,122,119,.12) 40%, transparent 100%), #0B1222;text-align:center}
   .hero h1{margin:6px 0 8px;font-size:clamp(22px, 2.6vw, 32px);background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
   .hero p{color:var(--muted);margin:0}
-  .hero small{color:var(--gold-soft)}
+  .hero small{color:var(--gold-soft); font-size: 13px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px;}
   
+  /* 呼吸燈動畫 */
+  @keyframes breathe-dot { 
+    0% { opacity: 0.4; transform: scale(0.9); } 
+    50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px currentColor; } 
+    100% { opacity: 0.4; transform: scale(0.9); } 
+  }
+
   @keyframes pulse-gold-glow {
     0% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.7); transform: scale(1); }
     70% { box-shadow: 0 0 0 15px rgba(201, 162, 39, 0); transform: scale(1.02); }
@@ -892,6 +899,42 @@
   }
 
   /* =========================================
+      AI 智能情境問候
+      ========================================= */
+  function initSmartGreeting() {
+      const hour = new Date().getHours();
+      let greeting = "";
+      let subMsg = "";
+      let color = "#E9D18A"; // 預設金色
+
+      if (hour >= 5 && hour < 11) {
+          greeting = "早安，開啟財富增長的一天";
+          subMsg = "AI 建議：定期檢視現金流目標。";
+          color = "#3dd68c"; // 綠色
+      } else if (hour >= 11 && hour < 17) {
+          greeting = "午安，午盤資金流向監控中";
+          subMsg = "市場震盪時，配息是最好的防禦。";
+          color = "#E9D18A"; // 金色
+      } else if (hour >= 17 && hour < 23) {
+          greeting = "晚安，美股與夜盤開盤在即";
+          subMsg = "MOMO AI 正在為您監控全球宏觀數據。";
+          color = "#ff6b6b"; // 紅色
+      } else {
+          greeting = "夜深了，讓雙贏策略為您工作";
+          subMsg = "您休息，資產繼續產生被動收入。";
+          color = "#AAB2BF"; // 藍灰色
+      }
+
+      const smallEl = document.querySelector('.hero small');
+      if (smallEl) {
+          smallEl.innerHTML = `
+              <span style="display:inline-block; width:8px; height:8px; background-color:${color}; border-radius:50%; margin-right:6px; box-shadow:0 0 8px ${color}; animation: breathe-dot 2s infinite;"></span>
+              ${greeting} <span style="opacity:0.5; margin:0 6px;">|</span> ${subMsg}
+          `;
+      }
+  }
+
+  /* =========================================
       MCS 儀表板邏輯
       ========================================= */
   const API_BASE = 'https://mcs-worker.nms3194949.workers.dev';
@@ -1012,6 +1055,7 @@
 
   function boot(){
     initSEO();
+    initSmartGreeting(); // 啟動智能問候
     document.querySelectorAll('.block').forEach(mountBlock);
     restore(); fromURL(); bindEvents(); update();
     loadMcs('balanced');
