@@ -191,7 +191,7 @@
   #calc .out-row{display:flex;gap:10px;flex-wrap:wrap}
   #calc .out-row .kv{flex:1;min-width:240px}
   #calc .actions{position:absolute;top:16px;right:16px;display:flex;gap:8px}
-  .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px}
+  .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);padding:6px 10px;border-radius:10px; cursor:pointer; transition:.2s;}
   .btn-outline:hover{background:rgba(233,209,138,.08)}
 
   .strategy-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
@@ -321,9 +321,12 @@
     </section>
 
     <section id="calc" class="section fade-in-section" aria-labelledby="calc-title">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap;">
         <h2 id="calc-title">配息許願</h2>
-        <button id="btn-save-png" class="btn-outline" type="button" aria-label="匯出目前互動試算為 PNG">匯出 PNG</button>
+        <div style="display:flex;gap:8px">
+            <button id="btn-share-link" class="btn-outline" type="button" aria-label="複製目前試算連結">複製連結 🔗</button>
+            <button id="btn-save-png" class="btn-outline" type="button" aria-label="匯出目前互動試算為 PNG">匯出 PNG</button>
+        </div>
       </div>
       <p class="desc">輸入本金，調整「配息率」拉桿，系統會即時計算：每月配息、<strong>每年的本金成長率</strong>、三年後本金、三年總領配息、三年總報酬與報酬率。</p>
 
@@ -412,10 +415,9 @@
 
   <script>
   /* ==========================================================================
-     SEO 與 內容維護區 (請在此修改文字與關鍵字，會自動更新到畫面上與結構化資料中)
+     SEO 與 內容維護區
      ========================================================================== */
   const SEO_DATA = {
-    // 1. FAQ 設定：增加關鍵字密度，搶佔 Google 搜尋版面
     faq: [
       {
         q: "MOMO 雙贏策略適合新手嗎？",
@@ -430,8 +432,6 @@
         a: "您可以直接點擊右下角的 LINE 按鈕加入官方帳號，我們會提供您專屬的配置建議與工具使用教學。"
       }
     ],
-    
-    // 2. SEO 文章區塊：放在頁面下方，用於增加長尾關鍵字 (支援 HTML 標籤如 <strong>)
     article: {
       title: "為什麼需要月配息複利試算？",
       content: `
@@ -441,8 +441,6 @@
         無論是退休規劃、現金流管理，透過本站的<strong>複利計算機</strong>，您能一鍵預覽未來三年的資產變化。
       `
     },
-
-    // 3. 應用程式資訊 (SoftwareApp Schema)：告訴 Google 這是一個好用的工具
     app: {
       name: "MOMO 月配息 AI 試算工具",
       desc: "輸入本金與預期配息率，AI 系統即時計算每月現金流、本金成長與三年總報酬的免費財商工具。",
@@ -451,70 +449,32 @@
   };
 
   /* ==========================================================================
-     系統邏輯區 (以下程式碼負責功能運作，不需要經常修改)
+     系統邏輯區
      ========================================================================== */
-  
-  // 自動生成 SEO 內容與 JSON-LD
   function initSEO() {
-    // A. 渲染 FAQ 到畫面
     const faqContainer = document.getElementById('seo-faq-container');
     if (faqContainer && SEO_DATA.faq.length > 0) {
       let html = `<h2 style="color:var(--gold-soft); margin-bottom:16px;">常見問題</h2><div class="card">`;
       SEO_DATA.faq.forEach(item => {
-        html += `
-          <details>
-            <summary>${item.q}</summary>
-            <div class="faq-content">${item.a}</div>
-          </details>`;
+        html += `<details><summary>${item.q}</summary><div class="faq-content">${item.a}</div></details>`;
       });
       html += `</div>`;
       faqContainer.innerHTML = html;
     }
-
-    // B. 渲染 SEO 文章到畫面
     const articleContainer = document.getElementById('seo-article-container');
     if (articleContainer && SEO_DATA.article.content) {
-      articleContainer.innerHTML = `
-        <article style="color:var(--muted); font-size:14px; line-height:1.8;">
-          <h3 style="color:var(--gold-soft); font-size:16px;">${SEO_DATA.article.title}</h3>
-          <p>${SEO_DATA.article.content}</p>
-        </article>`;
+      articleContainer.innerHTML = `<article style="color:var(--muted); font-size:14px; line-height:1.8;"><h3 style="color:var(--gold-soft); font-size:16px;">${SEO_DATA.article.title}</h3><p>${SEO_DATA.article.content}</p></article>`;
     }
-
-    // C. 注入 JSON-LD (FAQ Schema)
-    const faqSchema = {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": SEO_DATA.faq.map(item => ({
-        "@type": "Question",
-        "name": item.q,
-        "acceptedAnswer": { "@type": "Answer", "text": item.a }
-      }))
-    };
+    const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": SEO_DATA.faq.map(item => ({ "@type": "Question", "name": item.q, "acceptedAnswer": { "@type": "Answer", "text": item.a } })) };
     injectJSONLD(faqSchema);
-
-    // D. 注入 JSON-LD (SoftwareApplication Schema)
-    const appSchema = {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": SEO_DATA.app.name,
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Web",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
-      "description": SEO_DATA.app.desc,
-      "author": { "@type": "Person", "name": "MOMO", "url": "https://portaly.cc/momo_82786" }
-    };
+    const appSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", "name": SEO_DATA.app.name, "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" }, "description": SEO_DATA.app.desc, "author": { "@type": "Person", "name": "MOMO", "url": "https://portaly.cc/momo_82786" } };
     injectJSONLD(appSchema);
   }
 
   function injectJSONLD(data) {
-    const script = document.createElement('script');
-    script.type = "application/ld+json";
-    script.text = JSON.stringify(data);
-    document.head.appendChild(script);
+    const script = document.createElement('script'); script.type = "application/ld+json"; script.text = JSON.stringify(data); document.head.appendChild(script);
   }
 
-  // --- 原有的功能函式 ---
   const $ =(id)=>document.getElementById(id);
   const nfTW = new Intl.NumberFormat('zh-TW');
   const clamp =(v,min,max)=>Math.min(max,Math.max(min,v));
@@ -525,34 +485,17 @@
   async function ensureCanvas(){
     if(!window.html2canvas){
       await new Promise((res,rej)=>{
-        const s=document.createElement('script');
-        s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-        s.crossOrigin='anonymous';
-        s.onload=res; s.onerror=()=>rej(new Error('load html2canvas failed'));
-        document.head.appendChild(s);
+        const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'; s.crossOrigin='anonymous'; s.onload=res; s.onerror=()=>rej(new Error('load html2canvas failed')); document.head.appendChild(s);
       });
     }
   }
 
   const MOMO_PROGRESS_CONFIG = { monthly:75658, principal:6277633, dist:14, annual:45 };
-
-  function fmtAxis(v,u){
-    if(u=='%') return Math.round(v);
-    if(u=='M') return (v/1e6).toFixed(0)+'M';
-    if(u=='K') return (v/1e3).toFixed(0)+'K';
-    return nfTW.format(v);
-  }
+  function fmtAxis(v,u){ if(u=='%') return Math.round(v); if(u=='M') return (v/1e6).toFixed(0)+'M'; if(u=='K') return (v/1e3).toFixed(0)+'K'; return nfTW.format(v); }
   function fmtRead(v,u){ return u=='%'?Number(v).toFixed(2)+'%':'＄'+nfTW.format(Math.round(v))+' 元' }
-
-  function autoStep(min,max,baseStep,containerWidth){
-    const ticks=(max-min)/baseStep;
-    if(containerWidth<320&&ticks>8) return baseStep*2;
-    if(containerWidth<280&&ticks>6) return baseStep*3;
-    return baseStep;
-  }
+  function autoStep(min,max,baseStep,containerWidth){ const ticks=(max-min)/baseStep; if(containerWidth<320&&ticks>8) return baseStep*2; if(containerWidth<280&&ticks>6) return baseStep*3; return baseStep; }
   const uniqueId=(p='id')=>`${p}-${Math.random().toString(36).slice(2,9)}`;
 
-  // CountUp 動畫
   function animateValue(callback, start, end, duration) {
     let startTimestamp = null;
     const step = (timestamp) => {
@@ -566,261 +509,142 @@
     window.requestAnimationFrame(step);
   }
 
-  // Gauge 繪製
   function createGauge(el, { min, max, step, unit, breath = false }) {
     const parentWidth = Math.max(260, el.clientWidth || 300);
     const W = parentWidth, H = 64, BH = 14, X0 = 10, WB = W - 2 * X0, Y = 42, TYO = 10, TL = 6;
     const stepUsed = autoStep(min, max, step, parentWidth);
     const valueToX = v => { const t = (clamp(v, min, max) - min) / (max - min || 1); return X0 + t * WB; };
     const NS = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    el.innerHTML = ''; el.appendChild(svg);
-
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); el.innerHTML = ''; el.appendChild(svg);
     let fillAttr = '#E9D18A';
     if (breath) {
       const gradId = uniqueId('goldGrad');
       const defs = document.createElementNS(NS, 'defs');
-      const g = document.createElementNS(NS, 'linearGradient');
-      g.setAttribute('id', gradId); g.setAttribute('x1', '0%'); g.setAttribute('y1', '0%'); g.setAttribute('x2', '100%'); g.setAttribute('y2', '0%');
+      const g = document.createElementNS(NS, 'linearGradient'); g.setAttribute('id', gradId); g.setAttribute('x1', '0%'); g.setAttribute('y1', '0%'); g.setAttribute('x2', '100%'); g.setAttribute('y2', '0%');
       const s1 = document.createElementNS(NS, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('style', 'stop-color:#E9D18A;stop-opacity:1');
       const s2 = document.createElementNS(NS, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('class', 'gradient-stop-animated');
-      g.append(s1, s2); defs.append(g); svg.append(defs);
-      fillAttr = `url(#${gradId})`;
+      g.append(s1, s2); defs.append(g); svg.append(defs); fillAttr = `url(#${gradId})`;
     }
-
-    const lblStep = stepUsed * 2;
-    let lastMajorX = -1e9;
+    const lblStep = stepUsed * 2; let lastMajorX = -1e9;
     for (let v = min; v <= max; v += stepUsed) {
-      const x = valueToX(v);
-      const isMajor = (Math.abs(((v - min) % lblStep)) < 1e-6) || v === min || v === max;
-      const ln = document.createElementNS(NS, 'line');
-      ln.setAttribute('x1', x); ln.setAttribute('y1', Y - BH / 2 - TYO);
-      ln.setAttribute('x2', x); ln.setAttribute('y2', Y - BH / 2 - TYO + TL);
-      ln.setAttribute('stroke', isMajor ? '#E9D18A' : 'rgba(233,209,138,.7)');
-      ln.setAttribute('stroke-width', isMajor ? '2.6' : '1');
-      svg.append(ln);
-      if (isMajor) {
-        if (Math.abs(x - lastMajorX) > 36) {
-          const t = document.createElementNS(NS, 'text');
-          t.setAttribute('x', x); t.setAttribute('y', Y - BH / 2 - TYO - 3);
-          t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'tick-label');
-          t.textContent = fmtAxis(v, unit);
-          svg.append(t);
-          lastMajorX = x;
-        }
+      const x = valueToX(v); const isMajor = (Math.abs(((v - min) % lblStep)) < 1e-6) || v === min || v === max;
+      const ln = document.createElementNS(NS, 'line'); ln.setAttribute('x1', x); ln.setAttribute('y1', Y - BH / 2 - TYO); ln.setAttribute('x2', x); ln.setAttribute('y2', Y - BH / 2 - TYO + TL); ln.setAttribute('stroke', isMajor ? '#E9D18A' : 'rgba(233,209,138,.7)'); ln.setAttribute('stroke-width', isMajor ? '2.6' : '1'); svg.append(ln);
+      if (isMajor && Math.abs(x - lastMajorX) > 36) {
+          const t = document.createElementNS(NS, 'text'); t.setAttribute('x', x); t.setAttribute('y', Y - BH / 2 - TYO - 3); t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'tick-label'); t.textContent = fmtAxis(v, unit); svg.append(t); lastMajorX = x;
       }
     }
-
-    const tr = document.createElementNS(NS, 'rect');
-    tr.setAttribute('x', X0); tr.setAttribute('y', Y - BH / 2);
-    tr.setAttribute('width', WB); tr.setAttribute('height', BH);
-    tr.setAttribute('rx', BH / 2); tr.setAttribute('fill', '#1a2337');
-    svg.append(tr);
-
-    const pr = document.createElementNS(NS, 'rect');
-    pr.setAttribute('class', 'gauge-bar'); 
-    pr.setAttribute('x', X0); pr.setAttribute('y', Y - BH / 2);
-    pr.setAttribute('height', BH); pr.setAttribute('rx', BH / 2);
-    pr.setAttribute('fill', fillAttr);
-    pr.setAttribute('width', 0);
-    svg.append(pr);
-
-    return function updateBarWidth(val) {
-      const currentW = Math.max(0, valueToX(val) - X0);
-      pr.setAttribute('width', currentW);
-    };
+    const tr = document.createElementNS(NS, 'rect'); tr.setAttribute('x', X0); tr.setAttribute('y', Y - BH / 2); tr.setAttribute('width', WB); tr.setAttribute('height', BH); tr.setAttribute('rx', BH / 2); tr.setAttribute('fill', '#1a2337'); svg.append(tr);
+    const pr = document.createElementNS(NS, 'rect'); pr.setAttribute('class', 'gauge-bar'); pr.setAttribute('x', X0); pr.setAttribute('y', Y - BH / 2); pr.setAttribute('height', BH); pr.setAttribute('rx', BH / 2); pr.setAttribute('fill', fillAttr); pr.setAttribute('width', 0); svg.append(pr);
+    return function updateBarWidth(val) { const currentW = Math.max(0, valueToX(val) - X0); pr.setAttribute('width', currentW); };
   }
 
   function mountBlock(blockEl){
-    const key=blockEl.dataset.key; const min=+blockEl.dataset.min; const max=+blockEl.dataset.max;
-    const step=+blockEl.dataset.step; const unit=blockEl.dataset.unit;
+    const key=blockEl.dataset.key; const min=+blockEl.dataset.min; const max=+blockEl.dataset.max; const step=+blockEl.dataset.step; const unit=blockEl.dataset.unit;
     const gaugeEl=blockEl.querySelector('.gauge'); const readEl=blockEl.querySelector('.readout');
-    const initVal=clamp(Number(MOMO_PROGRESS_CONFIG[key]??0),min,max);
-    blockEl._value=initVal;
-
+    const initVal=clamp(Number(MOMO_PROGRESS_CONFIG[key]??0),min,max); blockEl._value=initVal;
     let updateView = null;
-    const init = () => {
-      updateView = createGauge(gaugeEl, { min, max, step, unit, value: blockEl._value, breath: (key==='monthly') });
-      updateView(blockEl._value);
-    };
+    const init = () => { updateView = createGauge(gaugeEl, { min, max, step, unit, value: blockEl._value, breath: (key==='monthly') }); updateView(blockEl._value); };
     init();
-
-    if(key === 'principal' || key === 'monthly') {
-      animateValue((val) => { readEl.textContent = fmtRead(val, unit); }, 0, initVal, 1500);
-    } else {
-      readEl.textContent = fmtRead(initVal, unit);
-    }
-
-    blockEl._update=(v)=>{ 
-      const nv=clamp(v,min,max); blockEl._value=nv; 
-      if(updateView) updateView(nv); readEl.textContent=fmtRead(nv,unit); 
-    };
-
-    const ro=new ResizeObserver(()=>{
-      if(blockEl._resizeTimer) clearTimeout(blockEl._resizeTimer);
-      blockEl._resizeTimer=setTimeout(init, 100);
-    });
-    ro.observe(gaugeEl); 
-    blockEl._destroy=()=>{ ro.disconnect(); if(blockEl._resizeTimer) clearTimeout(blockEl._resizeTimer); };
+    if(key === 'principal' || key === 'monthly') { animateValue((val) => { readEl.textContent = fmtRead(val, unit); }, 0, initVal, 1500); } else { readEl.textContent = fmtRead(initVal, unit); }
+    blockEl._update=(v)=>{ const nv=clamp(v,min,max); blockEl._value=nv; if(updateView) updateView(nv); readEl.textContent=fmtRead(nv,unit); };
+    const ro=new ResizeObserver(()=>{ if(blockEl._resizeTimer) clearTimeout(blockEl._resizeTimer); blockEl._resizeTimer=setTimeout(init, 100); });
+    ro.observe(gaugeEl); blockEl._destroy=()=>{ ro.disconnect(); if(blockEl._resizeTimer) clearTimeout(blockEl._resizeTimer); };
   }
 
   const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
-  const SLOPE = 1;
-  const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
+  const SLOPE = 1; const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
   const state = { baseCAGR: STRATEGY.rise, monthlyMul: MONTHLY_MULT.rise, principal: 1_000_000, dist: 8 };
-
   function safeNum(v,def=0){ v=+v; return Number.isFinite(v)?v:def; }
   function compute({principal, dist, baseCAGR, monthlyMul}){
-    const monthlyBase = principal*(dist/100)/12;
-    const monthly = monthlyBase * (monthlyMul ?? 1);
-    const grow = Math.max(0, baseCAGR - SLOPE*dist);
-    const after3y = principal*Math.pow(1+grow/100,3);
-    const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1);
-    const total = after3y + div3y;
-    const totalRate = principal>0 ? (total/principal - 1)*100 : 0;
-    return { monthly, grow, after3y, div3y, total, totalRate };
+    const monthlyBase = principal*(dist/100)/12; const monthly = monthlyBase * (monthlyMul ?? 1);
+    const grow = Math.max(0, baseCAGR - SLOPE*dist); const after3y = principal*Math.pow(1+grow/100,3);
+    const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1); const total = after3y + div3y;
+    const totalRate = principal>0 ? (total/principal - 1)*100 : 0; return { monthly, grow, after3y, div3y, total, totalRate };
   }
-
-  function renderOutputs(o){
-    $('out-monthly').textContent   = money(o.monthly);
-    $('out-grow').textContent      = pct(o.grow);
-    $('out-3y').textContent        = money(o.after3y);
-    $('out-3y-div').textContent    = money(o.div3y);
-    $('out-total').textContent     = money(o.total);
-    $('out-total-rate').textContent= pct(o.totalRate);
-  }
-
+  function renderOutputs(o){ $('out-monthly').textContent = money(o.monthly); $('out-grow').textContent = pct(o.grow); $('out-3y').textContent = money(o.after3y); $('out-3y-div').textContent = money(o.div3y); $('out-total').textContent = money(o.total); $('out-total-rate').textContent = pct(o.totalRate); }
   function persist(){ try{ localStorage.setItem('momo-calc', JSON.stringify(state)); }catch(_){} }
-  function restore(){
-    try{
-      const s = JSON.parse(localStorage.getItem('momo-calc'));
-      if(s && typeof s==='object'){
-        if(typeof s.baseCAGR==='number') state.baseCAGR=s.baseCAGR;
-        if(typeof s.monthlyMul==='number') state.monthlyMul=s.monthlyMul;
-        if(typeof s.principal==='number') state.principal=s.principal;
-        if(typeof s.dist==='number') state.dist=s.dist;
-      }
-    }catch(_){}
-  }
+  function restore(){ try{ const s = JSON.parse(localStorage.getItem('momo-calc')); if(s && typeof s==='object'){ if(typeof s.baseCAGR==='number') state.baseCAGR=s.baseCAGR; if(typeof s.monthlyMul==='number') state.monthlyMul=s.monthlyMul; if(typeof s.principal==='number') state.principal=s.principal; if(typeof s.dist==='number') state.dist=s.dist; } }catch(_){} }
+  
   function fromURL(){
     const p=new URLSearchParams(location.search);
     if(p.has('principal')) state.principal=clamp(safeNum(p.get('principal'), state.principal), 0, 1e9);
     if(p.has('dist')) state.dist=clamp(safeNum(p.get('dist'), state.dist), 0, 100);
     const st=p.get('strategy');
     if(st && ['start','rise','peak'].includes(st)){
-      state.baseCAGR = STRATEGY[st];
-      state.monthlyMul = MONTHLY_MULT[st];
-      document.querySelectorAll('[data-strategy]').forEach(b=>{
-        const active = b.dataset.strategy===st;
-        b.classList.toggle('is-active', active);
-        b.setAttribute('aria-pressed', active?'true':'false');
-      });
+      state.baseCAGR = STRATEGY[st]; state.monthlyMul = MONTHLY_MULT[st];
+      document.querySelectorAll('[data-strategy]').forEach(b=>{ const active = b.dataset.strategy===st; b.classList.toggle('is-active', active); b.setAttribute('aria-pressed', active?'true':'false'); });
     }
   }
 
   function update(){
     const badge = $('distNow'); if(badge) badge.textContent = (state.dist||0) + '%';
     const amt=$('amt'), range=$('distRange');
-    if(amt) amt.value = safeNum(state.principal,0);
-    if(range){ range.value = safeNum(state.dist,0); range.setAttribute('aria-valuenow', range.value); }
-    renderOutputs(compute(state));
-    persist();
+    if(amt) amt.value = safeNum(state.principal,0); if(range){ range.value = safeNum(state.dist,0); range.setAttribute('aria-valuenow', range.value); }
+    renderOutputs(compute(state)); persist();
   }
 
   function bindEvents(){
-    const r = $('distRange');
-    r.addEventListener('input',  ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt);
-    r.addEventListener('change', ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt);
-    [['dist5',5],['dist10',10],['dist15',15]].forEach(([id,v])=>{
-      $(id)?.addEventListener('click', ()=>{ state.dist=v; r.value=v; update(); }, passiveOpt);
-    });
-    const a = $('amt');
-    a.addEventListener('input',  ()=>{
-      const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update();
-    }, passiveOpt);
-    a.addEventListener('change', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update(); }, passiveOpt);
+    const r = $('distRange'); r.addEventListener('input', ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt); r.addEventListener('change', ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt);
+    [['dist5',5],['dist10',10],['dist15',15]].forEach(([id,v])=>{ $(id)?.addEventListener('click', ()=>{ state.dist=v; r.value=v; update(); }, passiveOpt); });
+    const a = $('amt'); a.addEventListener('input', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update(); }, passiveOpt); a.addEventListener('change', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update(); }, passiveOpt);
+    document.querySelectorAll('[data-strategy]').forEach(btn=>{ btn.addEventListener('click', ()=>{ const key = btn.getAttribute('data-strategy'); state.baseCAGR = STRATEGY[key] ?? state.baseCAGR; state.monthlyMul = MONTHLY_MULT[key] ?? 1; document.querySelectorAll('[data-strategy]').forEach(b=>{ b.classList.remove('is-active'); b.setAttribute('aria-pressed','false'); }); btn.classList.add('is-active'); btn.setAttribute('aria-pressed','true'); update(); }, passiveOpt); });
 
-    document.querySelectorAll('[data-strategy]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const key = btn.getAttribute('data-strategy');
-        state.baseCAGR  = STRATEGY[key] ?? state.baseCAGR;
-        state.monthlyMul = MONTHLY_MULT[key] ?? 1;
-        document.querySelectorAll('[data-strategy]').forEach(b=>{
-          b.classList.remove('is-active'); b.setAttribute('aria-pressed','false');
-        });
-        btn.classList.add('is-active'); btn.setAttribute('aria-pressed','true'); update();
-      }, passiveOpt);
-    });
-
-    const btn = $('btn-save-png');
-    const target = $('calc-capture');
+    const btn = $('btn-save-png'); const target = $('calc-capture');
     if(btn && target){
       btn.addEventListener('click', async ()=>{
-        const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background, transform: target.style.transform};
-        target.style.transform = 'none'; 
-        const goldEls = Array.from(document.querySelectorAll('.goldCycle'));
-        const prevClasses = goldEls.map(el => el.className);
-        goldEls.forEach(el => { el.classList.add('goldPlain'); });
+        const prev = {boxShadow: target.style.boxShadow, padding: target.style.padding, bg: target.style.background, transform: target.style.transform}; target.style.transform = 'none';
+        const goldEls = Array.from(document.querySelectorAll('.goldCycle')); const prevClasses = goldEls.map(el => el.className); goldEls.forEach(el => { el.classList.add('goldPlain'); });
         target.style.boxShadow='0 0 0 1px rgba(233,209,138,.18)'; target.style.padding='8px'; target.style.background='transparent';
-        try{
-          await ensureCanvas();
-          const canvas = await html2canvas(target,{
-            backgroundColor:'#0A1221', scale: Math.min(2, window.devicePixelRatio || 1), useCORS:true, logging:false
-          });
-          canvas.toBlob(blob=>{
-            if(blob){
-              const url = URL.createObjectURL(blob); const a = document.createElement('a');
-              a.href=url; a.download=`MOMO_calc_${new Date().toISOString().replace(/[:T]/g,'-').slice(0,19)}.png`;
-              document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 250);
-            }
-          });
-        }catch(e){ alert('匯出失敗，請再試一次'); }
-        finally{
-          target.style.boxShadow=prev.boxShadow; target.style.padding=prev.padding; target.style.background=prev.bg; target.style.transform=prev.transform;
-          const goldNow = Array.from(document.querySelectorAll('.goldPlain'));
-          goldNow.forEach((el,idx) => { el.className = prevClasses[idx] || el.className.replace(' goldPlain',''); });
+        try{ await ensureCanvas(); const canvas = await html2canvas(target,{ backgroundColor:'#0A1221', scale: Math.min(2, window.devicePixelRatio || 1), useCORS:true, logging:false }); canvas.toBlob(blob=>{ if(blob){ const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`MOMO_calc_${new Date().toISOString().replace(/[:T]/g,'-').slice(0,19)}.png`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 250); } }); }catch(e){ alert('匯出失敗，請再試一次'); }
+        finally{ target.style.boxShadow=prev.boxShadow; target.style.padding=prev.padding; target.style.background=prev.bg; target.style.transform=prev.transform; const goldNow = Array.from(document.querySelectorAll('.goldPlain')); goldNow.forEach((el,idx) => { el.className = prevClasses[idx] || el.className.replace(' goldPlain',''); }); }
+      }, passiveOpt);
+    }
+
+    // ===== 2. 複製連結功能 (新加入) =====
+    const btnShare = $('btn-share-link');
+    if(btnShare){
+      btnShare.addEventListener('click', async () => {
+        const params = new URLSearchParams();
+        params.set('principal', state.principal);
+        params.set('dist', state.dist);
+        const activeStrategyBtn = document.querySelector('.strategy-btn.is-active');
+        if(activeStrategyBtn) {
+            params.set('strategy', activeStrategyBtn.dataset.strategy);
+        }
+        const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          const originalText = btnShare.textContent;
+          btnShare.textContent = "已複製！✅";
+          btnShare.style.borderColor = "#06C755";
+          btnShare.style.color = "#06C755";
+          setTimeout(() => {
+            btnShare.textContent = originalText;
+            btnShare.style.borderColor = "";
+            btnShare.style.color = "";
+          }, 2000);
+        } catch (err) {
+          alert('複製失敗，請手動複製網址');
         }
       }, passiveOpt);
     }
+
     if (matchMedia('(max-width: 768px)').matches) document.body.classList.add('has-cta');
-    
-    // Scroll Reveal
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
-
-    // IG Lazy Load Optimization
+    const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } }); }, { threshold: 0.1 }); document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
     const igSection = document.getElementById('ig-section');
-    const loadIgScript = () => {
-        if(window.igScriptLoaded) return;
-        var js = document.createElement("script");
-        js.src = "https://embedsocial.com/cdn/ht.js"; js.id = "EmbedSocialHashtagScript";
-        document.head.appendChild(js); window.igScriptLoaded = true;
-    };
-    const igObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => { if (entry.isIntersecting) { loadIgScript(); igObserver.disconnect(); } });
-    }, { rootMargin: "200px" });
-    if(igSection) igObserver.observe(igSection);
+    const loadIgScript = () => { if(window.igScriptLoaded) return; var js = document.createElement("script"); js.src = "https://embedsocial.com/cdn/ht.js"; js.id = "EmbedSocialHashtagScript"; document.head.appendChild(js); window.igScriptLoaded = true; };
+    const igObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { loadIgScript(); igObserver.disconnect(); } }); }, { rootMargin: "200px" }); if(igSection) igObserver.observe(igSection);
   }
 
-  function boot(){
-    initSEO(); // 初始化 SEO 內容
-    document.querySelectorAll('.block').forEach(mountBlock);
-    restore(); fromURL(); bindEvents(); update();
-  }
+  function boot(){ initSEO(); document.querySelectorAll('.block').forEach(mountBlock); restore(); fromURL(); bindEvents(); update(); }
   document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
   </script>
 
   <script src="./assets/tools-config.js"></script>
   <script src="./assets/tools-render.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function(){
-      if (window.MOMO_TOOLS && typeof MOMO_TOOLS.initHomeSection === 'function') { MOMO_TOOLS.initHomeSection(); }
-    });
+    document.addEventListener('DOMContentLoaded', function(){ if (window.MOMO_TOOLS && typeof MOMO_TOOLS.initHomeSection === 'function') { MOMO_TOOLS.initHomeSection(); } });
   </script>
 </body>
 </html>
