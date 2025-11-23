@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基金戰情室 - 中央控制台</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <style>
+        :root { --primary: #2563eb; --success: #059669; --bg: #f1f5f9; --text: #1e293b; --info-bg: #eff6ff; --info-text: #1e40af; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 850px; margin: 0 auto; }
+        
+        h1 { text-align: center; color: #334155; margin-bottom: 20px; font-size: 1.8rem; }
+        
+        /* SOP 說明區塊樣式 */
+        .sop-card {
+            background: white; border-radius: 12px; padding: 25px; margin-bottom: 30px; 
+            border-left: 5px solid var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .sop-title { font-size: 1.2rem; font-weight: bold; color: var(--text); margin-bottom: 15px; display: flex; align-items: center; }
+        .sop-list { margin: 0; padding-left: 25px; color: #475569; line-height: 1.8; }
+        .sop-list li { margin-bottom: 8px; }
+        .highlight { color: #d97706; font-weight: bold; background: #fffbeb; padding: 2px 6px; border-radius: 4px; }
+        .link-text { color: var(--primary); text-decoration: none; font-weight: bold; cursor: pointer; }
+        
+        /* 功能卡片樣式 */
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .card-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; color: #334155; }
+        .hint { font-size: 0.9rem; color: #64748b; margin-bottom: 15px; display: block; line-height: 1.5; }
+        
+        /* 按鈕與輸入框 */
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; }
+        .btn-update { background: var(--primary); }
+        .btn-update:hover { background: #1d4ed8; }
+        .btn-upload { background: var(--success); }
+        .btn-upload:hover { background: #047857; }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        input[type="file"] { display: block; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; cursor: pointer; }
+        input[type="file"]:hover { border-color: var(--success); background: #f0fdf4; }
+
+        /* 狀態顯示 */
+        .status-box { margin-top: 15px; padding: 15px; border-radius: 8px; font-size: 0.9rem; white-space: pre-wrap; display: none; line-height: 1.6; }
+        .status-loading { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .status-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .status-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        /* 分隔線 */
+        hr { border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+<h1>🎛️ 基金資料庫控制台</h1>
+
+<div class="sop-card">
+    <div class="sop-title">📘 新增基金標準流程 (SOP)</div>
+    <ol class="sop-list">
+        <li>
+            <b>設定資料：</b>開啟 <a href="https://docs.google.com/spreadsheets/d/1hnk0iEVQv9NdXns_PZ0IGdc3WgkbbqoJs0Zw1EvLWl4/edit#gid=0" target="_blank" class="link-text">Google Sheet</a> 的 <span class="highlight">Config</span> 分頁，在最下方新增一行，填入該基金的 <b>代號、名稱、網址</b>。
+        </li>
+        <li>
+            <b>準備舊檔：</b>整理一個 Excel 檔案，將該基金過去的歷史淨值貼上去。<br>
+            ⚠️ <b>重要規則：</b>
+            <ul>
+                <li>工作表名稱 (Sheet Name) 必須等於 <span class="highlight">基金名稱</span>。</li>
+                <li>內容格式：<b>A欄=日期</b>，<b>B欄=淨值</b>。</li>
+            </ul>
+        </li>
+        <li>
+            <b>執行上傳：</b>使用本網頁下方的 <b>「功能 B」</b>，選取該 Excel 檔案並上傳。系統會自動將舊資料寫入雲端資料庫。
+        </li>
+        <li>
+            <b>完成：</b>之後每日的自動排程就會接手更新這支新基金。
+        </li>
+    </ol>
+</div>
+
+<div class="card">
+    <div class="card-header">🚀 功能 A：手動觸發更新</div>
+    <span class="hint">
+        這是您的「遙控器」。點擊後會命令 Google 後端立即執行一次「每日更新流程」 (抓取所有基金最近 30 天淨值並合併)。<br>
+        <i>(平常每日下午 5-6 點會自動執行，無需手動按)</i>
+    </span>
+    <button id="btn-manual" class="btn btn-update">立即執行更新</button>
+    <div id="status-manual" class="status-box"></div>
+</div>
+
+<div class="card">
+    <div class="card-header">📂 功能 B：上傳/補齊 歷史資料</div>
+    <span class="hint">
+        當您<b>新增基金</b>或<b>想補齊舊資料</b>時使用。<br>
+        請選擇符合 SOP 格式要求的 Excel 檔案：
+    </span>
+    <input type="file" id="file-input" accept=".xlsx, .xls">
+    <button id="btn-upload" class="btn btn-upload" disabled>讀取 Excel 並寫入資料庫</button>
+    <div id="status-upload" class="status-box"></div>
+</div>
+
+<div style="text-align: center; margin-top: 30px; color: #94a3b8; font-size: 0.8rem;">
+    Fund Manager System V26 • Powered by Google Apps Script
+</div>
+
+<script>
+    // ▼▼▼ 設定區 ▼▼▼
+    const API_URL = "https://script.google.com/macros/s/AKfycbwO6P2z-o4sfG0daX5aGUY0JdSiBQUA_rj_oKdyuhoGRoClJe3PDir8VxbEiHaf9egIxA/exec";
+    // ▲▲▲▲▲▲▲▲▲▲▲
+
+    // --- 功能 A: 手動更新 ---
+    const btnManual = document.getElementById('btn-manual');
+    const statusManual = document.getElementById('status-manual');
+
+    btnManual.addEventListener('click', async () => {
+        btnManual.disabled = true;
+        btnManual.innerText = "⏳ 正在連線後端更新...";
+        showStatus(statusManual, "系統正在抓取最新淨值並合併，請稍候約 20-40 秒...", "loading");
+
+        try {
+            const response = await fetch(`${API_URL}?op=manual_update`);
+            const json = await response.json();
+
+            if (json.status === "success") {
+                showStatus(statusManual, "✅ " + json.message + "\n(詳細內容請查看您的 Email 通知)", "success");
+                btnManual.innerText = "更新完成";
+            } else {
+                throw new Error(json.message || "未知錯誤");
+            }
+        } catch (err) {
+            showStatus(statusManual, "❌ 更新失敗: " + err.message, "error");
+            btnManual.innerText = "重試";
+            btnManual.disabled = false;
+        }
+    });
+
+    // --- 功能 B: 上傳歷史檔 ---
+    const fileInput = document.getElementById('file-input');
+    const btnUpload = document.getElementById('btn-upload');
+    const statusUpload = document.getElementById('status-upload');
+    let excelData = null;
+
+    // 1. 讀取 Excel
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            try {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                excelData = workbook;
+                btnUpload.disabled = false;
+                btnUpload.innerText = `準備上傳 (共 ${workbook.SheetNames.length} 個分頁)`;
+                showStatus(statusUpload, `已讀取檔案，包含以下基金分頁：\n${workbook.SheetNames.join(', ')}`, "loading");
+            } catch (err) {
+                showStatus(statusUpload, "❌ 檔案讀取失敗，請確認是有效的 Excel 檔。", "error");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    // 2. 解析並上傳
+    btnUpload.addEventListener('click', async () => {
+        if (!excelData) return;
+        btnUpload.disabled = true;
+        btnUpload.innerText = "⏳ 正在處理資料並上傳...";
+        
+        try {
+            let historyMap = new Map();
+            let fundNames = [];
+
+            // 解析每個 Sheet
+            excelData.SheetNames.forEach(sheetName => {
+                const fundName = sheetName.trim();
+                fundNames.push(fundName);
+                const sheet = excelData.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                if (json.length < 2) return;
+
+                for (let i = 1; i < json.length; i++) {
+                    const row = json[i];
+                    if (!row || row.length < 2) continue;
+                    
+                    let dVal = row[0], nVal = row[1];
+                    if (dVal == null || nVal == null) continue;
+
+                    // 日期標準化
+                    let dateStr = "";
+                    if (typeof dVal === 'number') {
+                        const d = XLSX.SSF.parse_date_code(dVal);
+                        dateStr = `${d.y}/${String(d.m).padStart(2,'0')}/${String(d.d).padStart(2,'0')}`;
+                    } else {
+                        dateStr = String(dVal).trim().replace(/-/g, '/');
+                    }
+
+                    if (!historyMap.has(dateStr)) historyMap.set(dateStr, { "日期": dateStr });
+                    historyMap.get(dateStr)[fundName] = nVal;
+                }
+            });
+
+            // 轉換為二維陣列
+            let headers = ["日期", ...fundNames];
+            let sheetRows = [headers];
+            let sortedDates = Array.from(historyMap.keys()).sort((a, b) => new Date(b) - new Date(a)); // 新到舊
+            
+            sortedDates.forEach(dateStr => {
+                let rowObj = historyMap.get(dateStr);
+                let row = [dateStr];
+                for (let k = 1; k < headers.length; k++) {
+                    row.push(rowObj[headers[k]] || "");
+                }
+                sheetRows.push(row);
+            });
+
+            showStatus(statusUpload, `正在上傳 ${sheetRows.length} 筆數據至雲端資料庫...`, "loading");
+
+            // POST
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    op: 'save_database',
+                    data: sheetRows
+                })
+            });
+            
+            const json = await response.json();
+
+            if (json.status === "success") {
+                showStatus(statusUpload, "✅ " + json.message + "\n(舊資料已成功與雲端資料庫合併)", "success");
+                btnUpload.innerText = "上傳成功";
+            } else {
+                throw new Error(json.message);
+            }
+
+        } catch (err) {
+            console.error(err);
+            showStatus(statusUpload, "❌ 上傳失敗: " + err.message, "error");
+            btnUpload.innerText = "重試";
+            btnUpload.disabled = false;
+        }
+    });
+
+    // 輔助顯示函式
+    function showStatus(element, msg, type) {
+        element.style.display = 'block';
+        element.innerText = msg;
+        element.className = 'status-box status-' + type;
+    }
+</script>
+
+</body>
+</html>
