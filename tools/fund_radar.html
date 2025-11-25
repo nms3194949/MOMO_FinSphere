@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基金戰情室 V37 (Pro+)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { 
+            --bg: #0f172a; 
+            --card-bg: #1e293b; 
+            --modal-bg: #1e293b;
+            --text: #f1f5f9; 
+            --red: #ef4444; 
+            --yellow: #eab308; 
+            --green: #10b981; 
+            --blue: #3b82f6;
+            --purple: #a855f7;
+            --orange: #f97316;
+            --gray: #64748b;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        h1 { text-align: center; font-weight: 800; margin-bottom: 5px; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; color: transparent; font-size: 1.8rem; letter-spacing: -0.5px; }
+        .subtitle { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px; font-weight: 500;}
+
+        /* 狀態列 */
+        .status-bar { text-align: center; font-size: 0.8rem; color: #64748b; margin-bottom: 15px; min-height: 20px;}
+
+        /* 篩選按鈕列 (Sticky) */
+        .filter-wrapper { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 10px 0; margin: 0 -15px; padding-left: 15px; }
+        .filter-container { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-right: 15px; }
+        .filter-container::-webkit-scrollbar { display: none; }
+        
+        .filter-btn { 
+            background: rgba(30, 41, 59, 0.8); color: #94a3b8; border: 1px solid #334155; backdrop-filter: blur(4px);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; white-space: nowrap; cursor: pointer; transition: all 0.2s; font-weight: 500;
+        }
+        .filter-btn.active { background: var(--blue); color: white; border-color: var(--blue); font-weight: bold; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); transform: translateY(-1px); }
+        .filter-btn:active { transform: scale(0.95); }
+
+        /* 網格與卡片 */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; padding-top: 5px; }
+        
+        .fund-card { 
+            background: var(--card-bg); border-radius: 16px; padding: 18px; 
+            border: 1px solid #334155; position: relative; transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; flex-direction: column; gap: 12px; cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .fund-card:active { transform: scale(0.98); }
+        
+        /* 燈號特效 */
+        .status-buy { border-left: 4px solid var(--red); background: linear-gradient(135deg, rgba(239,68,68,0.05) 0%, var(--card-bg) 100%); } 
+        .status-watch { border-left: 4px solid var(--yellow); } 
+        .status-safe { border-left: 4px solid var(--green); opacity: 0.85; } 
+
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .fund-name { font-weight: 700; font-size: 1.05rem; line-height: 1.4; color: #e2e8f0; flex: 1; margin-right: 10px; }
+        .strategy-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; background: rgba(0,0,0,0.2); font-weight: 600; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .data-item { display: flex; flex-direction: column; }
+        .lbl { font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px; letter-spacing: 0.5px; }
+        .val { font-size: 1.2rem; font-weight: 700; font-family: 'Roboto Mono', monospace; letter-spacing: -0.5px; }
+        .dd-val.alert { color: var(--red); text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        .dd-val.warn { color: var(--yellow); }
+
+        .target-bar { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .gap-close { color: var(--red); font-weight: bold; animation: pulse 2s infinite; }
+        .gap-far { color: var(--green); font-weight: 500; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        .chart-container { height: 60px; width: 100%; pointer-events: none; }
+
+        /* 懸浮按鈕 */
+        .fab-container { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 90; }
+        .fab { 
+            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); border: none; color: white; transition: transform 0.2s;
+        }
+        .fab:active { transform: scale(0.9); }
+        .fab-refresh { background: var(--blue); }
+        .fab-update { background: var(--red); }
+
+        #loading { text-align: center; margin-top: 50px; color: #94a3b8; display: none; }
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; background: rgba(255,255,255,0.02); border-radius: 12px; border: 2px dashed #334155; }
+
+        /* 通用 Modal 樣式 */
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            z-index: 100; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: var(--modal-bg); width: 90%; max-width: 600px; max-height: 90vh;
+            border-radius: 20px; padding: 20px; border: 1px solid #475569;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex; flex-direction: column; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .modal-backdrop.show .modal-content { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .modal-title { font-size: 1.2rem; font-weight: bold; color: var(--text); }
+        .btn-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+        
+        /* 詳情視窗樣式 */
+        .big-chart-box { height: 300px; width: 100%; margin-bottom: 20px; }
+        .modal-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .modal-info-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; text-align: center; }
+        .modal-lbl { font-size: 0.8rem; color: #94a3b8; display: block; margin-bottom: 5px; }
+        .modal-val { font-size: 1.1rem; font-weight: bold; font-family: 'Roboto Mono'; }
+        .modal-desc { font-size: 0.85rem; color: #94a3b8; line-height: 1.6; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border-left: 3px solid var(--blue); }
+
+        /* 更新報告樣式 */
+        .result-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .r-name { font-weight: bold; color: #e2e8f0; font-size: 0.95rem; }
+        .r-info { text-align: right; }
+        .r-date { font-size: 0.75rem; color: #94a3b8; display: block; }
+        .r-nav { font-family: 'Roboto Mono'; font-weight: bold; color: var(--green); font-size: 1rem; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎯 基金戰情室 <span style="font-size:0.5em; vertical-align:middle; opacity:0.7; background:#334155; padding:2px 6px; border-radius:4px;">V37 Pro</span></h1>
+    <p class="subtitle">雙核策略監控 • 智能詳情分析</p>
+
+    <div id="status-display" class="status-bar"></div>
+
+    <div class="filter-wrapper">
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="setFilter('ALL')">全部</button>
+            <button class="filter-btn" onclick="setFilter('SIGNAL')" style="color:#f87171; border-color:#ef4444">🚨 訊號區</button>
+            <button class="filter-btn" onclick="setFilter('BOND')">🟦 債券 (乖離)</button>
+            <button class="filter-btn" onclick="setFilter('EQUITY')">🟧 股票 (回撤)</button>
+            <button class="filter-btn" onclick="setFilter('BALANCED')">🟪 平衡</button>
+        </div>
+    </div>
+
+    <div id="loading">📡 正在連線資料庫...</div>
+    <div id="dashboard" class="grid"></div>
+</div>
+
+<div class="fab-container">
+    <button class="fab fab-update" onclick="manualUpdate()" title="觸發後端更新">🚀</button>
+    <button class="fab fab-refresh" onclick="forceReload()" title="強制刷新">↻</button>
+</div>
+
+<div id="detail-modal" class="modal-backdrop" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title" id="m-title">基金名稱</div>
+            <button class="btn-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-info" id="m-info-box"></div>
+        <div class="big-chart-box">
+            <canvas id="big-chart"></canvas>
+        </div>
+        <div class="modal-desc" id="m-strategy-desc">策略說明...</div>
+    </div>
+</div>
+
+<div id="update-result-modal" class="modal-backdrop" onclick="closeUpdateModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 80vh;">
+        <div class="modal-header">
+            <div class="modal-title">🚀 更新結果報告</div>
+            <button class="btn-close" onclick="closeUpdateModal()">×</button>
+        </div>
+        <div style="padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; margin-bottom: 15px; color: #10b981; font-size: 0.9rem;" id="update-msg">
+            狀態訊息...
+        </div>
+        <div class="result-list" id="update-list" style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto;">
+            </div>
+        <button onclick="closeUpdateModal()" style="margin-top:20px; width:100%; padding:12px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">確認並刷新</button>
+    </div>
+</div>
+
+<script>
+    // ▼▼▼ Google Apps Script 網址 (已自動填入) ▼▼▼
+    const API_URL = "https://script.google.com/macros/s/AKfycbwYVirIuGO475Kb63z4jTKKgSPINSqy9jM3wPaQPMfa0DXzpdDybCXpoiqfPmeveb7F0g/exec"; 
+    // ▲▲▲▲▲▲▲▲▲▲▲
+
+    const MA_DAYS = 240; 
+    const CACHE_KEY = 'fund_radar_v37_data'; // 更新快取 Key 以避免舊格式衝突
+    
+    let globalFunds = [];
+    let currentFilter = 'ALL';
+    let bigChartInstance = null; 
+
+    const STRATEGIES = {
+        BOND: { name: "債券領息", color: "#3b82f6", type: "BOND", useBias: true, watch: -0.04, buy: -0.07, desc: "債券看「年線乖離」。當價格跌破年線一定幅度，通常是超跌，適合領息族進場。" },
+        BALANCED: { name: "平衡穩健", color: "#a855f7", type: "BALANCED", useBias: false, watch: -0.08, buy: -0.15, desc: "平衡型波動適中，採用「波段回撤」策略，抓中型修正波段。" },
+        EQUITY: { name: "股票積極", color: "#f97316", type: "EQUITY", useBias: false, watch: -0.15, buy: -0.25, desc: "股票型波動大，需等待「大幅回撤」至恐慌區間再出手，避免接刀。" }
+    };
+
+    async function init() {
+        const dashboard = document.getElementById('dashboard');
+        const loading = document.getElementById('loading');
+        const statusDisplay = document.getElementById('status-display');
+
+        const cached = localStorage.getItem(CACHE_KEY);
+        let hasCache = false;
+        
+        if (cached) {
+            try {
+                const json = JSON.parse(cached);
+                if (json.data && json.timestamp) {
+                    processData(json.headers, json.data);
+                    renderDashboard();
+                    hasCache = true;
+                    const minDiff = Math.floor((Date.now() - json.timestamp) / 60000);
+                    statusDisplay.innerHTML = `⚡ 快取資料 (${minDiff}m 前) • <span style="animation:pulse 1s infinite; color:var(--blue)">背景更新中...</span>`;
+                }
+            } catch (e) { console.error("Cache Error", e); }
+        }
+
+        if (!hasCache) {
+            loading.style.display = 'block';
+            statusDisplay.innerText = '';
+        }
+
+        try {
+            const res = await fetch(`${API_URL}?op=get_db_monitor`);
+            const json = await res.json();
+            
+            if (json.error) throw new Error(json.error);
+
+            json.timestamp = Date.now();
+            localStorage.setItem(CACHE_KEY, JSON.stringify(json));
+
+            processData(json.headers, json.data);
+            renderDashboard();
+            
+            loading.style.display = 'none';
+            statusDisplay.innerHTML = `✅ 資料已更新 • ${new Date().toLocaleTimeString()}`;
+
+        } catch (err) {
+            loading.style.display = 'none';
+            if (!hasCache) {
+                dashboard.innerHTML = `<div class="empty-state">❌ 連線失敗: ${err.message}</div>`;
+            } else {
+                statusDisplay.innerHTML = `⚠️ 更新失敗 (顯示舊資料) • ${err.message}`;
+            }
+        }
+    }
+
+    function processData(headers, rows) {
+        let cleanRows = rows.map(row => {
+            let ts = Date.parse(row[0]);
+            return isNaN(ts) ? null : { ts: ts, date: row[0], data: row };
+        }).filter(r => r).sort((a, b) => a.ts - b.ts);
+
+        let tempFunds = [];
+
+        for (let i = 1; i < headers.length; i++) {
+            let name = headers[i];
+            if(name.includes("006208") || name.includes("SPY")) continue; 
+
+            let history = [];
+            let maxNav = 0;
+            
+            cleanRows.forEach(item => {
+                let val = parseFloat(item.data[i]);
+                if (!isNaN(val)) {
+                    history.push(val);
+                    if (val > maxNav) maxNav = val;
+                }
+            });
+
+            if (history.length > 0) {
+                let currentNav = history[history.length - 1];
+                let dd = (currentNav - maxNav) / maxNav;
+                let maValue = null, bias = null;
+                let maSeries = [];
+                
+                for(let k=0; k<history.length; k++) {
+                    if(k < MA_DAYS - 1) {
+                        maSeries.push(null);
+                    } else {
+                        let sum = 0;
+                        for(let m=0; m<MA_DAYS; m++) sum += history[k-m];
+                        maSeries.push(sum / MA_DAYS);
+                    }
+                }
+                
+                if (history.length >= MA_DAYS) {
+                    maValue = maSeries[maSeries.length-1];
+                    bias = (currentNav - maValue) / maValue;
+                } else { bias = 0; }
+                
+                let strategy = STRATEGIES.EQUITY;
+                if (name.includes("債") || name.includes("房貸") || name.includes("收益")) strategy = STRATEGIES.BOND;
+                else if (name.includes("多重") || name.includes("平衡")) strategy = STRATEGIES.BALANCED;
+
+                let gap = 0, monitorValue = 0;
+                if (strategy.useBias) {
+                    monitorValue = bias;
+                    gap = bias - strategy.buy; 
+                } else {
+                    monitorValue = dd;
+                    gap = dd - strategy.buy;
+                }
+
+                tempFunds.push({
+                    name, nav: currentNav, high: maxNav, 
+                    dd, bias, monitorValue, strategy, 
+                    history: history, maSeries: maSeries, gap: gap 
+                });
+            }
+        }
+        tempFunds.sort((a, b) => a.gap - b.gap);
+        globalFunds = tempFunds;
+    }
+
+    function setFilter(type) {
+        currentFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderDashboard();
+    }
+
+    function renderDashboard() {
+        const dashboard = document.getElementById('dashboard');
+        dashboard.innerHTML = '';
+
+        let displayFunds = globalFunds.filter(f => {
+            if (currentFilter === 'ALL') return true;
+            if (currentFilter === 'SIGNAL') return f.monitorValue <= f.strategy.watch;
+            return f.strategy.type === currentFilter;
+        });
+
+        if (displayFunds.length === 0) {
+            dashboard.innerHTML = `<div class="empty-state">📭 此分類目前沒有資料</div>`;
+            return;
+        }
+
+        displayFunds.forEach((f) => createCard(dashboard, f));
+    }
+
+    function createCard(container, f) {
+        let ddPct = (f.dd * 100).toFixed(1) + '%';
+        let biasPct = f.bias !== null ? (f.bias * 100).toFixed(1) + '%' : 'N/A';
+        
+        let mainLabel = f.strategy.useBias ? "年線乖離" : "波段回撤";
+        let mainValText = f.strategy.useBias ? biasPct : ddPct;
+        
+        let targetLabel = f.strategy.useBias ? "目標乖離" : "目標回撤";
+        let targetVal = (f.strategy.buy * 100).toFixed(0) + '%';
+        
+        let statusClass = 'status-safe';
+        let msg = `距離 ${Math.abs(f.gap * 100).toFixed(1)}%`;
+        let gapClass = 'gap-far';
+
+        if (f.monitorValue <= f.strategy.buy) {
+            statusClass = 'status-buy';
+            msg = `🚨 已達標！`;
+            gapClass = 'gap-close';
+        } else if (f.monitorValue <= f.strategy.watch) {
+            statusClass = 'status-watch';
+            msg = `⚠️ 觀察中`;
+            gapClass = 'gap-close';
+        }
+
+        let card = document.createElement('div');
+        card.className = `fund-card ${statusClass}`;
+        card.onclick = () => openModal(f);
+
+        let miniChartId = 'chart-' + Math.random().toString(36).substr(2, 9);
+        let miniHistory = f.history.slice(-60);
+
+        card.innerHTML = `
+            <div class="card-top">
+                <div class="fund-name">${f.name}</div>
+                <div class="strategy-tag" style="color:${f.strategy.color}; border-color:${f.strategy.color}">
+                    ${f.strategy.name}
+                </div>
+            </div>
+            
+            <div class="data-grid">
+                <div class="data-item">
+                    <span class="lbl" style="color:${f.strategy.color}">${mainLabel}</span>
+                    <span class="val dd-val ${f.monitorValue <= f.strategy.watch ? 'warn' : ''} ${f.monitorValue <= f.strategy.buy ? 'alert' : ''}">${mainValText}</span>
+                </div>
+                <div class="data-item" style="align-items:flex-end">
+                    <span class="lbl">最新淨值</span>
+                    <span class="val" style="font-size:1.1rem; color:#fff">$${f.nav}</span>
+                </div>
+            </div>
+
+            <div class="target-bar">
+                <span style="color:#94a3b8; font-size:0.8rem">${targetLabel}: <b style="color:${f.strategy.color}">${targetVal}</b></span>
+                <span class="${gapClass}">${msg}</span>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="${miniChartId}"></canvas>
+            </div>
+        `;
+        container.appendChild(card);
+        drawMiniChart(miniChartId, miniHistory, f.strategy.color, f.monitorValue <= f.strategy.watch);
+    }
+
+    function drawMiniChart(id, data, color, isAlert) {
+        const ctx = document.getElementById(id).getContext('2d');
+        let lineColor = isAlert ? '#ef4444' : color;
+        let lineWidth = isAlert ? 2.5 : 2;
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map((_, i) => i),
+                datasets: [{ data: data, borderColor: lineColor, borderWidth: lineWidth, pointRadius: 0, fill: false, tension: 0.3 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: { x: { display: false }, y: { display: false } },
+                layout: { padding: 5 }
+            }
+        });
+    }
+
+    // Modal Functions
+    function openModal(f) {
+        const modal = document.getElementById('detail-modal');
+        document.getElementById('m-title').innerText = f.name;
+        document.getElementById('m-strategy-desc').innerText = `💡 ${f.strategy.desc} \n目前設定買點：${(f.strategy.buy*100).toFixed(0)}%`;
+
+        let ddPct = (f.dd * 100).toFixed(2) + '%';
+        let biasPct = f.bias !== null ? (f.bias * 100).toFixed(2) + '%' : '-';
+        
+        let infoHtml = `
+            <div class="modal-info-item"><span class="modal-lbl">最新淨值</span><span class="modal-val" style="color:white">$${f.nav}</span></div>
+            <div class="modal-info-item"><span class="modal-lbl">年線乖離</span><span class="modal-val" style="color:${f.strategy.useBias?f.strategy.color:''}">${biasPct}</span></div>
+            <div class="modal-info-item"><span class="modal-lbl">波段回撤</span><span class="modal-val" style="color:${!f.strategy.useBias?f.strategy.color:''}">${ddPct}</span></div>
+            <div class="modal-info-item"><span class="modal-lbl">近一年高點</span><span class="modal-val">$${f.high}</span></div>
+        `;
+        document.getElementById('m-info-box').innerHTML = infoHtml;
+        drawBigChart(f);
+        modal.classList.add('show');
+    }
+
+    function closeModal(e) {
+        if(e && e.target !== document.getElementById('detail-modal') && e.target.className !== 'btn-close') return;
+        document.getElementById('detail-modal').classList.remove('show');
+    }
+
+    function drawBigChart(f) {
+        const ctx = document.getElementById('big-chart').getContext('2d');
+        if(bigChartInstance) bigChartInstance.destroy();
+
+        let days = 250;
+        let startIdx = Math.max(0, f.history.length - days);
+        let prices = f.history.slice(startIdx);
+        let maLine = f.maSeries.slice(startIdx);
+        let labels = prices.map((_,i) => i);
+
+        let datasets = [{
+            label: '淨值', data: prices, borderColor: '#e2e8f0', borderWidth: 2, pointRadius: 0, tension: 0.1
+        }];
+
+        if(f.strategy.useBias) {
+            datasets.push({ label: '年線 (240MA)', data: maLine, borderColor: '#eab308', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 });
+            let buyTargetLine = maLine.map(v => v ? v * (1 + f.strategy.buy) : null);
+            datasets.push({ label: `買點 (${f.strategy.buy*100}%)`, data: buyTargetLine, borderColor: '#10b981', borderWidth: 1, pointRadius: 0 });
+        } else {
+            let buyTargetLine = prices.map(p => f.high * (1 + f.strategy.buy));
+            datasets.push({ label: `目標價 (${f.strategy.buy*100}%)`, data: buyTargetLine, borderColor: '#10b981', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 });
+        }
+
+        bigChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { labels: { color: '#94a3b8' } }, tooltip: { mode: 'index', intersect: false } },
+                scales: { x: { display: false }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } }
+            }
+        });
+    }
+
+    // 更新結果 Modal Functions
+    function closeUpdateModal(e) {
+        if(e && e.target !== document.getElementById('update-result-modal') && e.target.className !== 'btn-close') return;
+        document.getElementById('update-result-modal').classList.remove('show');
+        forceReload(); 
+    }
+
+    function showUpdateResults(msg, details) {
+        const modal = document.getElementById('update-result-modal');
+        const listContainer = document.getElementById('update-list');
+        const msgBox = document.getElementById('update-msg');
+
+        msgBox.innerText = msg;
+        listContainer.innerHTML = '';
+
+        if (!details || details.length === 0) {
+            listContainer.innerHTML = '<div style="text-align:center; color:#64748b; padding:20px;">本次沒有擷取到新資料</div>';
+        } else {
+            details.forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <div class="r-name">${item.name}</div>
+                    <div class="r-info">
+                        <span class="r-nav">$${item.nav}</span>
+                        <span class="r-date">${item.date}</span>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+        modal.classList.add('show');
+    }
+
+    async function manualUpdate() {
+        if(!confirm("⚠️ 確定要手動觸發後端更新嗎？\n\n這會叫喚 Google 爬蟲去抓取最新股價，過程約需 15~30 秒。")) return;
+
+        const loading = document.getElementById('loading');
+        const updateBtn = document.querySelector('.fab-update');
+        
+        loading.style.display = 'block';
+        loading.innerHTML = `<div style="font-size: 1.2rem;">📡 正在連線爬蟲...</div><div style="font-size:0.9rem; color:#94a3b8">請稍候，正在收集最新淨值</div>`;
+        
+        if(updateBtn) { updateBtn.style.opacity = "0.5"; updateBtn.style.pointerEvents = "none"; }
+
+        try {
+            const res = await fetch(`${API_URL}?op=manual_update`);
+            const json = await res.json();
+            loading.style.display = 'none';
+
+            if (json.status === "success") {
+                showUpdateResults(json.message, json.details);
+            } else {
+                throw new Error(json.message || "未知錯誤");
+            }
+
+        } catch (err) {
+            loading.style.display = 'none';
+            alert(`❌ 更新失敗：\n${err.message}`);
+        } finally {
+            if(updateBtn) { updateBtn.style.opacity = "1"; updateBtn.style.pointerEvents = "auto"; }
+        }
+    }
+
+    function forceReload() {
+        localStorage.removeItem(CACHE_KEY); 
+        init();
+    }
+
+    init();
+</script>
+
+</body>
+</html>
