@@ -40,5 +40,23 @@ window.MOMO_TOOLS_CONFIG = [
     href: "https://warrant-render-proxy-1.onrender.com/",
     external: true,
     showOnHome: false          // 例如：只在工具總覽列出，不出現在首頁
+  },
+  {
+    id: "fund_radar",
+    category: "fund",
+    title: "基金監控雷達",
+    desc: "監控基金變化，找到甜蜜買點。",
+    href: "/MOMO_FinSphere/tools/fund_radar.html",
+    external: true,
+    showOnHome: false          // 例如：只在工具總覽列出，不出現在首頁
+  },
+  {
+    id: "etf-dashboard",
+    category: "ETF",
+    title: "台股ETF監控",
+    desc: "監控ETF報酬，找出最佳投資點。",
+    href: "/MOMO_FinSphere/tools/etf-dashboard.html",
+    external: true,
+    showOnHome: false          // 例如：只在工具總覽列出，不出現在首頁
   }
 ];
