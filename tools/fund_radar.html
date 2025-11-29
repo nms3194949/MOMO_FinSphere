@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基金戰情室 V37 (Pro+)</title>
+    <title>基金戰情室 V43 (Fix)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -56,9 +56,45 @@
         .status-watch { border-left: 4px solid var(--yellow); } 
         .status-safe { border-left: 4px solid var(--green); opacity: 0.85; } 
 
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .fund-name { font-weight: 700; font-size: 1.05rem; line-height: 1.4; color: #e2e8f0; flex: 1; margin-right: 10px; }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+        .fund-name { font-weight: 700; font-size: 1.05rem; line-height: 1.4; color: #e2e8f0; flex: 1; margin-right: 4px; }
+        .card-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
         .strategy-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; background: rgba(0,0,0,0.2); font-weight: 600; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+
+        /* 趨勢徽章 */
+        .trend-badge {
+            font-size: 0.7rem;
+            padding: 2px 7px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.6);
+            color: #e5e7eb;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .trend-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: #9ca3af;
+        }
+        .trend-bull     { border-color: #22c55e; color:#bbf7d0; }
+        .trend-bull .trend-dot { background:#22c55e; }
+        .trend-bear     { border-color: #ef4444; color:#fecaca; }
+        .trend-bear .trend-dot { background:#ef4444; }
+        .trend-neutral { border-color: #eab308; color:#facc15; }
+        .trend-neutral .trend-dot { background:#eab308; }
+
+        /* 缺漏資料警示 ICON */
+        .data-warning {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+        }
 
         .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .data-item { display: flex; flex-direction: column; }
@@ -106,7 +142,7 @@
         .modal-backdrop.show .modal-content { transform: translateY(0); }
 
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-title { font-size: 1.2rem; font-weight: bold; color: var(--text); }
+        .modal-title { font-size: 1.2rem; font-weight: bold; color: var(--text); display:flex; align-items:center; gap:6px; }
         .btn-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; padding: 5px; }
         
         /* 詳情視窗樣式 */
@@ -132,7 +168,7 @@
 <body>
 
 <div class="container">
-    <h1>🎯 基金戰情室 <span style="font-size:0.5em; vertical-align:middle; opacity:0.7; background:#334155; padding:2px 6px; border-radius:4px;">V37 Pro</span></h1>
+    <h1>🎯 基金戰情室 <span style="font-size:0.5em; vertical-align:middle; opacity:0.7; background:#334155; padding:2px 6px; border-radius:4px;">V43 Fix</span></h1>
     <p class="subtitle">雙核策略監控 • 智能詳情分析</p>
 
     <div id="status-display" class="status-bar"></div>
@@ -186,12 +222,15 @@
 </div>
 
 <script>
-    // ▼▼▼ Google Apps Script 網址 (已自動填入) ▼▼▼
+    // ▼▼▼ Google Apps Script 網址 (請確認是否需要更新) ▼▼▼
     const API_URL = "https://script.google.com/macros/s/AKfycbwYVirIuGO475Kb63z4jTKKgSPINSqy9jM3wPaQPMfa0DXzpdDybCXpoiqfPmeveb7F0g/exec"; 
     // ▲▲▲▲▲▲▲▲▲▲▲
 
     const MA_DAYS = 240; 
-    const CACHE_KEY = 'fund_radar_v37_data'; // 更新快取 Key 以避免舊格式衝突
+    const MA_SHORT_DAYS = 60;
+    
+    // 🔥 【關鍵修改】 更新 Cache Key，強制瀏覽器捨棄舊的錯誤資料
+    const CACHE_KEY = 'fund_radar_v43_fix_data'; 
     
     let globalFunds = [];
     let currentFilter = 'ALL';
@@ -255,10 +294,11 @@
     }
 
     function processData(headers, rows) {
+        // rows: [ [date, f1, f2, ...], ... ]  (後端已保證給新的，但我們還是防呆處理一下)
         let cleanRows = rows.map(row => {
             let ts = Date.parse(row[0]);
             return isNaN(ts) ? null : { ts: ts, date: row[0], data: row };
-        }).filter(r => r).sort((a, b) => a.ts - b.ts);
+        }).filter(r => r).sort((a, b) => a.ts - b.ts); // 🔥 這裡保證資料由舊到新排序，方便計算 MA
 
         let tempFunds = [];
 
@@ -268,21 +308,23 @@
 
             let history = [];
             let maxNav = 0;
-            
+            let lastDate = null;
+
             cleanRows.forEach(item => {
                 let val = parseFloat(item.data[i]);
                 if (!isNaN(val)) {
                     history.push(val);
                     if (val > maxNav) maxNav = val;
+                    lastDate = item.date;
                 }
             });
 
             if (history.length > 0) {
                 let currentNav = history[history.length - 1];
                 let dd = (currentNav - maxNav) / maxNav;
-                let maValue = null, bias = null;
+
+                // 240MA 與乖離
                 let maSeries = [];
-                
                 for(let k=0; k<history.length; k++) {
                     if(k < MA_DAYS - 1) {
                         maSeries.push(null);
@@ -293,11 +335,58 @@
                     }
                 }
                 
+                let maValue = null, bias = null;
                 if (history.length >= MA_DAYS) {
                     maValue = maSeries[maSeries.length-1];
                     bias = (currentNav - maValue) / maValue;
                 } else { bias = 0; }
-                
+
+                // 60 日 MA 與短期 MA / LONG MA for 趨勢判斷
+                let ma60Series = [];
+                for(let k=0; k<history.length; k++) {
+                    if(k < MA_SHORT_DAYS - 1) {
+                        ma60Series.push(null);
+                    } else {
+                        let sum = 0;
+                        for(let m=0; m<MA_SHORT_DAYS; m++) sum += history[k-m];
+                        ma60Series.push(sum / MA_SHORT_DAYS);
+                    }
+                }
+
+                let maShort = null;
+                if (history.length >= 5) {
+                    let win = Math.min(MA_SHORT_DAYS, history.length);
+                    let sum = 0;
+                    for(let idx = history.length - win; idx < history.length; idx++) sum += history[idx];
+                    maShort = sum / win;
+                }
+                let maLong = (history.length >= MA_DAYS && maSeries[maSeries.length-1]) ? maSeries[maSeries.length-1] : null;
+
+                let trendLabel = "中性";
+                let trendClass = "trend-neutral";
+                if (maShort && maLong) {
+                    let diff = (maShort - maLong) / maLong;
+                    if (diff >= 0.02) {
+                        trendLabel = "多頭";
+                        trendClass = "trend-bull";
+                    } else if (diff <= -0.02) {
+                        trendLabel = "空頭";
+                        trendClass = "trend-bear";
+                    }
+                }
+
+                // 資料缺漏偵測：歷史點太少 或 超過 7 天沒新 NAV
+                let hasDataIssue = false;
+                let diffDays = null;
+                if (lastDate) {
+                    let lastDateObj = new Date(lastDate.replace(/-/g,"/"));
+                    let today = new Date();
+                    diffDays = Math.floor((today - lastDateObj) / (1000*60*60*24));
+                    if (diffDays > 7) hasDataIssue = true;
+                }
+                if (history.length < 10) hasDataIssue = true;
+
+                // 策略分類
                 let strategy = STRATEGIES.EQUITY;
                 if (name.includes("債") || name.includes("房貸") || name.includes("收益")) strategy = STRATEGIES.BOND;
                 else if (name.includes("多重") || name.includes("平衡")) strategy = STRATEGIES.BALANCED;
@@ -312,9 +401,24 @@
                 }
 
                 tempFunds.push({
-                    name, nav: currentNav, high: maxNav, 
-                    dd, bias, monitorValue, strategy, 
-                    history: history, maSeries: maSeries, gap: gap 
+                    name, 
+                    nav: currentNav, 
+                    high: maxNav, 
+                    dd, 
+                    bias, 
+                    monitorValue, 
+                    strategy, 
+                    history: history, 
+                    maSeries: maSeries,         // 240MA
+                    ma60Series: ma60Series,     // 60MA
+                    gap: gap,
+                    maShort,
+                    maLong,
+                    trendLabel,
+                    trendClass,
+                    hasDataIssue,
+                    lastDate,
+                    diffDays
                 });
             }
         }
@@ -378,11 +482,25 @@
         let miniChartId = 'chart-' + Math.random().toString(36).substr(2, 9);
         let miniHistory = f.history.slice(-60);
 
+        const trendText = f.trendLabel || '—';
+        const trendClass = f.trendClass || 'trend-neutral';
+
+        let warningIcon = '';
+        if (f.hasDataIssue) {
+            warningIcon = `<span class="data-warning" title="資料可能有缺漏或超過 7 天未更新">⚠</span>`;
+        }
+
         card.innerHTML = `
             <div class="card-top">
-                <div class="fund-name">${f.name}</div>
-                <div class="strategy-tag" style="color:${f.strategy.color}; border-color:${f.strategy.color}">
-                    ${f.strategy.name}
+                <div class="fund-name">${f.name}${warningIcon}</div>
+                <div class="card-top-right">
+                    <div class="strategy-tag" style="color:${f.strategy.color}; border-color:${f.strategy.color}">
+                        ${f.strategy.name}
+                    </div>
+                    <div class="trend-badge ${trendClass}">
+                        <span class="trend-dot"></span>
+                        <span>${trendText}</span>
+                    </div>
                 </div>
             </div>
             
@@ -432,17 +550,40 @@
     // Modal Functions
     function openModal(f) {
         const modal = document.getElementById('detail-modal');
-        document.getElementById('m-title').innerText = f.name;
+
+        let warningIcon = '';
+        if (f.hasDataIssue) {
+            warningIcon = `<span class="data-warning" title="資料可能有缺漏或超過 7 天未更新">⚠</span>`;
+        }
+
+        document.getElementById('m-title').innerHTML = `${f.name}${warningIcon ? ' ' + warningIcon : ''}`;
         document.getElementById('m-strategy-desc').innerText = `💡 ${f.strategy.desc} \n目前設定買點：${(f.strategy.buy*100).toFixed(0)}%`;
 
         let ddPct = (f.dd * 100).toFixed(2) + '%';
         let biasPct = f.bias !== null ? (f.bias * 100).toFixed(2) + '%' : '-';
-        
+
+        let trendText = f.trendLabel || '中性';
+        let trendColor = '#fde68a';
+        if (f.trendClass === 'trend-bull') trendColor = '#bbf7d0';
+        if (f.trendClass === 'trend-bear') trendColor = '#fecaca';
+
         let infoHtml = `
-            <div class="modal-info-item"><span class="modal-lbl">最新淨值</span><span class="modal-val" style="color:white">$${f.nav}</span></div>
-            <div class="modal-info-item"><span class="modal-lbl">年線乖離</span><span class="modal-val" style="color:${f.strategy.useBias?f.strategy.color:''}">${biasPct}</span></div>
-            <div class="modal-info-item"><span class="modal-lbl">波段回撤</span><span class="modal-val" style="color:${!f.strategy.useBias?f.strategy.color:''}">${ddPct}</span></div>
-            <div class="modal-info-item"><span class="modal-lbl">近一年高點</span><span class="modal-val">$${f.high}</span></div>
+            <div class="modal-info-item">
+                <span class="modal-lbl">最新淨值</span>
+                <span class="modal-val" style="color:white">$${f.nav}</span>
+            </div>
+            <div class="modal-info-item">
+                <span class="modal-lbl">年線乖離</span>
+                <span class="modal-val" style="color:${f.strategy.useBias?f.strategy.color:''}">${biasPct}</span>
+            </div>
+            <div class="modal-info-item">
+                <span class="modal-lbl">波段回撤</span>
+                <span class="modal-val" style="color:${!f.strategy.useBias?f.strategy.color:''}">${ddPct}</span>
+            </div>
+            <div class="modal-info-item">
+                <span class="modal-lbl">趨勢(60 vs 240)</span>
+                <span class="modal-val" style="color:${trendColor}">${trendText}</span>
+            </div>
         `;
         document.getElementById('m-info-box').innerHTML = infoHtml;
         drawBigChart(f);
@@ -461,20 +602,65 @@
         let days = 250;
         let startIdx = Math.max(0, f.history.length - days);
         let prices = f.history.slice(startIdx);
-        let maLine = f.maSeries.slice(startIdx);
+        let ma240 = f.maSeries ? f.maSeries.slice(startIdx) : [];
+        let ma60  = f.ma60Series ? f.ma60Series.slice(startIdx) : [];
         let labels = prices.map((_,i) => i);
 
         let datasets = [{
-            label: '淨值', data: prices, borderColor: '#e2e8f0', borderWidth: 2, pointRadius: 0, tension: 0.1
+            label: '淨值',
+            data: prices,
+            borderColor: '#e2e8f0',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.1
         }];
 
+        // 60 日均線
+        if (ma60.some(v => v !== null)) {
+            datasets.push({
+                label: '60 日均線',
+                data: ma60,
+                borderColor: '#60a5fa',
+                borderWidth: 1.5,
+                pointRadius: 0,
+                tension: 0.1
+            });
+        }
+
+        // 240 日均線
+        if (ma240.some(v => v !== null)) {
+            datasets.push({
+                label: '240 日均線',
+                data: ma240,
+                borderColor: '#eab308',
+                borderWidth: 1.2,
+                borderDash: [5,5],
+                pointRadius: 0,
+                tension: 0.1
+            });
+        }
+
         if(f.strategy.useBias) {
-            datasets.push({ label: '年線 (240MA)', data: maLine, borderColor: '#eab308', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 });
-            let buyTargetLine = maLine.map(v => v ? v * (1 + f.strategy.buy) : null);
-            datasets.push({ label: `買點 (${f.strategy.buy*100}%)`, data: buyTargetLine, borderColor: '#10b981', borderWidth: 1, pointRadius: 0 });
+            // 債券：年線 + 買點線
+            let buyTargetLine = ma240.map(v => v ? v * (1 + f.strategy.buy) : null);
+            datasets.push({
+                label: `買點 (${(f.strategy.buy*100).toFixed(0)}%)`,
+                data: buyTargetLine,
+                borderColor: '#10b981',
+                borderWidth: 1,
+                pointRadius: 0
+            });
         } else {
+            // 股票/平衡：以全期高點計算的目標價
             let buyTargetLine = prices.map(p => f.high * (1 + f.strategy.buy));
-            datasets.push({ label: `目標價 (${f.strategy.buy*100}%)`, data: buyTargetLine, borderColor: '#10b981', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 });
+            datasets.push({
+                label: `目標價 (${(f.strategy.buy*100).toFixed(0)}%)`,
+                data: buyTargetLine,
+                borderColor: '#10b981',
+                borderWidth: 1,
+                borderDash: [5, 5],
+                pointRadius: 0
+            });
         }
 
         bigChartInstance = new Chart(ctx, {
@@ -483,8 +669,14 @@
             options: {
                 responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { labels: { color: '#94a3b8' } }, tooltip: { mode: 'index', intersect: false } },
-                scales: { x: { display: false }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } }
+                plugins: { 
+                    legend: { labels: { color: '#94a3b8' } }, 
+                    tooltip: { mode: 'index', intersect: false } 
+                },
+                scales: { 
+                    x: { display: false }, 
+                    y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } 
+                }
             }
         });
     }
