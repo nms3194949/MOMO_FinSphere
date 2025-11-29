@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>MOMO 景氣羅盤 V15 (最終版)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* ========= 1. 核心樣式 ========= */
+    :root {
+      --momo-bg: #0A1221;
+      --momo-gold: #FFD700;
+      --momo-gold-soft: #F6E6B0;
+      --momo-green: #2D7A77;
+      --momo-red: #E74C3C;
+      --momo-purple: #9B59B6;
+      --momo-text-main: #F7F7F7;
+      --momo-text-sub: #B0B8D0;
+      --ambient-color: rgba(62, 82, 117, 0.8);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--momo-text-main);
+      overflow-x: hidden;
+    }
+
+    /* 滿版動態背景 */
+    .ambient-bg {
+      position: fixed;
+      inset: -20%;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 50%, var(--ambient-color) 0%, #000000 70%);
+      transition: background 1.2s ease;
+      opacity: 0.9;
+      filter: blur(40px);
+    }
+
+    .momo-compass-card {
+      width: min(1120px, 100vw - 24px);
+      background: rgba(15, 20, 35, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .momo-compass-inner {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) 340px;
+      gap: 30px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .momo-compass-inner {
+        grid-template-columns: 1fr;
+      }
+      .compass-panel {
+        order: -1;
+        margin-bottom: 20px;
+      }
+    }
+
+    /* ========= Header & Slider ========= */
+    .header-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 20px;
+      gap: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 20px;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--momo-gold-soft);
+      letter-spacing: 1px;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 0, #fff7d0, #FFD700);
+      display: grid;
+      place-items: center;
+      color: #000;
+      font-weight: 900;
+      box-shadow: 0 0 15px var(--momo-gold);
+    }
+
+    .logo-wrap { margin-right: 10px; }
+
+    .text-caption {
+      font-size: 11px;
+      color: #aaa;
+    }
+
+    .time-machine-wrapper {
+      flex: 1;
+      min-width: 280px;
+      max-width: 500px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tm-slider {
+      flex: 1;
+      cursor: pointer;
+      accent-color: var(--momo-gold);
+    }
+
+    .tm-year {
+      font-family: monospace;
+      font-size: 14px;
+      color: #fff;
+      font-weight: bold;
+      min-width: 60px; /* 固定寬度避免跳動 */
+    }
+    
+    /* 播放按鈕 */
+    .btn-play {
+      background: transparent;
+      border: 1px solid var(--momo-gold);
+      color: var(--momo-gold);
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: 8px;
+      transition: all 0.2s;
+      font-size: 12px;
+    }
+    .btn-play:hover {
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    /* ========= 左側：分析面板 ========= */
+    .metrics-col { display: flex; flex-direction: column; gap: 12px; }
+
+    .strategy-card {
+      background: linear-gradient(135deg, rgba(30, 40, 70, 0.4), rgba(10, 15, 30, 0.6));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-left: 3px solid var(--momo-gold);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .strategy-title {
+      font-size: 13px;
+      color: var(--momo-gold);
+      font-weight: bold;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .strategy-text {
+      font-size: 15px;
+      color: #fff;
+      line-height: 1.6;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .sector-rotation-block {
+      margin-top: 15px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .sector-label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #ddd;
+      margin-right: 4px;
+    }
+
+    .sector-tag {
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--momo-gold-soft);
+      transition: all 0.3s;
+    }
+
+    .sector-tag.active {
+      background: rgba(255, 215, 0, 0.25);
+      border-color: var(--momo-gold);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+    }
+
+    .alloc-container {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .allocation-bar-wrapper {
+      display: flex;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .alloc-segment {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .alloc-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--momo-text-sub);
+      margin-top: 6px;
+    }
+
+    .alloc-val {
+      color: #fff;
+      font-weight: bold;
+      margin-left: 2px;
+    }
+
+    /* 圖表卡片 */
+    .metric-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .metric-card--compact { padding: 10px 14px; }
+
+    .metric-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .metric-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ccc;
+    }
+
+    .metric-val {
+      font-size: 13px;
+      color: var(--momo-gold-soft);
+      font-family: monospace;
+      font-weight: bold;
+    }
+
+    .chart-box {
+      height: 60px;
+      width: 100%;
+      position: relative;
+      margin-top: 5px;
+    }
+
+    /* ========= 右側：羅盤 ========= */
+    .compass-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+
+    .compass-container {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      border-radius: 50%;
+      box-shadow:
+        0 0 50px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255,255,255,0.1);
+      background: rgba(8, 12, 21, 0.9);
+      align-self: center;
+    }
+
+    .season-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #2d7a77 0deg 90deg,
+        #c9a227 90deg 180deg,
+        #d9534f 180deg 270deg,
+        #3e5275 270deg 360deg
+      );
+      opacity: 0.25;
+      mask: radial-gradient(transparent 58%, #000 59%);
+    }
+
+    .season-label {
+      position: absolute;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--momo-text-sub);
+      transform: translate(-50%, -50%);
+      text-align: center;
+      line-height: 1.3;
+      /* ★ 修正 1：文字位置從 18% 改為 12%，往外推避免擋到圓心 */
+    }
+
+    .lbl-spring { top: 12%; right: 12%; color: #57c3aa; }
+    .lbl-summer { bottom: 12%; right: 12%; color: #f6e6b0; }
+    .lbl-autumn { bottom: 12%; left: 12%; color: #ff9966; }
+    .lbl-winter { top: 12%; left: 12%; color: #8fa0c0; }
+
+    .compass-hand-container {
+      position: absolute;
+      inset: 0;
+      transition: transform 0.2s linear;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* 指針 */
+    .compass-hand-line {
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      width: 2px;
+      height: 38%;
+      transform-origin: 50% 100%;
+      background: linear-gradient(to bottom, #fff, transparent);
+      opacity: 0.9;
+      box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+
+    .compass-core {
+      position: absolute;
+      inset: 28%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #1a233a, #05080f);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.1),
+        0 10px 20px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .core-score {
+      font-size: 46px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .core-status {
+      margin-top: 6px;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+      color: var(--momo-gold-soft);
+      font-weight: bold;
+    }
+
+    .ecm-gauge-container {
+      position: absolute;
+      bottom: -24px;
+      width: 100%;
+      text-align: center;
+      z-index: 5;
+    }
+
+    .ecm-bar-bg {
+      width: 180px;
+      height: 6px;
+      background: #222;
+      margin: 0 auto;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ecm-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2D7A77, #C9A227);
+      transition: width 0.3s;
+      position: absolute;
+      left: 0;
+    }
+
+    .ecm-label {
+      font-size: 11px;
+      color: var(--momo-text-sub);
+      margin-top: 5px;
+    }
+
+    /* ========= 歷史事件卡 ========= */
+    .history-card {
+      background: rgba(20, 26, 45, 0.9);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 16px;
+      /* ★ 修正 2：增加 margin-top，避免跟上面的 ECM 條卡住 */
+      margin-top: 35px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .history-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--momo-gold-soft);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-tag {
+      font-size: 11px;
+      color: var(--momo-text-sub);
+    }
+
+    .history-highlight {
+      color: #F6E6B0;
+      font-weight: 600;
+    }
+
+    .history-empty {
+      color: var(--momo-text-sub);
+      font-style: italic;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="ambient-bg" id="ambientBg"></div>
+
+<div class="momo-compass-card">
+  <div class="header-group">
+    <div style="display:flex; align-items:center;">
+      <div class="logo logo-wrap">M</div>
+      <div>
+        <div class="brand-title">MOMO 景氣羅盤 V15</div>
+        <div class="text-caption">雙週期宏觀模型 (Dual-Cycle Model)</div>
+      </div>
+    </div>
+    <div class="time-machine-wrapper">
+      <div style="font-size:12px; color:var(--momo-gold); font-weight:bold;">模擬年份</div>
+      <input type="range" class="tm-slider" id="yearSlider" min="2015" max="2035" value="2025" step="0.25">
+      <div class="tm-year" id="displayYear">2025 Q1</div>
+      <button id="playBtn" class="btn-play">▶</button>
+    </div>
+  </div>
+
+  <div class="momo-compass-inner">
+
+    <div class="metrics-col">
+
+      <div class="strategy-card">
+        <div class="strategy-title">投資策略建議</div>
+        <div class="strategy-text" id="strategyText">分析中...</div>
+
+        <div class="sector-rotation-block">
+          <span class="sector-label">強勢板塊:</span>
+          <span id="sectorTags"></span>
+        </div>
+
+        <div class="alloc-container">
+          <div class="text-caption">建議資產配置比重</div>
+          <div class="allocation-bar-wrapper">
+            <div class="alloc-segment" id="segStock" style="width:60%; background:#d9534f;" title="股票"></div>
+            <div class="alloc-segment" id="segBond" style="width:30%; background:#2D7A77;" title="債券"></div>
+            <div class="alloc-segment" id="segCash" style="width:10%; background:#444;" title="現金"></div>
+          </div>
+          <div class="alloc-labels">
+            <span>股票/風險 <span class="alloc-val" id="valStock">60%</span></span>
+            <span>債券/避險 <span class="alloc-val" id="valBond">30%</span></span>
+            <span>現金 <span class="alloc-val" id="valCash">10%</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-head">
+          <span class="metric-name">納茲達克指數 (Nasdaq Trend)</span>
+          <span class="metric-val" id="valNasdaq" style="color:#9B59B6;">--</span>
+        </div>
+        <div class="chart-box" id="chartNasdaq"></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-head">
+          <span class="metric-name">長週期 (康波 Kon-Wave 60年)</span>
+          <span class="metric-val" id="valKon">--</span>
+        </div>
+        <div class="chart-box" id="chartKon"></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-head">
+          <span class="metric-name">資金流向 (ECM 短週期循環)</span>
+          <span class="metric-val" id="valEcm">--</span>
+        </div>
+        <div class="chart-box" id="chartEcm"></div>
+      </div>
+
+      <div class="metric-card metric-card--compact">
+        <div class="metric-head">
+          <span class="metric-name">宏觀風險 (VIX 恐慌指數)</span>
+          <span class="metric-val" id="valRisk">--</span>
+        </div>
+        <div style="height:5px; background:#222; border-radius:4px; overflow:hidden; margin-top:6px;">
+          <div id="barRisk" style="width:0%; height:100%; background:#d9534f; transition:width 0.3s;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compass-panel">
+      <div class="compass-container">
+        <div class="season-ring"></div>
+        <div class="season-label lbl-spring">春｜復甦<br>Reflation</div>
+        <div class="season-label lbl-summer">夏｜過熱<br>Expansion</div>
+        <div class="season-label lbl-autumn">秋｜滯脹<br>Slowdown</div>
+        <div class="season-label lbl-winter">冬｜衰退<br>Recession</div>
+
+        <div class="compass-hand-container" id="compassHand">
+          <div class="compass-hand-line"></div>
+        </div>
+
+        <div class="compass-core">
+          <div class="text-caption" style="color:var(--momo-gold);">綜合評分</div>
+          <div class="core-score" id="coreScore">--</div>
+          <div class="core-status" id="coreStatus">--</div>
+        </div>
+
+        <div class="ecm-gauge-container">
+          <div class="ecm-bar-bg">
+            <div class="ecm-bar-fill" id="ecmBarBottom"></div>
+          </div>
+          <div class="ecm-label">避險 (公債) ⟷ 風險 (股市)</div>
+        </div>
+      </div>
+
+      <div class="history-card">
+        <div class="history-title">
+          <span>歷史事件對照</span>
+          <span class="history-tag" id="historyTag">—</span>
+        </div>
+        <div id="historyText" class="history-empty">
+          目前區間暫無特定事件註記。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ========= 設定物件 ========= */
+  const SEASONS = [
+    {
+      key: "spring",
+      name: "春｜復甦期",
+      range: [0, 90],
+      sectors: ["金融股", "非必需消費", "房地產"],
+      ambientBg: "rgba(45, 122, 119, 0.9)",
+      accent: "#2D7A77"
+    },
+    {
+      key: "summer",
+      name: "夏｜過熱期",
+      range: [90, 180],
+      sectors: ["科技股", "工業", "原物料"],
+      ambientBg: "rgba(255, 215, 0, 0.7)",
+      accent: "#FFD700"
+    },
+    {
+      key: "autumn",
+      name: "秋｜滯脹期",
+      range: [180, 270],
+      sectors: ["能源", "醫療健保", "必需消費"],
+      ambientBg: "rgba(231, 76, 60, 0.8)",
+      accent: "#E74C3C"
+    },
+    {
+      key: "winter",
+      name: "冬｜衰退期",
+      range: [270, 360],
+      sectors: ["公用事業", "電信", "長天期公債"],
+      ambientBg: "rgba(93, 173, 226, 0.8)",
+      accent: "#5DADE2"
+    }
+  ];
+
+  // 歷史事件
+  const HISTORY_EVENTS = {
+    "2015-Q3": { title: "中國股災與全球震盪", text: "中國 A 股大幅崩跌，全球風險偏好急速降溫，新興市場與高收益債承壓，防禦型資產與美元資產相對受惠。" },
+    "2018-Q4": { title: "美中貿易戰＋聯準會緊縮", text: "市場擔心貿易戰升級與過度升息，股市出現明顯修正。成長股壓力大，短天期公債相對抗跌。" },
+    "2020-Q1": { title: "新冠疫情爆發 (COVID-19)", text: "疫情與封城措施引爆 V 型暴跌，景氣完全落入『急凍衰退』；黃金、美債、美元短線避險。" },
+    "2020-Q2": { title: "無限 QE 與財政刺激", text: "聯準會與各國央行啟動大規模 QE，流動性洪水推動科技股與成長股率先 V 型反彈。" },
+    "2022-Q1": { title: "聯準會啟動升息循環", text: "通膨飆升迫使聯準會由鴿轉鷹，長短天期利率上行，成長股與高估值資產承壓，價值股相對抗跌。" },
+    "2022-Q4": { title: "通膨見頂預期", text: "市場預期通膨見頂與升息步調放緩，股債出現反彈跡象，科技資產短線修復。" }
+  };
+
+  function pickSeason(angleDeg) {
+    const normalized = ((angleDeg % 360) + 360) % 360;
+    return (
+      SEASONS.find(s => normalized >= s.range[0] && normalized < s.range[1]) ||
+      SEASONS[0]
+    );
+  }
+
+  /* ========= 數學模型 ========= */
+  function calcFinalScore({ konAngleDeg, ecmValue }) {
+    const baseScore = (Math.sin((konAngleDeg * Math.PI) / 180) + 1) * 50; 
+    const ecmScore = (ecmValue + 1) * 50; 
+    let final = baseScore * 0.8 + ecmScore * 0.2;
+    final = Math.round(Math.min(98, Math.max(2, final)));
+    return final;
+  }
+
+  function normalizeAlloc(stock, bond, cash) {
+    let total = stock + bond + cash;
+    if (!total || !isFinite(total)) return { stock: 0, bond: 0, cash: 0 };
+    let s = Math.round((stock / total) * 100);
+    let b = Math.round((bond / total) * 100);
+    let c = 100 - s - b;
+    if (c < 0) c = 0;
+    return { stock: s, bond: b, cash: c };
+  }
+
+  // 模擬 Nasdaq
+  function getNasdaqSimulation(y) {
+    let val = 4800 * Math.pow(1.12, y - 2015);
+    if (y >= 2019.8 && y <= 2020.3) val *= 0.85;
+    else if (y > 2020.3 && y < 2022.0) val *= 1.25;
+    if (y >= 2022.0 && y <= 2023.0) val *= 0.75;
+    val += Math.sin(y * 10) * 100;
+    return val;
+  }
+
+  /* ========= 繪圖 ========= */
+  function drawCustomChart(containerId, options) {
+    const container = document.getElementById(containerId);
+    if (!container) return 0;
+    container.innerHTML = "";
+
+    const w = container.clientWidth || 260;
+    const h = 60;
+    const { startY, endY, color1, color2, dataFn, currentY } = options;
+    const range = endY - startY || 1;
+    const pxPerY = w / range;
+
+    const points = [];
+    let minVal = Infinity;
+    let maxVal = -Infinity;
+
+    for (let x = 0; x <= w; x += 3) {
+      const yOffset = x / pxPerY;
+      const year = startY + yOffset;
+      const val = Number(dataFn(year));
+      if (!isFinite(val)) continue;
+      points.push({ x, val, year });
+      if (val < minVal) minVal = val;
+      if (val > maxVal) maxVal = val;
+    }
+
+    if (!points.length) { container.textContent = "No data"; return 0; }
+
+    let yRange = maxVal - minVal;
+    if (yRange === 0) { yRange = maxVal || 1; minVal -= 1; maxVal += 1; }
+
+    const yPadding = yRange * 0.1;
+    minVal -= yPadding; maxVal += yPadding;
+
+    let pathD = "";
+    let areaD = `M 0 ${h} `;
+    points.forEach((p, i) => {
+      const normalizedY = h - ((p.val - minVal) / (maxVal - minVal)) * h;
+      if (i === 0) pathD += `M ${p.x} ${normalizedY}`;
+      else pathD += ` L ${p.x} ${normalizedY}`;
+      areaD += ` L ${p.x} ${normalizedY}`;
+    });
+    areaD += ` L ${w} ${h} Z`;
+
+    const curVal = Number(dataFn(currentY));
+    let curX = null, curY = null;
+    if (isFinite(curVal)) {
+      curX = (currentY - startY) * pxPerY;
+      curY = h - ((curVal - minVal) / (maxVal - minVal)) * h;
+    }
+
+    const gid = containerId + "_grad";
+    const svg =
+      `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;">` +
+      `<defs>
+          <linearGradient id="${gid}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:${color1}; stop-opacity:0.8" />
+            <stop offset="100%" style="stop-color:${color2}; stop-opacity:0.1" />
+          </linearGradient>
+        </defs>
+        <path d="${areaD}" fill="url(#${gid})" style="stroke:none;" />
+        <path d="${pathD}" stroke="${color1}" fill="none" stroke-width="2" />` +
+      (curX !== null && curY !== null && currentY >= startY && currentY <= endY
+        ? `<circle cx="${curX}" cy="${curY}" r="4" fill="#fff" stroke="${color1}" stroke-width="2" />`
+        : "") +
+      `<text x="5" y="${h - 5}" fill="#666" font-size="9">${startY}</text>
+        <text x="${w - 30}" y="${h - 5}" fill="#666" font-size="9">${endY}</text>
+      </svg>`;
+
+    container.innerHTML = svg;
+    return isFinite(curVal) ? curVal : 0;
+  }
+
+  function drawWaveChart(containerId, config) {
+    const { startY, endY, period, phase, color1, color2, currentY } = config;
+    drawCustomChart(containerId, {
+      startY, endY, currentY, color1, color2,
+      dataFn: y => Math.sin(((y + phase) / period) * Math.PI * 2)
+    });
+  }
+
+  /* ========= 季度 / 歷史事件工具 ========= */
+  function getQuarterIndex(yearFloat) {
+    const yr = Math.floor(yearFloat);
+    const frac = yearFloat - yr; 
+    const idx = Math.round(frac / 0.25) % 4; 
+    return idx; 
+  }
+
+  function formatQuarterLabel(yearFloat) {
+    const yr = Math.floor(yearFloat);
+    const qIdx = getQuarterIndex(yearFloat);
+    const quarter = ["Q1", "Q2", "Q3", "Q4"][qIdx];
+    return `${yr} ${quarter}`;
+  }
+
+  function getHistoryKey(yearFloat) {
+    const yr = Math.floor(yearFloat);
+    const qIdx = getQuarterIndex(yearFloat);
+    return `${yr}-Q${qIdx + 1}`;
+  }
+
+  function updateHistoryBlock(yearFloat) {
+    const key = getHistoryKey(yearFloat);
+    const ev = HISTORY_EVENTS[key];
+    const tagEl = document.getElementById("historyTag");
+    const textEl = document.getElementById("historyText");
+
+    tagEl.textContent = key.replace("-", " ");
+
+    if (!ev) {
+      textEl.className = "history-empty";
+      textEl.textContent = "目前區間暫無特定事件註記，可作為假設情境使用。";
+      return;
+    }
+    textEl.className = "";
+    textEl.innerHTML = `<span class="history-highlight">${ev.title}</span>：` + ev.text;
+  }
+
+  /* ========= 主更新邏輯 ========= */
+  function updateModel(yearFloat) {
+    const year = parseFloat(yearFloat);
+    
+    // 數學模型
+    const cycleProgress = ((year - 2005) / 60) % 1;
+    const konAngle = cycleProgress * 360;
+    const ecmVal = Math.sin(((year - 2020) / 10) * Math.PI * 2);
+
+    const finalScore = calcFinalScore({ konAngleDeg: konAngle, ecmValue: ecmVal });
+
+    // 季節
+    const seasonInfo = pickSeason(konAngle);
+    const { name: seasonName, sectors, ambientBg, accent } = seasonInfo;
+
+    // 配置
+    let rawStock, rawBond, rawCash, strategyMsg;
+    if (finalScore >= 70) {
+      rawStock = 80; rawBond = 15; rawCash = 5;
+      strategyMsg = "【積極進攻】雙週期向上共振。建議 <span style='color:#E74C3C'>大幅增持科技與成長股</span>，搭配少量避險部位。";
+    } else if (finalScore >= 45) {
+      rawStock = 50; rawBond = 40; rawCash = 10;
+      strategyMsg = "【平衡佈局】多空交戰震盪。建議採 <span style='color:#F6E6B0'>股債平衡 (50/40/10)</span> 策略，保留彈性。";
+    } else {
+      rawStock = 30; rawBond = 50; rawCash = 20;
+      strategyMsg = "【防禦優先】下行風險偏高。建議 <span style='color:#5DADE2'>提高公債與現金比重</span>，控制槓桿。";
+    }
+
+    const { stock, bond, cash } = normalizeAlloc(rawStock, rawBond, rawCash);
+
+    // DOM Update
+    document.getElementById("displayYear").textContent = formatQuarterLabel(year);
+    document.getElementById("ambientBg").style.background = `radial-gradient(circle at 50% 50%, ${ambientBg} 0%, #000000 70%)`;
+
+    const tagContainer = document.getElementById("sectorTags");
+    tagContainer.innerHTML = sectors.map(sec => `<span class="sector-tag active">${sec}</span>`).join("");
+
+    document.getElementById("coreScore").textContent = finalScore;
+    const statusEl = document.getElementById("coreStatus");
+    statusEl.textContent = seasonName;
+    statusEl.style.color = accent;
+
+    document.getElementById("strategyText").innerHTML = strategyMsg;
+
+    document.getElementById("segStock").style.width = stock + "%";
+    document.getElementById("segBond").style.width = bond + "%";
+    document.getElementById("segCash").style.width = cash + "%";
+    document.getElementById("valStock").textContent = stock + "%";
+    document.getElementById("valBond").textContent = bond + "%";
+    document.getElementById("valCash").textContent = cash + "%";
+
+    document.getElementById("compassHand").style.transform = `rotate(${konAngle}deg)`;
+
+    let noise = Math.sin(year * 10) * 5;
+    let riskScore = Math.floor(100 - finalScore + noise);
+    if (riskScore > 100) riskScore = 98; if (riskScore < 10) riskScore = 12;
+
+    const konText = finalScore >= 55 ? "擴張期 (Expansion)" : "收縮期 (Contraction)";
+    const ecmText = ecmVal > 0 ? "偏向風險 (Risk-On)" : "偏向避險 (Risk-Off)";
+    document.getElementById("valKon").textContent = konText;
+    document.getElementById("valEcm").textContent = ecmText;
+
+    const barRisk = document.getElementById("barRisk");
+    barRisk.style.width = riskScore + "%";
+    barRisk.style.backgroundColor = riskScore > 60 ? "#E74C3C" : "#2D7A77";
+    document.getElementById("valRisk").textContent = riskScore + "/100";
+    
+    const ecmPct = (ecmVal + 1) * 50;
+    document.getElementById("ecmBarBottom").style.width = ecmPct + "%";
+
+    // Charting
+    const currentNasdaq = drawCustomChart("chartNasdaq", {
+      startY: 2015, endY: 2035, currentY: year,
+      color1: "#9B59B6", color2: "#8E44AD",
+      dataFn: getNasdaqSimulation
+    });
+    document.getElementById("valNasdaq").textContent = Math.round(currentNasdaq).toLocaleString();
+
+    drawWaveChart("chartKon", {
+      startY: 2000, endY: 2060, period: 60, currentY: year,
+      color1: "#FFD700", color2: "#F6E6B0", phase: 0
+    });
+
+    drawWaveChart("chartEcm", {
+      startY: 2000, endY: 2060, period: 10, currentY: year,
+      color1: "#2D7A77", color2: "#57c3aa", phase: 0
+    });
+
+    updateHistoryBlock(year);
+  }
+
+  // ========= 自動播放邏輯 =========
+  const slider = document.getElementById("yearSlider");
+  const playBtn = document.getElementById("playBtn");
+  let isPlaying = false;
+  let playInterval = null;
+  let rafId = null;
+
+  function requestUpdateFromSlider(val) {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => updateModel(val));
+  }
+
+  playBtn.addEventListener("click", () => {
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      playBtn.textContent = "❚❚"; 
+      playBtn.style.background = "var(--momo-gold)";
+      playBtn.style.color = "#000";
+      
+      playInterval = setInterval(() => {
+        let currentVal = parseFloat(slider.value);
+        let nextVal = currentVal + 0.25;
+        if (nextVal > parseFloat(slider.max)) nextVal = parseFloat(slider.min);
+        
+        slider.value = nextVal;
+        requestUpdateFromSlider(nextVal);
+      }, 800); // 速度
+      
+    } else {
+      playBtn.textContent = "▶"; 
+      playBtn.style.background = "transparent";
+      playBtn.style.color = "var(--momo-gold)";
+      clearInterval(playInterval);
+    }
+  });
+
+  slider.addEventListener("input", e => {
+    // 拖動時若在播放，先暫停播放
+    if(isPlaying) playBtn.click();
+    requestUpdateFromSlider(e.target.value);
+  });
+
+  window.addEventListener("resize", () => {
+    requestUpdateFromSlider(slider.value);
+  });
+
+  // Init
+  updateModel(slider.value);
+</script>
+</body>
+</html>
