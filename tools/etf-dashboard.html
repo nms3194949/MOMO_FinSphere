@@ -30,6 +30,26 @@
       margin: auto;
     }
 
+    /* 新增：回首頁按鈕樣式 */
+    .btn-home {
+      display: inline-block;
+      margin-bottom: 15px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--gold);
+      text-decoration: none;
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-home:hover {
+      background: rgba(201, 162, 39, 0.1);
+      border-color: var(--gold);
+      color: #fff;
+    }
+
     h1 {
       color: var(--gold);
       font-size: 26px;
@@ -115,6 +135,10 @@
 <body>
 
 <div class="page">
+  <a href="https://nms3194949.github.io/MOMO_FinSphere/index.html" class="btn-home">
+    ← 回首頁
+  </a>
+
   <h1>ETF 績效排行榜</h1>
   <div class="desc">
     整合 FinMind（價格）與 TWSE（配息），以「有效年數」計算更準確的年化績效。<br>
