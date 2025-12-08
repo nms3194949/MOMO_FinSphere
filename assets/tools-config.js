@@ -41,6 +41,15 @@ window.MOMO_TOOLS_CONFIG = [
     external: true,
     showOnHome: false          // 例如：只在工具總覽列出，不出現在首頁
   },
+    {
+    id: "fund_radar",
+    category: "fund",
+    title: "MOMO景氣羅盤",
+    desc: "監控景氣變化，找到長期適合的策略。",
+    href: "/MOMO_FinSphere/tools/Macro-Compass.html",
+    external: true,
+    showOnHome: false          // 例如：只在工具總覽列出，不出現在首頁
+  },
   {
     id: "fund_radar",
     category: "fund",
