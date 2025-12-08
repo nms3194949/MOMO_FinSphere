@@ -3,167 +3,350 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>MOMO財商智庫｜ETF 績效排行榜</title>
+  <title>MOMO財商智庫｜ETF 績效戰情室</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --deep: #0A1221;
-      --card: #111827;
-      --gold: #C9A227;
-      --gold-light: rgba(201,162,39,0.4);
+      --deep: #050b14;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --gold: #FFD700;
+      --gold-glow: rgba(255, 215, 0, 0.4);
+      --silver: #E0E0E0;
+      --bronze: #CD7F32;
+      --text: #E5E7EB;
       --muted: #9CA3AF;
-      --text: #F3F4F6;
-      --danger: #F87171;
-      --success: #4ADE80;
+      --danger: #FF2A2A;
+      --success: #00FF9D;
+      --info: #00EAFF;
+      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     body {
       margin: 0;
-      background: var(--deep);
-      font-family: "Noto Sans TC", system-ui, sans-serif;
+      background-color: var(--deep);
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, rgba(0, 234, 255, 0.1) 0%, transparent 60%);
+      background-size: 40px 40px, 40px 40px, 100% 100%;
+      background-attachment: fixed;
+      font-family: "Noto Sans TC", sans-serif;
       color: var(--text);
-      padding: 20px;
+      padding: 30px 20px;
     }
 
     .page {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: auto;
+      padding-bottom: 60px;
     }
 
-    /* 新增：回首頁按鈕樣式 */
-    .btn-home {
-      display: inline-block;
-      margin-bottom: 15px;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--gold);
-      text-decoration: none;
-      border: 1px solid rgba(201, 162, 39, 0.3);
-      border-radius: 6px;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-
-    .btn-home:hover {
-      background: rgba(201, 162, 39, 0.1);
-      border-color: var(--gold);
-      color: #fff;
-    }
+    /* --- Header --- */
+    header { text-align: center; margin-bottom: 50px; position: relative; }
 
     h1 {
       color: var(--gold);
-      font-size: 26px;
-      margin-bottom: 8px;
-      letter-spacing: 0.05em;
+      font-size: 32px;
+      margin: 20px 0 15px 0;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-shadow: 0 0 15px var(--gold-glow);
+      display: inline-block;
+      border-bottom: 3px solid var(--gold);
+      padding-bottom: 10px;
     }
 
     .desc {
       color: var(--muted);
       font-size: 14px;
       line-height: 1.6;
-      margin-bottom: 20px;
+      max-width: 600px;
+      margin: 10px auto;
+      background: rgba(0,0,0,0.4);
+      padding: 10px 20px;
+      border-radius: 4px;
+      border-left: 3px solid var(--info);
     }
 
-    /* Table */
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--gold);
+      text-decoration: none;
+      border: 1px solid var(--gold);
+      font-family: "Noto Sans TC", sans-serif;
+      font-weight: bold;
+      font-size: 13px;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+    .btn-home:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
+
+    /* --- Progress Bar --- */
+    .loading-container {
+      margin: 40px auto;
+      max-width: 400px;
+      text-align: center;
+    }
+    .loading-text {
+      color: var(--info);
+      font-family: "Noto Sans TC", sans-serif;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px var(--info);
+      letter-spacing: 1px;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);
+      background-size: 200% 100%;
+      animation: rainbowMove 1s linear infinite; 
+      transition: width 0.3s ease-out;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+    @keyframes rainbowMove { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+    /* --- Table --- */
+    .table-container {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: var(--glass-border);
+      border-radius: 12px;
+      /* 設定最大高度讓 sticky header 生效，同時保留手機橫向捲動 */
+      max-height: 80vh; 
+      overflow: auto; 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
     table {
       width: 100%;
-      border-collapse: collapse;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      overflow: hidden;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 900px;
     }
 
+    /* 固定表頭 */
     thead {
-      background: linear-gradient(90deg, #C9A227 0%, #EFD88A 70%, #C9A227 100%);
-      color: #000;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #0A1221; /* 必須指定背景色不然會透明 */
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
 
     th {
-      padding: 10px 8px;
+      padding: 15px 10px;
       font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
       cursor: pointer;
       white-space: nowrap;
       user-select: none;
+      transition: color 0.2s;
     }
+    th:hover { color: var(--gold); }
 
-    tbody tr {
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+    /* 排序指示器 */
+    th.sort-active { color: var(--gold); text-shadow: 0 0 8px var(--gold-glow); }
+    th.sort-active::after {
+      content: '';
+      display: inline-block;
+      margin-left: 5px;
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      vertical-align: middle;
     }
+    /* 降冪 (大到小) */
+    th.sort-desc::after { border-top: 5px solid var(--gold); }
+    /* 升冪 (小到大) */
+    th.sort-asc::after { border-bottom: 5px solid var(--gold); }
 
-    tbody tr:last-child {
-      border-bottom: none;
+    .num-col { text-align: right; padding-right: 20px; }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 0 20px rgba(0, 234, 255, 0.05);
     }
 
     td {
-      padding: 10px 8px;
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .symbol {
-      font-weight: bold;
-      color: var(--gold);
+      padding: 14px 10px;
       font-size: 15px;
-      letter-spacing: 0.03em;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+      font-family: "Roboto Mono", monospace;
     }
 
-    .name {
-      color: var(--text);
-      text-align: left;
-      font-size: 14px;
-      white-space: nowrap;
+    /* 排名獎牌樣式 */
+    .rank-medal {
+      display: inline-block;
+      width: 24px; height: 24px;
+      line-height: 24px;
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 12px;
+      text-align: center;
+      color: #000;
+    }
+    .rank-1 { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+    .rank-2 { background: var(--silver); box-shadow: 0 0 10px var(--silver); }
+    .rank-3 { background: var(--bronze); box-shadow: 0 0 10px var(--bronze); }
+    .rank-n { color: var(--muted); font-family: "Roboto Mono"; }
+
+    /* 股票連結 */
+    .symbol-link {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+      border-bottom: 1px dashed rgba(255, 215, 0, 0.3);
+      transition: all 0.2s;
+    }
+    .symbol-link:hover {
+      color: #fff;
+      border-bottom-color: #fff;
+      text-shadow: 0 0 10px var(--gold);
     }
 
-    .pos { color: var(--success); font-weight: 600; }
-    .neg { color: var(--danger); font-weight: 600; }
-    .muted { color: var(--muted); }
-
-    .error-row {
-      background: rgba(255,0,0,0.1);
-      color: #FCA5A5;
-      font-size: 13px;
+    .name { color: var(--text); text-align: left; font-family: "Noto Sans TC", sans-serif; font-weight: 500; }
+    .pos { color: var(--success); text-shadow: 0 0 8px rgba(0, 255, 157, 0.2); }
+    .neg { color: var(--danger); text-shadow: 0 0 8px rgba(255, 42, 42, 0.2); }
+    .warn { color: #FFA500; font-size: 12px; }
+    .muted { color: #555; font-size: 12px; }
+    
+    .auto-fix-icon { 
+      color: var(--info); font-size: 14px; margin-left: 5px; cursor: help; 
+      animation: blink 2s infinite; 
     }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-    .loading {
-      margin-top: 20px;
-      color: var(--muted);
+    /* --- Modal --- */
+    .th-help {
+      display: inline-block; width: 16px; height: 16px; line-height: 16px;
+      text-align: center; border: 1px solid var(--muted); border-radius: 50%;
+      font-size: 10px; margin-left: 5px; color: var(--muted);
+      cursor: pointer; transition: 0.2s;
     }
+    .th-help:hover { border-color: var(--info); color: var(--info); box-shadow: 0 0 10px var(--info); }
+
+    .modal-backdrop {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 9998;
+    }
+    .modal-box {
+      display: none; position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); width: 90%; max-width: 320px;
+      background: #0A1221; border: 1px solid var(--info);
+      box-shadow: 0 0 30px rgba(0, 234, 255, 0.3);
+      padding: 20px; z-index: 9999; border-radius: 8px; text-align: left;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+    }
+    .modal-title { color: var(--info); font-size: 16px; font-weight: bold; margin-bottom: 8px; font-family: "Noto Sans TC", sans-serif; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;}
+    .modal-formula { color: var(--gold); font-size: 13px; margin-bottom: 10px; font-family: "Roboto Mono"; }
+    .modal-desc { color: #ddd; font-size: 14px; line-height: 1.5; font-family: "Noto Sans TC", sans-serif;}
+    .modal-close {
+      margin-top: 15px; display: block; width: 100%;
+      background: rgba(255,255,255,0.1); border: none;
+      color: #fff; padding: 8px; cursor: pointer;
+      font-family: "Noto Sans TC", sans-serif; font-size: 14px; transition: all 0.2s;
+    }
+    .modal-close:hover { background: var(--info); color: #000; box-shadow: 0 0 10px var(--info); }
+    .show-modal { display: block; animation: popIn 0.2s ease-out; }
+    @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 
   </style>
 </head>
 <body>
 
 <div class="page">
-  <a href="https://nms3194949.github.io/MOMO_FinSphere/index.html" class="btn-home">
-    ← 回首頁
-  </a>
+  <header>
+    <a href="https://nms3194949.github.io/MOMO_FinSphere/index.html" class="btn-home">
+      &lt; 返回首頁
+    </a>
+    <br>
+    <h1>ETF 績效戰情室</h1>
+    <div class="desc">
+      系統核心：FinMind 股價 + TWSE 配息整合<br>
+      運算模式：還原權息 (有效年數演算法)
+    </div>
+  </header>
 
-  <h1>ETF 績效排行榜</h1>
-  <div class="desc">
-    整合 FinMind（價格）與 TWSE（配息），以「有效年數」計算更準確的年化績效。<br>
-    支援排序：年化總報酬、殖利率、Sharpe 值。
+  <div id="loading-container" class="loading-container">
+    <div id="loading-text" class="loading-text">系統全速運算中... 0%</div>
+    <div class="progress-bar-bg">
+      <div id="progress-bar-fill" class="progress-bar-fill"></div>
+    </div>
   </div>
 
-  <div id="status" class="loading">資料載入中…</div>
+  <div class="table-container">
+    <table id="etf-table" style="display:none;">
+      <thead>
+        <tr>
+          <th style="width: 60px;">排名</th>
+          
+          <th data-sort="symbol">代碼</th>
+          <th>名稱</th>
+          <th data-sort="eff" class="num-col">有效年數</th>
+          
+          <th data-sort="total" class="num-col">
+            年化總報酬
+            <span class="th-help" onclick="showHelp('年化總報酬', '年化價差 + 年化配息率', '最核心的指標。代表您持有這段期間，平均每年能拿到多少總獲利（包含股價上漲與領到的股息）。')">?</span>
+          </th>
 
-  <table id="etf-table" style="display:none;">
-    <thead>
-      <tr>
-        <th data-sort="symbol">代碼</th>
-        <th>名稱</th>
-        <th data-sort="eff">有效年數</th>
-        <th data-sort="total">年化總報酬</th>
-        <th data-sort="price">年化價差</th>
-        <th data-sort="yield1">殖利率(1Y)</th>
-        <th data-sort="yann">年化配息率</th>
-        <th data-sort="vol">波動度</th>
-        <th data-sort="sharpe">Sharpe</th>
-        <th>備註</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
+          <th data-sort="price" class="num-col">
+            年化價差
+            <span class="th-help" onclick="showHelp('年化價差', '(現價 / 買價)^(1/年) - 1', '不包含配息，純粹計算股價本身上漲或下跌的年化幅度。')">?</span>
+          </th>
+
+          <th data-sort="yield1" class="num-col">
+            殖利率(1Y)
+            <span class="th-help" onclick="showHelp('殖利率 (1Y)', '近一年總股利 / 現價', '若您現在買入，依照過去一年的配息水準，預期可獲得的現金回報率。')">?</span>
+          </th>
+
+          <th data-sort="yann" class="num-col">
+            年化配息率
+            <span class="th-help" onclick="showHelp('年化配息率', '持有期間總配息率 / 年數', '長期持有的平均配息水準。比單看一年殖利率更能反映長期配息的穩定度。')">?</span>
+          </th>
+
+          <th data-sort="vol" class="num-col">波動度</th>
+          <th data-sort="sharpe" class="num-col">Sharpe</th>
+          <th>系統備註</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="modal-backdrop" class="modal-backdrop" onclick="closeHelp()"></div>
+<div id="modal-box" class="modal-box">
+  <div id="modal-title" class="modal-title">標題</div>
+  <div id="modal-formula" class="modal-formula">公式</div>
+  <div id="modal-desc" class="modal-desc">說明內容...</div>
+  <button class="modal-close" onclick="closeHelp()">關閉視窗</button>
 </div>
 
 <script>
@@ -192,11 +375,26 @@ const BATCHES = [
 
 let dataRows = [];
 let currentSort = "symbol";
+let isDesc = true; // 預設降冪排序 (大到小)
 
+// --- Modal Control ---
+function showHelp(title, formula, desc) {
+  document.getElementById('modal-title').innerText = "/// " + title;
+  document.getElementById('modal-formula').innerText = "公式：" + formula;
+  document.getElementById('modal-desc').innerText = desc;
+  document.getElementById('modal-backdrop').classList.add('show-modal');
+  document.getElementById('modal-box').classList.add('show-modal');
+}
+function closeHelp() {
+  document.getElementById('modal-backdrop').classList.remove('show-modal');
+  document.getElementById('modal-box').classList.remove('show-modal');
+}
+
+// --- Utils ---
 function pct(v){ return v==null||isNaN(v)?"–":(v*100).toFixed(2)+"%"; }
 function num(v){ return v==null||isNaN(v)?"–":v.toFixed(2); }
-
-function note(symbol,total,y1){
+function getNote(symbol, total, y1, isFixed){
+  if(isFixed) return "分割後自動校正";
   if(symbol==="0050") return "大盤核心";
   if(symbol==="0056") return "經典高股息";
   if(symbol==="00940") return "新掛牌";
@@ -206,17 +404,42 @@ function note(symbol,total,y1){
   return "—";
 }
 
+// --- Logic ---
+function fixSplitLogic(row, years) {
+    let r = { ...row };
+    const SPLIT_MAP = { "0052": 7 };
+    const splitFactor = SPLIT_MAP[r.symbol];
+    let isFixed = false;
+    if (splitFactor && r.price?.annualized_return_ex_div < -0.1) {
+        const originalRatio = Math.pow(1 + r.price.annualized_return_ex_div, years);
+        const fixedRatio = originalRatio * splitFactor;
+        r.price.annualized_return_ex_div = Math.pow(fixedRatio, 1 / years) - 1;
+        if (r.dividend?.yield_period_annualized) r.dividend.yield_period_annualized /= splitFactor;
+        if (r.dividend?.yield_1y) r.dividend.yield_1y /= splitFactor;
+        if (r.risk?.annualized_vol > 0.5) r.risk.annualized_vol = 0.25; 
+        const newTotalReturn = r.price.annualized_return_ex_div + (r.dividend?.yield_period_annualized || 0);
+        if (r.risk?.annualized_vol) r.risk.sharpe = (newTotalReturn - 0.01) / r.risk.annualized_vol;
+        isFixed = true;
+    }
+    return { data: r, isFixed: isFixed };
+}
+
+function getRankBadge(index) {
+    if (index === 0) return `<span class="rank-medal rank-1">1</span>`;
+    if (index === 1) return `<span class="rank-medal rank-2">2</span>`;
+    if (index === 2) return `<span class="rank-medal rank-3">3</span>`;
+    return `<span class="rank-medal rank-n">${index + 1}</span>`;
+}
+
 function render(){
   const tbody=document.getElementById("tbody");
   tbody.innerHTML="";
 
-  dataRows.forEach(r=>{
+  dataRows.forEach((row, index) => {
+    const { data: r, isFixed } = fixSplitLogic(row, YEARS);
+
     if(r.error){
-      tbody.innerHTML+=`
-      <tr class="error-row">
-        <td class="symbol">${r.symbol}</td>
-        <td colspan="9">無法取得資料：${r.error}</td>
-      </tr>`;
+      tbody.innerHTML+=`<tr class="error-row"><td colspan="10">Error: ${r.symbol}</td></tr>`;
       return;
     }
 
@@ -227,92 +450,123 @@ function render(){
     const vol = r.risk?.annualized_vol;
     const sharpe = r.risk?.sharpe;
 
+    // Yahoo 連結
+    const linkUrl = `https://tw.stock.yahoo.com/quote/${r.symbol}`;
+
     tbody.innerHTML+=`
     <tr>
-      <td class="symbol">${r.symbol}</td>
+      <td>${getRankBadge(index)}</td>
+      <td>
+        <a href="${linkUrl}" target="_blank" class="symbol-link">${r.symbol}</a>
+      </td>
       <td class="name">${ETF_META[r.symbol]||""}</td>
-      <td>${r.effective_years?.toFixed(1)||"–"}</td>
+      <td class="num-col">${r.effective_years?.toFixed(1)||"–"}</td>
 
-      <td class="${total>=0?'pos':'neg'}">${pct(total)}</td>
-      <td class="${price>=0?'pos':'neg'}">${pct(price)}</td>
-      <td class="${y1>=0?'pos':'neg'}">${pct(y1)}</td>
-      <td class="${yann>=0?'pos':'neg'}">${pct(yann)}</td>
+      <td class="${total>=0?'pos':'neg'} num-col">
+        ${pct(total)}
+        ${isFixed ? '<span class="auto-fix-icon" title="分割修正啟用">⚡</span>' : ''}
+      </td>
+      <td class="${price>=0?'pos':'neg'} num-col">${pct(price)}</td>
+      <td class="${y1>=0?'pos':'neg'} num-col">${pct(y1)}</td>
+      <td class="${yann>=0?'pos':'neg'} num-col">${pct(yann)}</td>
 
-      <td>${pct(vol)}</td>
-      <td>${sharpe==null?'–':num(sharpe)}</td>
+      <td class="num-col">${pct(vol)}</td>
+      <td class="num-col">${sharpe==null?'–':num(sharpe)}</td>
 
-      <td class="muted">${note(r.symbol,total,y1)}</td>
+      <td class="${isFixed?'warn':'muted'}">${getNote(r.symbol, total, y1, isFixed)}</td>
     </tr>`;
   });
 }
 
-// Sorting
 function sortBy(key){
-  currentSort=key;
+  // 如果點擊同一個欄位，反轉排序方向；否則預設降冪
+  if (currentSort === key) {
+    isDesc = !isDesc;
+  } else {
+    currentSort = key;
+    isDesc = true; // 新欄位預設大到小
+  }
+
+  // 更新表頭樣式
+  document.querySelectorAll('th').forEach(th => {
+    th.classList.remove('sort-active', 'sort-asc', 'sort-desc');
+    if (th.dataset.sort === key) {
+      th.classList.add('sort-active');
+      th.classList.add(isDesc ? 'sort-desc' : 'sort-asc');
+    }
+  });
+
   dataRows.sort((a,b)=>{
-    const av=a[key], bv=b[key];
+    const fixedA = fixSplitLogic(a, YEARS).data;
+    const fixedB = fixSplitLogic(b, YEARS).data;
+
+    let av, bv;
+    if(key==="symbol") { av=fixedA.symbol; bv=fixedB.symbol; }
+    else if(key==="eff") { av=fixedA.effective_years; bv=fixedB.effective_years; }
+    else if(key==="total") { 
+        av=(fixedA.price?.annualized_return_ex_div||0)+(fixedA.dividend?.yield_period_annualized||0);
+        bv=(fixedB.price?.annualized_return_ex_div||0)+(fixedB.dividend?.yield_period_annualized||0);
+    }
+    else if(key==="price") { av=fixedA.price?.annualized_return_ex_div; bv=fixedB.price?.annualized_return_ex_div; }
+    else if(key==="yield1") { av=fixedA.dividend?.yield_1y; bv=fixedB.dividend?.yield_1y; }
+    else if(key==="yann") { av=fixedA.dividend?.yield_period_annualized; bv=fixedB.dividend?.yield_period_annualized; }
+    else if(key==="vol") { av=fixedA.risk?.annualized_vol; bv=fixedB.risk?.annualized_vol; }
+    else if(key==="sharpe") { av=fixedA.risk?.sharpe; bv=fixedB.risk?.sharpe; }
+
     if(av==null) return 1;
     if(bv==null) return -1;
-    return bv-av;
+    if(typeof av === 'string') return isDesc ? bv.localeCompare(av) : av.localeCompare(bv);
+    
+    // 數字排序
+    return isDesc ? bv - av : av - bv;
   });
   render();
 }
 
 document.querySelectorAll("th[data-sort]").forEach(th=>{
   th.addEventListener("click",()=>{
-    const key=th.dataset.sort;
-    let mapKey="";
-    if(key==="symbol") mapKey="symbol";
-    if(key==="eff") mapKey="effective_years";
-    if(key==="total") mapKey="total";
-    if(key==="price") mapKey="annualized_return_ex_div";
-    if(key==="yield1") mapKey="yield_1y";
-    if(key==="yann") mapKey="yield_period_annualized";
-    if(key==="vol") mapKey="annualized_vol";
-    if(key==="sharpe") mapKey="sharpe";
-
-    if(mapKey==="total"){
-      dataRows.forEach(r=>{
-        r.total = (r.price?.annualized_return_ex_div||0)+(r.dividend?.yield_period_annualized||0);
-      });
-    }
-    if(mapKey==="annualized_return_ex_div"){
-      dataRows.forEach(r=>r.annualized_return_ex_div = r.price?.annualized_return_ex_div);
-    }
-    if(mapKey==="yield_1y"){
-      dataRows.forEach(r=>r.yield_1y = r.dividend?.yield_1y);
-    }
-    if(mapKey==="yield_period_annualized"){
-      dataRows.forEach(r=>r.yield_period_annualized = r.dividend?.yield_period_annualized);
-    }
-    if(mapKey==="annualized_vol"){
-      dataRows.forEach(r=>r.annualized_vol = r.risk?.annualized_vol);
-    }
-    if(mapKey==="sharpe"){
-      dataRows.forEach(r=>r.sharpe = r.risk?.sharpe);
-    }
-
-    sortBy(mapKey);
+    sortBy(th.dataset.sort);
   });
 });
 
-// Load data
 async function load(){
-  const status=document.getElementById("status");
+  const loadingContainer = document.getElementById("loading-container");
+  const loadingText = document.getElementById("loading-text");
+  const barFill = document.getElementById("progress-bar-fill");
+  
   try{
     const list=[];
-    for(const batch of BATCHES){
+    const totalBatches = BATCHES.length;
+
+    for(let i=0; i<totalBatches; i++){
+      const batch = BATCHES[i];
+      const currentPct = Math.round((i / totalBatches) * 100);
+      loadingText.innerText = `系統全速運算中... ${currentPct}%`;
+      barFill.style.width = `${currentPct}%`;
+
       const url=`${WORKER_URL}?symbols=${batch.join(",")}&years=${YEARS}`;
       const resp=await fetch(url);
       const json=await resp.json();
       if(json.etfs) list.push(...json.etfs);
     }
+
+    loadingText.innerText = "數據同步完成 100%";
+    barFill.style.width = "100%";
     dataRows=list;
-    status.style.display="none";
-    document.getElementById("etf-table").style.display="table";
-    render();
-  }catch(e){
-    status.innerHTML="❌ 無法載入資料";
+
+    setTimeout(() => {
+        loadingContainer.style.display="none";
+        document.getElementById("etf-table").style.display="table";
+        // 預設: 依年化總報酬、降冪排序
+        isDesc = true; 
+        currentSort = ""; // 設空是為了觸發 sortBy 裡面的 else 邏輯
+        sortBy("total");
+    }, 600);
+
+  } catch(e){
+    loadingText.innerText = "❌ 連線失敗";
+    loadingText.style.color = "var(--danger)";
+    console.error(e);
   }
 }
 
