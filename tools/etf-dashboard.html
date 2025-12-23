@@ -6,7 +6,6 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-NG917BWVXP');
   </script>
 
@@ -14,16 +13,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   
   <title>MOMO財商智庫｜ETF 績效戰情室</title>
-  <meta name="description" content="MOMO財商智庫 ETF 戰情室，整合 FinMind 股價與 TWSE 配息數據，提供獨家「有效年數」演算法，精準計算 ETF 年化報酬、殖利率與 Sharpe 值，助您一眼找出最強標的。">
-  <meta name="keywords" content="ETF, 績效排行榜, 0050, 0056, 00878, 年化報酬率, 殖利率, 存股, MOMO財商智庫">
-  <meta name="author" content="MOMO財商智庫">
-
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/index.html">
-  <meta property="og:title" content="ETF 績效戰情室｜MOMO財商智庫">
-  <meta property="og:description" content="獨家演算法還原真實績效！一鍵查詢 ETF 年化報酬、配息率與波動風險。">
-  <meta property="og:image" content=""> 
-
+  <link rel="icon" type="image/png" href="ETF.png">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -47,337 +38,82 @@
     }
 
     body {
-      margin: 0;
-      background-color: var(--deep);
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        radial-gradient(circle at 50% 0%, rgba(0, 234, 255, 0.1) 0%, transparent 60%);
-      background-size: 40px 40px, 40px 40px, 100% 100%;
-      background-attachment: fixed;
-      font-family: "Noto Sans TC", sans-serif;
-      color: var(--text);
-      padding: 30px 20px;
-      padding-bottom: 80px;
+      margin: 0; background-color: var(--deep);
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px), radial-gradient(circle at 50% 0%, rgba(0, 234, 255, 0.1) 0%, transparent 60%);
+      background-size: 40px 40px, 40px 40px, 100% 100%; background-attachment: fixed;
+      font-family: "Noto Sans TC", sans-serif; color: var(--text); padding: 20px 10px;
     }
 
-    .page {
-      max-width: 1280px;
-      margin: auto;
-    }
+    header { text-align: center; margin-bottom: 30px; }
+    h1 { color: var(--gold); font-size: 26px; text-shadow: 0 0 15px var(--gold-glow); border-bottom: 3px solid var(--gold); padding-bottom: 8px; display: inline-block; margin: 10px 0; }
+    .desc { color: var(--muted); font-size: 13px; max-width: 500px; margin: 5px auto; background: rgba(0,0,0,0.4); padding: 8px 15px; border-left: 3px solid var(--info); }
 
-    /* Header */
-    header { text-align: center; margin-bottom: 50px; position: relative; }
+    .loading-container { margin: 40px auto; max-width: 300px; text-align: center; }
+    .loading-text { color: var(--info); font-size: 14px; margin-bottom: 12px; font-family: "Roboto Mono"; }
+    .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; position: relative; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00EAFF, #00FF9D); transition: width 0.1s linear; }
 
-    h1 {
-      color: var(--gold);
-      font-size: 32px;
-      margin: 20px 0 15px 0;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-shadow: 0 0 15px var(--gold-glow);
-      display: inline-block;
-      border-bottom: 3px solid var(--gold);
-      padding-bottom: 10px;
-    }
-
-    .desc {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
-      max-width: 600px;
-      margin: 10px auto;
-      background: rgba(0,0,0,0.4);
-      padding: 10px 20px;
-      border-radius: 4px;
-      border-left: 3px solid var(--info);
-    }
-
-    .btn-home {
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--gold);
-      text-decoration: none;
-      border: 1px solid var(--gold);
-      font-family: "Noto Sans TC", sans-serif;
-      font-weight: bold;
-      font-size: 13px;
-      transition: all 0.3s;
-      margin-bottom: 15px;
-      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-    }
-    .btn-home:hover {
-      background: var(--gold);
-      color: #000;
-      box-shadow: 0 0 20px var(--gold-glow);
-    }
-
-    /* Progress Bar */
-    .loading-container {
-      margin: 40px auto;
-      max-width: 400px;
-      text-align: center;
-    }
-    .loading-text {
-      color: var(--info);
-      font-family: "Noto Sans TC", sans-serif;
-      font-size: 14px;
-      margin-bottom: 10px;
-      text-shadow: 0 0 8px var(--info);
-      letter-spacing: 1px;
-    }
-    .progress-bar-bg {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-      overflow: hidden;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);
-      background-size: 200% 100%;
-      animation: rainbowMove 1s linear infinite; 
-      transition: width 0.3s ease-out;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    }
-    @keyframes rainbowMove { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
-
-    /* Table */
-    .table-container {
-      background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: var(--glass-border);
-      border-radius: 12px;
-      max-height: 75vh; 
-      overflow: auto; 
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      position: relative;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      min-width: 900px;
-    }
-
-    thead {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: #0A1221;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-
-    th {
-      padding: 15px 10px;
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 700;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      cursor: pointer;
-      white-space: nowrap;
-      user-select: none;
-      transition: color 0.2s;
-    }
-    th:hover { color: var(--gold); }
-
-    th.sort-active { color: var(--gold); text-shadow: 0 0 8px var(--gold-glow); }
-    th.sort-active::after {
-      content: ''; display: inline-block; margin-left: 5px; width: 0; height: 0;
-      border-left: 4px solid transparent; border-right: 4px solid transparent; vertical-align: middle;
-    }
-    th.sort-desc::after { border-top: 5px solid var(--gold); }
-    th.sort-asc::after { border-bottom: 5px solid var(--gold); }
-
-    .num-col { text-align: right; padding-right: 20px; }
-
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.05);
-      box-shadow: inset 0 0 20px rgba(0, 234, 255, 0.05);
-    }
-
-    td {
-      padding: 14px 10px;
-      font-size: 15px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      text-align: center;
-      font-family: "Roboto Mono", monospace;
-    }
-
-    .rank-medal {
-      display: inline-block; width: 24px; height: 24px; line-height: 24px;
-      border-radius: 50%; font-weight: bold; font-size: 12px; text-align: center; color: #000;
-    }
+    .table-container { background: var(--card-bg); backdrop-filter: blur(10px); border: var(--glass-border); border-radius: 12px; overflow: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 580px; } 
+    thead { position: sticky; top: 0; z-index: 10; background: #0A1221; }
+    th { padding: 12px 6px; font-size: 12px; color: var(--muted); border-bottom: 1px solid rgba(255,255,255,0.2); cursor: pointer; user-select: none; }
+    th.sort-active { color: var(--gold); }
+    td { padding: 12px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; font-family: "Roboto Mono"; font-size: 13px; }
+    
+    .rank-medal { display: inline-block; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; font-weight: bold; font-size: 11px; color: #000; }
     .rank-1 { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
     .rank-2 { background: var(--silver); box-shadow: 0 0 10px var(--silver); }
     .rank-3 { background: var(--bronze); box-shadow: 0 0 10px var(--bronze); }
-    .rank-n { color: var(--muted); font-family: "Roboto Mono"; }
+    .rank-n { color: var(--muted); }
 
-    .symbol-link {
-      color: var(--gold); text-decoration: none; font-weight: bold;
-      text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-      border-bottom: 1px dashed rgba(255, 215, 0, 0.3); transition: all 0.2s;
-    }
-    .symbol-link:hover { color: #fff; border-bottom-color: #fff; text-shadow: 0 0 10px var(--gold); }
+    .symbol-link { color: var(--gold); text-decoration: none; font-weight: bold; }
+    .pos { color: var(--success); }
+    .neg { color: var(--danger); }
 
-    .name { color: var(--text); text-align: left; font-family: "Noto Sans TC", sans-serif; font-weight: 500; }
-    .pos { color: var(--success); text-shadow: 0 0 8px rgba(0, 255, 157, 0.2); }
-    .neg { color: var(--danger); text-shadow: 0 0 8px rgba(255, 42, 42, 0.2); }
-    .warn { color: #FFA500; font-size: 12px; }
-    .muted { color: #555; font-size: 12px; }
-    
-    .auto-fix-icon { 
-      color: var(--info); font-size: 14px; margin-left: 5px; cursor: help; 
-      animation: blink 2s infinite; 
-    }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-    /* Modal */
-    .th-help {
-      display: inline-block; width: 16px; height: 16px; line-height: 16px;
-      text-align: center; border: 1px solid var(--muted); border-radius: 50%;
-      font-size: 10px; margin-left: 5px; color: var(--muted); cursor: pointer; transition: 0.2s;
-    }
-    .th-help:hover { border-color: var(--info); color: var(--info); box-shadow: 0 0 10px var(--info); }
-
-    .modal-backdrop {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 9998;
-    }
-    .modal-box {
-      display: none; position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); width: 90%; max-width: 320px;
-      background: #0A1221; border: 1px solid var(--info);
-      box-shadow: 0 0 30px rgba(0, 234, 255, 0.3); padding: 20px; z-index: 9999;
-      border-radius: 8px; text-align: left;
-      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
-    }
-    .modal-title { color: var(--info); font-size: 16px; font-weight: bold; margin-bottom: 8px; font-family: "Noto Sans TC", sans-serif; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;}
-    .modal-formula { color: var(--gold); font-size: 13px; margin-bottom: 10px; font-family: "Roboto Mono"; }
-    .modal-desc { color: #ddd; font-size: 14px; line-height: 1.5; font-family: "Noto Sans TC", sans-serif;}
-    .modal-close {
-      margin-top: 15px; display: block; width: 100%;
-      background: rgba(255,255,255,0.1); border: none;
-      color: #fff; padding: 8px; cursor: pointer;
-      font-family: "Noto Sans TC", sans-serif; font-size: 14px; transition: all 0.2s;
-    }
-    .modal-close:hover { background: var(--info); color: #000; box-shadow: 0 0 10px var(--info); }
-    .show-modal { display: block; animation: popIn 0.2s ease-out; }
-    @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      color: var(--muted);
-      font-size: 12px;
-      font-family: "Noto Sans TC", sans-serif;
-    }
-    
-    .counter-box {
+    /* 拆分提示圖示樣式 */
+    .split-hint {
       display: inline-block;
-      margin-top: 10px;
-      padding: 5px 15px;
-      background: rgba(0,0,0,0.3);
-      border-radius: 20px;
-      border: 1px solid rgba(0, 234, 255, 0.2);
-    }
-    
-    .counter-label { color: var(--info); margin-right: 5px; }
-    
-    #busuanzi_value_site_pv {
-      color: var(--gold); font-family: "Roboto Mono", monospace;
-      font-weight: bold; text-shadow: 0 0 5px var(--gold-glow);
+      margin-left: 4px;
+      color: var(--info);
+      font-weight: bold;
+      cursor: help;
+      text-decoration: underline dotted;
     }
 
+    .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9998; backdrop-filter: blur(5px); }
+    .modal-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; background: #0A1221; border: 1px solid var(--info); padding: 20px; z-index: 9999; border-radius: 8px; }
+    .show-modal { display: block; }
   </style>
 </head>
 <body>
 
 <div class="page">
   <header>
-    <a href="https://nms3194949.github.io/MOMO_FinSphere/index.html" class="btn-home">
-      &lt; 返回首頁
-    </a>
-    <br>
     <h1>ETF 績效戰情室</h1>
-    <div class="desc">
-      系統核心：FinMind 股價 + TWSE 配息整合<br>
-      運算模式：還原權息 (有效年數演算法)
-    </div>
+    <div class="desc">數據同步至 2025.12 | 模式：還原權息演算</div>
   </header>
 
   <div id="loading-container" class="loading-container">
-    <div id="loading-text" class="loading-text">系統全速運算中... 0%</div>
-    <div class="progress-bar-bg">
-      <div id="progress-bar-fill" class="progress-bar-fill"></div>
-    </div>
+    <div id="loading-text" class="loading-text">連線數據中心... 0%</div>
+    <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
   </div>
 
   <div class="table-container">
     <table id="etf-table" style="display:none;">
       <thead>
         <tr>
-          <th style="width: 60px;">排名</th>
+          <th style="width: 45px;">排名</th>
           <th data-sort="symbol">代碼</th>
-          <th>名稱</th>
-          <th data-sort="eff" class="num-col">有效年數</th>
-          
-          <th data-sort="total" class="num-col">
-            年化總報酬
-            <span class="th-help" onclick="showHelp('年化總報酬', '年化價差 + 年化配息率', '最核心的指標。代表您持有這段期間，平均每年能拿到多少總獲利（包含股價上漲與領到的股息）。')">?</span>
-          </th>
-
-          <th data-sort="price" class="num-col">
-            年化價差
-            <span class="th-help" onclick="showHelp('年化價差', '(現價 / 買價)^(1/年) - 1', '不包含配息，純粹計算股價本身上漲或下跌的年化幅度。')">?</span>
-          </th>
-
-          <th data-sort="yield1" class="num-col">
-            殖利率(1Y)
-            <span class="th-help" onclick="showHelp('殖利率 (1Y)', '近一年總股利 / 現價', '若您現在買入，依照過去一年的配息水準，預期可獲得的現金回報率。')">?</span>
-          </th>
-
-          <th data-sort="yann" class="num-col">
-            年化配息率
-            <span class="th-help" onclick="showHelp('年化配息率', '持有期間總配息率 / 年數', '長期持有的平均配息水準。比單看一年殖利率更能反映長期配息的穩定度。')">?</span>
-          </th>
-
-          <th data-sort="vol" class="num-col">波動度</th>
-          <th data-sort="sharpe" class="num-col">Sharpe</th>
-          <th>系統備註</th>
+          <th style="text-align:left;">名稱</th>
+          <th>頻率</th>
+          <th data-sort="total">年化總報酬</th>
+          <th data-sort="yield1">殖利率(1Y)</th>
+          <th data-sort="yann">年化配息率</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
-
-  <footer>
-    <div>MOMO 財商智庫 &copy; 2024. All Rights Reserved.</div>
-    <div class="counter-box">
-      <span id="busuanzi_container_site_pv" style="display:none;">
-        <span class="counter-label">● SYSTEM TRAFFIC:</span>
-        <span id="busuanzi_value_site_pv">--</span> VIEWS
-      </span>
-    </div>
-  </footer>
-</div>
-
-<div id="modal-backdrop" class="modal-backdrop" onclick="closeHelp()"></div>
-<div id="modal-box" class="modal-box">
-  <div id="modal-title" class="modal-title">標題</div>
-  <div id="modal-formula" class="modal-formula">公式</div>
-  <div id="modal-desc" class="modal-desc">說明內容...</div>
-  <button class="modal-close" onclick="closeHelp()">關閉視窗</button>
 </div>
 
 <script>
@@ -385,18 +121,22 @@ const WORKER_URL = "https://etf-metrics-worker.nms3194949.workers.dev/etf-metric
 const YEARS = 3;
 
 const ETF_META = {
-  "0056": "元大台灣高股息",
-  "00713": "元大高股息低波動",
-  "00878": "國泰永續高股息",
-  "00918": "大華優選高填息30",
-  "00919": "群益台灣精選高息",
-  "00929": "復華科技優息",
-  "00940": "元大台灣價值高息",
-  "00915": "凱基台灣優選高股息30",
-  "0050": "元大台灣50",
-  "0052": "富邦科技",
-  "00881": "國泰科技龍頭",
-  "00757": "統一NYSE FANG+"
+  "0056": { name: "元大台灣高股息", freq: "季配" },
+  "00713": { name: "元大高股息低波動", freq: "季配" },
+  "00878": { name: "國泰永續高股息", freq: "季配" },
+  "00918": { name: "大華優選高填息30", freq: "季配" },
+  "00919": { name: "群益台灣精選高息", freq: "季配" },
+  "00929": { name: "復華科技優息", freq: "月配" },
+  "00940": { name: "元大台灣價值高息", freq: "月配" },
+  "00915": { name: "凱基台灣優選高股息30", freq: "季配" },
+  "0050": { name: "元大台灣50", freq: "半年配" },
+  "0052": { 
+      name: "富邦科技", 
+      freq: "年配", 
+      splitInfo: "拆分日期：2025/09/25\n說明：本基金執行「1拆7」分割案，數據已進行權值還原，殖利率計算已校正為拆分後水準。" 
+  },
+  "00881": { name: "國泰科技龍頭", freq: "半年配" },
+  "00757": { name: "統一NYSE FANG+", freq: "不配息" }
 };
 
 const BATCHES = [
@@ -405,196 +145,120 @@ const BATCHES = [
 ];
 
 let dataRows = [];
-let currentSort = "symbol";
+let currentSort = ""; 
 let isDesc = true;
+let displayProgress = 0;
+let progressTarget = 0;
 
-// Modal Control
-function showHelp(title, formula, desc) {
-  document.getElementById('modal-title').innerText = "/// " + title;
-  document.getElementById('modal-formula').innerText = "公式：" + formula;
-  document.getElementById('modal-desc').innerText = desc;
-  document.getElementById('modal-backdrop').classList.add('show-modal');
-  document.getElementById('modal-box').classList.add('show-modal');
-}
-function closeHelp() {
-  document.getElementById('modal-backdrop').classList.remove('show-modal');
-  document.getElementById('modal-box').classList.remove('show-modal');
-}
-
-// Utils
-function pct(v){ return v==null||isNaN(v)?"–":(v*100).toFixed(2)+"%"; }
-function num(v){ return v==null||isNaN(v)?"–":v.toFixed(2); }
-function getNote(symbol, total, y1, isFixed){
-  if(isFixed) return "分割後自動校正";
-  if(symbol==="0050") return "大盤核心";
-  if(symbol==="0056") return "經典高股息";
-  if(symbol==="00940") return "新掛牌";
-  if(y1>0.07 && total>0.05) return "息＋價差均衡";
-  if(y1>0.07 && total<=0.02) return "注意吃本金";
-  if(y1<0.03 && total>0.08) return "成長型 ETF";
-  return "—";
+function animateProgress() {
+  if (displayProgress < progressTarget) {
+    displayProgress += 0.8; 
+    if (displayProgress > progressTarget) displayProgress = progressTarget;
+    document.getElementById("loading-text").innerText = `運算中... ${Math.floor(displayProgress)}%`;
+    document.getElementById("progress-bar-fill").style.width = `${displayProgress}%`;
+  }
+  if (displayProgress < 100) requestAnimationFrame(animateProgress);
 }
 
-function fixSplitLogic(row, years) {
+function fixSplitLogic(row) {
     let r = { ...row };
-    const SPLIT_MAP = { "0052": 7 };
-    const splitFactor = SPLIT_MAP[r.symbol];
     let isFixed = false;
-    if (splitFactor && r.price?.annualized_return_ex_div < -0.1) {
-        const originalRatio = Math.pow(1 + r.price.annualized_return_ex_div, years);
-        const fixedRatio = originalRatio * splitFactor;
-        r.price.annualized_return_ex_div = Math.pow(fixedRatio, 1 / years) - 1;
-        if (r.dividend?.yield_period_annualized) r.dividend.yield_period_annualized /= splitFactor;
-        if (r.dividend?.yield_1y) r.dividend.yield_1y /= splitFactor;
-        if (r.risk?.annualized_vol > 0.5) r.risk.annualized_vol = 0.25; 
-        const newTotalReturn = r.price.annualized_return_ex_div + (r.dividend?.yield_period_annualized || 0);
-        if (r.risk?.annualized_vol) r.risk.sharpe = (newTotalReturn - 0.01) / r.risk.annualized_vol;
+    // 0052 1拆7還原
+    if (r.symbol === "0052" && r.price?.annualized_return_ex_div < -0.1) {
+        const originalRatio = Math.pow(1 + r.price.annualized_return_ex_div, YEARS);
+        r.price.annualized_return_ex_div = Math.pow(originalRatio * 7, 1 / YEARS) - 1;
         isFixed = true;
     }
     return { data: r, isFixed: isFixed };
 }
 
-function getRankBadge(index) {
-    if (index === 0) return `<span class="rank-medal rank-1">1</span>`;
-    if (index === 1) return `<span class="rank-medal rank-2">2</span>`;
-    if (index === 2) return `<span class="rank-medal rank-3">3</span>`;
-    return `<span class="rank-medal rank-n">${index + 1}</span>`;
-}
-
 function render(){
-  const tbody=document.getElementById("tbody");
-  tbody.innerHTML="";
-
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
   dataRows.forEach((row, index) => {
-    const { data: r, isFixed } = fixSplitLogic(row, YEARS);
+    const { data: r, isFixed } = fixSplitLogic(row);
+    const meta = ETF_META[r.symbol] || { name: r.symbol, freq: "–" };
+    
+    const total = (r.price?.annualized_return_ex_div || 0) + (r.dividend?.yield_period_annualized || 0);
+    let yield1 = r.dividend?.yield_1y || 0;
+    let yann = r.dividend?.yield_period_annualized || 0;
+    if (meta.freq === "不配息") { yield1 = 0; yann = 0; }
 
-    if(r.error){
-      tbody.innerHTML+=`<tr class="error-row"><td colspan="10">Error: ${r.symbol}</td></tr>`;
-      return;
-    }
+    // 如果有 splitInfo，則產生標註 HTML
+    const hintHTML = meta.splitInfo ? `<span class="split-hint" title="${meta.splitInfo}">(!)</span>` : "";
 
-    const total = (r.price?.annualized_return_ex_div||0) + (r.dividend?.yield_period_annualized||0);
-    const price = r.price?.annualized_return_ex_div;
-    const y1 = r.dividend?.yield_1y;
-    const yann = r.dividend?.yield_period_annualized;
-    const vol = r.risk?.annualized_vol;
-    const sharpe = r.risk?.sharpe;
-    const linkUrl = `https://tw.stock.yahoo.com/quote/${r.symbol}`;
-
-    tbody.innerHTML+=`
+    tbody.innerHTML += `
     <tr>
       <td>${getRankBadge(index)}</td>
-      <td>
-        <a href="${linkUrl}" target="_blank" class="symbol-link">${r.symbol}</a>
+      <td><a href="https://tw.stock.yahoo.com/quote/${r.symbol}" target="_blank" class="symbol-link">${r.symbol}</a></td>
+      <td style="text-align:left;">${meta.name}</td>
+      <td style="color:var(--info); font-size:11px;">${meta.freq}</td>
+      <td class="${total>=0?'pos':'neg'}" style="font-weight:bold;">
+        ${(total*100).toFixed(2)}%${hintHTML}
       </td>
-      <td class="name">${ETF_META[r.symbol]||""}</td>
-      <td class="num-col">${r.effective_years?.toFixed(1)||"–"}</td>
-
-      <td class="${total>=0?'pos':'neg'} num-col">
-        ${pct(total)}
-        ${isFixed ? '<span class="auto-fix-icon" title="分割修正啟用">⚡</span>' : ''}
+      <td class="${yield1>=0?'pos':'neg'}">
+        ${(yield1*100).toFixed(2)}%${hintHTML}
       </td>
-      <td class="${price>=0?'pos':'neg'} num-col">${pct(price)}</td>
-      <td class="${y1>=0?'pos':'neg'} num-col">${pct(y1)}</td>
-      <td class="${yann>=0?'pos':'neg'} num-col">${pct(yann)}</td>
-
-      <td class="num-col">${pct(vol)}</td>
-      <td class="num-col">${sharpe==null?'–':num(sharpe)}</td>
-
-      <td class="${isFixed?'warn':'muted'}">${getNote(r.symbol, total, y1, isFixed)}</td>
+      <td class="${yann>=0?'pos':'neg'}">
+        ${(yann*100).toFixed(2)}%
+      </td>
     </tr>`;
   });
 }
 
-function sortBy(key){
-  if (currentSort === key) {
-    isDesc = !isDesc;
-  } else {
-    currentSort = key;
-    isDesc = true; 
-  }
+function getRankBadge(i) {
+  if (i === 0) return `<span class="rank-medal rank-1">1</span>`;
+  if (i === 1) return `<span class="rank-medal rank-2">2</span>`;
+  if (i === 2) return `<span class="rank-medal rank-3">3</span>`;
+  return `<span class="rank-medal rank-n">${i+1}</span>`;
+}
 
-  document.querySelectorAll('th').forEach(th => {
-    th.classList.remove('sort-active', 'sort-asc', 'sort-desc');
-    if (th.dataset.sort === key) {
-      th.classList.add('sort-active');
-      th.classList.add(isDesc ? 'sort-desc' : 'sort-asc');
-    }
+function sortBy(key, forceDesc = false){
+  if (forceDesc) { currentSort = key; isDesc = true; }
+  else if (currentSort === key) isDesc = !isDesc;
+  else { currentSort = key; isDesc = true; }
+
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.classList.remove('sort-active');
+      if(th.dataset.sort === key) th.classList.add('sort-active');
   });
-
+  
   dataRows.sort((a,b)=>{
-    const fixedA = fixSplitLogic(a, YEARS).data;
-    const fixedB = fixSplitLogic(b, YEARS).data;
-
+    const fa = fixSplitLogic(a).data, fb = fixSplitLogic(b).data;
     let av, bv;
-    if(key==="symbol") { av=fixedA.symbol; bv=fixedB.symbol; }
-    else if(key==="eff") { av=fixedA.effective_years; bv=fixedB.effective_years; }
-    else if(key==="total") { 
-        av=(fixedA.price?.annualized_return_ex_div||0)+(fixedA.dividend?.yield_period_annualized||0);
-        bv=(fixedB.price?.annualized_return_ex_div||0)+(fixedB.dividend?.yield_period_annualized||0);
-    }
-    else if(key==="price") { av=fixedA.price?.annualized_return_ex_div; bv=fixedB.price?.annualized_return_ex_div; }
-    else if(key==="yield1") { av=fixedA.dividend?.yield_1y; bv=fixedB.dividend?.yield_1y; }
-    else if(key==="yann") { av=fixedA.dividend?.yield_period_annualized; bv=fixedB.dividend?.yield_period_annualized; }
-    else if(key==="vol") { av=fixedA.risk?.annualized_vol; bv=fixedB.risk?.annualized_vol; }
-    else if(key==="sharpe") { av=fixedA.risk?.sharpe; bv=fixedB.risk?.sharpe; }
-
-    if(av==null) return 1;
-    if(bv==null) return -1;
-    if(typeof av === 'string') return isDesc ? bv.localeCompare(av) : av.localeCompare(bv);
+    if(key==="total") {
+      av = (fa.price?.annualized_return_ex_div||0) + (fa.dividend?.yield_period_annualized||0);
+      bv = (fb.price?.annualized_return_ex_div||0) + (fb.dividend?.yield_period_annualized||0);
+    } else { av = fa[key] || 0; bv = fb[key] || 0; }
     return isDesc ? bv - av : av - bv;
   });
   render();
 }
 
-document.querySelectorAll("th[data-sort]").forEach(th=>{
-  th.addEventListener("click",()=>{
-    sortBy(th.dataset.sort);
-  });
-});
-
 async function load(){
-  const loadingContainer = document.getElementById("loading-container");
-  const loadingText = document.getElementById("loading-text");
-  const barFill = document.getElementById("progress-bar-fill");
-  
-  try{
-    const list=[];
-    const totalBatches = BATCHES.length;
-
-    for(let i=0; i<totalBatches; i++){
-      const batch = BATCHES[i];
-      const currentPct = Math.round((i / totalBatches) * 100);
-      loadingText.innerText = `系統全速運算中... ${currentPct}%`;
-      barFill.style.width = `${currentPct}%`;
-
-      const url=`${WORKER_URL}?symbols=${batch.join(",")}&years=${YEARS}`;
-      const resp=await fetch(url);
-      const json=await resp.json();
-      if(json.etfs) list.push(...json.etfs);
+  animateProgress(); 
+  try {
+    const list = [];
+    for(let i=0; i<BATCHES.length; i++){
+      progressTarget = Math.round(((i + 1) / BATCHES.length) * 100);
+      const r = await fetch(`${WORKER_URL}?symbols=${BATCHES[i].join(",")}&years=${YEARS}`);
+      const j = await r.json();
+      if(j.etfs) list.push(...j.etfs);
     }
-
-    loadingText.innerText = "數據同步完成 100%";
-    barFill.style.width = "100%";
-    dataRows=list;
-
+    dataRows = list;
     setTimeout(() => {
-        loadingContainer.style.display="none";
-        document.getElementById("etf-table").style.display="table";
-        isDesc = true; 
-        currentSort = "";
-        sortBy("total");
+      document.getElementById("loading-container").style.display="none";
+      document.getElementById("etf-table").style.display="table";
+      sortBy("total", true); 
     }, 600);
-
-  } catch(e){
-    loadingText.innerText = "❌ 連線失敗";
-    loadingText.style.color = "var(--danger)";
-    console.error(e);
-  }
+  } catch(e) { }
 }
+
+document.querySelectorAll("th[data-sort]").forEach(th => {
+  th.addEventListener("click", () => sortBy(th.dataset.sort));
+});
 
 load();
 </script>
-
 </body>
 </html>
