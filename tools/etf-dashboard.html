@@ -24,9 +24,8 @@
       --deep:#050b14;
       --card-bg:rgba(17,24,39,.85);
       --gold:#FFD700;
+      --gold2:#F6E6B0;
       --gold-glow:rgba(255,215,0,.35);
-      --silver:#E0E0E0;
-      --bronze:#CD7F32;
       --text:#E5E7EB;
       --muted:#9CA3AF;
       --danger:#FF2A2A;
@@ -47,10 +46,10 @@
       background-attachment:fixed;
       font-family:"Noto Sans TC", sans-serif;
       color:var(--text);
-      padding:20px 10px;
+      padding:18px 10px 24px;
     }
 
-    header{ text-align:center; margin-bottom:18px; }
+    header{ text-align:center; margin-bottom:14px; }
 
     .btn-home{
       display:inline-flex;align-items:center;
@@ -62,7 +61,7 @@
       font-weight:700;
       font-size:13px;
       transition:.25s;
-      margin-bottom:14px;
+      margin-bottom:12px;
       clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
     }
     .btn-home:hover{ background:var(--gold); color:#000; box-shadow:0 0 20px var(--gold-glow); }
@@ -74,26 +73,26 @@
       border-bottom:3px solid var(--gold);
       padding-bottom:8px;
       display:inline-block;
-      margin:8px 0 10px;
+      margin:6px 0 10px;
       letter-spacing:.5px;
     }
 
     .desc{
       color:var(--muted);
       font-size:13px;
-      max-width:680px;
+      max-width:980px;
       margin:8px auto 10px;
       background:rgba(0,0,0,.35);
       padding:10px 14px;
       border-left:3px solid var(--info);
-      border-radius:8px;
+      border-radius:10px;
       line-height:1.65;
       text-align:left;
     }
 
     .meta-strip{
-      max-width:680px;
-      margin:10px auto 16px;
+      max-width:980px;
+      margin:10px auto 14px;
       display:flex;
       gap:10px;
       justify-content:space-between;
@@ -111,8 +110,180 @@
     }
     .pill b{ color:var(--gold); font-family:"Roboto Mono"; }
 
+    /* ===== Top cards ===== */
+    .top-grid{
+      max-width:980px;
+      margin:10px auto 14px;
+      display:grid;
+      grid-template-columns: 1.15fr 1fr 1fr 1fr;
+      gap:12px;
+    }
+    .card{
+      background:var(--card-bg);
+      border:var(--glass-border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+      padding:14px 14px 12px;
+      overflow:hidden;
+      min-height:118px;
+    }
+    .card h3{
+      margin:0 0 10px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      letter-spacing:.3px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .card h3 .unit{ color:var(--muted); font-weight:700; }
+    .big{
+      font-family:"Roboto Mono";
+      font-weight:900;
+      font-size:38px;
+      letter-spacing:.5px;
+      margin:0;
+      line-height:1.05;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .big.green{ color:var(--success); text-shadow:0 0 12px rgba(0,255,157,.18); }
+    .big.gold{ color:var(--gold); text-shadow:0 0 14px rgba(255,215,0,.16); }
+    .sub{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
+    .sub code{
+      font-family:"Roboto Mono";
+      color:var(--gold2);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      padding:2px 6px;
+      border-radius:8px;
+    }
+
+    .amount-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .amount-input{
+      width:100%;
+      box-sizing:border-box;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:16px 14px;
+      font-family:"Roboto Mono";
+      font-size:22px;
+      font-weight:900;
+      outline:none;
+      min-width:0;
+    }
+    .amount-input:focus{
+      border-color:rgba(0,234,255,.5);
+      box-shadow:0 0 0 3px rgba(0,234,255,.1);
+    }
+
+    .btn-row{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .btn{
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.5px;
+      transition:.2s;
+    }
+    .btn:hover{ box-shadow:0 0 18px rgba(255,255,255,.08); transform:translateY(-1px); }
+    .btn.primary{
+      border-color:rgba(255,215,0,.45);
+      box-shadow:0 0 0 1px rgba(255,215,0,.15) inset;
+    }
+
+    /* ===== Month achievement ===== */
+    .achieve{
+      max-width:980px;
+      margin:0 auto 12px;
+      background:var(--card-bg);
+      border:var(--glass-border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .ach-left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .ach-title{
+      color:var(--muted);
+      font-weight:900;
+      letter-spacing:.4px;
+    }
+    .sum-pill{
+      color:var(--muted);
+      font-family:"Roboto Mono";
+      font-weight:800;
+    }
+    .missing{
+      color:rgba(255,42,42,.9);
+      font-weight:900;
+      letter-spacing:.3px;
+    }
+    .months-strip{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .mLamp{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-family:"Roboto Mono";
+      font-weight:900;
+      font-size:13px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:rgba(229,231,235,.55);
+      box-shadow:none;
+      transition:.15s;
+    }
+    .mLamp.on{
+      border-color:rgba(255,215,0,.55);
+      color:#111;
+      background:linear-gradient(180deg, rgba(255,215,0,.95), rgba(246,230,176,.85));
+      box-shadow:0 0 18px rgba(255,215,0,.18);
+    }
+
     /* Loading */
-    .loading-container{ margin:28px auto 18px; max-width:340px; text-align:center; }
+    .loading-container{ margin:22px auto 12px; max-width:340px; text-align:center; }
     .loading-text{
       color:var(--info);
       font-size:14px;
@@ -141,46 +312,52 @@
     /* Error box */
     .error-box{
       display:none;
-      max-width:680px;
-      margin:14px auto;
+      max-width:980px;
+      margin:12px auto;
       background:rgba(255,42,42,.08);
       border:1px solid rgba(255,42,42,.35);
-      border-radius:12px;
+      border-radius:14px;
       padding:12px 14px;
       box-shadow:var(--shadow);
       line-height:1.7;
     }
-    .error-box .title{ color:var(--danger); font-weight:800; }
+    .error-box .title{ color:var(--danger); font-weight:900; }
     .error-box button{
       margin-top:10px;
       width:100%;
       padding:10px;
       border:none;
       cursor:pointer;
-      border-radius:10px;
+      border-radius:12px;
       background:rgba(255,255,255,.08);
       color:var(--text);
-      font-weight:800;
+      font-weight:900;
     }
     .error-box button:hover{ box-shadow:0 0 18px rgba(255,255,255,.08); }
 
-    /* Table */
+    /* ===== Table ===== */
     .table-container{
+      max-width:980px;
+      margin:0 auto;
       background:var(--card-bg);
       backdrop-filter:blur(10px);
       border:var(--glass-border);
-      border-radius:12px;
+      border-radius:16px;
       overflow:auto;
       box-shadow:var(--shadow);
     }
-    table{ width:100%; border-collapse:separate; border-spacing:0; min-width:640px; }
-
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width: 980px; /* 重要：避免右欄被擠掉 */
+    }
     thead{
       position:sticky; top:0; z-index:10;
       background:#0A1221;
     }
     th{
-      padding:12px 8px;
+      padding:12px 10px;
       font-size:12px;
       color:var(--muted);
       border-bottom:1px solid rgba(255,255,255,.2);
@@ -190,113 +367,170 @@
     }
     th.sort-active{ color:var(--gold); }
     th .arrow{ opacity:.65; margin-left:6px; font-size:10px; }
+
     td{
-      padding:12px 8px;
+      padding:12px 10px;
       border-bottom:1px solid rgba(255,255,255,.05);
       text-align:center;
       font-family:"Roboto Mono";
       font-size:13px;
       white-space:nowrap;
+      vertical-align:middle;
     }
     tbody tr:hover{ background:rgba(255,255,255,.03); }
 
+    /* column widths（重點：縮頻率/月份，讓右欄回來） */
+    th.col-rank{ width:60px; }
+    th.col-sym{ width:88px; }
+    th.col-name{ width:220px; text-align:left; }
+    th.col-w{ width:150px; }
+    th.col-fm{ width:230px; text-align:left; } /* 控制不要太寬 */
+    th.col-metric{ width:140px; }
+
     .rank-medal{
-      display:inline-block; width:22px; height:22px; line-height:22px;
-      border-radius:50%; font-weight:900; font-size:11px; color:#000;
+      display:inline-flex;
+      width:28px; height:28px;
+      border-radius:999px;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      font-size:13px;
+      color:#000;
+      box-shadow:none;
     }
-    .rank-1{ background:var(--gold); box-shadow:0 0 10px var(--gold); }
-    .rank-2{ background:var(--silver); box-shadow:0 0 10px var(--silver); }
-    .rank-3{ background:var(--bronze); box-shadow:0 0 10px var(--bronze); }
-    .rank-n{ color:var(--muted); font-weight:800; }
+    .rank-1{ background:var(--gold); box-shadow:0 0 16px rgba(255,215,0,.25); }
+    .rank-2{ background:#E0E0E0; box-shadow:0 0 16px rgba(224,224,224,.18); }
+    .rank-3{ background:#CD7F32; box-shadow:0 0 16px rgba(205,127,50,.18); }
+    .rank-n{ background:rgba(255,255,255,.08); color:rgba(229,231,235,.75); border:1px solid rgba(255,255,255,.12); }
 
     .symbol-link{ color:var(--gold); text-decoration:none; font-weight:900; }
     .pos{ color:var(--success); }
     .neg{ color:var(--danger); }
 
-    /* ====== NEW: 頻率月份徽章 ====== */
-    .freq-wrap{
+    /* allocation input */
+    .w-wrap{
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:6px;
-      flex-wrap:wrap;
-      font-family:"Noto Sans TC";
+      gap:8px;
     }
-    .freq-tag{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:4px 8px;
-      border-radius:999px;
-      font-weight:800;
-      font-size:11px;
-      letter-spacing:.2px;
-      border:1px solid rgba(0,234,255,.25);
-      background:rgba(0,234,255,.08);
-      color:var(--info);
-      box-shadow:0 0 12px rgba(0,234,255,.08);
-      line-height:1;
-    }
-    .months{
-      display:inline-flex;
-      gap:4px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
-    .m-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:22px;
-      height:18px;
-      padding:0 6px;
-      border-radius:999px;
+    .w-input{
+      width:92px;
+      box-sizing:border-box;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 10px;
       font-family:"Roboto Mono";
-      font-size:11px;
-      border:1px solid rgba(255,215,0,.22);
-      background:rgba(255,215,0,.10);
-      color:var(--gold);
-      box-shadow:0 0 12px rgba(255,215,0,.06);
-      line-height:1;
-    }
-    .m-chip.m-all{
-      border:1px solid rgba(0,255,157,.25);
-      background:rgba(0,255,157,.08);
-      color:var(--success);
-      box-shadow:0 0 12px rgba(0,255,157,.06);
+      font-size:16px;
       font-weight:900;
+      outline:none;
+      text-align:center;
     }
-    .m-chip.m-none{
+    .w-input::placeholder{ color:rgba(229,231,235,.35); font-weight:700; }
+    .w-input:focus{
+      border-color:rgba(0,234,255,.5);
+      box-shadow:0 0 0 3px rgba(0,234,255,.1);
+    }
+    .pct-suffix{ color:rgba(229,231,235,.55); font-weight:900; }
+
+    /* Frequency / Months cell */
+    .fm{
+      text-align:left;
+      font-family:"Noto Sans TC";
+      white-space:normal;
+    }
+    .freq-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 12px;
+      border-radius:999px;
+      font-weight:900;
+      letter-spacing:.3px;
+      border:1px solid rgba(0,234,255,.35);
+      background:rgba(0,234,255,.08);
+      color:rgba(190,255,255,.95);
+      margin-right:10px;
+      min-width:64px;
+    }
+    .freq-badge.monthly{
+      border-color:rgba(255,215,0,.35);
+      background:rgba(255,215,0,.07);
+      color:var(--gold);
+    }
+    .freq-badge.none{
+      border-color:rgba(255,255,255,.14);
+      background:rgba(255,255,255,.05);
+      color:rgba(229,231,235,.65);
+    }
+
+    /* per-ETF month lamps (only their months) */
+    .row-months{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .sLamp{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-family:"Roboto Mono";
+      font-weight:900;
+      font-size:13px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.05);
-      color:var(--muted);
+      color:rgba(229,231,235,.55);
       box-shadow:none;
+    }
+    .sLamp.on{
+      border-color:rgba(255,215,0,.55);
+      color:#111;
+      background:linear-gradient(180deg, rgba(255,215,0,.95), rgba(246,230,176,.85));
+      box-shadow:0 0 14px rgba(255,215,0,.16);
+    }
+    .sLamp.smallText{
+      width:auto;
+      padding:0 12px;
+      font-family:"Noto Sans TC";
+      font-size:12px;
+      height:34px;
     }
 
     /* Help / info */
     .th-help{
-      display:inline-block; width:16px; height:16px; line-height:16px;
-      text-align:center;
-      border:1px solid var(--muted);
-      border-radius:50%;
-      font-size:10px;
+      display:inline-flex;
+      width:18px; height:18px;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.28);
+      border-radius:999px;
+      font-size:11px;
       cursor:pointer;
-      margin-left:6px;
+      margin-left:8px;
+      color:rgba(229,231,235,.75);
       transition:.2s;
+      background:rgba(255,255,255,.05);
     }
-    .th-help:hover{ border-color:var(--info); color:var(--info); box-shadow:0 0 8px rgba(0,234,255,.35); }
+    .th-help:hover{ border-color:var(--info); color:var(--info); box-shadow:0 0 10px rgba(0,234,255,.2); }
 
     .info-dot{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:16px;height:16px;
-      border-radius:50%;
+      width:18px;height:18px;
+      border-radius:999px;
       border:1px solid rgba(0,234,255,.6);
       color:var(--info);
       font-family:"Roboto Mono";
-      font-size:10px;
-      margin-left:6px;
+      font-size:11px;
+      margin-left:8px;
       cursor:pointer;
       box-shadow:0 0 10px rgba(0,234,255,.12);
     }
@@ -315,12 +549,12 @@
       position:fixed;
       top:50%; left:50%;
       transform:translate(-50%,-50%);
-      width:min(360px, calc(100vw - 28px));
+      width:min(420px, calc(100vw - 28px));
       background:#0A1221;
       border:1px solid rgba(0,234,255,.6);
       padding:18px;
       z-index:9999;
-      border-radius:12px;
+      border-radius:14px;
       box-shadow:0 0 40px rgba(0,234,255,.12);
     }
     .show-modal{ display:block; }
@@ -352,13 +586,14 @@
       border:none;
       cursor:pointer;
       font-weight:900;
-      border-radius:10px;
+      border-radius:12px;
     }
     .modal-btn:hover{ box-shadow:0 0 18px rgba(255,255,255,.08); }
 
-    @media (max-width:420px){
-      h1{ font-size:24px; }
-      td{ font-size:12px; }
+    @media (max-width:980px){
+      .top-grid{ grid-template-columns:1fr; }
+      table{ min-width:980px; }
+      .big{ font-size:34px; }
     }
   </style>
 </head>
@@ -371,7 +606,7 @@
 
       <div class="desc">
         <b style="color:var(--gold)">報告用途：</b>以「還原權息」方式估算 ETF 近 <b id="years-text"></b> 年年化績效，將股價價差與現金股利合併呈現。<br>
-        <span style="color:var(--info)">提醒：</span>配息不等於報酬，請搭配總報酬與波動風險一併評估。
+        <span style="color:var(--info)">重點：</span>下方可輸入「配置%」立即換算成「月配達成燈號」與「預估月配金額」。
       </div>
 
       <div class="meta-strip">
@@ -381,11 +616,67 @@
       </div>
     </header>
 
+    <!-- ===== Top cards (instant calc) ===== -->
+    <section class="top-grid">
+      <div class="card">
+        <h3><span style="color:var(--info);font-weight:900;">起始金額</span>（預設 1,000,000）<span class="unit">TWD</span></h3>
+        <div class="amount-row">
+          <input id="amount" class="amount-input" type="number" inputmode="numeric" min="0" step="1000" value="1000000" />
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="btnFill100">一鍵100%</button>
+          <button class="btn" id="btnReset">重置</button>
+        </div>
+        <div class="sub">
+          輸入後即時計算：<code>預期年化總報酬</code>、<code>年化配息率</code>、<code>月配換算金額</code>。
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>預期年化總報酬（依配置加權）</h3>
+        <p id="kpiTotal" class="big green">—</p>
+        <div class="sub">
+          = Σ(權重 × (年化價差 + 年化配息率))<br>
+          <span id="kpiStatus1" style="color:var(--muted);font-weight:900;"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>預期年化配息率（依配置加權）</h3>
+        <p id="kpiDiv" class="big green">—</p>
+        <div class="sub">
+          = Σ(權重 × 年化配息率)<br>
+          <span id="kpiStatus2" style="color:var(--muted);font-weight:900;"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>預估每月配息金額（全部換算月配）</h3>
+        <p id="kpiMonthly" class="big gold">$ —</p>
+        <div class="sub">
+          = 起始金額 × 年化配息率 ÷ 12
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Month achievement ===== -->
+    <section class="achieve">
+      <div class="ach-left">
+        <div class="ach-title">月配達成燈號（有配息＝亮燈）</div>
+        <div class="sum-pill">配置合計：<span id="sumW">0.00%</span></div>
+        <div id="missingText" class="missing" style="display:none;">缺月：—</div>
+        <span class="th-help" onclick="showHelp('月配達成燈號', '亮燈 = 該月份有被分配到配息 ETF', '若你想「月月有息」，就讓 1~12 全部亮燈。\n月配 ETF：視為 1~12 都會亮燈。\n季配/半年配/年配：只會點亮各自的除息月份。')">?</span>
+      </div>
+      <div id="achMonths" class="months-strip"></div>
+    </section>
+
+    <!-- Loading -->
     <div id="loading-container" class="loading-container">
       <div id="loading-text" class="loading-text">連線數據中心... 0%</div>
       <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
     </div>
 
+    <!-- Error -->
     <div id="error-box" class="error-box">
       <div class="title">資料載入失敗</div>
       <div style="color:var(--text); margin-top:6px;">
@@ -395,30 +686,35 @@
       <button onclick="location.reload()">重新整理</button>
     </div>
 
+    <!-- Table -->
     <div class="table-container">
       <table id="etf-table" style="display:none;">
         <thead>
           <tr>
-            <th style="width:55px;">排名</th>
-            <th data-sort="symbol">代碼<span class="arrow" id="arrow-symbol"></span></th>
-            <th style="text-align:left;">名稱</th>
-            <th>頻率</th>
+            <th class="col-rank">排名</th>
+            <th class="col-sym" data-sort="symbol">代碼<span class="arrow" id="arrow-symbol"></span></th>
+            <th class="col-name">名稱</th>
 
-            <th data-sort="total">
-              年化總報酬
-              <span class="th-help" onclick="event.stopPropagation(); showHelp('年化總報酬', '年化價差 + 年化配息率', '最核心指標：把股價價差(含還原拆分/權息)與配息合併後，轉成年化。')">?</span>
+            <th class="col-w">
+              配置% <span class="th-help" onclick="event.stopPropagation(); showHelp('配置%', '輸入 0~100', '輸入每檔 ETF 的配置比重（%）。\n上方會即時計算「預期報酬 / 配息率 / 月配換算」。\n可按「一鍵100%」自動補滿。')">?</span>
+            </th>
+
+            <th class="col-fm">
+              頻率 / 月份 <span class="th-help" onclick="event.stopPropagation(); showHelp('頻率 / 月份', '每檔只顯示自己的配息月份', '月份燈號：該 ETF 的典型除息月份。\n亮金燈：該月份有配息。\n月配：視為每月都有配息。')">?</span>
+            </th>
+
+            <th class="col-metric" data-sort="total">
+              年化總報酬 <span class="th-help" onclick="event.stopPropagation(); showHelp('年化總報酬', '年化價差 + 年化配息率', '最核心指標：把股價價差(含還原拆分/權息)與配息合併後，轉成年化。')">?</span>
               <span class="arrow" id="arrow-total"></span>
             </th>
 
-            <th data-sort="yield1">
-              殖利率(1Y)
-              <span class="th-help" onclick="event.stopPropagation(); showHelp('殖利率(1Y)', '近1年現金股利 / 現價', '站在「現在買入」角度，回看過去一年實際配息相對於現價的比例。')">?</span>
+            <th class="col-metric" data-sort="yield1">
+              殖利率(1Y) <span class="th-help" onclick="event.stopPropagation(); showHelp('殖利率(1Y)', '近1年現金股利 / 現價', '站在「現在買入」角度，回看過去一年實際配息相對於現價的比例。')">?</span>
               <span class="arrow" id="arrow-yield1"></span>
             </th>
 
-            <th data-sort="yann">
-              年化配息率
-              <span class="th-help" onclick="event.stopPropagation(); showHelp('年化配息率', '區間總配息率 / 持有年數', '以近 N 年區間的配息總額估算，除以 N 轉成年化平均配息率。')">?</span>
+            <th class="col-metric" data-sort="yann">
+              年化配息率 <span class="th-help" onclick="event.stopPropagation(); showHelp('年化配息率', '區間總配息率 / 持有年數', '以近 N 年區間的配息總額估算，除以 N 轉成年化平均配息率。')">?</span>
               <span class="arrow" id="arrow-yann"></span>
             </th>
           </tr>
@@ -428,6 +724,7 @@
     </div>
   </div>
 
+  <!-- Modal -->
   <div id="modal-backdrop" class="modal-backdrop" onclick="closeHelp()"></div>
   <div id="modal-box" class="modal-box" role="dialog" aria-modal="true">
     <div id="modal-title" class="modal-title"></div>
@@ -437,41 +734,44 @@
   </div>
 
 <script>
-  // ========= 基本設定 =========
+  // =========================================================
+  // 基本設定
+  // =========================================================
   const WORKER_URL = "https://etf-metrics-worker.nms3194949.workers.dev/etf-metrics";
   const YEARS = 3;
 
   document.getElementById("years-text").innerText = YEARS;
   document.getElementById("asof-text").innerText = "2025.12";
 
-  // ========= ETF 基礎資料 =========
-  // months: 用「典型除息月份」做呈現（徽章化）
-  // - 月配：["ALL"]
-  // - 不配息：[]
-  const ETF_META = {
-    "0056":  { name: "元大台灣高股息",      freq: "季配",  months: [1,4,7,10] },
-    "00713": { name: "元大高股息低波動",    freq: "季配",  months: [3,6,9,12] },
-    "00878": { name: "國泰永續高股息",      freq: "季配",  months: [2,5,8,11] },
-    "00918": { name: "大華優選高填息30",    freq: "季配",  months: [3,6,9,12] },
-    "00919": { name: "群益台灣精選高息",    freq: "季配",  months: [3,6,9,12] },
-    "00929": { name: "復華科技優息",        freq: "月配",  months: ["ALL"] },
-    "00940": { name: "元大台灣價值高息",    freq: "月配",  months: ["ALL"] },
-    "00915": { name: "凱基台灣優選高股息30",freq: "季配",  months: [3,6,9,12] },
-    "0050":  { name: "元大台灣50",          freq: "半年配",months: [1,7] },
+  // =========================================================
+  // ETF 基礎資料（月份：典型除息月份）
+  // - months: array of month numbers
+  // - 月配：months = [1..12]
+  // =========================================================
+  const ALL_MONTHS = [1,2,3,4,5,6,7,8,9,10,11,12];
 
-    "0052": {
-      name: "富邦科技",
-      freq: "年配",
-      months: [4],
+  const ETF_META = {
+    "0056":  { name:"元大台灣高股息",       freq:"季配",   months:[1,4,7,10] },
+    "00713": { name:"元大高股息低波動",     freq:"季配",   months:[3,6,9,12] },
+    "00878": { name:"國泰永續高股息",       freq:"季配",   months:[2,5,8,11] },
+    "00918": { name:"大華優選高填息30",     freq:"季配",   months:[3,6,9,12] },
+    "00919": { name:"群益台灣精選高息",     freq:"季配",   months:[3,6,9,12] },
+    "00929": { name:"復華科技優息",         freq:"月配",   months:ALL_MONTHS },
+    "00940": { name:"元大台灣價值高息",     freq:"月配",   months:ALL_MONTHS },
+    "00915": { name:"凱基台灣優選高股息30", freq:"季配",   months:[3,6,9,12] },
+    "0050":  { name:"元大台灣50",           freq:"半年配", months:[1,7] },
+    "0052":  {
+      name:"富邦科技",
+      freq:"年配",
+      months:[4],
       splitRatio: 7,
       splitInfo:
 `拆分日期：2025/09/25
 事件：1拆7 分割
 處理：僅針對「價格價差」進行拆分還原校正，殖利率以最新現價為基準。`
     },
-
-    "00881": { name: "國泰科技龍頭",        freq: "半年配",months: [1,8] },
-    "00757": { name: "統一NYSE FANG+",      freq: "不配息",months: [] }
+    "00881": { name:"國泰科技龍頭",         freq:"半年配", months:[1,8] },
+    "00757": { name:"統一NYSE FANG+",       freq:"不配息", months:[] }
   };
 
   const BATCHES = [
@@ -479,17 +779,30 @@
     ["00940","00915","0050","0052","00881","00757"]
   ];
 
-  // ========= 狀態 =========
+  // =========================================================
+  // 狀態
+  // =========================================================
   let dataRows = [];
   let currentSort = "total";
   let isDesc = true;
+
   let displayProgress = 0;
   let progressTarget = 0;
 
-  // ========= 工具 =========
+  // 配置（%）
+  const STORE_KEY = "momo_etf_alloc_v1";
+  let alloc = {}; // {symbol: number}
+
+  // =========================================================
+  // 工具
+  // =========================================================
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const safeNum = (v) => (Number.isFinite(v) ? v : 0);
-  const pct = (v) => `${(safeNum(v) * 100).toFixed(2)}%`;
+  const fmtPct = (v) => `${(safeNum(v) * 100).toFixed(2)}%`;
+  const fmtMoney = (n) => {
+    const x = Math.round(safeNum(n));
+    return x.toLocaleString("en-US");
+  };
 
   function animateProgress(){
     if(displayProgress < progressTarget){
@@ -503,7 +816,7 @@
 
   function showHelp(t, f, d){
     document.getElementById('modal-title').innerText = t;
-    document.getElementById('modal-formula').innerText = "公式：" + "\n" + f;
+    document.getElementById('modal-formula').innerText = "公式／說明：" + "\n" + f;
     document.getElementById('modal-desc').innerText = d;
     document.getElementById('modal-backdrop').classList.add('show-modal');
     document.getElementById('modal-box').classList.add('show-modal');
@@ -513,7 +826,7 @@
     document.getElementById('modal-box').classList.remove('show-modal');
   }
 
-  // ✅ 拆分修正：只修正「price 年化價差」
+  // 拆分修正：只修正「price 年化價差」
   function applyCorporateActions(row){
     const r = structuredClone(row);
     const meta = ETF_META[r.symbol] || {};
@@ -527,19 +840,18 @@
     return r;
   }
 
-  // ✅ 指標取值器
   function getMetric(r, key){
     const meta = ETF_META[r.symbol] || {};
     const isNoDiv = meta.freq === "不配息";
 
     const priceAnn = safeNum(r.price?.annualized_return_ex_div);
     const yAnn = isNoDiv ? 0 : safeNum(r.dividend?.yield_period_annualized);
-    const y1 = isNoDiv ? 0 : safeNum(r.dividend?.yield_1y);
+    const y1   = isNoDiv ? 0 : safeNum(r.dividend?.yield_1y);
 
     if(key === "symbol") return Number(r.symbol);
-    if(key === "total") return priceAnn + yAnn;
+    if(key === "total")  return priceAnn + yAnn;
     if(key === "yield1") return y1;
-    if(key === "yann") return yAnn;
+    if(key === "yann")   return yAnn;
     return 0;
   }
 
@@ -556,61 +868,6 @@
       if(!el) return;
       if(currentSort !== k) el.innerText = "";
       else el.innerText = isDesc ? "▼" : "▲";
-    });
-  }
-
-  // ====== NEW: 月份徽章 HTML ======
-  function renderMonthsChips(meta){
-    const months = meta.months;
-
-    if(!months || months.length === 0){
-      return `<span class="m-chip m-none">—</span>`;
-    }
-    if(months.length === 1 && months[0] === "ALL"){
-      return `<span class="m-chip m-all">每月</span>`;
-    }
-
-    return months.map(m => `<span class="m-chip">${m}</span>`).join("");
-  }
-
-  function render(){
-    const tbody = document.getElementById("tbody");
-    tbody.innerHTML = "";
-
-    dataRows.forEach((raw, index) => {
-      const r = applyCorporateActions(raw);
-      const meta = ETF_META[r.symbol] || { name: r.symbol, freq: "–", months: [] };
-
-      const total = getMetric(r, "total");
-      const yield1 = getMetric(r, "yield1");
-      const yann = getMetric(r, "yann");
-
-      const infoDot = meta.splitInfo
-        ? `<span class="info-dot" onclick="event.stopPropagation(); showHelp('${meta.name}｜拆分/權值校正', '拆分資訊', \`${meta.splitInfo.replace(/`/g,'\\`')}\`)">i</span>`
-        : "";
-
-      const freqCell = `
-        <div class="freq-wrap">
-          <span class="freq-tag">${meta.freq}</span>
-          <span class="months">${renderMonthsChips(meta)}</span>
-        </div>
-      `;
-
-      tbody.innerHTML += `
-        <tr>
-          <td>${getRankBadge(index)}</td>
-          <td>
-            <a href="https://tw.stock.yahoo.com/quote/${r.symbol}" target="_blank" class="symbol-link">${r.symbol}</a>
-            ${infoDot}
-          </td>
-          <td style="text-align:left; font-family:'Noto Sans TC';">${meta.name}</td>
-          <td>${freqCell}</td>
-
-          <td class="${total>=0?'pos':'neg'}" style="font-weight:900;">${pct(total)}</td>
-          <td class="${yield1>=0?'pos':'neg'}">${pct(yield1)}</td>
-          <td class="${yann>=0?'pos':'neg'}">${pct(yann)}</td>
-        </tr>
-      `;
     });
   }
 
@@ -638,8 +895,272 @@
 
     setArrows();
     render();
+    recomputeKpis();
   }
 
+  // =========================================================
+  // 配置：儲存 / 讀取
+  // =========================================================
+  function loadAlloc(){
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return;
+      const parsed = JSON.parse(raw);
+      if(parsed && typeof parsed === "object") alloc = parsed;
+    }catch(e){}
+  }
+  function saveAlloc(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(alloc)); }catch(e){}
+  }
+
+  function getAllocPct(symbol){
+    const v = Number(alloc[symbol] ?? 0);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  function setAllocPct(symbol, v){
+    alloc[symbol] = v;
+    saveAlloc();
+  }
+
+  // =========================================================
+  // 月配燈號（依目前配置）
+  // =========================================================
+  function computeCoveredMonths(){
+    const covered = new Set();
+    for(const row of dataRows){
+      const sym = row.symbol;
+      const w = getAllocPct(sym);
+      if(w <= 0) continue;
+
+      const meta = ETF_META[sym] || {};
+      const months = Array.isArray(meta.months) ? meta.months : [];
+
+      // 不配息 => 不點燈
+      if(!months.length) continue;
+
+      // 月配 => 全亮（months 會是 1..12）
+      months.forEach(m => covered.add(m));
+    }
+    return covered;
+  }
+
+  function renderAchieveLamps(){
+    const wrap = document.getElementById("achMonths");
+    const covered = computeCoveredMonths();
+    wrap.innerHTML = "";
+
+    for(let m=1;m<=12;m++){
+      const on = covered.has(m);
+      wrap.innerHTML += `<div class="mLamp ${on?'on':''}">${m}</div>`;
+    }
+
+    // 缺月提醒
+    const missing = [];
+    for(let m=1;m<=12;m++){
+      if(!covered.has(m)) missing.push(m);
+    }
+    const missEl = document.getElementById("missingText");
+    if(missing.length === 0){
+      missEl.style.display = "none";
+      missEl.innerText = "";
+    }else{
+      missEl.style.display = "inline";
+      missEl.innerText = "缺月：" + missing.join(", ");
+    }
+  }
+
+  // =========================================================
+  // KPI 即時計算
+  // =========================================================
+  function getWeightSum(){
+    let s = 0;
+    for(const row of dataRows){
+      s += getAllocPct(row.symbol);
+    }
+    return s;
+  }
+
+  function recomputeKpis(){
+    const sumW = getWeightSum();
+    document.getElementById("sumW").innerText = `${sumW.toFixed(2)}%`;
+
+    // 轉成 0~1 權重
+    const wNorm = (sym) => getAllocPct(sym) / 100;
+
+    let expTotal = 0;
+    let expDiv = 0;
+
+    for(const raw of dataRows){
+      const r = applyCorporateActions(raw);
+      const sym = r.symbol;
+      const w = wNorm(sym);
+      if(w <= 0) continue;
+
+      const total = getMetric(r, "total"); // (priceAnn + yAnn)
+      const yann  = getMetric(r, "yann");
+
+      expTotal += w * total;
+      expDiv   += w * yann;
+    }
+
+    const amount = safeNum(Number(document.getElementById("amount").value));
+    const monthlyCash = amount * expDiv / 12;
+
+    const status = (sumW >= 99.999 && sumW <= 100.001) ? "（已滿100%）" : "（未滿100%）";
+
+    document.getElementById("kpiTotal").innerText = fmtPct(expTotal);
+    document.getElementById("kpiDiv").innerText   = fmtPct(expDiv);
+    document.getElementById("kpiMonthly").innerText = `$ ${fmtMoney(monthlyCash)}`;
+
+    document.getElementById("kpiStatus1").innerText = status;
+    document.getElementById("kpiStatus2").innerText = status;
+
+    renderAchieveLamps();
+  }
+
+  // =========================================================
+  // 事件：一鍵100% / 重置
+  // =========================================================
+  function fillTo100(){
+    // 將現有配置維持比例，補到 100%
+    const sumW = getWeightSum();
+    if(sumW <= 0){
+      // 沒輸入就平均分到「有配息的 ETF」（你也可以改成全部平均）
+      const divSyms = dataRows
+        .map(r=>r.symbol)
+        .filter(sym => (ETF_META[sym]?.months?.length || 0) > 0);
+      const n = divSyms.length || dataRows.length || 1;
+      const each = 100 / n;
+      divSyms.forEach(sym => setAllocPct(sym, Number(each.toFixed(2))));
+    }else{
+      const scale = 100 / sumW;
+      for(const row of dataRows){
+        const sym = row.symbol;
+        const cur = getAllocPct(sym);
+        if(cur <= 0) continue;
+        setAllocPct(sym, Number((cur * scale).toFixed(2)));
+      }
+    }
+    render();
+    recomputeKpis();
+  }
+
+  function resetAll(){
+    document.getElementById("amount").value = 1000000;
+    alloc = {};
+    saveAlloc();
+    render();
+    recomputeKpis();
+  }
+
+  // =========================================================
+  // UI：頻率/月份燈號（每檔只顯示自己的月份）
+  // - 小燈：一律金燈（因為是「該檔的配息月份」）
+  // - 月配：顯示一顆「每月」燈（避免太多燈）
+  // =========================================================
+  function renderMonthsForEtf(symbol){
+    const meta = ETF_META[symbol] || {};
+    const months = Array.isArray(meta.months) ? meta.months : [];
+
+    // 不配息
+    if(meta.freq === "不配息" || months.length === 0){
+      return `<div class="row-months"><span class="sLamp smallText">—</span></div>`;
+    }
+
+    // 月配：用「每月」取代 12 顆燈（更乾淨）
+    if(meta.freq === "月配"){
+      return `<div class="row-months">
+        <span class="sLamp on smallText">每月</span>
+      </div>`;
+    }
+
+    // 其他：顯示該檔月份燈號
+    return `<div class="row-months">
+      ${months.map(m => `<span class="sLamp on">${m}</span>`).join("")}
+    </div>`;
+  }
+
+  // =========================================================
+  // Render Table
+  // =========================================================
+  function render(){
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+
+    dataRows.forEach((raw, index) => {
+      const r = applyCorporateActions(raw);
+      const meta = ETF_META[r.symbol] || { name: r.symbol, freq: "–", months:[] };
+
+      const total  = getMetric(r, "total");
+      const yield1 = getMetric(r, "yield1");
+      const yann   = getMetric(r, "yann");
+
+      const w = getAllocPct(r.symbol);
+
+      const infoDot = meta.splitInfo
+        ? `<span class="info-dot" onclick="event.stopPropagation(); showHelp('${meta.name}｜拆分/權值校正', '拆分資訊', \`${String(meta.splitInfo).replace(/`/g,'\\`')}\`)">i</span>`
+        : "";
+
+      const freqClass =
+        meta.freq === "月配" ? "monthly" :
+        meta.freq === "不配息" ? "none" : "";
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${getRankBadge(index)}</td>
+
+          <td>
+            <a href="https://tw.stock.yahoo.com/quote/${r.symbol}" target="_blank" class="symbol-link">${r.symbol}</a>
+            ${infoDot}
+          </td>
+
+          <td style="text-align:left; font-family:'Noto Sans TC'; font-weight:800;">${meta.name}</td>
+
+          <td>
+            <div class="w-wrap">
+              <input class="w-input" type="number" inputmode="decimal" step="0.1" min="0" max="100"
+                data-sym="${r.symbol}" value="${w ? w : ""}" placeholder="0" />
+              <span class="pct-suffix">%</span>
+            </div>
+          </td>
+
+          <td class="fm">
+            <span class="freq-badge ${freqClass}">${meta.freq}</span>
+            ${renderMonthsForEtf(r.symbol)}
+          </td>
+
+          <td class="${total>=0?'pos':'neg'}" style="font-weight:900;">${fmtPct(total)}</td>
+          <td class="${yield1>=0?'pos':'neg'}">${fmtPct(yield1)}</td>
+          <td class="${yann>=0?'pos':'neg'}">${fmtPct(yann)}</td>
+        </tr>
+      `;
+    });
+
+    // 綁定配置輸入事件
+    tbody.querySelectorAll(".w-input").forEach(inp => {
+      inp.addEventListener("focus", () => inp.select());
+      inp.addEventListener("input", () => {
+        const sym = inp.dataset.sym;
+        const v = Number(inp.value);
+        const val = Number.isFinite(v) ? clamp(v, 0, 100) : 0;
+        setAllocPct(sym, val);
+        recomputeKpis();
+      });
+      inp.addEventListener("blur", () => {
+        // 美化：保留 1 位小數（但不要強迫顯示 0）
+        const sym = inp.dataset.sym;
+        const cur = getAllocPct(sym);
+        inp.value = cur ? Number(cur.toFixed(1)) : "";
+      });
+    });
+
+    renderAchieveLamps();
+  }
+
+  // =========================================================
+  // Load data
+  // =========================================================
   async function load(){
     animateProgress();
 
@@ -649,7 +1170,7 @@
         progressTarget = Math.round(((i+1)/BATCHES.length)*100);
 
         const url = `${WORKER_URL}?symbols=${BATCHES[i].join(",")}&years=${YEARS}`;
-        const res = await fetch(url, { cache: "no-store" });
+        const res = await fetch(url, { cache:"no-store" });
         if(!res.ok) throw new Error("Fetch failed: " + res.status);
 
         const j = await res.json();
@@ -662,7 +1183,7 @@
         document.getElementById("loading-container").style.display = "none";
         document.getElementById("etf-table").style.display = "table";
         sortBy("total", true);
-      }, 450);
+      }, 380);
 
     }catch(e){
       document.getElementById("loading-container").style.display = "none";
@@ -671,10 +1192,26 @@
     }
   }
 
+  // =========================================================
+  // Init
+  // =========================================================
   document.querySelectorAll("th[data-sort]").forEach(th=>{
     th.addEventListener("click", ()=> sortBy(th.dataset.sort));
   });
 
+  document.getElementById("amount").addEventListener("input", () => recomputeKpis());
+
+  document.getElementById("btnFill100").addEventListener("click", () => fillTo100());
+  document.getElementById("btnReset").addEventListener("click", () => resetAll());
+
+  // 先渲染月燈（空狀態）
+  (function initMonthStrip(){
+    const wrap = document.getElementById("achMonths");
+    wrap.innerHTML = "";
+    for(let m=1;m<=12;m++) wrap.innerHTML += `<div class="mLamp">${m}</div>`;
+  })();
+
+  loadAlloc();
   load();
 </script>
 </body>
