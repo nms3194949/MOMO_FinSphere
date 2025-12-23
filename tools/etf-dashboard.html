@@ -213,6 +213,66 @@
     .pos{ color:var(--success); }
     .neg{ color:var(--danger); }
 
+    /* ====== NEW: 頻率月份徽章 ====== */
+    .freq-wrap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      flex-wrap:wrap;
+      font-family:"Noto Sans TC";
+    }
+    .freq-tag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:4px 8px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:11px;
+      letter-spacing:.2px;
+      border:1px solid rgba(0,234,255,.25);
+      background:rgba(0,234,255,.08);
+      color:var(--info);
+      box-shadow:0 0 12px rgba(0,234,255,.08);
+      line-height:1;
+    }
+    .months{
+      display:inline-flex;
+      gap:4px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .m-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:22px;
+      height:18px;
+      padding:0 6px;
+      border-radius:999px;
+      font-family:"Roboto Mono";
+      font-size:11px;
+      border:1px solid rgba(255,215,0,.22);
+      background:rgba(255,215,0,.10);
+      color:var(--gold);
+      box-shadow:0 0 12px rgba(255,215,0,.06);
+      line-height:1;
+    }
+    .m-chip.m-all{
+      border:1px solid rgba(0,255,157,.25);
+      background:rgba(0,255,157,.08);
+      color:var(--success);
+      box-shadow:0 0 12px rgba(0,255,157,.06);
+      font-weight:900;
+    }
+    .m-chip.m-none{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      box-shadow:none;
+    }
+
     /* Help / info */
     .th-help{
       display:inline-block; width:16px; height:16px; line-height:16px;
@@ -382,24 +442,27 @@
   const YEARS = 3;
 
   document.getElementById("years-text").innerText = YEARS;
-  document.getElementById("asof-text").innerText = "2025.12"; // 你想做成動態也可以改成 Worker 回傳
+  document.getElementById("asof-text").innerText = "2025.12";
 
   // ========= ETF 基礎資料 =========
-  // splitRatio：若該 ETF 在區間內做過拆分（例如 1拆7 => splitRatio=7），我們只需要校正「價格價差」那一段即可
+  // months: 用「典型除息月份」做呈現（徽章化）
+  // - 月配：["ALL"]
+  // - 不配息：[]
   const ETF_META = {
-    "0056": { name: "元大台灣高股息", freq: "季配" },
-    "00713": { name: "元大高股息低波動", freq: "季配" },
-    "00878": { name: "國泰永續高股息", freq: "季配" },
-    "00918": { name: "大華優選高填息30", freq: "季配" },
-    "00919": { name: "群益台灣精選高息", freq: "季配" },
-    "00929": { name: "復華科技優息", freq: "月配" },
-    "00940": { name: "元大台灣價值高息", freq: "月配" },
-    "00915": { name: "凱基台灣優選高股息30", freq: "季配" },
-    "0050": { name: "元大台灣50", freq: "半年配" },
+    "0056":  { name: "元大台灣高股息",      freq: "季配",  months: [1,4,7,10] },
+    "00713": { name: "元大高股息低波動",    freq: "季配",  months: [3,6,9,12] },
+    "00878": { name: "國泰永續高股息",      freq: "季配",  months: [2,5,8,11] },
+    "00918": { name: "大華優選高填息30",    freq: "季配",  months: [3,6,9,12] },
+    "00919": { name: "群益台灣精選高息",    freq: "季配",  months: [3,6,9,12] },
+    "00929": { name: "復華科技優息",        freq: "月配",  months: ["ALL"] },
+    "00940": { name: "元大台灣價值高息",    freq: "月配",  months: ["ALL"] },
+    "00915": { name: "凱基台灣優選高股息30",freq: "季配",  months: [3,6,9,12] },
+    "0050":  { name: "元大台灣50",          freq: "半年配",months: [1,7] },
 
     "0052": {
       name: "富邦科技",
       freq: "年配",
+      months: [4],
       splitRatio: 7,
       splitInfo:
 `拆分日期：2025/09/25
@@ -407,8 +470,8 @@
 處理：僅針對「價格價差」進行拆分還原校正，殖利率以最新現價為基準。`
     },
 
-    "00881": { name: "國泰科技龍頭", freq: "半年配" },
-    "00757": { name: "統一NYSE FANG+", freq: "不配息" }
+    "00881": { name: "國泰科技龍頭",        freq: "半年配",months: [1,8] },
+    "00757": { name: "統一NYSE FANG+",      freq: "不配息",months: [] }
   };
 
   const BATCHES = [
@@ -450,15 +513,13 @@
     document.getElementById('modal-box').classList.remove('show-modal');
   }
 
-  // ✅ 拆分修正：只修正「price 年化價差」那段；不做模糊條件判斷（避免誤傷）
+  // ✅ 拆分修正：只修正「price 年化價差」
   function applyCorporateActions(row){
     const r = structuredClone(row);
     const meta = ETF_META[r.symbol] || {};
     const ratio = meta.splitRatio ? Number(meta.splitRatio) : 0;
 
     if(ratio && r.price && Number.isFinite(r.price.annualized_return_ex_div)){
-      // 假設原本 annualized 是以「未還原拆分」導致價差過度負向
-      // 方式：把區間的累積報酬(1+ann)^YEARS 乘上 ratio，再轉回年化
       const cumulative = Math.pow(1 + r.price.annualized_return_ex_div, YEARS);
       const fixedCumulative = cumulative * ratio;
       r.price.annualized_return_ex_div = Math.pow(fixedCumulative, 1 / YEARS) - 1;
@@ -466,7 +527,7 @@
     return r;
   }
 
-  // ✅ 每個欄位都用正確的取值器，避免排序抓不到資料
+  // ✅ 指標取值器
   function getMetric(r, key){
     const meta = ETF_META[r.symbol] || {};
     const isNoDiv = meta.freq === "不配息";
@@ -475,7 +536,7 @@
     const yAnn = isNoDiv ? 0 : safeNum(r.dividend?.yield_period_annualized);
     const y1 = isNoDiv ? 0 : safeNum(r.dividend?.yield_1y);
 
-    if(key === "symbol") return Number(r.symbol); // 台股代碼可用數字排序
+    if(key === "symbol") return Number(r.symbol);
     if(key === "total") return priceAnn + yAnn;
     if(key === "yield1") return y1;
     if(key === "yann") return yAnn;
@@ -498,13 +559,28 @@
     });
   }
 
+  // ====== NEW: 月份徽章 HTML ======
+  function renderMonthsChips(meta){
+    const months = meta.months;
+
+    if(!months || months.length === 0){
+      return `<span class="m-chip m-none">—</span>`;
+    }
+    if(months.length === 1 && months[0] === "ALL"){
+      return `<span class="m-chip m-all">每月</span>`;
+    }
+
+    return months.map(m => `<span class="m-chip">${m}</span>`).join("");
+  }
+
   function render(){
     const tbody = document.getElementById("tbody");
     tbody.innerHTML = "";
 
     dataRows.forEach((raw, index) => {
       const r = applyCorporateActions(raw);
-      const meta = ETF_META[r.symbol] || { name: r.symbol, freq: "–" };
+      const meta = ETF_META[r.symbol] || { name: r.symbol, freq: "–", months: [] };
+
       const total = getMetric(r, "total");
       const yield1 = getMetric(r, "yield1");
       const yann = getMetric(r, "yann");
@@ -512,6 +588,13 @@
       const infoDot = meta.splitInfo
         ? `<span class="info-dot" onclick="event.stopPropagation(); showHelp('${meta.name}｜拆分/權值校正', '拆分資訊', \`${meta.splitInfo.replace(/`/g,'\\`')}\`)">i</span>`
         : "";
+
+      const freqCell = `
+        <div class="freq-wrap">
+          <span class="freq-tag">${meta.freq}</span>
+          <span class="months">${renderMonthsChips(meta)}</span>
+        </div>
+      `;
 
       tbody.innerHTML += `
         <tr>
@@ -521,7 +604,7 @@
             ${infoDot}
           </td>
           <td style="text-align:left; font-family:'Noto Sans TC';">${meta.name}</td>
-          <td style="color:var(--info); font-size:11px; font-family:'Noto Sans TC';">${meta.freq}</td>
+          <td>${freqCell}</td>
 
           <td class="${total>=0?'pos':'neg'}" style="font-weight:900;">${pct(total)}</td>
           <td class="${yield1>=0?'pos':'neg'}">${pct(yield1)}</td>
