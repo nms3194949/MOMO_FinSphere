@@ -52,6 +52,15 @@ window.MOMO_TOOLS_CONFIG = [
     external: true,
     showOnHome: true
   },
+    {
+    id: "fund-radar",
+    category: "fund",
+    title: "雙贏策略",
+    desc: "風險與收益間找到最佳平衡點。",
+    href: "/MOMO_FinSphere/tools/MOMO-Wealth-Simulator.html",
+    external: true,
+    showOnHome: true
+  },
   {
     // [修正 3] 統一 ID 命名風格 (原本是 fund_radar)
     id: "fund-radar",
