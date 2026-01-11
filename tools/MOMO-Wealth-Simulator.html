@@ -35,6 +35,7 @@
     header{padding-bottom:18px;margin-bottom:18px;}
     .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
     .title-wrap h1{margin:0;font-size:28px;background:var(--gold-grad);-webkit-background-clip:text;color:transparent;}
+    .title-wrap p{margin:6px 0 0 0;color:#8aa0b8;font-size:12px;letter-spacing:.3px;}
 
     .contact-card{
       display:flex;align-items:center;gap:14px;
@@ -42,7 +43,7 @@
       border:1px solid rgba(255,255,255,.06);
       background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.18));
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      min-width: 340px;
+      min-width: 360px;
       max-width: 100%;
     }
     .avatar-ring{
@@ -62,7 +63,7 @@
     .contact-text .hint{font-size:10px;color:#6f859e;margin-top:2px;}
 
     .layout{display:grid;grid-template-columns:340px 1fr;gap:22px;align-items:start;}
-    @media (max-width:980px){.layout{grid-template-columns:1fr;}}
+    @media (max-width:1100px){ .layout{grid-template-columns:1fr;} }
 
     .control-panel{background:var(--panel);padding:18px;border-radius:20px;border:1px solid var(--line);}
     .input-group{margin-bottom:14px;}
@@ -263,18 +264,25 @@
     }
     .btn-export-full:hover{transform:translateY(-1px);}
 
-    /* ✅ 修正X軸被裁切：加大底部 padding */
     .chart-wrapper{
       position:relative;height:520px;width:100%;
       background:rgba(0,0,0,.10); border-radius:18px;
-      padding:14px 14px 56px 14px; /* ✅ 原本26 -> 56 */
+      padding:14px 14px 40px 14px; /* ✅ 多留一點底部，避免 X 軸被切到 */
       border:1px solid rgba(233,209,138,.10); overflow:hidden;
     }
+    @media (max-width:900px){
+      .chart-wrapper{height:460px; padding-bottom:44px;}
+    }
+    @media (max-width:520px){
+      .chart-wrapper{height:420px; padding:12px 12px 50px 12px;}
+    }
+
     .chart-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px 0;gap:10px;flex-wrap:wrap;}
     .chart-title h4{margin:0;color:#c9d6e6;font-size:14px;font-weight:900;}
     .badge{
       padding:6px 10px;border-radius:999px; background:rgba(249,226,124,.12);
       border:1px solid rgba(249,226,124,.25); color:var(--gold-strong); font-size:12px;font-weight:900;
+      white-space:nowrap;
     }
     .chart-canvas-wrap{position:relative;height:100%;width:100%;}
 
@@ -305,7 +313,9 @@
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       color:#cfe2ff;font-weight:900;font-size:13px;margin-bottom:6px;width:100%;
     }
-    .metric-title-group { display: flex; align-items: center; gap: 10px; }
+    .metric-title-group {
+      display: flex; align-items: center; gap: 10px;
+    }
 
     .dot{width:12px;height:12px;border-radius:50%;}
     .dot.gold{background:var(--gold-strong);} .dot.blue{background:var(--accent-blue);}
@@ -322,6 +332,7 @@
       border:1px solid rgba(255,255,255,0.10);
       background:rgba(255,255,255,0.04);
       font-size:11px;
+      white-space:nowrap;
     }
     .pct.up{ border-color: rgba(52,211,153,0.25); background: rgba(52,211,153,0.10); color:#a7f3d0; }
     .pct.down{ border-color: rgba(248,113,113,0.25); background: rgba(248,113,113,0.10); color:#fecaca; }
@@ -340,6 +351,7 @@
     .lead-pct.positive{ border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.10); color:#a7f3d0; }
     .lead-pct.negative{ border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.10); color:#fecaca; }
 
+    /* 領先卡：漸層金 + 呼吸 + 閃耀 */
     .lead-card{
       border:1px solid rgba(249,226,124,.26);
       box-shadow:
@@ -413,34 +425,61 @@
       z-index:2;
     }
 
-    /* ✅ 新增：累積配息金額強光特效（兩張卡） */
-    .glow-amount{
-      font-size:34px;
-      font-weight:900;
+    /* ✅ 新增：累積領配息卡（金額特效明顯） */
+    .div-card{
+      min-height: 132px;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(120% 160% at 15% 20%, rgba(249,226,124,.18), rgba(0,0,0,0) 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.22));
+    }
+    .div-card.blue{
+      background:
+        radial-gradient(120% 160% at 15% 20%, rgba(56,189,248,.14), rgba(0,0,0,0) 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.22));
+    }
+    .div-amount{
+      font-size:36px;
+      font-weight:1000;
       letter-spacing:.2px;
-      margin:0 0 6px 0;
-      display:inline-block;
-      transform: translateZ(0);
-      animation: glowPulse 2.2s ease-in-out infinite;
-    }
-    .glow-gold{
-      color: var(--gold-strong);
+      margin:2px 0 6px 0;
+      line-height:1.05;
       text-shadow:
-        0 0 10px rgba(249,226,124,.30),
-        0 0 22px rgba(249,226,124,.18),
-        0 0 38px rgba(249,226,124,.10);
+        0 0 18px rgba(249,226,124,.22),
+        0 0 2px rgba(0,0,0,.45);
     }
-    .glow-blue{
-      color: #bfeaff;
-      text-shadow:
-        0 0 10px rgba(56,189,248,.26),
-        0 0 22px rgba(56,189,248,.16),
-        0 0 38px rgba(56,189,248,.10);
+    .div-amount.gold{
+      background: var(--gold-grad);
+      -webkit-background-clip:text;
+      color: transparent;
+      animation: divGlow 2.6s ease-in-out infinite;
     }
-    @keyframes glowPulse{
-      0%,100%{ filter:saturate(1.05); transform: scale(1); }
-      50%{ filter:saturate(1.20); transform: scale(1.03); }
+    .div-amount.blu{
+      background: linear-gradient(90deg, rgba(56,189,248,1), rgba(207,226,255,1));
+      -webkit-background-clip:text;
+      color: transparent;
+      animation: divGlowBlue 2.8s ease-in-out infinite;
     }
+    @keyframes divGlow{
+      0%,100%{ filter: drop-shadow(0 0 0 rgba(249,226,124,.0)); transform: translateY(0); }
+      50%{ filter: drop-shadow(0 0 10px rgba(249,226,124,.18)); transform: translateY(-1px); }
+    }
+    @keyframes divGlowBlue{
+      0%,100%{ filter: drop-shadow(0 0 0 rgba(56,189,248,.0)); transform: translateY(0); }
+      50%{ filter: drop-shadow(0 0 10px rgba(56,189,248,.16)); transform: translateY(-1px); }
+    }
+    .div-subhint{
+      font-size:11px;
+      color:#8aa0b8;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .div-subhint b{color:#e9f2ff;}
 
     /* 檢視用 A/B 明細（匯出隱藏） */
     .selection-preview{
@@ -578,26 +617,31 @@
     body.exporting .lead-card::after{
       display:none !important;
     }
-    body.exporting .glow-amount{
+    body.exporting .div-amount.gold,
+    body.exporting .div-amount.blu{
       animation:none !important;
-      transform:none !important;
-      text-shadow:none !important;
     }
+    body.exporting .div-amount.gold{ color:#F9E27C !important; background:none !important; -webkit-background-clip:initial !important; }
+    body.exporting .div-amount.blu{ color:#BFEAFF !important; background:none !important; -webkit-background-clip:initial !important; }
 
-    /* ✅ 平板/手機更穩的響應式 */
-    @media (max-width: 820px){
-      body{ padding:12px; }
-      #report-capture{ padding:20px; border-radius:22px; }
-      .title-wrap h1{ font-size:22px; }
-      .contact-card{ width:100%; min-width:0; justify-content:space-between; }
-      .contact-text .t2{ font-size:16px; }
-      .chart-wrapper{ height:460px; }
+    /* ✅ 若你曾經有放「累積領配息 %」欄位：用作法 B 直接隱藏（保險） */
+    #momo-div-pct, #bench-div-pct { display:none !important; }
+
+    /* ✅ 平板/手機：整體更好塞 */
+    @media (max-width:900px){
+      body{padding:14px;}
+      #report-capture{padding:18px;border-radius:22px;}
+      .contact-card{min-width:unset; width:100%;}
+      .contact-text .t2{font-size:16px;}
+      .title-wrap h1{font-size:24px;}
     }
-    @media (max-width: 480px){
-      .chart-wrapper{ height:420px; padding:12px 12px 58px 12px; }
-      .big{ font-size:30px; }
-      .glow-amount{ font-size:30px; }
-      .contact-text .hint{ display:none; }
+    @media (max-width:520px){
+      #report-capture{padding:14px;border-radius:18px;}
+      .header-row{gap:12px;}
+      .avatar-ring{width:48px;height:48px;}
+      .qrbox{padding:5px;}
+      .contact-text .t2{font-size:15px;}
+      .title-wrap h1{font-size:22px;}
     }
   </style>
 </head>
@@ -721,7 +765,7 @@
             <input type="number" id="momo-cagr" value="12.77" step="0.01" oninput="update()" />
           </div>
           <div class="sub-input" style="margin-bottom:0">
-            <label>年配息率 (%)（用於推估累積配息金額）</label>
+            <label>年配息率 (%)（用於推估累積領息金額）</label>
             <input type="number" id="momo-div" value="6.4" step="0.1" oninput="update()" />
           </div>
         </div>
@@ -743,7 +787,7 @@
             <input type="number" id="bench-cagr" value="1.51" step="0.01" oninput="update()" />
           </div>
           <div class="sub-input" style="margin-bottom:0">
-            <label>年配息率 (%)（用於推估累積配息金額）</label>
+            <label>年配息率 (%)（用於推估累積領息金額）</label>
             <input type="number" id="bench-div" value="9.2" step="0.1" oninput="update()" />
           </div>
         </div>
@@ -761,7 +805,6 @@
         </div>
 
         <div class="bottom-grid">
-          <!-- ✅ KPI 第一排：兩張總含息價值 + 領先價值 -->
           <div class="kpi-row">
             <div class="metric-card">
               <div class="metric-top">
@@ -774,6 +817,7 @@
               <div class="big" id="momo-total">$ 0</div>
 
               <div class="sub">期末本金：<b id="momo-principal" style="color:#fff;">$ 0</b></div>
+              <div class="sub">累積領息：<b id="momo-acc-div" style="color:var(--gold-soft);">$ 0</b></div>
               <div class="sub" style="margin-top:2px; color:#F87171;">⚠️ 區間最大回撤：<b id="momo-mdd">-0.0%</b></div>
             </div>
 
@@ -788,6 +832,7 @@
               <div class="big" id="bench-total">$ 0</div>
 
               <div class="sub">期末本金：<b id="bench-principal" style="color:#fff;">$ 0</b></div>
+              <div class="sub">累積領息：<b id="bench-acc-div" style="color:#bfeaff;">$ 0</b></div>
               <div class="sub" style="margin-top:2px; color:#F87171;">⚠️ 區間最大回撤：<b id="bench-mdd">-0.0%</b></div>
             </div>
 
@@ -807,37 +852,31 @@
             </div>
           </div>
 
-          <!-- ✅ KPI 第二排：新增兩張「累積領配息」區塊（寬度與第一張卡一致） -->
+          <!-- ✅ 新增：兩個「累積領配息」區塊（寬度與上方卡一致） -->
           <div class="kpi-row">
-            <div class="metric-card">
+            <div class="metric-card div-card">
               <div class="metric-top">
                 <div class="metric-title-group">
                   <span class="dot gold"></span> MOMO｜累積領配息
                 </div>
-                <span class="pct up" id="momo-div-pct">+0.0%</span>
+                <!-- 不顯示 % 差異 -->
               </div>
-
-              <div class="glow-amount glow-gold" id="momo-acc-div-big">$ 0</div>
-
-              <div class="sub">推估方式：<b>起始本金 × 年配息率 × 時間</b></div>
-              <div class="sub">（不影響主圖，僅作現金流比較）</div>
+              <div class="div-amount gold" id="momo-div-amount">$ 0</div>
+              <div class="div-subhint">估算依據：<b>起始本金 × 年配息率</b>（固定推估）</div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card div-card blue">
               <div class="metric-top">
                 <div class="metric-title-group">
                   <span class="dot blue"></span> 原始方案｜累積領配息
                 </div>
-                <span class="pct up" id="bench-div-pct">+0.0%</span>
+                <!-- 不顯示 % 差異 -->
               </div>
-
-              <div class="glow-amount glow-blue" id="bench-acc-div-big">$ 0</div>
-
-              <div class="sub">推估方式：<b>起始本金 × 年配息率 × 時間</b></div>
-              <div class="sub">（不影響主圖，僅作現金流比較）</div>
+              <div class="div-amount blu" id="bench-div-amount">$ 0</div>
+              <div class="div-subhint">估算依據：<b>起始本金 × 年配息率</b>（固定推估）</div>
             </div>
 
-            <!-- ✅ 佔位用：維持三欄等寬（桌機時更整齊） -->
+            <!-- 第三格補位（保持寬度一致） -->
             <div class="metric-card" style="opacity:0; pointer-events:none;"></div>
           </div>
 
@@ -1096,6 +1135,7 @@
       }
       rawGlobalData.sort((a,b) => a.dt - b.dt);
 
+      // ✅ 前值補齊（forward fill）：中途空值會沿用前一次有值
       const lastValid = {};
       allFundNames.forEach(n => lastValid[n] = null);
       rawGlobalData.forEach(row => {
@@ -1213,6 +1253,7 @@
         return;
       }
 
+      // 主圖仍用 raw（會在 processHistoryPrincipal 過濾完整資料）
       parsedMomoData = rawGlobalData.map(row => ({ dt: row.dt, date: row.dateKey, vals: momoFundNames.map(n => row.valsRaw[n]) }));
       parsedBenchData = rawGlobalData.map(row => ({ dt: row.dt, date: row.dateKey, vals: benchFundNames.map(n => row.valsRaw[n]) }));
 
@@ -1448,99 +1489,74 @@
       });
     }
 
-  function updateValidationChart(type){
-  const id = type==='bench' ? 'valBenchChart' : 'valMomoChart';
-  const names = type==='bench' ? benchFundNames : momoFundNames;
-  const canvas = document.getElementById(id);
-  if(!canvas) return;
+    // ✅ 修復：驗證圖改用 valsFilled（中途空值→沿用前一次有值）→ 線會連續
+    function updateValidationChart(type){
+      const id = type==='bench' ? 'valBenchChart' : 'valMomoChart';
+      const names = type==='bench' ? benchFundNames : momoFundNames;
+      const canvas = document.getElementById(id);
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
 
-  const ctx = canvas.getContext('2d');
+      if(!names || names.length === 0 || !rawGlobalData || rawGlobalData.length === 0){
+        if(type==='bench' && vBenchChart) {vBenchChart.destroy(); vBenchChart=null;}
+        if(type==='momo' && vMomoChart) {vMomoChart.destroy(); vMomoChart=null;}
+        return;
+      }
 
-  // 沒選基金就清掉圖
-  if(!names || names.length === 0 || !rawGlobalData || rawGlobalData.length === 0){
-    if(type==='bench' && vBenchChart) { vBenchChart.destroy(); vBenchChart=null; }
-    if(type==='momo' && vMomoChart)  { vMomoChart.destroy(); vMomoChart=null; }
-    return;
-  }
+      const startIdxs = [];
+      for(const n of names){
+        let s=-1;
+        for(let k=0;k<rawGlobalData.length;k++){
+          const v = rawGlobalData[k].valsFilled[n];
+          if(v!==null && v>0){ s=k; break; }
+        }
+        if(s>=0) startIdxs.push(s);
+      }
+      const globalStart = startIdxs.length ? Math.min(...startIdxs) : 0;
 
-  // ✅ 使用「已前值補齊」的 valsFilled（中途空值會用前一期數值補上）
-  // 找全體基金最早可開始的日期（避免有人前面都還沒資料）
-  const firstIdxs = [];
-  for(const n of names){
-    let s = -1;
-    for(let k=0; k<rawGlobalData.length; k++){
-      const v = rawGlobalData[k].valsFilled[n];
-      if(v !== null && v > 0){ s = k; break; }
-    }
-    if(s >= 0) firstIdxs.push(s);
-  }
-  const globalStart = firstIdxs.length ? Math.min(...firstIdxs) : 0;
+      const sliced = rawGlobalData.slice(globalStart);
+      const labels = sliced.map(r => r.dateKey);
 
-  const sliced = rawGlobalData.slice(globalStart);
-  const labels = sliced.map(r => r.dateKey);
+      const momoColors  = ['#F9E27C','#F87171','#34D399','#A78BFA','#FB923C','#FFFFFF'];
+      const benchColors = ['#38BDF8','#A78BFA','#34D399','#F9E27C','#FB923C','#F87171','#FFFFFF'];
 
-  const momoColors  = ['#F9E27C','#F87171','#34D399','#A78BFA','#FB923C','#FFFFFF'];
-  const benchColors = ['#38BDF8','#A78BFA','#34D399','#F9E27C','#FB923C','#F87171','#FFFFFF'];
+      const ds = names.map((n,i)=>{
+        let startVal=null, startPos=-1;
+        for(let k=0;k<sliced.length;k++){
+          const v = sliced[k].valsFilled[n];
+          if(v!==null && v>0){ startVal=v; startPos=k; break; }
+        }
 
-  const ds = names.map((n, i) => {
-    // 這支基金的起始值（第一個可用值）
-    let startVal = null;
-    let startPos = -1;
-    for(let k=0; k<sliced.length; k++){
-      const v = sliced[k].valsFilled[n];
-      if(v !== null && v > 0){
-        startVal = v;
-        startPos = k;
-        break;
+        const data = sliced.map((row,idx)=>{
+          if(startVal===null) return null;
+          if(idx < startPos) return null;
+          const v = row.valsFilled[n];
+          if(v===null) return null;
+          return ((v-startVal)/startVal)*100;
+        });
+
+        const color = (type==='bench') ? benchColors[i % benchColors.length] : momoColors[i % momoColors.length];
+        return { label:n, data, borderColor:color, borderWidth:1.6, pointRadius:0, tension:0.12, spanGaps:true };
+      });
+
+      if(type==='bench'){
+        if(vBenchChart) vBenchChart.destroy();
+        vBenchChart = createVChart(ctx, labels, ds);
+      }else{
+        if(vMomoChart) vMomoChart.destroy();
+        vMomoChart = createVChart(ctx, labels, ds);
       }
     }
 
-    const data = sliced.map((row, idx) => {
-      if(startVal === null) return null;
-      if(idx < startPos) return null;  // 起始點之前不畫（避免從 0% 拉直線）
-      const v = row.valsFilled[n];     // ✅ 這裡不會因中途空值而斷線（已前值補齊）
-      if(v === null) return null;      // 理論上 startPos 之後不會再 null，但留保險
-      return ((v - startVal) / startVal) * 100;
-    });
-
-    const color = (type === 'bench')
-      ? benchColors[i % benchColors.length]
-      : momoColors[i % momoColors.length];
-
-    return {
-      label: n,
-      data,
-      borderColor: color,
-      borderWidth: 1.6,
-      pointRadius: 0,
-      tension: 0.12,
-      spanGaps: true // ✅ 保險：即使偶發 null 也盡量連起來
-    };
-  });
-
-  if(type==='bench'){
-    if(vBenchChart) vBenchChart.destroy();
-    vBenchChart = createVChart(ctx, labels, ds);
-  } else {
-    if(vMomoChart) vMomoChart.destroy();
-    vMomoChart = createVChart(ctx, labels, ds);
-  }
-}
-
-
+    // ✅ MDD (最大回撤)
     function calculateMaxDrawdown(prices) {
       if (!prices || prices.length < 2) return 0;
       let maxPeak = prices[0];
       let maxDrawdown = 0;
-
       for (let p of prices) {
-        if (p > maxPeak) {
-          maxPeak = p;
-        }
+        if (p > maxPeak) maxPeak = p;
         const dd = (p - maxPeak) / maxPeak;
-        if (dd < maxDrawdown) {
-          maxDrawdown = dd;
-        }
+        if (dd < maxDrawdown) maxDrawdown = dd;
       }
       return maxDrawdown * 100;
     }
@@ -1619,7 +1635,7 @@
       const bp = hist.benchPrincipal.slice();
 
       if(labels.length === 0) {
-        return { labels:[], momoP:[0], benchP:[0], momoCumDiv:[0], benchCumDiv:[0], nowIdx:0, histLen:0, endIndex:0 };
+        return { labels:[], momoP:[0], benchP:[0], momoCumDiv:[0], benchCumDiv:[0], histLen:0, nowIdx:0, endIndex:0 };
       }
 
       const histLen = labels.length;
@@ -1644,6 +1660,7 @@
         }
       }
 
+      // 累積領息（固定：起始本金 × 配息率）
       const momoCumDiv = new Array(labels.length).fill(0);
       const benchCumDiv = new Array(labels.length).fill(0);
       let accM = 0, accB = 0;
@@ -1676,16 +1693,15 @@
           responsive:true, maintainAspectRatio:false,
           interaction:{ mode:'index', intersect:false },
           elements:{ point:{ radius:0, hoverRadius:5 } },
-          /* ✅ 底部留更大，避免X軸日期被裁切 */
-          layout:{ padding:{ bottom: 36, left: 4, right: 6, top: 6 } },
+          layout:{ padding:{ bottom: 34, left: 6, right: 8, top: 6 } }, /* ✅ 再加大底部 */
           scales:{
             x:{
               grid:{color:'rgba(255,255,255,0.05)'},
               ticks:{
                 color:'#8aa0b8',
-                maxTicksLimit: 10,
+                maxTicksLimit: 9,
                 autoSkip: true,
-                padding: 14,
+                padding: 16,            /* ✅ 增加 ticks padding，避免被擋 */
                 maxRotation: 45,
                 minRotation: 35
               }
@@ -1764,22 +1780,24 @@
         setLeadCard(0, 1, 0, 0);
         setPctBadge(document.getElementById('momo-nav-pct'), 0);
         setPctBadge(document.getElementById('bench-nav-pct'), 0);
-        const mm = document.getElementById('momo-mdd'); if(mm) mm.innerText = "-0.0%";
-        const bm = document.getElementById('bench-mdd'); if(bm) bm.innerText = "-0.0%";
-        const a1 = document.getElementById('momo-acc-div-big'); if(a1) a1.innerText = money(0);
-        const a2 = document.getElementById('bench-acc-div-big'); if(a2) a2.innerText = money(0);
+        document.getElementById('momo-mdd').innerText = "-0.0%";
+        document.getElementById('bench-mdd').innerText = "-0.0%";
+        document.getElementById('momo-div-amount').innerText = "$ 0";
+        document.getElementById('bench-div-amount').innerText = "$ 0";
         return;
       }
 
+      // ✅ 建立金色漸層
       const ctx = mainChart.ctx;
       const gradientMomo = ctx.createLinearGradient(0, 0, 0, 400);
-      gradientMomo.addColorStop(0, 'rgba(249, 226, 124, 0.4)');
+      gradientMomo.addColorStop(0, 'rgba(249, 226, 124, 0.35)');
       gradientMomo.addColorStop(1, 'rgba(249, 226, 124, 0.0)');
 
-      const segmentStyle = { borderDash: ctx => (ctx.p0DataIndex > s.nowIdx ? [6,6] : undefined) };
+      const segmentStyle = { borderDash: c => (c.p0DataIndex > s.nowIdx ? [6,6] : undefined) };
 
-      /* ✅ 主圖：移除兩條配息線，只留淨值與初始水位 */
       mainChart.data.labels = s.labels;
+
+      // ✅ 主圖：只保留「淨值走勢」兩條線（移除兩條配息線）
       mainChart.data.datasets = [
         {
           label:'MOMO策略 淨值(不含息)',
@@ -1813,6 +1831,7 @@
           borderDash:[3,6]
         }
       ];
+
       mainChart.update();
 
       const i = s.endIndex;
@@ -1825,25 +1844,20 @@
       const momoTotalWealth = momoP + momoDiv;
       const benchTotalWealth = benchP + benchDiv;
 
-      const mt = document.getElementById('momo-total'); if(mt) mt.innerText = money(momoTotalWealth);
-      const bt = document.getElementById('bench-total'); if(bt) bt.innerText = money(benchTotalWealth);
+      document.getElementById('momo-total').innerText = money(momoTotalWealth);
+      document.getElementById('bench-total').innerText = money(benchTotalWealth);
 
-      const mpEl = document.getElementById('momo-principal'); if(mpEl) mpEl.innerText = money(momoP);
-      const bpEl = document.getElementById('bench-principal'); if(bpEl) bpEl.innerText = money(benchP);
+      document.getElementById('momo-principal').innerText = money(momoP);
+      document.getElementById('bench-principal').innerText = money(benchP);
 
-      /* ✅ 新增兩張「累積領配息」卡（強光） */
-      const momoAccEl = document.getElementById('momo-acc-div-big');
-      const benchAccEl = document.getElementById('bench-acc-div-big');
-      if(momoAccEl) momoAccEl.innerText = money(momoDiv);
-      if(benchAccEl) benchAccEl.innerText = money(benchDiv);
+      if(document.getElementById('momo-acc-div'))
+         document.getElementById('momo-acc-div').innerText = money(momoDiv);
+      if(document.getElementById('bench-acc-div'))
+         document.getElementById('bench-acc-div').innerText = money(benchDiv);
 
-      /* ✅ 配息卡的 %：用「A 相對 B 的差額占比」 */
-      const momoDivPctEl = document.getElementById('momo-div-pct');
-      const benchDivPctEl = document.getElementById('bench-div-pct');
-      const baseDiv = Math.max(1, benchDiv);
-      const divLeadPct = ((momoDiv - benchDiv) / baseDiv) * 100;
-      if(momoDivPctEl) setPctBadge(momoDivPctEl, divLeadPct);
-      if(benchDivPctEl) setPctBadge(benchDivPctEl, 0); // 你也可以改成顯示自身成長率
+      // ✅ 下方兩個「累積領配息」區塊（特效金額）
+      document.getElementById('momo-div-amount').innerText = money(momoDiv);
+      document.getElementById('bench-div-amount').innerText = money(benchDiv);
 
       const momoStart = s.momoP[0] || 1;
       const benchStart = s.benchP[0] || 1;
@@ -1853,14 +1867,15 @@
       setPctBadge(document.getElementById('momo-nav-pct'), momoPct);
       setPctBadge(document.getElementById('bench-nav-pct'), benchPct);
 
+      // ✅ MDD（只用歷史段）
       const momoHistP = s.momoP.slice(0, s.histLen);
       const benchHistP = s.benchP.slice(0, s.histLen);
 
       const momoMDD = calculateMaxDrawdown(momoHistP);
       const benchMDD = calculateMaxDrawdown(benchHistP);
 
-      const mdd1 = document.getElementById('momo-mdd'); if(mdd1) mdd1.innerText = `${momoMDD.toFixed(1)}%`;
-      const mdd2 = document.getElementById('bench-mdd'); if(mdd2) mdd2.innerText = `${benchMDD.toFixed(1)}%`;
+      document.getElementById('momo-mdd').innerText = `${momoMDD.toFixed(1)}%`;
+      document.getElementById('bench-mdd').innerText = `${benchMDD.toFixed(1)}%`;
 
       const leadValue = momoTotalWealth - benchTotalWealth;
       const principalDiff = momoP - benchP;
@@ -1869,6 +1884,7 @@
       setLeadCard(leadValue, benchTotalWealth, principalDiff, divDiff);
     }
 
+    // ✅ 關鍵修復：加入強制還原保險機制 (Safety Timer)
     async function exportImg() {
       const t = document.getElementById("report-capture");
       const originalScrollPos = window.scrollY;
@@ -1882,8 +1898,8 @@
         clearTimeout(safetyTimer);
         document.body.classList.remove('exporting');
         setTimeout(() => {
-            try { if(mainChart) mainChart.resize(); } catch(e) {}
-            window.scrollTo(0, originalScrollPos);
+          try { if(mainChart) mainChart.resize(); } catch(e) { console.error("圖表重繪失敗", e); }
+          window.scrollTo(0, originalScrollPos);
         }, 100);
       }
 
