@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# 告訴 AI 你的網站地圖在哪裡
+Sitemap: https://nms3194949.github.io/MOMO_FinSphere/sitemap.xml
+
+# 這是 2025 年的新標準，告訴 AI 你的 LLM 說明檔在哪裡
+# 注意：並非所有爬蟲都支援此語法，但這是未來趨勢
+Allow: /llms.txt
