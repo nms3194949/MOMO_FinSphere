@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SEBWBQLV4Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SEBWBQLV4Z');
+  </script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+
+  <title>2025 基金配息試算機｜免費線上計算月配息 & 複利成長 - MOMO財商智庫</title>
+  <meta name="description" content="免費的線上配息計算機。輸入本金與配息率，一鍵算出每月現金流、本金成長與複利效果。支援台股 ETF、月配息基金與加密貨幣資產試算。">
+  <meta name="keywords" content="配息試算,基金計算機,月配息計算,複利試算,ETF配息,存股試算,MOMO財商智庫">
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html">
+
+  <meta property="og:title" content="線上基金配息試算機｜MOMO財商智庫">
+  <meta property="og:description" content="輸入本金，立即預覽你的被動收入藍圖。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html">
+  <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-calc.jpg">
+
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta name="theme-color" content="#0A1221" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MOMO 基金配息試算機",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "TWD"
+    },
+    "description": "輸入本金與預期配息率，即時計算每月現金流、本金成長與三年總報酬的免費財商工具。",
+    "author": {
+        "@type": "Person",
+        "name": "MOMO",
+        "url": "https://nms3194949.github.io/MOMO_FinSphere/"
+    }
+  }
+  </script>
+
+  <style>
+  :root{
+    --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#AAB2BF;
+    --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
+    --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
+    --accent:#2D7A77; --danger: #ff6b6b; --safe: #3dd68c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; position: relative; overflow-x: hidden;}
+  a{color:inherit;text-decoration:none}
+
+  body::before {
+    content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.05), transparent 60%);
+    animation: backgroundMove 25s linear infinite; z-index: -1; pointer-events: none;
+  }
+  @keyframes backgroundMove { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  .wrap{max-width:900px; margin:0 auto; padding:16px;} /* 工具頁面縮小寬度聚焦 */
+  .header{display:flex;align-items:center;justify-content:space-between;padding:12px 0; margin-bottom: 20px;}
+  .logo{font-weight:800; font-size: 18px; color: var(--gold-soft);}
+  .nav a{font-size: 14px; color: var(--muted); margin-left: 16px; font-weight: 600;}
+  .nav a:hover{color: #fff;}
+
+  .hero-tool {
+    text-align: center; padding: 40px 20px;
+    background: linear-gradient(180deg, rgba(12,21,42,0) 0%, rgba(12,21,42,0.8) 100%);
+    border-bottom: 1px solid var(--line); margin-bottom: 30px;
+  }
+  .hero-tool h1 {
+    font-size: clamp(24px, 4vw, 36px); margin: 0 0 10px 0;
+    background: var(--gold-grad); -webkit-background-clip: text; color: transparent;
+  }
+  .hero-tool p { color: var(--muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+  /* 引用原本的計算機樣式 */
+  .panel, .strategy-info-box {
+    background: rgba(12, 21, 42, 0.75); backdrop-filter: blur(12px);
+    border: 1px solid rgba(233, 209, 138, 0.18); border-radius: 16px; padding: 20px;
+    margin-bottom: 20px;
+  }
+  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  
+  /* 按鈕樣式 */
+  .btn-outline { background: transparent; border: 1px solid var(--gold-soft); color: var(--gold-soft); padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: .2s; font-size: 13px; }
+  .btn-outline:hover { background: rgba(233,209,138,.1); }
+  .btn-line { display: block; text-align: center; padding: 14px; border-radius: 99px; background: var(--gold-grad); color: #0A1221; font-weight: 800; box-shadow: 0 8px 16px rgba(0,0,0,.35); text-decoration: none; margin-top: 10px;}
+  
+  /* 輸入元件 */
+  input[type="number"] { width: 100%; background: rgba(14, 22, 42, 0.5); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 18px; font-weight: bold; }
+  input[type="range"] { width: 100%; margin: 15px 0; accent-color: var(--gold); }
+  
+  .strategy-btn { border: 1px solid var(--line); padding: 8px 16px; border-radius: 99px; background: #0e162a; color: var(--muted); cursor: pointer; margin-right: 8px; margin-bottom: 8px; }
+  .strategy-btn.is-active { background: var(--gold-grad); border-color: transparent; color: #0A1221; font-weight: bold; }
+
+  /* 結果顯示 */
+  .out .kv { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .out .k { color: var(--muted); font-size: 14px; }
+  .out .v { font-size: 18px; font-weight: 700; color: #fff; }
+  .goldCycle { color: var(--gold-soft); }
+
+  .unlock-overlay {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.4); border-radius: 8px;
+    text-decoration: none; transition: 0.3s;
+  }
+  .unlock-pill {
+    background: var(--gold); color: #0A1221; padding: 6px 16px; 
+    border-radius: 99px; font-size: 13px; font-weight: 800; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  }
+
+  .footer { text-align: center; color: var(--muted); font-size: 12px; padding: 40px 0; border-top: 1px solid var(--line); margin-top: 40px; }
+
+  /* 特效 */
+  @keyframes flashGold {
+    0% { color: #fff; text-shadow: 0 0 5px #fff; transform: scale(1); }
+    50% { color: #F9E27C; text-shadow: 0 0 20px #F9E27C; transform: scale(1.05); }
+    100% { color: inherit; transform: scale(1); }
+  }
+  .flash-anim { animation: flashGold 0.4s ease-out; }
+  
+  /* 返回首頁浮動鈕 */
+  .back-home { position: fixed; bottom: 20px; left: 20px; background: rgba(12,21,42,0.8); border: 1px solid var(--line); padding: 10px 16px; border-radius: 99px; font-size: 13px; backdrop-filter: blur(5px); color: var(--gold-soft); z-index: 100; }
+  </style>
+</head>
+<body>
+
+  <main class="wrap">
+    <header class="header">
+      <div class="logo">MOMO FinSphere</div>
+      <nav class="nav">
+        <a href="index.html">回首頁</a>
+        <a href="index.html#strategy">策略績效</a>
+        <a href="https://portaly.cc/momo_82786" target="_blank" style="color:var(--gold-soft)">聯絡 MOMO</a>
+      </nav>
+    </header>
+
+    <section class="hero-tool">
+      <h1>線上基金配息試算機</h1>
+      <p>只要 3 秒鐘，輸入本金與預期配息率，系統自動計算每月現金流、複利成長效應與 3 年後的資產變化。</p>
+    </section>
+
+    <section id="calc" class="grid" id="calc-capture">
+        
+        <div class="panel">
+          <h3 style="margin-top:0; color:var(--gold-soft)">1. 設定參數</h3>
+
+          <label style="display:block;margin-bottom:8px;font-size:13px;color:rgba(233,209,138,.9);font-weight:bold">策略模組</label>
+          <div class="strategy-group">
+            <button type="button" class="strategy-btn" data-strategy="start">雙贏起步 (穩健)</button>
+            <button type="button" class="strategy-btn is-active" data-strategy="rise">雙贏躍升 (平衡)</button>
+            <button type="button" class="strategy-btn" data-strategy="peak">雙贏巔峰 (積極)</button>
+          </div>
+
+          <label for="amt" style="display:block;margin-top:16px;margin-bottom:8px;font-size:13px;color:rgba(233,209,138,.9);font-weight:bold">投入本金 (TWD)</label>
+          <input id="amt" type="number" inputmode="numeric" min="0" step="10000" value="1000000" />
+
+          <div style="display:flex; justify-content:space-between; margin-top:20px; align-items:center;">
+            <label for="distRange" style="margin:0;font-size:13px;color:rgba(233,209,138,.9);font-weight:bold">預估配息率</label>
+            <span id="distNow" style="font-size:18px; font-weight:bold; color:var(--gold-soft)">8%</span>
+          </div>
+          <input id="distRange" type="range" min="0" max="17" step="1" value="8" />
+          
+          <div style="font-size:12px; color:var(--muted); margin-top:-10px; display:flex; gap:8px;">
+            快捷：
+            <span id="dist5" style="cursor:pointer; text-decoration:underline">5%</span>
+            <span id="dist10" style="cursor:pointer; text-decoration:underline">10%</span>
+            <span id="dist15" style="cursor:pointer; text-decoration:underline">15%</span>
+          </div>
+          
+          <div id="strategy-info-box" style="margin-top:20px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; font-size:13px; color:#ccc; line-height:1.5;">
+            <span style="color:var(--gold-soft); font-weight:bold">💡 策略觀點：</span>
+            <span id="info-desc">適合穩健型投資人，股債平衡配置。</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0; color:var(--gold-soft)">2. 試算結果</h3>
+            <button id="btn-save-png" class="btn-outline">匯出圖片</button>
+          </div>
+          
+          <div class="out">
+            <div class="kv">
+                <div class="k">預估月配息</div>
+                <div class="v" id="out-monthly" style="color:var(--safe); font-size:20px;">—</div>
+            </div>
+            
+            <div class="kv" style="position:relative; background:linear-gradient(90deg, rgba(201,162,39,0.1), transparent);">
+                <div class="k" style="color:var(--gold);">🔥 AI 優化後配息</div>
+                <div class="v" style="filter:blur(4px); opacity:0.7">$99,999</div>
+                <a href="https://portaly.cc/momo_82786" target="_blank" class="unlock-overlay" style="position:absolute; inset:0;">
+                    <div class="unlock-pill">加入 LINE 解鎖</div>
+                </a>
+            </div>
+
+            <div style="padding:12px; margin:10px 0; background:rgba(0,0,0,0.2); border-radius:8px; display:flex; align-items:center; gap:10px;">
+                <span id="life-icon" style="font-size:20px;">🌱</span>
+                <span id="life-text" style="font-size:13px; color:var(--muted);">累積種子期</span>
+            </div>
+
+            <div class="kv"><div class="k">每年本金成長率</div><div class="v" id="out-grow">—</div></div>
+            <div class="kv"><div class="k">三年後本金</div><div class="v" id="out-3y">—</div></div>
+            <div class="kv"><div class="k">三年總報酬 (含息)</div><div class="v goldCycle" id="out-total">—</div></div>
+          </div>
+
+          <a href="https://portaly.cc/momo_82786" target="_blank" class="btn-line">
+            索取此現金流配置建議 ▶
+          </a>
+        </div>
+
+    </section>
+
+    <section style="margin-top:40px; color:var(--muted); font-size:14px; line-height:1.8;">
+        <h2 style="font-size:18px; color:var(--gold-soft);">為什麼您需要基金配息試算？</h2>
+        <p>
+            在規劃退休金或被動收入時，單純的「定存」往往無法抵抗通膨。透過本工具，您可以模擬將資金配置在「月配息基金」或「高股息 ETF」時的現金流狀況。
+            MOMO 的雙贏策略不同於坊間的高風險操作，我們強調<strong>「本金成長」</strong>與<strong>「配息穩定」</strong>的平衡。
+        </p>
+        <p>
+            <strong>使用小撇步：</strong> 試著切換「雙贏起步」與「雙贏巔峰」模式，觀察在不同風險屬性下，您的資產三年後會有什麼樣的驚人變化。
+        </p>
+    </section>
+
+    <footer class="footer">
+      © MOMO財商智庫｜本試算結果僅供參考，實際績效以市場狀況為準。
+    </footer>
+  </main>
+
+  <a href="index.html" class="back-home">◀ 回首頁</a>
+
+  <script>
+  const $ =(id)=>document.getElementById(id);
+  const nfTW = new Intl.NumberFormat('zh-TW');
+  const clamp =(v,min,max)=>Math.min(max,Math.max(min,v));
+  const money =(x)=>'＄'+nfTW.format(Math.round(x));
+  const pct =(x)=>(Math.round(x*100)/100).toFixed(2)+'%';
+  
+  // 載入 html2canvas
+  if(!window.html2canvas){
+      const s=document.createElement('script'); 
+      s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'; 
+      document.head.appendChild(s);
+  }
+
+  // 策略參數
+  const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
+  const STRATEGY_DESC = {
+      start: "適合穩健型投資人，優先建立安全護城河。",
+      rise: "適合追求成長者，股債平衡配置，加速資產翻倍。",
+      peak: "適合積極型投資人，聚焦高成長機會，報酬潛力最高。"
+  };
+  const SLOPE = 1; 
+  const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
+  
+  const state = { baseCAGR: STRATEGY.rise, monthlyMul: MONTHLY_MULT.rise, principal: 1000000, dist: 8 };
+
+  function compute({principal, dist, baseCAGR, monthlyMul}){
+    const monthlyBase = principal*(dist/100)/12; 
+    const monthly = monthlyBase * (monthlyMul ?? 1);
+    const grow = Math.max(0, baseCAGR - SLOPE*dist); 
+    const after3y = principal*Math.pow(1+grow/100,3);
+    const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1); 
+    const total = after3y + div3y;
+    return { monthly, grow, after3y, total };
+  }
+
+  function render(o){
+    $('out-monthly').textContent = money(o.monthly);
+    $('out-grow').textContent = pct(o.grow);
+    $('out-3y').textContent = money(o.after3y);
+    
+    const totalEl = $('out-total');
+    if(totalEl.textContent !== money(o.total)) {
+        totalEl.textContent = money(o.total);
+        totalEl.classList.remove('flash-anim');
+        void totalEl.offsetWidth; 
+        totalEl.classList.add('flash-anim');
+    }
+
+    // 生活場景
+    const m = o.monthly;
+    let icon='🌱', text='累積種子期';
+    if(m > 3000) { icon='☕'; text='每天一杯星巴克'; }
+    if(m > 10000) { icon='🍱'; text='每月加菜金 + 水電費全免'; }
+    if(m > 25000) { icon='🚗'; text='支付國產車貸'; }
+    if(m > 50000) { icon='🏠'; text='支付房貸，邁向自由'; }
+    $('life-icon').textContent = icon;
+    $('life-text').textContent = text;
+  }
+
+  function update(){
+    const range = $('distRange');
+    const amt = $('amt');
+    $('distNow').textContent = range.value + '%';
+    
+    // 更新狀態
+    state.dist = +range.value;
+    state.principal = +amt.value;
+    
+    render(compute(state));
+  }
+
+  function init(){
+    // 綁定事件
+    $('distRange').addEventListener('input', update);
+    $('amt').addEventListener('input', update);
+    
+    // 策略按鈕
+    document.querySelectorAll('.strategy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.strategy-btn').forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+            
+            const key = btn.dataset.strategy;
+            state.baseCAGR = STRATEGY[key];
+            state.monthlyMul = MONTHLY_MULT[key];
+            $('info-desc').textContent = STRATEGY_DESC[key];
+            
+            update();
+        });
+    });
+
+    // 快捷鍵
+    ['dist5','dist10','dist15'].forEach(id => {
+        $(id).addEventListener('click', () => {
+            const val = id.replace('dist','');
+            $('distRange').value = val;
+            update();
+        });
+    });
+
+    // 匯出圖片
+    $('btn-save-png').addEventListener('click', async () => {
+        const target = $('calc');
+        try {
+            const canvas = await html2canvas(target, { backgroundColor:'#0A1221' });
+            const url = canvas.toDataURL("image/png");
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'MOMO_配息試算.png';
+            a.click();
+        } catch(e) { alert('匯出失敗'); }
+    });
+
+    update();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
