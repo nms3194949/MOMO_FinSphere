@@ -16,9 +16,9 @@
 
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 
-  <title>MOMO財商智庫｜月配息 × AI智能決策系統</title>
-  <meta name="description" content="MOMO財商智庫：月配息 × 資產增值 × AI智能決策。整合基金研究、回撤策略、虛擬貨幣進出場、權證篩選與智能工具的一站式財商系統。">
-  <meta name="keywords" content="MOMO財商智庫,MOMO FinSphere,月配息,基金研究,基金配息,回撤策略,AI智能決策,權證篩選,加密貨幣策略,投資工具">
+  <title>MOMO財商智庫｜月配息基金 × 股票試算 × AI智能投資策略</title>
+  <meta name="description" content="輸入本金即時試算月配息！MOMO財商智庫整合基金智能分析、台股配息計算與加密貨幣策略。提供年化配息率 8%-15% 的雙贏策略配置建議。">
+  <meta name="keywords" content="MOMO財商智庫,月配息,基金配息,股票試算,被動收入,資產配置,雙贏策略,AI投資工具,殖利率計算,MOMO FinSphere">
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/">
 
@@ -37,6 +37,63 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "MOMO FinSphere 財商智庫",
+        "url": "https://nms3194949.github.io/MOMO_FinSphere/",
+        "description": "整合月配息基金智能分析、台股 ETF 監控與加密貨幣策略，提供 MCS 景氣循環分數與資產配置建議。",
+        "author": {
+            "@type": "Person",
+            "name": "MOMO",
+            "jobTitle": "Financial Planner"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://nms3194949.github.io/MOMO_FinSphere/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "FinancialProduct",
+        "name": "MOMO 雙贏策略 (Win-Win Strategy)",
+        "description": "專為穩健型投資人設計的股債平衡配置策略，透過 AI 監控市場回撤，目標創造穩定的月配息現金流。",
+        "interestRate": {
+          "@type": "QuantitativeValue",
+          "value": "8.0",
+          "unitText": "PERCENT",
+          "description": "目標年化配息率"
+        },
+        "keywords": "月配息, 基金投資, 資產配置, 被動收入, 複利試算"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "MOMO 雙贏策略適合新手嗎？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "非常適合。我們的策略包含「雙贏起步」模組，專為初入市場的投資人設計，透過低波動的月配息基金配置，降低市場震盪的心理壓力，同時建立穩定的現金流。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "這個月配息試算工具準確嗎？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "此工具基於歷史回測數據與 MOMO 財商智庫的 AI 模型運算。透過「年均成長率」與「配息率」的動態試算，能幫助您更具體地規劃退休目標與現金流需求。"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <style>
   :root{
@@ -72,7 +129,7 @@
   .nav a[aria-current="page"], .nav a:hover{background:var(--gold-grad);color:#0A1221}
 
   .section{margin-top:24px}
-   
+    
   /* --- 體驗優化：卡片玻璃擬態與懸浮效果 --- */
   .card, .card2, .tool-card, .panel, .factor-card, .mcs-hero-section {
     background: rgba(12, 21, 42, 0.75);
@@ -90,7 +147,7 @@
     box-shadow: 0 12px 30px rgba(201, 162, 39, 0.12), inset 0 0 20px rgba(201, 162, 39, 0.03);
     border-color: rgba(233, 209, 138, 0.5);
   }
-   
+    
   .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
   .btn-gold{background:var(--gold-grad);color:#0A1221;border:none}
   .btn-gold:hover{filter:brightness(1.1)}
@@ -101,7 +158,7 @@
   .hero h1{margin:6px 0 8px;font-size:clamp(22px, 2.6vw, 32px);background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
   .hero p{color:var(--muted);margin:0}
   .hero small{color:var(--gold-soft); font-size: 13px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px;}
-   
+    
   /* 呼吸燈動畫 */
   @keyframes breathe-dot { 
     0% { opacity: 0.4; transform: scale(0.9); } 
@@ -146,7 +203,7 @@
     opacity: 0.6;
   }
   .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 24px; }
-   
+    
   .hero-gauge-col {
     flex: 0 0 180px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -207,7 +264,7 @@
   }
   @media (max-width:900px){ .mcs-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media (max-width:600px){ .mcs-grid { grid-template-columns:1fr; } }
-   
+    
   .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
   #ig-section{margin-top:60px;padding:40px 0;background: transparent}
   #ig-section h2{font-size:22px;font-weight:700;margin:0 0 18px 0;color:var(--gold-soft)}
@@ -235,7 +292,7 @@
   .block:last-child{padding-bottom:0;border-bottom:0}
   .block .label{font-size:13.5px;font-weight:800;color:rgba(233,209,138,.9)}
   .gauge{width:100%}
-   
+    
   .gauge-bar {
     transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     will-change: width;
@@ -266,7 +323,7 @@
   #calc label{display:block;font-weight:800;font-size:13px;color:rgba(233,209,138,.9);margin-bottom:6px}
   #calc input[type="number"]{width:100%;background:rgba(14, 22, 42, 0.5);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
   #calc .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-   
+    
   /* --- 體驗優化：美化 Range Slider (金色質感) --- */
   #calc input[type="range"]{
     -webkit-appearance: none; width:100%; background: transparent; margin: 10px 0;
@@ -371,7 +428,7 @@
   }
   @keyframes fade-in-tooltip { to { opacity: 1; transform: translateX(0); } }
   @media(max-width: 768px) { .float-line-btn { bottom: 90px; right: 16px; width: 54px; height: 54px; } }
-   
+    
   /* FAQ 樣式 (SEO區塊) */
   details { margin-bottom:10px; background:rgba(255,255,255,0.03); border-radius:10px; overflow:hidden; transition:background .2s; }
   details:hover { background:rgba(255,255,255,0.05); }
@@ -482,7 +539,7 @@
     font-size: 48px; /* 稍微加大 */
     font-weight: 900; 
     font-family: "Noto Sans TC", sans-serif;
-     
+      
     /* 黃金漸層設定 */
     background: linear-gradient(
         90deg, 
@@ -495,10 +552,10 @@
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-     
+      
     /* 文字陰影增強立體感 */
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
-     
+      
     /* 動畫 */
     animation: shineText 3s linear infinite;
   }
@@ -713,7 +770,7 @@
       </div>
 
       <div class="dividend-container fade-in-section">
-         
+          
         <div class="dividend-list-card">
           <div class="div-header">
             <span>入帳日期</span>
@@ -811,7 +868,7 @@
             <p class="info-desc" id="info-desc">
               適合初入市場的投資人。配置高信評債券與低波動資產，優先確保本金安全，提供穩定的基礎現金流。
             </p>
-             
+              
             <div class="info-tags">
               <div class="tag-item">
                 <span class="tag-label">風險屬性</span>
@@ -830,13 +887,13 @@
           <h3 id="out-title" style="margin:0 0 10px">結果</h3>
           <div class="out" aria-live="polite">
             <div class="kv"><div class="k">預估月配息</div><div class="v" id="out-monthly">—</div></div>
-             
+              
             <div class="kv locked-row" style="position:relative; overflow:hidden; border-color:rgba(201,162,39,0.4); background:linear-gradient(90deg, rgba(201,162,39,0.08), transparent); margin-top:8px;">
                 <div class="k" style="color:var(--gold);">
                     <span style="margin-right:4px;">🔥</span>AI 智能優化後配息
                 </div>
                 <div class="v" id="out-optimized" style="filter:blur(5px); opacity:0.8; user-select:none;">$99,999</div>
-                 
+                  
                 <a href="https://portaly.cc/momo_82786" target="_blank" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); text-decoration:none; cursor:pointer; transition:0.3s; z-index:10;" class="unlock-overlay">
                     <div style="background:var(--gold); color:#0A1221; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:800; box-shadow:0 4px 12px rgba(0,0,0,0.6); display:flex; align-items:center; gap:4px;">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-9-2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
@@ -884,9 +941,37 @@
       <div class="tools" id="home-tools-grid"></div>
     </section>
 
-    <section id="seo-article-container" class="section fade-in-section" style="margin-bottom:20px;"></section>
+    <section id="seo-article-container" class="section fade-in-section" style="margin-bottom:20px;">
+      <article style="color:var(--muted); font-size:14px; line-height:1.8; background:rgba(255,255,255,0.02); padding:20px; border-radius:12px;">
+        <h3 style="color:var(--gold-soft); font-size:18px; margin-top:0;">為什麼需要月配息複利試算？</h3>
+        <p>
+          在規劃<strong>被動收入</strong>時，許多投資人忽略了<strong>本金成長</strong>的重要性。
+          MOMO FinSphere 系統整合了<strong>基金智能分析</strong>與<strong>股票/加密貨幣策略</strong>，
+          不同於傳統的儲蓄險或定存，我們透過 AI 監控市場回撤 (Drawdown)，協助您在領取<strong>月配息</strong>的同時，確保資產能抵抗通膨。
+        </p>
+        <p>
+          無論是退休規劃、現金流管理，透過本站的<strong>配息複利計算機</strong>，您可以一鍵預覽未來三年的資產變化，找到最適合自己的股債配置比例。
+        </p>
+      </article>
+    </section>
 
-    <section id="seo-faq-container" class="section fade-in-section" style="margin-bottom:40px;"></section>
+    <section id="seo-faq-container" class="section fade-in-section" style="margin-bottom:40px;">
+      <h2 style="color:var(--gold-soft); margin-bottom:16px;">常見問題</h2>
+      <div class="card">
+        <details>
+          <summary>MOMO 雙贏策略適合新手嗎？</summary>
+          <div class="faq-content">非常適合。我們的策略包含「雙贏起步」模組，專為初入市場的投資人設計，透過低波動的月配息基金配置，降低市場震盪的心理壓力，同時建立穩定的現金流。</div>
+        </details>
+        <details>
+          <summary>這個月配息試算工具準確嗎？</summary>
+          <div class="faq-content">此工具基於歷史回測數據與 MOMO 財商智庫的 AI 模型運算。雖然過去績效不代表未來表現，但透過「年均成長率」與「配息率」的動態試算，能幫助您更具體地規劃退休目標與現金流需求。</div>
+        </details>
+        <details>
+          <summary>如何開始使用 MOMO 的財商工具？</summary>
+          <div class="faq-content">您可以直接點擊右下角的 LINE 按鈕加入官方帳號，我們會提供您專屬的配置建議與工具使用教學。</div>
+        </details>
+      </div>
+    </section>
 
     <section id="ig-section" class="fade-in-section" aria-labelledby="ig-title">
       <h2 id="ig-title">最新 IG 精選</h2>
@@ -900,7 +985,7 @@
 
     <footer class="footer">
       © MOMO財商智庫｜投資有風險，基金與加密資產無保證報酬，淨值可能因市場波動而變化，請依自身風險承受度謹慎評估。
-      
+       
       <div style="margin-top: 12px; font-size: 12px; opacity: 0.8;">
         <span id="busuanzi_container_site_pv" style="display:none;">
           <span style="color:var(--gold-soft);">✦</span> 本站總瀏覽量：
@@ -930,64 +1015,6 @@
   </a>
 
   <script>
-  /* ==========================================================================
-      SEO 與 內容維護區
-      ========================================================================== */
-  const SEO_DATA = {
-    faq: [
-      {
-        q: "MOMO 雙贏策略適合新手嗎？",
-        a: "非常適合。我們的策略包含「雙贏起步」模組，專為初入市場的投資人設計，透過低波動的月配息基金配置，降低市場震盪的心理壓力，同時建立穩定的現金流。"
-      },
-      {
-        q: "這個試算工具準確嗎？",
-        a: "此工具基於歷史回測數據與 MOMO 財商智庫的 AI 模型運算。雖然過去績效不代表未來表現，但透過「年均成長率」與「配息率」的動態試算，能幫助您更具體地規劃退休目標與現金流需求。"
-      },
-      {
-        q: "如何開始使用 MOMO 的財商工具？",
-        a: "您可以直接點擊右下角的 LINE 按鈕加入官方帳號，我們會提供您專屬的配置建議與工具使用教學。"
-      }
-    ],
-    article: {
-      title: "為什麼需要月配息複利試算？",
-      content: `
-        在規劃<strong>被動收入</strong>時，許多投資人忽略了<strong>本金成長</strong>的重要性。
-        MOMO FinSphere 系統整合了<strong>基金智能分析</strong>與<strong>加密貨幣策略</strong>，
-        不同於傳統的儲蓄險或定存，我們透過 AI 監控市場回撤，協助您在領取<strong>月配息</strong>的同時，確保資產能抵抗通膨。
-        無論是退休規劃、現金流管理，透過本站的<strong>複利計算機</strong>，您能一鍵預覽未來三年的資產變化。
-      `
-    },
-    app: {
-      name: "MOMO 月配息 AI 試算工具",
-      desc: "輸入本金與預期配息率，AI 系統即時計算每月現金流、本金成長與三年總報酬的免費財商工具。",
-      url: "https://nms3194949.github.io/MOMO_FinSphere/"
-    }
-  };
-
-  function initSEO() {
-    const faqContainer = document.getElementById('seo-faq-container');
-    if (faqContainer && SEO_DATA.faq.length > 0) {
-      let html = `<h2 style="color:var(--gold-soft); margin-bottom:16px;">常見問題</h2><div class="card">`;
-      SEO_DATA.faq.forEach(item => {
-        html += `<details><summary>${item.q}</summary><div class="faq-content">${item.a}</div></details>`;
-      });
-      html += `</div>`;
-      faqContainer.innerHTML = html;
-    }
-    const articleContainer = document.getElementById('seo-article-container');
-    if (articleContainer && SEO_DATA.article.content) {
-      articleContainer.innerHTML = `<article style="color:var(--muted); font-size:14px; line-height:1.8;"><h3 style="color:var(--gold-soft); font-size:16px;">${SEO_DATA.article.title}</h3><p>${SEO_DATA.article.content}</p></article>`;
-    }
-    const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": SEO_DATA.faq.map(item => ({ "@type": "Question", "name": item.q, "acceptedAnswer": { "@type": "Answer", "text": item.a } })) };
-    injectJSONLD(faqSchema);
-    const appSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", "name": SEO_DATA.app.name, "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" }, "description": SEO_DATA.app.desc, "author": { "@type": "Person", "name": "MOMO", "url": "https://portaly.cc/momo_82786" } };
-    injectJSONLD(appSchema);
-  }
-
-  function injectJSONLD(data) {
-    const script = document.createElement('script'); script.type = "application/ld+json"; script.text = JSON.stringify(data); document.head.appendChild(script);
-  }
-
   const $ =(id)=>document.getElementById(id);
   const nfTW = new Intl.NumberFormat('zh-TW');
   const clamp =(v,min,max)=>Math.min(max,Math.max(min,v));
@@ -1102,7 +1129,7 @@
   /* 更新情報卡函式 */
   function updateStrategyInfo(key) {
     const data = STRATEGY_INFO[key] || STRATEGY_INFO['start'];
-     
+      
     // 更新文字
     const descEl = document.getElementById('info-desc');
     // 簡單的淡出淡入效果
@@ -1119,7 +1146,7 @@
     bar.style.width = data.risk + '%';
     bar.style.background = data.riskColor;
   }
-   
+    
   /* --- 體驗優化：金色粒子爆炸特效 --- */
   function explodeGold(x, y) {
     const colors = ['#F9E27C', '#D9B84B', '#B88A1E', '#FFFFFF'];
@@ -1158,7 +1185,7 @@
     $('out-grow').textContent = pct(o.grow); 
     $('out-3y').textContent = money(o.after3y); 
     $('out-3y-div').textContent = money(o.div3y); 
-     
+      
     const totalEl = $('out-total');
     const newTotal = money(o.total);
     if(totalEl.textContent !== newTotal) {
@@ -1167,7 +1194,7 @@
         void totalEl.offsetWidth; 
         totalEl.classList.add('flash-anim');
     }
-     
+      
     $('out-total-rate').textContent = pct(o.totalRate); 
 
     /* --- 解鎖神秘黑箱邏輯 --- */
@@ -1181,7 +1208,7 @@
     const mapEl = document.getElementById('life-mapping');
     const iconEl = document.getElementById('life-icon');
     const textEl = document.getElementById('life-text');
-     
+      
     let icon = '🌱', text = '累積種子期';
     if(m > 150 && m <= 3000) { icon='☕'; text='每天一杯星巴克'; }
     else if(m > 3000 && m <= 10000) { icon='🍱'; text='每月加菜金 + 水電費全免'; }
@@ -1209,10 +1236,10 @@
         }
     }
   }
-   
+    
   function persist(){ try{ localStorage.setItem('momo-calc', JSON.stringify(state)); }catch(_){} }
   function restore(){ try{ const s = JSON.parse(localStorage.getItem('momo-calc')); if(s && typeof s==='object'){ if(typeof s.baseCAGR==='number') state.baseCAGR=s.baseCAGR; if(typeof s.monthlyMul==='number') state.monthlyMul=s.monthlyMul; if(typeof s.principal==='number') state.principal=s.principal; if(typeof s.dist==='number') state.dist=s.dist; } }catch(_){} }
-   
+    
   function fromURL(){
     const p=new URLSearchParams(location.search);
     if(p.has('principal')) state.principal=clamp(safeNum(p.get('principal'), state.principal), 0, 1e9);
@@ -1235,7 +1262,7 @@
     const r = $('distRange'); r.addEventListener('input', ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt); r.addEventListener('change', ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt);
     [['dist5',5],['dist10',10],['dist15',15]].forEach(([id,v])=>{ $(id)?.addEventListener('click', ()=>{ state.dist=v; r.value=v; update(); }, passiveOpt); });
     const a = $('amt'); a.addEventListener('input', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update(); }, passiveOpt); a.addEventListener('change', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update(); }, passiveOpt);
-     
+      
     // !!! 修改後的策略按鈕監聽：加入更新情報卡 !!!
     document.querySelectorAll('[data-strategy]').forEach(btn=>{ 
         btn.addEventListener('click', ()=>{ 
@@ -1248,10 +1275,10 @@
             }); 
             btn.classList.add('is-active'); 
             btn.setAttribute('aria-pressed','true'); 
-             
+              
             // 更新情報卡
             updateStrategyInfo(key);
-             
+              
             update(); 
         }, passiveOpt); 
     });
@@ -1454,7 +1481,7 @@
     // 取得目標數字 (移除 $ 和 ,)
     const targetStr = el.innerText; // ex: $78,857
     const targetNum = parseInt(targetStr.replace(/[$,]/g, ''), 10);
-     
+      
     // 如果不是數字就停止
     if (isNaN(targetNum)) return;
 
@@ -1465,7 +1492,7 @@
     const easeOutQuad = t => t * (2 - t); // 緩出效果
 
     let frame = 0;
-     
+      
     const counter = setInterval(() => {
         frame++;
         // 計算進度
@@ -1479,7 +1506,7 @@
         clearInterval(counter);
         // 確保最後顯示準確數字
         el.innerText = targetStr; 
-         
+          
         // 跑完後加一個閃光特效類別 (Optional)
         el.style.textShadow = "0 0 30px rgba(255, 255, 255, 0.8)";
         setTimeout(() => { el.style.textShadow = ""; }, 500);
@@ -1488,7 +1515,7 @@
   }
 
   function boot(){
-    initSEO();
+    // initSEO() 已移除，改用靜態 HTML
     initSmartGreeting(); // 啟動智能問候
     document.querySelectorAll('.block').forEach(mountBlock);
     restore(); fromURL(); bindEvents(); update();
