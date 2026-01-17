@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>MOMO｜基金超級工具箱 v4.2 (優化版)</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* === 深色主題核心樣式 === */
+    :root{
+      --bg:#070B14;
+      --panel:#0B1426;
+      --line:rgba(233,209,138,0.22);
+      --line2:rgba(201,162,39,0.18);
+      --text:#E9EEF7;
+      --muted:rgba(233,238,247,0.60);
+      --gold:#C9A227;
+      --gold2:#E9D18A;
+      --danger:#FF6B6B;
+      --ok:#3DFFB5;
+      --radius:16px;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family:"Noto Sans TC", sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(201,162,39,0.15), transparent 55%),
+                  radial-gradient(900px 500px at 100% 0%, rgba(233,209,138,0.08), transparent 55%), var(--bg);
+      color:var(--text); padding-bottom: 50px;
+    }
+    .wrap{ max-width:1200px; margin:0 auto; padding:28px 18px; }
+    
+    .hero{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; flex-wrap:wrap; gap:16px; }
+    .title h1{ margin:0; font-size:28px; font-weight:900; letter-spacing:1px; background:linear-gradient(to right, #fff, var(--gold2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .title .sub{ color:var(--muted); font-size:14px; margin-top:6px; }
+    .badge{ padding:8px 14px; border-radius:99px; background:rgba(201,162,39,0.1); border:1px solid var(--line); color:var(--gold2); font-size:12px; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .dot{ width:8px; height:8px; background:var(--gold); border-radius:50%; box-shadow:0 0 10px var(--gold); }
+
+    .tabs{ display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid var(--line2); padding-bottom:10px; }
+    .tab-btn{ background:transparent; border:none; color:var(--muted); font-size:16px; font-weight:700; padding:10px 16px; cursor:pointer; position:relative; transition:.3s; }
+    .tab-btn:hover{ color:#fff; }
+    .tab-btn.active{ color:var(--gold2); }
+    .tab-btn.active::after{ content:''; position:absolute; bottom:-11px; left:0; width:100%; height:3px; background:var(--gold); box-shadow:0 -2px 10px var(--gold); }
+
+    .grid{ display:grid; grid-template-columns: 1fr 340px; gap:20px; }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr; } }
+    .grid-full { grid-template-columns: 1fr; } 
+
+    .card{ background:rgba(11,20,38,0.85); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden; backdrop-filter:blur(10px); }
+    .card-hd{ padding:14px 18px; background:rgba(201,162,39,0.05); border-bottom:1px solid var(--line2); display:flex; justify-content:space-between; align-items:center; font-weight:700; color:var(--gold2); }
+    .card-bd{ padding:18px; flex:1; display:flex; flex-direction:column; gap:16px; }
+
+    .drop-zone{ position: relative; border: 2px dashed var(--line2); border-radius: 12px; padding: 40px 20px; text-align: center; background: rgba(0,0,0,0.2); transition: .2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; }
+    .drop-zone:hover, .drop-zone.dragover{ border-color: var(--gold2); background: rgba(201,162,39,0.1); transform: scale(1.005); }
+    .drop-zone input[type="file"]{ position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+    .drop-icon { font-size: 48px; color: var(--muted); margin-bottom: 15px; transition: .3s; }
+    .drop-zone:hover .drop-icon { color: var(--gold); transform: translateY(-5px); }
+    .drop-txt{ color: var(--muted); font-size:15px; pointer-events:none; }
+    .drop-txt b{ color: var(--gold2); }
+    
+    label.block{ display:block; color:var(--muted); font-size:12px; margin-bottom:6px; font-weight:bold; }
+    input[type="number"], select, input[type="text"] { width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--line2); border-radius:8px; color:#fff; outline:none; transition:.2s; font-size: 14px; }
+    input:focus, select:focus{ border-color:var(--gold2); background: rgba(0,0,0,0.5); }
+    
+    .btn{ width:100%; padding:14px; border:none; border-radius:12px; font-weight:800; font-size:15px; cursor:pointer; background:linear-gradient(180deg, rgba(201,162,39,0.2), rgba(11,20,38,0.2)); border:1px solid rgba(233,209,138,0.3); color:var(--text); box-shadow:0 4px 15px rgba(0,0,0,0.3); transition:.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn:hover:not(:disabled){ transform:translateY(-2px); border-color:var(--gold2); background:rgba(201,162,39,0.3); }
+    .btn:disabled{ opacity:0.5; cursor:not-allowed; filter:grayscale(1); }
+    
+    .btn.primary{ background:var(--gold); color:#000; text-shadow:none; border:none; box-shadow:0 0 20px rgba(201,162,39,0.4); }
+    .btn.primary:hover:not(:disabled){ background:#e0b943; }
+    
+    /* 紅色按鈕樣式 (清空用) */
+    .btn.danger { background: rgba(255,107,107,0.1); border: 1px solid var(--danger); color: var(--danger); }
+    .btn.danger:hover { background: rgba(255,107,107,0.2); transform:translateY(-2px); }
+    
+    .hide{ display:none !important; }
+    
+    .file-list-area { margin-top: 20px; animation: fadeIn 0.5s ease; }
+    .file-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+    .file-table th { text-align: left; padding: 12px; color: var(--gold2); border-bottom: 1px solid var(--line); font-weight: 700; background: rgba(0,0,0,0.2); }
+    .file-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+    .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .status-wait { background: rgba(255,255,255,0.1); color: var(--muted); }
+    .status-ok { background: rgba(61, 255, 181, 0.15); color: var(--ok); }
+    
+    .toggle-row{ display:flex; gap:10px; margin-bottom:10px; flex-wrap: wrap; }
+    .toggle-lbl{ flex:1; cursor:pointer; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border:1px solid transparent; text-align:center; font-size:13px; color:var(--muted); transition:.2s; min-width: 120px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .toggle-lbl:hover{ background:rgba(255,255,255,0.1); }
+    input[type="checkbox"]:checked + .toggle-lbl, input[type="radio"]:checked + .toggle-lbl { background:rgba(201,162,39,0.2); border-color:var(--gold2); color:var(--gold2); font-weight:bold; }
+    input[type="checkbox"], input[type="radio"]{ display:none; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    #loadingOverlay { position: fixed; inset: 0; background: rgba(7, 11, 20, 0.85); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; color: var(--gold); }
+    .spinner { width: 40px; height: 40px; border: 4px solid rgba(201,162,39,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="title">
+      <h1>MOMO｜基金超級工具箱 v4.2</h1>
+      <div class="sub">Drag & Drop 整合版：支援無附檔名 CSV、自訂名稱、資料庫更新。</div>
+    </div>
+    <div class="badge"><span class="dot"></span> Optimized</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('merge')">模式 A：整理與合併 (Organize)</button>
+    <button class="tab-btn" onclick="switchTab('update')">模式 B：資料庫更新 (Update DB)</button>
+  </div>
+
+  <div id="view-merge" class="grid-full">
+    <div class="card">
+      <div class="card-hd">
+        <span>📂 檔案上傳與設定</span>
+        <div style="font-size:12px; color:var(--muted);">支援無附檔名 CSV、Excel</div>
+      </div>
+      <div class="card-bd">
+        
+        <div class="drop-zone" id="mergeDropZone">
+           <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+           <div class="drop-txt"><b>點擊選擇</b> 或 將多個檔案拖曳至此</div>
+           <div style="font-size:12px; color:var(--muted); margin-top:5px;">系統將自動過濾「漲跌」欄位，只保留「日期、淨值」</div>
+           <input type="file" id="mergeInput" multiple />
+        </div>
+
+        <div id="mergeSettingsArea" class="hide file-list-area">
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--line2); margin-bottom: 20px;">
+                <label class="block" style="margin-bottom: 10px; font-size: 14px; color: var(--gold2);">🛠️ 輸出模式選擇：</label>
+                <div class="toggle-row">
+                    <label>
+                        <input type="radio" name="exportMode" value="merged" checked>
+                        <div class="toggle-lbl"><i class="fa-solid fa-table-columns"></i> 合併成一表 (Date Key)</div>
+                    </label>
+                    <label>
+                        <input type="radio" name="exportMode" value="sheets">
+                        <div class="toggle-lbl"><i class="fa-solid fa-layer-group"></i> 分頁存檔 (獨立 Sheet)</div>
+                    </label>
+                </div>
+                <div class="toggle-row" style="margin-top:10px;">
+                    <label>
+                        <input type="checkbox" id="chkFill" checked>
+                        <div class="toggle-lbl" style="font-size:12px;">補前值 (合併模式用)</div>
+                    </label>
+                    <div style="flex:1; text-align:right;">
+                        <select id="encodingSelect" style="width: auto; display:inline-block;">
+                            <option value="UTF-8">UTF-8 (通用)</option>
+                            <option value="Big5">Big5 (舊系統亂碼用)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto; border: 1px solid var(--line2); border-radius: 12px;">
+                <table class="file-table" id="fileListTable">
+                    <thead>
+                        <tr>
+                            <th width="40%">原始檔名</th>
+                            <th width="40%"><i class="fa-solid fa-pen"></i> 基金名稱 (將作為 Sheet 名稱)</th>
+                            <th width="20%" style="text-align:center;">狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fileListBody"></tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+                <button class="btn danger" onclick="resetMergeMode()" style="max-width: 120px;">
+                    <i class="fa-solid fa-trash-can"></i> 清空重選
+                </button>
+                <button class="btn primary" onclick="runMergeProcess()" style="max-width: 400px; flex: 1;">
+                    <i class="fa-solid fa-file-export"></i> 開始處理並下載 Excel
+                </button>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="view-update" class="grid hide">
+    <div class="card">
+      <div class="card-hd">📋 處理日誌 & 狀態</div>
+      <div class="card-bd">
+        <div class="log-box" id="updateLog" style="background:rgba(0,0,0,0.4); border:1px solid var(--line2); border-radius:12px; padding:12px; height:250px; overflow-y:auto; font-family:'Roboto Mono', monospace; font-size:12px; color:rgba(255,255,255,0.7); line-height:1.6;">
+          <div class="log-msg">等待操作...</div>
+        </div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.6;">
+          <b>功能說明：</b>讀取「目標檔」與「來源檔」，比對日期並寫入。<br>
+          <b>智慧覆蓋：</b>可設定差異門檻，避免錯誤數據覆蓋。
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">⚙️ 更新參數設定</div>
+      <div class="card-bd">
+        <div>
+          <label class="block">1. 上傳目標檔 (Database)</label>
+          <div class="drop-zone" style="min-height: 100px; padding: 20px;">
+             <div class="drop-txt" style="font-size:13px;">拖曳或點擊 <b>目標檔</b></div>
+             <input type="file" id="targetFile" accept=".xlsx,.xls" />
+          </div>
+          <div id="targetFileInfo" style="font-size:12px; margin-top:5px; text-align:right;"></div>
+        </div>
+
+        <div>
+          <label class="block">2. 上傳來源檔 (最新淨值)</label>
+          <div class="drop-zone" style="min-height: 100px; padding: 20px;">
+             <div class="drop-txt" style="font-size:13px;">拖曳或點擊 <b>來源檔</b></div>
+             <input type="file" id="sourceFile" accept=".xlsx,.xls" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block">3. 寫入策略</label>
+          <div class="toggle-row">
+            <label><input type="radio" name="mode" value="fill" checked><div class="toggle-lbl">只補空白</div></label>
+            <label><input type="radio" name="mode" value="overwrite"><div class="toggle-lbl">強制覆蓋</div></label>
+            <label><input type="radio" name="mode" value="smart"><div class="toggle-lbl">智慧覆蓋</div></label>
+          </div>
+          <div id="smartOpt" class="hide" style="display:flex; gap:10px; margin-top:5px;">
+             <input type="number" id="threshold" value="0.3" step="0.01" placeholder="門檻%" style="flex:1;">
+             <span style="align-self:center; color:var(--muted); font-size:12px;">% 差異才寫入</span>
+          </div>
+        </div>
+
+        <button class="btn primary" onclick="runUpdate()">🚀 執行更新並下載</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="loadingOverlay" class="hide">
+    <div class="spinner"></div>
+    <div style="font-size:18px; font-weight:bold;">正在處理數據...</div>
+    <div style="font-size:14px; color:rgba(255,255,255,0.7); margin-top:5px;">請稍候，這可能需要幾秒鐘</div>
+</div>
+
+<script>
+// ==================== 共用工具 ====================
+const $ = (s) => document.querySelector(s);
+function logMsg(el, msg, type=""){
+  const color = type==='err' ? 'var(--danger)' : type==='ok' ? 'var(--ok)' : type==='warn' ? 'var(--gold)' : '';
+  el.innerHTML += `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+function switchTab(mode){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick="switchTab('${mode}')"]`).classList.add('active');
+  $('#view-merge').classList.add('hide');
+  $('#view-update').classList.add('hide');
+  $(`#view-${mode}`).classList.remove('hide');
+}
+function pad2(n){ return String(n).padStart(2,"0"); }
+
+function getStandardDateKey(input){
+  if(input == null || input === "") return null;
+  if(input instanceof Date && !isNaN(input)) return `${input.getFullYear()}/${pad2(input.getMonth()+1)}/${pad2(input.getDate())}`;
+  if(typeof input === "number"){
+    const dc = XLSX.SSF.parse_date_code(input);
+    if(dc) return `${dc.y}/${pad2(dc.m)}/${pad2(dc.d)}`;
+  }
+  const s = String(input).trim();
+  let m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if(m) return `${m[1]}/${pad2(m[2])}/${pad2(m[3])}`;
+  m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if(m) return `${m[1]}/${pad2(m[2])}/${pad2(m[3])}`;
+  return null;
+}
+
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+}
+
+document.querySelectorAll('input[name="mode"]').forEach(r => {
+  r.addEventListener('change', (e) => {
+    if(e.target.value === 'smart') $('#smartOpt').classList.remove('hide');
+    else $('#smartOpt').classList.add('hide');
+  });
+});
+
+// ==================== 模式 A：邏輯區 ====================
+let selectedMergeFiles = [];
+const mergeDropZone = $('#mergeDropZone');
+const mergeInput = $('#mergeInput');
+
+['dragenter', 'dragover'].forEach(evt => {
+    mergeDropZone.addEventListener(evt, (e) => { e.preventDefault(); mergeDropZone.classList.add('dragover'); });
+});
+['dragleave', 'drop'].forEach(evt => {
+    mergeDropZone.addEventListener(evt, (e) => { e.preventDefault(); mergeDropZone.classList.remove('dragover'); });
+});
+
+// 監聽拖曳放下
+mergeDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    handleMergeFiles(e.dataTransfer.files);
+});
+
+// 監聽檔案選擇
+mergeInput.addEventListener('change', (e) => handleMergeFiles(e.target.files));
+
+function handleMergeFiles(files) {
+    if (files.length > 0) {
+        selectedMergeFiles = Array.from(files);
+        renderMergeFileList();
+        $('#mergeSettingsArea').classList.remove('hide');
+        setTimeout(() => {
+            $('#mergeSettingsArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
+}
+
+// 新增：清空功能
+function resetMergeMode() {
+    selectedMergeFiles = [];
+    $('#mergeInput').value = ''; // 重置 input 
+    $('#fileListBody').innerHTML = ''; // 清空表格
+    $('#mergeSettingsArea').classList.add('hide'); // 隱藏設定區
+    // 滾動回頂部
+    $('#view-merge').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderMergeFileList() {
+    const tbody = $('#fileListBody');
+    tbody.innerHTML = '';
+    selectedMergeFiles.forEach((file, index) => {
+        let defaultName = file.name.replace(/\.[^/.]+$/, ""); 
+        if(defaultName.length > 30) defaultName = defaultName.substring(0, 30);
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <div style="display:flex; align-items:center;">
+                    <i class="fa-regular fa-file-lines" style="margin-right:10px; color:var(--muted); font-size:18px;"></i>
+                    <div>
+                        <div style="color:#fff;">${file.name}</div>
+                        <div style="font-size:12px; color:var(--muted);">${formatBytes(file.size)}</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <input type="text" id="sheetName-${index}" value="${defaultName}" placeholder="輸入基金名稱">
+            </td>
+            <td style="text-align:center;" id="status-${index}">
+                <span class="status-badge status-wait">待處理</span>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function readFileContent(file, encoding) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject(e);
+        reader.readAsText(file, encoding); 
+    });
+}
+
+async function runMergeProcess() {
+    const exportMode = document.querySelector('input[name="exportMode"]:checked').value;
+    const encoding = $('#encodingSelect').value;
+    const isFill = $('#chkFill').checked;
+    
+    if (selectedMergeFiles.length === 0) return;
+    $('#loadingOverlay').classList.remove('hide');
+    
+    const workbook = XLSX.utils.book_new();
+    const usedSheetNames = new Set();
+    let mergeDataMap = new Map();
+    let allDates = new Set();
+    let fundNamesList = [];
+    
+    try {
+        for (let i = 0; i < selectedMergeFiles.length; i++) {
+            const file = selectedMergeFiles[i];
+            const statusCell = document.getElementById(`status-${i}`);
+            let sheetName = document.getElementById(`sheetName-${i}`).value.trim() || `Fund_${i+1}`;
+            
+            sheetName = sheetName.replace(/[:\/\\?*\[\]]/g, "_");
+            if(sheetName.length > 31) sheetName = sheetName.substring(0, 31);
+            
+            let originalName = sheetName;
+            let counter = 1;
+            while (usedSheetNames.has(sheetName)) {
+                sheetName = `${originalName}_${counter}`;
+                counter++;
+            }
+            usedSheetNames.add(sheetName);
+            
+            const csvText = await readFileContent(file, encoding);
+            const parseResult = Papa.parse(csvText, { header: false, skipEmptyLines: true });
+            const rawData = parseResult.data;
+            
+            if (rawData && rawData.length > 0) {
+                let startRow = 0;
+                const firstRowStr = rawData[0].join("").toLowerCase();
+                if(firstRowStr.includes("日期") || firstRowStr.includes("date") || isNaN(Date.parse(rawData[0][0]))) {
+                    startRow = 1; 
+                }
+                
+                let cleanData = [];
+                if(exportMode === 'sheets') {
+                    cleanData.push(["日期", "淨值"]);
+                }
+
+                for(let r = startRow; r < rawData.length; r++) {
+                    const row = rawData[r];
+                    if(row.length >= 2) {
+                        const dKey = getStandardDateKey(row[0]);
+                        let val = row[1];
+                        if(typeof val === 'string') val = parseFloat(val.replace(/,/g,''));
+                        
+                        if(dKey && val != null && !isNaN(val)) {
+                            if(exportMode === 'sheets') {
+                                cleanData.push([dKey, val]);
+                            } else {
+                                if(!mergeDataMap.has(dKey)) mergeDataMap.set(dKey, new Map());
+                                mergeDataMap.get(dKey).set(sheetName, val);
+                                allDates.add(dKey);
+                            }
+                        }
+                    }
+                }
+                
+                if(exportMode === 'sheets') {
+                    const ws = XLSX.utils.aoa_to_sheet(cleanData);
+                    XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+                } else {
+                    fundNamesList.push(sheetName);
+                }
+                statusCell.innerHTML = `<span class="status-badge status-ok">OK</span>`;
+            } else {
+                statusCell.innerHTML = `<span style="color:var(--danger)">無資料</span>`;
+            }
+        }
+        
+        if (exportMode === 'merged') {
+            const sortedDates = Array.from(allDates).sort().reverse();
+            const header = ["日期", ...fundNamesList];
+            let resultRows = [header];
+            let lastValues = {}; 
+            fundNamesList.forEach(f => lastValues[f] = null);
+            
+            const ascDates = [...sortedDates].reverse();
+            let fullData = new Map();
+            
+            ascDates.forEach(d => {
+                let row = [];
+                fundNamesList.forEach(f => {
+                    let v = mergeDataMap.get(d)?.get(f);
+                    if (v == null && isFill && lastValues[f] != null) v = lastValues[f];
+                    if (v != null) lastValues[f] = v;
+                    row.push(v);
+                });
+                fullData.set(d, row);
+            });
+            
+            sortedDates.forEach(d => {
+                const vals = fullData.get(d);
+                resultRows.push([d, ...vals]);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(resultRows);
+            XLSX.utils.book_append_sheet(workbook, ws, "基金合併總表");
+        }
+        
+        const stamp = new Date().toISOString().slice(0,10).replace(/-/g,"");
+        const fileName = exportMode === 'sheets' ? `MOMO_Sheets_${stamp}.xlsx` : `MOMO_Merged_${stamp}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+        
+        setTimeout(() => {
+            $('#loadingOverlay').classList.add('hide');
+            alert("✅ 處理完成，檔案已下載！");
+        }, 500);
+
+    } catch (err) {
+        console.error(err);
+        $('#loadingOverlay').classList.add('hide');
+        alert("❌ 發生錯誤：" + err.message);
+    }
+}
+
+// ==================== 模式 B：資料庫更新邏輯 ====================
+$('#targetFile').addEventListener('change', async function(){
+    const file = this.files[0];
+    const infoEl = $('#targetFileInfo');
+    if(!file){ infoEl.textContent = ""; return; }
+    infoEl.textContent = "檢查中...";
+    infoEl.style.color = "var(--gold2)";
+    try {
+        const data = await file.arrayBuffer();
+        const wb = XLSX.read(data);
+        if(!wb.SheetNames.includes("Database")){
+            infoEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> 錯誤：缺少「Database」分頁`;
+            infoEl.style.color = "var(--danger)";
+        } else {
+            infoEl.innerHTML = `<i class="fa-solid fa-check"></i> 格式正確 (含 Database)`;
+            infoEl.style.color = "var(--ok)";
+        }
+    } catch(e){ infoEl.textContent = "讀取失敗"; }
+});
+
+async function runUpdate(){
+    const fileT = $('#targetFile').files[0];
+    const fileS = $('#sourceFile').files[0];
+    const logEl = $('#updateLog');
+    
+    if(!fileT || !fileS){ alert("請上傳兩個檔案"); return; }
+    
+    $('#loadingOverlay').classList.remove('hide');
+    logEl.innerHTML = "";
+    logMsg(logEl, "開始執行更新...", "warn");
+    
+    try {
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const threshold = parseFloat($('#threshold').value) || 0;
+        
+        const wbT = XLSX.read(await fileT.arrayBuffer());
+        const wsT = wbT.Sheets["Database"];
+        let arrT = XLSX.utils.sheet_to_json(wsT, {header:1, raw:true, defval:""});
+        
+        let headers = arrT[0] || [];
+        let dateMap = new Map();
+        for(let i=1; i<arrT.length; i++){
+            const d = getStandardDateKey(arrT[i][0]);
+            if(d) dateMap.set(d, i);
+        }
+        
+        const wbS = XLSX.read(await fileS.arrayBuffer());
+        let stats = { add:0, update:0, skip:0 };
+        
+        for(let sheetName of wbS.SheetNames){
+            let colIdx = headers.indexOf(sheetName);
+            if(colIdx === -1){
+                headers.push(sheetName);
+                colIdx = headers.length - 1;
+                logMsg(logEl, `新增基金欄位: ${sheetName}`, "ok");
+            }
+            
+            const arrS = XLSX.utils.sheet_to_json(wbS.Sheets[sheetName], {header:1, raw:true});
+            for(let r=1; r<arrS.length; r++){
+                const dKey = getStandardDateKey(arrS[r][0]);
+                let val = arrS[r][1];
+                if(typeof val === 'string') val = parseFloat(val.replace(/,/g,''));
+                
+                if(dKey && val != null && !isNaN(val)){
+                    let rowIdx = dateMap.get(dKey);
+                    if(rowIdx === undefined){
+                        let newRow = new Array(headers.length).fill("");
+                        newRow[0] = dKey;
+                        arrT.push(newRow);
+                        rowIdx = arrT.length - 1;
+                        dateMap.set(dKey, rowIdx);
+                    }
+                    if(!arrT[rowIdx]) arrT[rowIdx] = [];
+                    while(arrT[rowIdx].length < headers.length) arrT[rowIdx].push("");
+                    
+                    const oldVal = arrT[rowIdx][colIdx];
+                    let doWrite = false;
+                    
+                    if(oldVal === "" || oldVal == null){
+                        doWrite = true; stats.add++;
+                    } else if(mode === 'overwrite'){
+                        doWrite = true; stats.update++;
+                    } else if(mode === 'smart'){
+                        const pct = Math.abs((val - oldVal)/oldVal) * 100;
+                        if(pct > threshold) { doWrite = true; stats.update++; }
+                    }
+                    if(doWrite) arrT[rowIdx][colIdx] = val;
+                }
+            }
+        }
+        
+        arrT[0] = headers;
+        const dataRows = arrT.slice(1);
+        dataRows.sort((a,b) => new Date(b[0]) - new Date(a[0]));
+        const finalData = [headers, ...dataRows];
+        
+        wbT.Sheets["Database"] = XLSX.utils.aoa_to_sheet(finalData);
+        const stamp = new Date().toISOString().slice(0,10).replace(/-/g,"");
+        XLSX.writeFile(wbT, `MOMO_DB_Updated_${stamp}.xlsx`);
+        logMsg(logEl, `更新完成！新增值:${stats.add}, 更新:${stats.update}`, "ok");
+        
+    } catch(e) {
+        logMsg(logEl, "錯誤：" + e.message, "err");
+        alert("更新失敗");
+    } finally {
+        $('#loadingOverlay').classList.add('hide');
+    }
+}
+</script>
+</body>
+</html>
