@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>MOMO FinSphere｜Google Sheet 專業版（完美修復版）</title>
+  <title>MOMO FinSphere｜Google Sheet 專業版（全自動運算版）</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -202,6 +202,10 @@
     }
     .sub-input label{margin:0 0 4px 0;color:#93a4b7;font-size:10px;}
     .sub-input input{background:transparent;border:none;padding:0;font-size:15px;font-weight:900;color:#fff;width:100%;}
+    
+    /* 自動計算標示 - 金色/藍色文字 */
+    .strat-block.momo .auto-calced input { color: var(--gold-soft); }
+    .strat-block.original .auto-calced input { color: #bfeaff; }
 
     #dynamic-weights-area, #dynamic-weights-area-bench{
       margin-top:10px; padding-top:10px;
@@ -267,7 +271,7 @@
     .chart-wrapper{
       position:relative;height:520px;width:100%;
       background:rgba(0,0,0,.10); border-radius:18px;
-      padding:14px 14px 40px 14px; /* ✅ 多留一點底部，避免 X 軸被切到 */
+      padding:14px 14px 40px 14px;
       border:1px solid rgba(233,209,138,.10); overflow:hidden;
     }
     @media (max-width:900px){
@@ -351,7 +355,6 @@
     .lead-pct.positive{ border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.10); color:#a7f3d0; }
     .lead-pct.negative{ border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.10); color:#fecaca; }
 
-    /* 領先卡：漸層金 + 呼吸 + 閃耀 */
     .lead-card{
       border:1px solid rgba(249,226,124,.26);
       box-shadow:
@@ -425,7 +428,6 @@
       z-index:2;
     }
 
-    /* ✅ 新增：累積領配息卡（金額特效明顯） */
     .div-card{
       min-height: 132px;
       border:1px solid rgba(255,255,255,.08);
@@ -481,7 +483,6 @@
     }
     .div-subhint b{color:#e9f2ff;}
 
-    /* 檢視用 A/B 明細（匯出隱藏） */
     .selection-preview{
       border-top:1px dashed rgba(255,255,255,0.10);
       padding-top:14px;
@@ -588,7 +589,6 @@
       padding:12px 0;
     }
 
-    /* 驗證區（匯出會隱藏） */
     .validation-section{margin-top:14px; border-top:1px dashed rgba(255,255,255,0.10); padding-top:14px;}
     .validation-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     @media (max-width:980px){.validation-grid{grid-template-columns:1fr;}}
@@ -596,7 +596,6 @@
     .v-title{color:#fff;font-size:12px;margin-bottom:8px;font-weight:900;border-left:3px solid #666;padding-left:8px;}
     .v-chart-h{height:180px;position:relative;}
 
-    /* 匯出 PNG：停用動畫 & 隱藏檢視區 */
     body.exporting .control-panel{display:none;}
     body.exporting .layout{grid-template-columns:1fr;}
     body.exporting .validation-section{display:none;}
@@ -624,10 +623,8 @@
     body.exporting .div-amount.gold{ color:#F9E27C !important; background:none !important; -webkit-background-clip:initial !important; }
     body.exporting .div-amount.blu{ color:#BFEAFF !important; background:none !important; -webkit-background-clip:initial !important; }
 
-    /* ✅ 若你曾經有放「累積領配息 %」欄位：用作法 B 直接隱藏（保險） */
     #momo-div-pct, #bench-div-pct { display:none !important; }
 
-    /* ✅ 平板/手機：整體更好塞 */
     @media (max-width:900px){
       body{padding:14px;}
       #report-capture{padding:18px;border-radius:22px;}
@@ -705,19 +702,24 @@
 
           <div style="display:flex; gap:8px;">
             <div style="flex:1;">
-              <label style="font-size:10px; color:#aaa;">分頁 ID (GID)</label>
+              <label style="font-size:10px; color:#aaa;">淨值 ID (GID)</label>
               <input type="text" id="sheet-gid" value="877412256" style="font-size:11px;" />
             </div>
-            <div style="flex:1; display:flex; align-items:end;">
-              <button class="btn-action btn-load" type="button" onclick="fetchSheetData()" style="margin:0; font-size:11px;">
-                📡 重讀資料
-              </button>
+            <div style="flex:1;">
+                <label style="font-size:10px; color:#aaa;">Config ID (GID)</label>
+                <input type="text" id="config-gid" value="1114691785" placeholder="填入GID" style="font-size:11px;" />
             </div>
+          </div>
+          
+          <div style="display:flex; align-items:end; margin-top:8px;">
+              <button class="btn-action btn-load" type="button" onclick="fetchSheetData()" style="margin:0; font-size:11px;">
+                📡 讀取資料 & Config
+              </button>
           </div>
 
           <div id="load-status">
             狀態：<b>尚未讀取</b><br/>
-            讀取順序：GViz(JSONP, headers=1) → 失敗才 CSV fallback
+            讀取順序：GViz(JSONP) → 失敗才 CSV fallback
           </div>
         </div>
 
@@ -760,13 +762,13 @@
             </div>
           </div>
 
-          <div class="sub-input" style="margin-top:10px;">
-            <label>預估 CAGR (%)</label>
+          <div class="sub-input auto-calced" style="margin-top:10px;">
+            <label>不含息 CAGR (%) (依選取區間自動計算)</label>
             <input type="number" id="momo-cagr" value="12.77" step="0.01" oninput="update()" />
           </div>
-          <div class="sub-input" style="margin-bottom:0">
-            <label>年配息率 (%)（用於推估累積領息金額）</label>
-            <input type="number" id="momo-div" value="6.4" step="0.1" oninput="update()" />
+          <div class="sub-input auto-calced" style="margin-bottom:0">
+            <label>年配息率 (%) (依組合權重自動計算)</label>
+            <input type="number" id="momo-div" value="6.4" step="0.01" oninput="update()" />
           </div>
         </div>
 
@@ -782,13 +784,13 @@
             </div>
           </div>
 
-          <div class="sub-input" style="margin-top:10px;">
-            <label>預估 CAGR (%)</label>
+          <div class="sub-input auto-calced" style="margin-top:10px;">
+            <label>不含息 CAGR (%) (依選取區間自動計算)</label>
             <input type="number" id="bench-cagr" value="1.51" step="0.01" oninput="update()" />
           </div>
-          <div class="sub-input" style="margin-bottom:0">
-            <label>年配息率 (%)（用於推估累積領息金額）</label>
-            <input type="number" id="bench-div" value="9.2" step="0.1" oninput="update()" />
+          <div class="sub-input auto-calced" style="margin-bottom:0">
+            <label>年配息率 (%) (依組合權重自動計算)</label>
+            <input type="number" id="bench-div" value="9.2" step="0.01" oninput="update()" />
           </div>
         </div>
 
@@ -852,14 +854,12 @@
             </div>
           </div>
 
-          <!-- ✅ 新增：兩個「累積領配息」區塊（寬度與上方卡一致） -->
           <div class="kpi-row">
             <div class="metric-card div-card">
               <div class="metric-top">
                 <div class="metric-title-group">
                   <span class="dot gold"></span> MOMO｜累積領配息
                 </div>
-                <!-- 不顯示 % 差異 -->
               </div>
               <div class="div-amount gold" id="momo-div-amount">$ 0</div>
               <div class="div-subhint">估算依據：<b>起始本金 × 年配息率</b>（固定推估）</div>
@@ -870,13 +870,11 @@
                 <div class="metric-title-group">
                   <span class="dot blue"></span> 原始方案｜累積領配息
                 </div>
-                <!-- 不顯示 % 差異 -->
               </div>
               <div class="div-amount blu" id="bench-div-amount">$ 0</div>
               <div class="div-subhint">估算依據：<b>起始本金 × 年配息率</b>（固定推估）</div>
             </div>
 
-            <!-- 第三格補位（保持寬度一致） -->
             <div class="metric-card" style="opacity:0; pointer-events:none;"></div>
           </div>
 
@@ -987,8 +985,10 @@
     let rawGlobalData = [];
     let allFundNames = [];
     let parsedBenchData = [], parsedMomoData = [], momoFundNames = [], benchFundNames = [];
-    let mainChart = null, vBenchChart = null, vMomoChart = null;
+    // Config 對應表
+    let fundConfigMap = {};
 
+    let mainChart = null, vBenchChart = null, vMomoChart = null;
     const weightState = { momo: new Map(), bench: new Map() };
 
     function setStatus(html){
@@ -1072,39 +1072,91 @@
       return XLSX.utils.sheet_to_json(sheet, {header: 1, raw: true});
     }
 
+    // ✅ 處理 Config 資料 (修正版：B欄名稱, D欄配息)
+    function processConfigData(rows) {
+        fundConfigMap = {};
+        if(!rows || rows.length < 2) return;
+        
+        console.log("正在處理 Config 分頁資料 (來源: B欄名稱, D欄配息)...");
+        
+        for(let i=1; i<rows.length; i++) {
+            const row = rows[i];
+            const rawName = String(row[1] || "").trim(); // B欄 (index 1)
+            const rateRaw = row[3]; // D欄 (index 3)
+            
+            // 淨化名稱：轉小寫、移除空格、移除常見符號，作為對照 Key
+            const cleanKey = rawName.toLowerCase().replace(/\s+/g, '').replace(/[-_()]/g, '');
+            
+            let rate = 0;
+            if(typeof rateRaw === 'number') {
+                rate = rateRaw;
+            } else if(typeof rateRaw === 'string') {
+                rate = parseFloat(rateRaw.replace(/%/g, '').trim());
+            }
+
+            // 防呆：如果讀出來是 0.06 (小數)，轉成 6.0 (%)
+            if(rate > 0 && rate < 1) rate = rate * 100;
+
+            if(cleanKey && !isNaN(rate)) {
+                fundConfigMap[cleanKey] = rate;
+                fundConfigMap["__RAW__" + cleanKey] = rawName;
+            }
+        }
+        console.log(`✅ Config 讀取完成，共載入 ${Object.keys(fundConfigMap).length / 2} 筆配息資料`);
+    }
+
+    // ✅ 讀取資料主程式
     async function fetchSheetData() {
       const sheetId = document.getElementById('sheet-id').value.trim();
-      const gid = document.getElementById('sheet-gid').value.trim();
+      const navGid = document.getElementById('sheet-gid').value.trim();
+      const configGid = document.getElementById('config-gid').value.trim();
+
       if (!sheetId) { alert("請輸入 Google Sheet ID"); return; }
-      if (!gid) { alert("請輸入 GID"); return; }
+      if (!navGid) { alert("請輸入 淨值 GID"); return; }
 
       const btn = document.querySelector('.btn-load');
       const oldText = btn ? btn.innerHTML : "";
       if(btn){ btn.innerHTML = "⏳ 連線中..."; btn.disabled = true; }
 
-      setStatus(`狀態：<b>讀取中…</b><br/>來源：GViz(JSONP, headers=1) → 失敗才 CSV`);
+      setStatus(`狀態：<b>讀取中…</b><br/>同步讀取 淨值 & Config`);
 
       try {
-        const resp = await gvizJsonp(sheetId, gid);
-        const rows = gvizToRows(resp);
-        if (!rows || rows.length < 2) throw new Error("GViz 讀取成功但資料為空");
-        processRawSheetData(rows);
-        document.getElementById('selector-ui').style.display = 'block';
-        setStatus(`狀態：<b>GViz 成功</b><br/>筆數：${rawGlobalData.length}｜基金欄位：${allFundNames.length}`);
-      } catch (e1) {
-        console.warn("GViz 失敗，改用 CSV fallback：", e1);
-        setStatus(`狀態：<b>GViz 失敗</b>（${e1.message}）<br/>改用：CSV fallback…`);
-        try {
-          const rows = await fetchCsvFallback(sheetId, gid);
-          if (!rows || rows.length < 2) throw new Error("CSV 讀取成功但資料為空");
-          processRawSheetData(rows);
-          document.getElementById('selector-ui').style.display = 'block';
-          setStatus(`狀態：<b>CSV fallback 成功</b><br/>筆數：${rawGlobalData.length}｜基金欄位：${allFundNames.length}`);
-        } catch (e2) {
-          console.error(e2);
-          setStatus(`狀態：<b>讀取失敗</b><br/>GViz：${e1.message}<br/>CSV：${e2.message}`);
-          alert(`❌ 讀取失敗！\n\nGViz：${e1.message}\nCSV：${e2.message}\n\n請確認：\n1) 試算表已「發布到網路」或設為可公開\n2) GID 是否正確\n3) 試算表不是需要登入權限`);
+        const pNav = gvizJsonp(sheetId, navGid)
+             .then(resp => gvizToRows(resp))
+             .catch(() => fetchCsvFallback(sheetId, navGid));
+        
+        let pConfig = Promise.resolve([]);
+        if(configGid) {
+            pConfig = gvizJsonp(sheetId, configGid)
+                .then(resp => gvizToRows(resp))
+                .catch(() => fetchCsvFallback(sheetId, configGid));
         }
+
+        const [navRows, configRows] = await Promise.all([pNav, pConfig]);
+
+        if (!navRows || navRows.length < 2) throw new Error("淨值資料為空");
+        
+        // 1. 處理 Config
+        if(configRows && configRows.length > 1) {
+            processConfigData(configRows);
+        } else {
+            console.warn("⚠️ Config 資料為空或讀取失敗");
+        }
+
+        // 2. 處理 Nav
+        processRawSheetData(navRows);
+
+        // 3. 強制刷新計算
+        if(momoFundNames.length > 0) normalizeWeightsTo100('momo');
+        if(benchFundNames.length > 0) normalizeWeightsTo100('bench');
+
+        document.getElementById('selector-ui').style.display = 'block';
+        setStatus(`狀態：<b>讀取成功</b><br/>淨值筆數：${rawGlobalData.length}｜Config 對應：${Object.keys(fundConfigMap).length/2}`);
+
+      } catch (e) {
+        console.error(e);
+        setStatus(`狀態：<b>讀取失敗</b><br/>${e.message}`);
+        alert(`❌ 讀取失敗！請檢查 ID/GID 與權限設定。\n錯誤：${e.message}`);
       } finally {
         if(btn){ btn.innerHTML = oldText; btn.disabled = false; }
       }
@@ -1135,7 +1187,7 @@
       }
       rawGlobalData.sort((a,b) => a.dt - b.dt);
 
-      // ✅ 前值補齊（forward fill）：中途空值會沿用前一次有值
+      // Forward fill
       const lastValid = {};
       allFundNames.forEach(n => lastValid[n] = null);
       rawGlobalData.forEach(row => {
@@ -1253,7 +1305,6 @@
         return;
       }
 
-      // 主圖仍用 raw（會在 processHistoryPrincipal 過濾完整資料）
       parsedMomoData = rawGlobalData.map(row => ({ dt: row.dt, date: row.dateKey, vals: momoFundNames.map(n => row.valsRaw[n]) }));
       parsedBenchData = rawGlobalData.map(row => ({ dt: row.dt, date: row.dateKey, vals: benchFundNames.map(n => row.valsRaw[n]) }));
 
@@ -1305,6 +1356,55 @@
       else el.classList.add('warn');
     }
 
+    // ✅ 計算加權平均配息率 (含模糊搜尋)
+    function updateWeightedDiv(type) {
+        const arr = readWeightsFromDOM(type);
+        if(!arr || arr.length === 0) return;
+        
+        const totalWeight = arr.reduce((a,b) => a + (b.val||0), 0);
+        let weightedRate = 0;
+        let foundCount = 0;
+
+        arr.forEach(item => {
+            const w = item.val || 0;
+            const currentName = item.name;
+            const searchKey = currentName.toLowerCase().replace(/\s+/g, '').replace(/[-_()]/g, '');
+            
+            // 嘗試直接查找
+            let rate = fundConfigMap[searchKey];
+
+            // 找不到則模糊搜尋
+            if (rate === undefined) {
+                const fuzzyKey = Object.keys(fundConfigMap).find(k => 
+                    !k.startsWith("__RAW__") && (k.includes(searchKey) || searchKey.includes(k))
+                );
+                if(fuzzyKey) {
+                    rate = fundConfigMap[fuzzyKey];
+                    console.log(`🔍 模糊比對成功: [${currentName}] -> ${rate}%`);
+                }
+            }
+
+            if (rate !== undefined) {
+                weightedRate += rate * w;
+                foundCount++;
+            } else {
+                console.warn(`⚠️ 找不到配息率: [${currentName}]`);
+            }
+        });
+
+        let finalRate = 0;
+        if(totalWeight > 0) {
+            finalRate = weightedRate / totalWeight; 
+        }
+
+        const inputId = type === 'momo' ? 'momo-div' : 'bench-div';
+        const inputEl = document.getElementById(inputId);
+        if(inputEl) {
+            inputEl.value = finalRate.toFixed(2);
+            inputEl.style.color = (foundCount === 0 && arr.length > 0) ? '#ff6b6b' : '';
+        }
+    }
+
     function normalizeWeightsTo100(type, changedName=null){
       const arr = readWeightsFromDOM(type);
       if(arr.length === 0) { renderSelectionPreview(); return; }
@@ -1321,6 +1421,7 @@
         unlocked.forEach(it => writeWeightToDOM(it, 0));
         syncStateFromDOM(type);
         renderSelectionPreview();
+        updateWeightedDiv(type); // ✅ 更新配息
         return;
       }
 
@@ -1328,6 +1429,7 @@
       if(unlocked.length === 0){
         syncStateFromDOM(type);
         renderSelectionPreview();
+        updateWeightedDiv(type); // ✅ 更新配息
         return;
       }
 
@@ -1343,6 +1445,7 @@
           writeWeightToDOM(fixedItem, budget);
           syncStateFromDOM(type);
           renderSelectionPreview();
+          updateWeightedDiv(type); // ✅ 更新配息
           return;
         }
 
@@ -1367,6 +1470,7 @@
 
       syncStateFromDOM(type);
       renderSelectionPreview();
+      updateWeightedDiv(type); // ✅ 更新配息
     }
 
     function onWeightChange(type, name){
@@ -1489,7 +1593,6 @@
       });
     }
 
-    // ✅ 修復：驗證圖改用 valsFilled（中途空值→沿用前一次有值）→ 線會連續
     function updateValidationChart(type){
       const id = type==='bench' ? 'valBenchChart' : 'valMomoChart';
       const names = type==='bench' ? benchFundNames : momoFundNames;
@@ -1548,7 +1651,6 @@
       }
     }
 
-    // ✅ MDD (最大回撤)
     function calculateMaxDrawdown(prices) {
       if (!prices || prices.length < 2) return 0;
       let maxPeak = prices[0];
@@ -1616,20 +1718,54 @@
       update();
     }
 
+    // ✅ 修正版：自動計算歷史 CAGR 並填入，然後畫圖
     function buildSeries(){
       const p0 = parseFloat(document.getElementById('p0').value)||0;
       const years = parseInt(document.getElementById('proj-years').value)||3;
       document.getElementById('year-display').innerText = years;
       document.getElementById('year-badge').innerText = showFuture ? `第 ${years} 年` : "歷史尾端";
 
+      const lookbackYears = parseInt(document.getElementById('entry-window').value)||0;
+
+      // 1. 先取得歷史走勢數據
+      const hist = processHistoryPrincipal(p0, lookbackYears);
+      
+      // 2. ✅【新增邏輯】根據歷史數據計算 CAGR 並自動填入
+      if(hist.labels.length > 1) {
+          const startDate = parseDateLoose(hist.labels[0]);
+          const endDate = hist.lastDate instanceof Date ? hist.lastDate : parseDateLoose(hist.labels[hist.labels.length-1]);
+          
+          let yearsDiff = 0;
+          if(startDate && endDate) {
+              const diffTime = endDate.getTime() - startDate.getTime();
+              yearsDiff = diffTime / (1000 * 3600 * 24 * 365.25); // 換算成年
+          }
+
+          if(yearsDiff > 0.1) { // 至少要有0.1年才計算
+              // MOMO CAGR
+              const mStart = hist.momoPrincipal[0];
+              const mEnd = hist.momoPrincipal[hist.momoPrincipal.length-1];
+              const mCagr = (Math.pow(mEnd / mStart, 1 / yearsDiff) - 1) * 100;
+              
+              // Bench CAGR
+              const bStart = hist.benchPrincipal[0];
+              const bEnd = hist.benchPrincipal[hist.benchPrincipal.length-1];
+              const bCagr = (Math.pow(bEnd / bStart, 1 / yearsDiff) - 1) * 100;
+
+              // 填入 DOM
+              const mInput = document.getElementById('momo-cagr');
+              const bInput = document.getElementById('bench-cagr');
+              if(mInput) mInput.value = mCagr.toFixed(2);
+              if(bInput) bInput.value = bCagr.toFixed(2);
+          }
+      }
+
+      // 3. 重新讀取剛剛填入的 CAGR (用於繪製未來線)
       const momoCagr = parseFloat(document.getElementById('momo-cagr').value)||0;
       const momoDiv  = parseFloat(document.getElementById('momo-div').value)||0;
       const benchCagr = parseFloat(document.getElementById('bench-cagr').value)||0;
       const benchDiv  = parseFloat(document.getElementById('bench-div').value)||0;
 
-      const lookbackYears = parseInt(document.getElementById('entry-window').value)||0;
-
-      const hist = processHistoryPrincipal(p0, lookbackYears);
       const labels = hist.labels.slice();
       const mp = hist.momoPrincipal.slice();
       const bp = hist.benchPrincipal.slice();
@@ -1646,6 +1782,7 @@
 
       if (showFuture) {
         const totalDays = years * 365;
+        // 使用剛剛自動算出來的 CAGR 進行推演
         const dailyM = Math.pow(1 + momoCagr/100, 1/365) - 1;
         const dailyB = Math.pow(1 + benchCagr/100, 1/365) - 1;
         let currMp = lastMp, currBp = lastBp;
@@ -1660,7 +1797,6 @@
         }
       }
 
-      // 累積領息（固定：起始本金 × 配息率）
       const momoCumDiv = new Array(labels.length).fill(0);
       const benchCumDiv = new Array(labels.length).fill(0);
       let accM = 0, accB = 0;
@@ -1693,7 +1829,7 @@
           responsive:true, maintainAspectRatio:false,
           interaction:{ mode:'index', intersect:false },
           elements:{ point:{ radius:0, hoverRadius:5 } },
-          layout:{ padding:{ bottom: 34, left: 6, right: 8, top: 6 } }, /* ✅ 再加大底部 */
+          layout:{ padding:{ bottom: 34, left: 6, right: 8, top: 6 } },
           scales:{
             x:{
               grid:{color:'rgba(255,255,255,0.05)'},
@@ -1701,7 +1837,7 @@
                 color:'#8aa0b8',
                 maxTicksLimit: 9,
                 autoSkip: true,
-                padding: 16,            /* ✅ 增加 ticks padding，避免被擋 */
+                padding: 16,
                 maxRotation: 45,
                 minRotation: 35
               }
@@ -1787,7 +1923,6 @@
         return;
       }
 
-      // ✅ 建立金色漸層
       const ctx = mainChart.ctx;
       const gradientMomo = ctx.createLinearGradient(0, 0, 0, 400);
       gradientMomo.addColorStop(0, 'rgba(249, 226, 124, 0.35)');
@@ -1797,7 +1932,6 @@
 
       mainChart.data.labels = s.labels;
 
-      // ✅ 主圖：只保留「淨值走勢」兩條線（移除兩條配息線）
       mainChart.data.datasets = [
         {
           label:'MOMO策略 淨值(不含息)',
@@ -1855,7 +1989,6 @@
       if(document.getElementById('bench-acc-div'))
          document.getElementById('bench-acc-div').innerText = money(benchDiv);
 
-      // ✅ 下方兩個「累積領配息」區塊（特效金額）
       document.getElementById('momo-div-amount').innerText = money(momoDiv);
       document.getElementById('bench-div-amount').innerText = money(benchDiv);
 
@@ -1867,7 +2000,6 @@
       setPctBadge(document.getElementById('momo-nav-pct'), momoPct);
       setPctBadge(document.getElementById('bench-nav-pct'), benchPct);
 
-      // ✅ MDD（只用歷史段）
       const momoHistP = s.momoP.slice(0, s.histLen);
       const benchHistP = s.benchP.slice(0, s.histLen);
 
@@ -1884,7 +2016,6 @@
       setLeadCard(leadValue, benchTotalWealth, principalDiff, divDiff);
     }
 
-    // ✅ 關鍵修復：加入強制還原保險機制 (Safety Timer)
     async function exportImg() {
       const t = document.getElementById("report-capture");
       const originalScrollPos = window.scrollY;
