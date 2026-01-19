@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>MOMO FinSphere｜Google Sheet 專業版（敏感度分析圖）</title>
+  <title>MOMO FinSphere｜Google Sheet 專業版（完美修復匯出版）</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -457,6 +457,12 @@
         -webkit-background-clip:text;
         color: transparent;
     }
+    /* 修正匯出時比值變色塊的問題 */
+    body.exporting .ratio-val {
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      color: #C084FC !important;
+    }
 
     .div-amount{
       font-size:36px;
@@ -614,10 +620,13 @@
     .v-title{color:#fff;font-size:12px;margin-bottom:8px;font-weight:900;border-left:3px solid #666;padding-left:8px;}
     .v-chart-h{height:180px;position:relative;}
 
+    /* ✅ 隱藏敏感度圖表 (匯出時) */
     body.exporting .control-panel{display:none;}
     body.exporting .layout{grid-template-columns:1fr;}
     body.exporting .validation-section{display:none;}
     body.exporting .selection-preview{display:none;}
+    body.exporting #sensitivity-chart-section { display: none !important; }
+
     body.exporting .title-wrap h1{
       background:none !important;
       -webkit-background-clip:initial !important;
@@ -948,7 +957,7 @@
             </div>
           </div>
 
-          <div class="chart-wrapper" style="margin-top:14px; height: 320px;">
+          <div id="sensitivity-chart-section" class="chart-wrapper" style="margin-top:14px; height: 320px;">
             <div class="chart-title">
               <h4>📊 敏感度分析：配息基金權重 (0% ~ 100%) vs 領先/領息差額比</h4>
               <div class="badge">配置優化建議</div>
