@@ -1,59 +1,236 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MOMO 權證篩選器｜載入中</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MOMO權證篩選器</title>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/xlsx/dist/cpexcel.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+  :root{
+    --deep:#0A1221; --card:#0C152A;
+    --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
+    --gold-soft:#E9D18A; --gold-solid:#E5C45A;
+    --line:#E9D18A55; --muted:#9fb0d0; --red:#FF6B6B; --purple:#BD93F9;
+  }
+  html,body{ margin:0;background:var(--deep);color:#fff;font-family:"Noto Sans TC",sans-serif; }
+  .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .field{flex:1 1 200px;background:#0b1630;color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;outline:none;}
+  
+  .btn-link{background:var(--gold-grad);color:#000;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;transition:0.2s;}
+  .btn-link:hover{transform:translateY(-1px); opacity:0.9;}
+  .btn-link[disabled]{background:#4a4a4a; color:#888; cursor:not-allowed;}
+  
+  .spinner {
+    width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid #000;
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; display: none;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  <!-- 立即轉跳到 Render（顯示 Render 自己的白畫面／冷啟動畫面） -->
-  <meta http-equiv="refresh" content="0; url='https://warrant-render-proxy-1.onrender.com/'" />
-
-  <style>
-    :root{
-      --deep:#0A1221;
-      --muted:#9fb0d0;
-      --gold:#C9A227;
-    }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      min-height:100vh;
-      background:#0A1221;
-      color:#fff;
-      font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:24px 16px;
-    }
-    h1{font-size:20px;margin-bottom:8px;}
-    p{font-size:13px;color:var(--muted);line-height:1.7;}
-    .dot{
-      margin-top:10px;
-      width:32px;height:32px;
-      border-radius:50%;
-      border:3px solid rgba(255,255,255,.15);
-      border-top-color:var(--gold);
-      animation:spin 1s linear infinite;
-    }
-    @keyframes spin{to{transform:rotate(360deg);}}
-    a{
-      margin-top:12px;
-      font-size:12px;
-      color:var(--gold);
-      text-decoration:none;
-      border-bottom:1px dashed rgba(201,162,39,.7);
-    }
-    a:hover{border-bottom-style:solid;}
-  </style>
+  .table-container{overflow:auto;max-height:70vh;margin-top:10px;border:1px solid var(--line);border-radius:8px;}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;}
+  th,td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap; color:#fff !important;}
+  th{position:sticky;top:0;z-index:10;background:#0f1b34;color:var(--gold-soft) !important;}
+  .sticky-col{position:sticky;left:0;z-index:5;background:#0C152A;}
+  th.sticky-col{z-index:11;}
+  tbody tr:hover td { background-color: #1a2a4a !important; color: #fff !important; }
+  
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
+  .tag.C{background:#E25A5A;color:#fff} .tag.P{background:#39C27A;color:#fff}
+  
+  .gold-text{background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+  .red-text{color:var(--red) !important; font-weight:700;}
+  .purple-text{color:var(--purple) !important; font-weight:700;}
+  .count-badge{color:var(--gold-solid); font-weight:bold; font-size:14px; border:1px solid var(--gold-soft); padding:2px 8px; border-radius:4px;}
+</style>
 </head>
 <body>
-  <h1>MOMO 權證篩選器啟動中…</h1>
-  <p>正在連線到 Render 後端服務，可能需要幾秒時間載入。<br>如果沒有自動跳轉，你可以點擊下方連結。</p>
-  <div class="dot"></div>
-  <a href="https://warrant-render-proxy-1.onrender.com/" target="_self">
-    若未自動跳轉，請點此前往權證篩選器
-  </a>
+<div class="wrap">
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0">MOMO權證篩選器</h3>
+      <div id="topStatus" class="hint">等待載入資料...</div>
+    </div>
+    <div class="row">
+      <button id="btnFetch" class="btn-link">
+        <span class="spinner" id="btnSpinner"></span>
+        <span id="btnText">下載權證資料</span>
+      </button>
+      <input id="nameFilter" type="text" class="field" placeholder="標的搜尋 (如: 2330)"/>
+      <select id="selType" class="field" style="max-width:140px">
+        <option value="C" selected>認購 (C)</option>
+        <option value="P">認售 (P)</option>
+      </select>
+      <select id="selSortKey" class="field" style="max-width:240px">
+        <option value="s1" selected>S1 (價差比 / 槓桿)</option>
+        <option value="spread">價差比</option>
+        <option value="leverage">槓桿</option>
+        <option value="days_left">距到期天數</option>
+      </select>
+      <select id="selLimit" class="field" style="max-width:140px">
+        <option value="10" selected>顯示 10 列</option>
+        <option value="all">顯示全部</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkFilterZeroSpread" checked/>排除價差=0</label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkHasIV" checked/>排除無隱波</label>
+      <button id="btnExportPng" class="btn-link">匯出 PNG</button>
+    </div>
+  </div>
+
+  <div id="resultCard" class="card" style="margin-top:12px;display:none">
+    <div class="hint" id="meta2" style="margin-bottom:8px"></div>
+    <div class="table-container">
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th class="sticky-col">代號</th><th>名稱</th><th>類型</th><th>價差比</th><th>槓桿</th><th>行使比例</th>
+            <th>S1 (價差比 / 槓桿)</th><th>S2 (S1 / 行使比例)</th><th>天數</th><th>履約價</th><th>成交價</th>
+            <th>隱波</th><th>價內外</th><th>流通比</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fmtNum=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(+v).toFixed(d);
+const showPct100=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
+const toHalf=(s)=>String(s||"").replace(/[\uFF01-\uFF5E]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0));
+
+function num(x){
+  if(x==null) return null;
+  let s=toHalf(String(x)).trim().replace(/,/g,"").replace(/%$/,"");
+  const v=parseFloat(s);
+  return isNaN(v)?null:v;
+}
+
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwGUgr8LFnjZDSCT5qDZ0lpD0o8c2ztVdAwCsmI2kHRqR3ZvofkT6BLoJpJLe-fTOrO/exec"; 
+let RAW_DATA = [];
+
+$("#btnFetch").addEventListener("click", async () => {
+  const btn = $("#btnFetch");
+  const spinner = $("#btnSpinner");
+  const btnText = $("#btnText");
+  btn.disabled = true;
+  spinner.style.display = "inline-block";
+  btnText.textContent = "載入中...";
+
+  try {
+    const res = await fetch(GAS_URL);
+    const csvText = await res.text();
+    const wb = XLSX.read(csvText, { type: "string", codepage: 65001 });
+    RAW_DATA = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
+    $("#topStatus").innerHTML = `來源總數：<span class="count-badge">${RAW_DATA.length.toLocaleString()}</span> 筆`;
+    render();
+  } catch (e) {
+    alert("抓取失敗。");
+  } finally {
+    btn.disabled = false;
+    spinner.style.display = "none";
+    btnText.textContent = "下載權證資料";
+  }
+});
+
+function processData() {
+  const wantType = $("#selType").value;
+  const dropZero = $("#chkFilterZeroSpread").checked;
+  const needIV = $("#chkHasIV").checked;
+  const q = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
+
+  return RAW_DATA.map(r => {
+    const name = r["權證名稱"] || r["FLD_WAR_NM"] || "";
+    const spread = num(r["買賣價差比"] || r["FLD_WAR_UP_DN_RATE"]);
+    const lev = num(r["實質槓桿"] || r["FLD_LEVERAGE"]);
+    const exr = num(r["行使比例"] || r["FLD_N_UND_CONVER"]);
+    const s1 = (spread != null && lev && lev !== 0) ? spread / Math.abs(lev) : null;
+    return {
+      code: r["權證代碼"] || r["FLD_WAR_ID"],
+      name, cp: (/[售]/.test(name) || /P/.test(name)) ? "P" : "C",
+      spread, leverage: lev, exercise: exr, s1, s2: (s1 && exr) ? s1 / exr : null,
+      days_left: num(r["距到期天數"] || r["FLD_PERIOD"]),
+      strike: r["履約價"] || r["FLD_N_STRIKE_PRC"],
+      price: r["權證成交價"] || r["FLD_WAR_TXN_PRICE"],
+      iv: num(r["成交價隱波(%)"] || r["FLD_IV_CLOSE_PRICE"]),
+      moneyness: r["價內外程度"] || r["FLD_IN_OUT"],
+      float_rate: num(r["流通在外比率(%)"] || r["FLD_OUT_VOL_RATE"])
+    };
+  }).filter(x => {
+    if (x.cp !== wantType) return false;
+    if (dropZero && (x.spread === 0 || x.spread === null)) return false;
+    if (needIV && (!x.iv || x.iv === 0)) return false;
+    if (x.days_left != null && x.days_left <= 60) return false;
+    if (q.length) {
+      const fullStr = (x.name + x.code).toLowerCase();
+      if (!q.every(token => fullStr.includes(token))) return false;
+    }
+    return true;
+  }).sort((a, b) => {
+    const key = $("#selSortKey").value;
+    return (a[key] || 0) - (b[key] || 0);
+  });
+}
+
+function render() {
+  const rows = processData();
+  const limitVal = $("#selLimit").value;
+  const limit = limitVal === "all" ? rows.length : parseInt(limitVal);
+  const shown = rows.slice(0, limit);
+  const tb = $("#tbody");
+  tb.innerHTML = "";
+  
+  shown.forEach(r => {
+    const tr = document.createElement("tr");
+    
+    // 條件判斷邏輯
+    const ivClass = (r.iv && r.iv > 80) ? "purple-text" : "";
+    const exrClass = (r.exercise != null && r.exercise < 0.01) ? "red-text" : (r.exercise >= 0.1 ? "gold-text" : ""); // 新增：>=0.1 標金
+    const s1Class = (r.s1 && r.s1 < 0.1) ? "gold-text" : "";
+    
+    // S2 邏輯優化：< 150% (即 1.5) 標金, > 1000% (即 10.0) 標紅
+    let s2Class = "";
+    if (r.s2 != null) {
+      if (r.s2 < 1.5) s2Class = "gold-text";
+      else if (r.s2 > 10) s2Class = "red-text";
+    }
+
+    tr.innerHTML = `
+      <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
+      <td>${r.name}</td>
+      <td><span class="tag ${r.cp}">${r.cp}</span></td>
+      <td>${fmtNum(r.spread, 3)}</td>
+      <td class="${Math.abs(r.leverage) > 5 ? 'gold-text' : ''}">${fmtNum(Math.abs(r.leverage), 2)}</td>
+      <td class="${exrClass}">${fmtNum(r.exercise, 3)}</td>
+      <td class="${s1Class}">${showPct100(r.s1)}</td>
+      <td class="${s2Class}">${showPct100(r.s2)}</td>
+      <td>${r.days_left || "—"}</td><td>${r.strike || "—"}</td>
+      <td>${fmtNum(num(r.price), 3)}</td>
+      <td class="${ivClass}">${fmtNum(r.iv, 2)}</td>
+      <td>${r.moneyness || "—"}</td>
+      <td>${r.float_rate != null ? r.float_rate.toFixed(2) + "%" : "—"}</td>
+    `;
+    tb.appendChild(tr);
+  });
+  $("#resultCard").style.display = "block";
+  $("#meta2").textContent = `顯示前 ${shown.length} 筆`;
+}
+
+let debounceTimer;
+$("#nameFilter").addEventListener("input", () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(render, 300);
+});
+["selType","selSortKey","chkFilterZeroSpread","selLimit","chkHasIV"].forEach(id => $(`#${id}`).addEventListener("change", render));
+$("#btnExportPng").addEventListener("click", async () => {
+  const canvas = await html2canvas($("#resultCard"), { backgroundColor: "#0A1221", scale: 2 });
+  const a = document.createElement("a");
+  a.href = canvas.toDataURL(); a.download = `MOMO_Warrant.png`; a.click();
+});
+</script>
 </body>
 </html>
