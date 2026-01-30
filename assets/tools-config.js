@@ -38,7 +38,7 @@ window.MOMO_TOOLS_CONFIG = [
     category: "warrant",
     title: "權證篩選 API",
     desc: "串接權證 API，自動解析過濾異常數據。",
-    href: "https://warrant-render-proxy-1.onrender.com/",
+    href: "/MOMO_FinSphere/tools/warrant-api.html",
     external: true,
     showOnHome: false
   },
