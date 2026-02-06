@@ -1,185 +1,266 @@
-/**
- * ==============================================================================
- * MOMO 權證自動化監測系統 - 後端核心 (精簡一列 + 效能優化版)
- * ==============================================================================
- * 功能 1: 每日自動抓取，強制每檔權證在試算表中「僅保留 1 筆最新紀錄」。
- * 功能 2: 更新時自動紀錄「昨日隱波」，以精準監控隱波差 (IV Delta)。
- * 功能 3: 嚴格過濾垃圾數據：剔除天數 < 60天、S2 > 1500% 的標的。
- * 功能 4: 排序邏輯：全表依 S1 (CP值) 進行升冪排序，並發送 Telegram 報告。
- * ==============================================================================
- */
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MOMO權證篩選器 - 終極優化版</title>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/xlsx/dist/cpexcel.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+  /* 核心視覺風格 */
+  :root{
+    --deep:#0A1221; --card:#0C152A;
+    --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
+    --gold-soft:#E9D18A; --gold-solid:#E5C45A;
+    --line:#E9D18A55; --muted:#9fb0d0; --red:#FF6B6B; --purple:#BD93F9;
+  }
+  html,body{ margin:0;background:var(--deep);color:#fff;font-family:"Noto Sans TC",sans-serif; }
+  .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .field{flex:1 1 200px;background:#0b1630;color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;outline:none;}
+  
+  /* 按鈕樣式 */
+  .btn-link{background:var(--gold-grad);color:#000;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;display:flex;align-items:center;transition:0.2s;}
+  .btn-link:hover{transform:translateY(-1px); opacity:0.9;}
+  .btn-link[disabled]{background:#4a4a4a; color:#888; cursor:not-allowed;}
+  
+  /* 載入動畫 */
+  .spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid #000; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-const SHEET_ID = "1hyH_AhuFVgWtQawHKi9JI-JGcFf0Q5VZc03R8giaDs4";
-const TELEGRAM_TOKEN = "8308620447:AAF5Qzb85Et4d2RdpioPCx3OkvaBhYDENFw";
-const TELEGRAM_CHAT_ID = "7953758794";
+  /* 表格佈局與固定首欄 */
+  .table-container{overflow:auto;max-height:70vh;margin-top:10px;border:1px solid var(--line);border-radius:8px;}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;}
+  th,td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap; color:#fff !important;}
+  th{position:sticky;top:0;z-index:10;background:#0f1b34;color:var(--gold-soft) !important;}
+  .sticky-col{position:sticky;left:0;z-index:5;background:#0C152A;}
+  th.sticky-col{z-index:11;}
+  
+  /* 互動效果 */
+  tbody tr:hover td { background-color: #1a2a4a !important; color: #fff !important; }
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
+  .tag.C{background:#E25A5A;color:#fff} .tag.P{background:#39C27A;color:#fff}
+  
+  /* 策略顏色標記 */
+  .gold-text{background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+  .red-text{color:var(--red) !important; font-weight:700;}
+  .purple-text{color:var(--purple) !important; font-weight:700;}
+  .count-badge{color:var(--gold-solid); font-weight:bold; font-size:14px; border:1px solid var(--gold-soft); padding:2px 8px; border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0">MOMO權證篩選器</h3>
+      <div id="topStatus" class="hint">等待載入資料...</div>
+    </div>
+    <div class="row">
+      <button id="btnFetch" class="btn-link">
+        <span class="spinner" id="btnSpinner"></span>
+        <span id="btnText">下載權證資料</span>
+      </button>
+      <input id="nameFilter" type="text" class="field" placeholder="標的搜尋 (如: 2330)"/>
+      <select id="selType" class="field" style="max-width:140px">
+        <option value="C" selected>認購 (C)</option>
+        <option value="P">認售 (P)</option>
+      </select>
+      <select id="selSortKey" class="field" style="max-width:260px">
+        <option value="s1" selected>S1 (價差比 / 槓桿)</option>
+        <option value="spread">價差比</option>
+        <option value="leverage">槓桿</option>
+        <option value="days_left">距到期天數</option>
+      </select>
+      <select id="selLimit" class="field" style="max-width:140px">
+        <option value="10" selected>顯示 10 列</option>
+        <option value="all">顯示全部</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkFilterZeroSpread" checked/>排除價差=0</label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkHasIV" checked/>排除無隱波</label>
+      <button id="btnExportPng" class="btn-link">匯出 PNG</button>
+    </div>
+  </div>
 
-// 特定觀察標的 (代號或名稱)
-const WATCHLIST = ["台積電", "2330", "鴻海", "2317", "聯發科", "2454", "廣達", "2382", "欣興", "3037"]; 
+  <div id="resultCard" class="card" style="margin-top:12px;display:none">
+    <div class="hint" id="meta2" style="margin-bottom:8px"></div>
+    <div class="table-container">
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th class="sticky-col">代號</th><th>名稱</th><th>類型</th><th>價差比</th><th>槓桿</th><th>行使比例</th>
+            <th>S1 (價差比 / 槓桿)</th><th>S2 (S1 / 行使比例)</th><th>天數</th><th>履約價</th><th>成交價</th>
+            <th>隱波</th><th>價內外</th><th>流通比</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-// 篩選門檻
-const GOLDEN_S1_LIMIT = 0.001; 
-const S2_MAX_LIMIT = 15.0;     // S2 > 1500% 剃除
-const MIN_DAYS = 60;           // 天數 < 60 剃除
+<script>
+const $=s=>document.querySelector(s);
+const fmtNum=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(+v).toFixed(d);
+const showPct100=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
+const toHalf=(s)=>String(s||"").replace(/[\uFF01-\uFF5E]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0));
 
-/**
- * 網頁呼叫 API 入口
- */
-function doGet(e) {
+function num(x){
+  if(x==null) return null;
+  let s=toHalf(String(x)).trim().replace(/,/g,"").replace(/%$/,"");
+  const v=parseFloat(s);
+  return isNaN(v)?null:v;
+}
+
+// 你的 GAS 部署網址
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwGUgr8LFnjZDSCT5qDZ0lpD0o8c2ztVdAwCsmI2kHRqR3ZvofkT6BLoJpJLe-fTOrO/exec"; 
+let RAW_DATA = [];
+
+$("#btnFetch").addEventListener("click", async () => {
+  const btn = $("#btnFetch");
+  const spinner = $("#btnSpinner");
+  const btnText = $("#btnText");
+  btn.disabled = true; spinner.style.display = "inline-block"; btnText.textContent = "載入中...";
+
   try {
-    const csvData = fetchWarrantDataFromYuanta();
-    return ContentService.createTextOutput(csvData).setMimeType(ContentService.MimeType.TEXT);
-  } catch (err) {
-    return ContentService.createTextOutput("Error: " + err.toString());
-  }
-}
+    const res = await fetch(GAS_URL);
+    const csvText = await res.text();
+    const wb = XLSX.read(csvText, { type: "string", codepage: 65001 });
+    RAW_DATA = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
+    $("#topStatus").innerHTML = `來源總數：<span class="count-badge">${RAW_DATA.length.toLocaleString()}</span> 筆`;
+    render();
+  } catch (e) { alert("連線 API 失敗"); }
+  finally { btn.disabled = false; spinner.style.display = "none"; btnText.textContent = "下載權證資料"; }
+});
 
-/**
- * 每日任務：核心自動化紀錄與 Telegram 回報
- */
-function dailyWarrantJob() {
-  const csvData = fetchWarrantDataFromYuanta();
-  const allData = parseCSVToObjects(csvData);
-  
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = ss.getSheetByName("History") || ss.insertSheet("History");
-  const today = Utilities.formatDate(new Date(), "GMT+8", "yyyy-MM-dd");
+function processData() {
+  const wantType = $("#selType").value;
+  const dropZero = $("#chkFilterZeroSpread").checked;
+  const needIV = $("#chkHasIV").checked;
+  const q = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
 
-  const existingRows = sheet.getDataRange().getValues();
-  const historyMap = new Map();
-  
-  // 建立現有資料 Map (代號 -> 該行數據)
-  for (let i = 1; i < existingRows.length; i++) {
-    const code = existingRows[i][1].toString().trim();
-    historyMap.set(code, existingRows[i]);
-  }
-
-  let goldenList = [];
-  let watchlistReport = [];
-  const updatedDataMap = new Map();
-
-  allData.forEach(r => {
-    // 嚴格過濾：無效數據、天數不足、性價比極低
-    if (r.iv <= 0.1 || r.leverage <= 0.1 || r.spread <= 0 || r.days < MIN_DAYS) return;
-    const s1 = r.spread / Math.abs(r.leverage);
-    const s2 = s1 / r.exercise;
-    if (s2 > S2_MAX_LIMIT) return;
-
-    const isWatch = WATCHLIST.some(tag => r.name.includes(tag) || r.code.includes(tag));
-    const isGolden = (s1 < GOLDEN_S1_LIMIT && (s2 * 100) < 150);
-
-    if (isWatch || isGolden) {
-      const oldRecord = historyMap.get(r.code);
-      let lastIv = null;
-
-      if (oldRecord) {
-        // 如果舊紀錄是今天的，嘗試維持原本的昨日隱波；若非今天，則今日隱波變昨日隱波
-        lastIv = (oldRecord[0] === today) ? oldRecord[4] : oldRecord[3];
-      }
-
-      const ivDelta = (lastIv && !isNaN(lastIv)) ? (r.iv - lastIv).toFixed(2) : "New";
-      const newRow = [
-        today, r.code, r.name, r.iv, lastIv || "—", ivDelta, 
-        (s1*100).toFixed(2) + "%", (s2*100).toFixed(2) + "%", r.days
-      ];
-      
-      updatedDataMap.set(r.code, newRow);
-
-      if (isGolden) goldenList.push({...r, s1Value: s1});
-      if (isWatch) watchlistReport.push({...r, ivDelta, s1Value: s1});
-    }
-  });
-
-  // 全域依 S1 排序 (最低最划算排第一)
-  let finalRows = Array.from(updatedDataMap.values()).sort((a, b) => {
-    return parseFloat(a[6]) - parseFloat(b[6]);
-  });
-
-  // 覆寫試算表
-  sheet.clearContents();
-  const header = ["日期", "代號", "名稱", "今日隱波", "昨日隱波", "隱波差", "S1", "S2", "天數"];
-  sheet.getRange(1, 1, 1, header.length).setValues([header]);
-  if (finalRows.length > 0) {
-    sheet.getRange(2, 1, finalRows.length, header.length).setValues(finalRows);
-  }
-
-  sendTelegramReport(goldenList, watchlistReport);
-}
-
-/**
- * 手動執行工具：一鍵整理現有混亂資料為「一檔一列」
- */
-function reorganizeHistorySheet() {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = ss.getSheetByName("History");
-  if (!sheet) return;
-  const rawData = sheet.getDataRange().getValues();
-  const codeMap = new Map();
-  for (let i = 1; i < rawData.length; i++) {
-    const row = rawData[i];
-    const code = row[1].toString().trim();
-    const s2Val = parseFloat(row[7]) / 100 || 0;
-    const days = parseInt(row[8]) || 0;
-    if (days >= MIN_DAYS && s2Val <= S2_MAX_LIMIT) codeMap.set(code, row);
-  }
-  const sorted = Array.from(codeMap.values()).sort((a, b) => parseFloat(a[6]) - parseFloat(b[6]));
-  sheet.clearContents();
-  sheet.getRange(1, 1, 1, 9).setValues([["日期", "代號", "名稱", "今日隱波", "昨日隱波", "隱波差", "S1", "S2", "天數"]]);
-  if (sorted.length > 0) sheet.getRange(2, 1, sorted.length, 9).setValues(sorted);
-}
-
-function sendTelegramReport(goldens, watches) {
-  let msg = `📅 <b>MOMO 權證日報 (${Utilities.formatDate(new Date(), "GMT+8", "MM/dd")})</b>\n\n`;
-  msg += `🏆 <b>精選黃金權證 (S1 最優排序)</b>\n`;
-  if (goldens.length === 0) {
-    msg += "• 今日無符合標的\n";
-  } else {
-    goldens.sort((a,b) => a.s1Value - b.s1Value).slice(0, 8).forEach(g => {
-      msg += `• <a href="https://www.wantgoo.com/stock/warrant/${g.code}">${g.code}</a> ${escapeHtml(g.name)}\n  (S1: ${(g.s1Value*100).toFixed(2)}% | ${escapeHtml(g.moneyness)})\n`;
-    });
-  }
-  msg += `\n🔍 <b>標的隱波監控 (IV Delta)</b>\n`;
-  WATCHLIST.forEach(target => {
-    const matched = watches.filter(w => w.name.includes(target) || w.code === target);
-    if (matched.length > 0) {
-      msg += `<b>[${escapeHtml(target)}]</b>\n`;
-      matched.sort((a,b) => a.s1Value - b.s1Value).slice(0, 2).forEach(m => {
-        const sign = m.ivDelta > 0 ? "📈 +" : (m.ivDelta < 0 ? "📉 " : "➖ ");
-        msg += `  ${m.code}: IV ${m.iv} (${sign}${m.ivDelta} | ${escapeHtml(m.moneyness)})\n`;
-      });
-    }
-  });
-
-  UrlFetchApp.fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-    "method": "post", "contentType": "application/json",
-    "payload": JSON.stringify({ "chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "HTML", "disable_web_page_preview": true }),
-    "muteHttpExceptions": true
-  });
-}
-
-function fetchWarrantDataFromYuanta() {
-  const targetUrl = 'https://www.warrantwin.com.tw/eyuanta/ws/GetWarData.ashx';
-  const payload = {
-    format: "CSV", factor: {
-      columns: ["FLD_WAR_ID", "FLD_WAR_NM", "FLD_WAR_TXN_PRICE", "FLD_WAR_UP_DN", "FLD_WAR_UP_DN_RATE", "FLD_WAR_TXN_VOLUME", "FLD_N_STRIKE_PRC", "FLD_N_UND_CONVER", "FLD_PERIOD", "FLD_IN_OUT", "FLD_BUY_SELL_RATE", "FLD_LEVERAGE", "FLD_IV_CLOSE_PRICE"],
-      condition: [{ "field": "FLD_WAR_TYPE", "values": ["1", "2"] }]
-    }, pagination: { "page": "1" }
-  };
-  const response = UrlFetchApp.fetch(targetUrl, { 'method': 'post', 'payload': { 'data': JSON.stringify(payload) } });
-  return Utilities.newBlob(response.getBlob().getBytes(), 'text/csv', 'big5').getDataAsString('big5');
-}
-
-function parseCSVToObjects(csv) {
-  const lines = csv.split("\n");
-  return lines.slice(1).map(line => {
-    const c = line.split(",").map(cell => cell.replace(/"/g, "").trim());
-    if (c.length < 13) return null;
+  return RAW_DATA.map(r => {
+    const name = r["權證名稱"] || r["FLD_WAR_NM"] || "";
+    const spread = num(r["買賣價差比"] || r["FLD_WAR_UP_DN_RATE"]);
+    const lev = num(r["實質槓桿"] || r["FLD_LEVERAGE"]);
+    const exr = num(r["行使比例"] || r["FLD_N_UND_CONVER"]);
+    const s1 = (spread != null && lev && lev !== 0) ? spread / Math.abs(lev) : null;
     return {
-      code: c[0], name: c[1], exercise: parseFloat(c[7]) || 0, days: parseInt(c[8]) || 0,
-      moneyness: c[9], spread: parseFloat(c[10]) || 0, leverage: parseFloat(c[11]) || 0, iv: parseFloat(c[12]) || 0
+      code: r["權證代碼"] || r["FLD_WAR_ID"],
+      name, cp: (/[售]/.test(name) || /P/.test(name)) ? "P" : "C",
+      spread, leverage: lev, exercise: exr, s1, s2: (s1 && exr) ? s1 / exr : null,
+      days_left: num(r["距到期天數"] || r["FLD_PERIOD"]),
+      strike: r["履約價"] || r["FLD_N_STRIKE_PRC"],
+      price: r["權證成交價"] || r["FLD_WAR_TXN_PRICE"],
+      iv: num(r["成交價隱波(%)"] || r["FLD_IV_CLOSE_PRICE"]),
+      moneyness: r["價內外程度"] || r["FLD_IN_OUT"],
+      float_rate: num(r["流通在外比率(%)"] || r["FLD_OUT_VOL_RATE"])
     };
-  }).filter(Boolean);
+  }).filter(x => {
+    if (x.cp !== wantType) return false;
+    if (dropZero && (x.spread === 0 || x.spread === null)) return false;
+    if (needIV && (!x.iv || x.iv === 0)) return false;
+    
+    // 核心過濾邏輯：天數 < 60 或 S2 > 1500% 剔除
+    if (x.days_left < 60 || (x.s2 * 100 > 1500)) return false;
+
+    if (q.length) {
+      const fullStr = (x.name + x.code).toLowerCase();
+      if (!q.every(token => fullStr.includes(token))) return false;
+    }
+    return true;
+  }).sort((a, b) => {
+    const key = $("#selSortKey").value;
+    return (a[key] || 0) - (b[key] || 0);
+  });
 }
 
-function escapeHtml(text) {
-  return text ? text.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+function render() {
+  const rows = processData();
+  const limitVal = $("#selLimit").value;
+  const limit = limitVal === "all" ? rows.length : parseInt(limitVal);
+  const shown = rows.slice(0, limit);
+  const tb = $("#tbody");
+  tb.innerHTML = "";
+  
+  shown.forEach(r => {
+    const tr = document.createElement("tr");
+    
+    // 視覺化分級邏輯
+    const ivClass = (r.iv && r.iv > 80) ? "purple-text" : "";
+    const exrClass = (r.exercise != null && r.exercise < 0.01) ? "red-text" : (r.exercise >= 0.1 ? "gold-text" : "");
+    const s1Class = (r.s1 && r.s1 < 0.1) ? "gold-text" : "";
+    
+    let s2Class = "";
+    if (r.s2 != null) {
+      if (r.s2 < 1.5) s2Class = "gold-text"; // S2 < 150% 標金
+      else if (r.s2 > 10) s2Class = "red-text"; // S2 > 1000% 標紅
+    }
+
+    tr.innerHTML = `
+      <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
+      <td>${r.name}</td>
+      <td><span class="tag ${r.cp}">${r.cp}</span></td>
+      <td>${fmtNum(r.spread, 3)}</td>
+      <td class="${Math.abs(r.leverage) > 5 ? 'gold-text' : ''}">${fmtNum(Math.abs(r.leverage), 2)}</td>
+      <td class="${exrClass}">${fmtNum(r.exercise, 3)}</td>
+      <td class="${s1Class}">${showPct100(r.s1)}</td>
+      <td class="${s2Class}">${showPct100(r.s2)}</td>
+      <td>${r.days_left || "—"}</td><td>${r.strike || "—"}</td>
+      <td>${fmtNum(num(r.price), 3)}</td>
+      <td class="${ivClass}">${fmtNum(r.iv, 2)}</td>
+      <td>${r.moneyness || "—"}</td>
+      <td>${r.float_rate != null ? r.float_rate.toFixed(2) + "%" : "—"}</td>
+    `;
+    tb.appendChild(tr);
+  });
+  $("#resultCard").style.display = "block";
+  $("#meta2").textContent = `顯示前 ${shown.length} 筆 / 符合條件 ${rows.length} 筆`;
 }
+
+// 修復手機完整截圖邏輯
+$("#btnExportPng").addEventListener("click", async () => {
+  const btn = $("#btnExportPng");
+  const originalCard = $("#resultCard");
+  btn.disabled = true; btn.textContent = "產生圖片中...";
+  try {
+    const tempDiv = document.createElement("div");
+    tempDiv.style.position = "absolute"; tempDiv.style.left = "-9999px"; tempDiv.style.width = "1300px";
+    document.body.appendChild(tempDiv);
+
+    const cloneCard = originalCard.cloneNode(true);
+    tempDiv.appendChild(cloneCard);
+
+    const cloneContainer = cloneCard.querySelector(".table-container");
+    if (cloneContainer) {
+      cloneContainer.style.maxHeight = "none"; 
+      cloneContainer.style.overflow = "visible";
+    }
+
+    const stickyEls = cloneCard.querySelectorAll(".sticky-col");
+    stickyEls.forEach(el => { 
+      el.style.position = "static"; 
+      el.style.backgroundColor = "transparent"; 
+    });
+
+    const canvas = await html2canvas(cloneCard, { backgroundColor: "#0A1221", scale: 2, width: 1300 });
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/png");
+    a.download = `MOMO_Warrant_${new Date().getTime()}.png`;
+    a.click();
+
+    document.body.removeChild(tempDiv);
+  } catch (e) { alert("匯出失敗"); }
+  finally { btn.disabled = false; btn.textContent = "匯出 PNG"; }
+});
+
+let debounceTimer;
+$("#nameFilter").addEventListener("input", () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(render, 300);
+});
+["selType","selSortKey","chkFilterZeroSpread","selLimit","chkHasIV"].forEach(id => $(`#${id}`).addEventListener("change", render));
+</script>
+</body>
+</html>
