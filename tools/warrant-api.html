@@ -3,12 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MOMO權證篩選器 - 終極優化版</title>
+<title>MOMO權證篩選器 - 截圖優化版</title>
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/xlsx/dist/cpexcel.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
-  /* 核心視覺風格 */
   :root{
     --deep:#0A1221; --card:#0C152A;
     --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
@@ -20,30 +19,22 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .field{flex:1 1 200px;background:#0b1630;color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;outline:none;}
-  
-  /* 按鈕樣式 */
   .btn-link{background:var(--gold-grad);color:#000;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;display:flex;align-items:center;transition:0.2s;}
   .btn-link:hover{transform:translateY(-1px); opacity:0.9;}
   .btn-link[disabled]{background:#4a4a4a; color:#888; cursor:not-allowed;}
-  
-  /* 載入動畫 */
   .spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid #000; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* 表格佈局與固定首欄 */
   .table-container{overflow:auto;max-height:70vh;margin-top:10px;border:1px solid var(--line);border-radius:8px;}
   table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;}
   th,td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap; color:#fff !important;}
   th{position:sticky;top:0;z-index:10;background:#0f1b34;color:var(--gold-soft) !important;}
   .sticky-col{position:sticky;left:0;z-index:5;background:#0C152A;}
   th.sticky-col{z-index:11;}
-  
-  /* 互動效果 */
   tbody tr:hover td { background-color: #1a2a4a !important; color: #fff !important; }
   .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
   .tag.C{background:#E25A5A;color:#fff} .tag.P{background:#39C27A;color:#fff}
   
-  /* 策略顏色標記 */
+  /* 漸層文字類別 */
   .gold-text{background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
   .red-text{color:var(--red) !important; font-weight:700;}
   .purple-text{color:var(--purple) !important; font-weight:700;}
@@ -58,71 +49,41 @@
       <div id="topStatus" class="hint">等待載入資料...</div>
     </div>
     <div class="row">
-      <button id="btnFetch" class="btn-link">
-        <span class="spinner" id="btnSpinner"></span>
-        <span id="btnText">下載權證資料</span>
-      </button>
+      <button id="btnFetch" class="btn-link"><span class="spinner" id="btnSpinner"></span><span id="btnText">下載權證資料</span></button>
       <input id="nameFilter" type="text" class="field" placeholder="標的搜尋 (如: 2330)"/>
-      <select id="selType" class="field" style="max-width:140px">
-        <option value="C" selected>認購 (C)</option>
-        <option value="P">認售 (P)</option>
-      </select>
-      <select id="selSortKey" class="field" style="max-width:260px">
-        <option value="s1" selected>S1 (價差比 / 槓桿)</option>
-        <option value="spread">價差比</option>
-        <option value="leverage">槓桿</option>
-        <option value="days_left">距到期天數</option>
-      </select>
-      <select id="selLimit" class="field" style="max-width:140px">
-        <option value="10" selected>顯示 10 列</option>
-        <option value="all">顯示全部</option>
-      </select>
+      <select id="selType" class="field" style="max-width:140px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
+      <select id="selSortKey" class="field" style="max-width:260px"><option value="s1" selected>S1 (價差比 / 槓桿)</option><option value="spread">價差比</option><option value="leverage">槓桿</option><option value="days_left">距到期天數</option></select>
+      <select id="selLimit" class="field" style="max-width:140px"><option value="10" selected>顯示 10 列</option><option value="all">顯示全部</option></select>
       <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkFilterZeroSpread" checked/>排除價差=0</label>
       <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkHasIV" checked/>排除無隱波</label>
       <button id="btnExportPng" class="btn-link">匯出 PNG</button>
     </div>
   </div>
-
   <div id="resultCard" class="card" style="margin-top:12px;display:none">
     <div class="hint" id="meta2" style="margin-bottom:8px"></div>
-    <div class="table-container">
-      <table id="resultTable">
-        <thead>
-          <tr>
-            <th class="sticky-col">代號</th><th>名稱</th><th>類型</th><th>價差比</th><th>槓桿</th><th>行使比例</th>
-            <th>S1 (價差比 / 槓桿)</th><th>S2 (S1 / 行使比例)</th><th>天數</th><th>履約價</th><th>成交價</th>
-            <th>隱波</th><th>價內外</th><th>流通比</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
+    <div class="table-container"><table id="resultTable"><thead><tr>
+      <th class="sticky-col">代號</th><th>名稱</th><th>類型</th><th>價差比</th><th>槓桿</th><th>行使比例</th>
+      <th>S1 (價差比 / 槓桿)</th><th>S2 (S1 / 行使比例)</th><th>天數</th><th>履約價</th><th>成交價</th><th>隱波</th><th>價內外</th><th>流通比</th>
+    </tr></thead><tbody id="tbody"></tbody></table></div>
   </div>
 </div>
-
 <script>
 const $=s=>document.querySelector(s);
 const fmtNum=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(+v).toFixed(d);
 const showPct100=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
 const toHalf=(s)=>String(s||"").replace(/[\uFF01-\uFF5E]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0));
-
 function num(x){
   if(x==null) return null;
   let s=toHalf(String(x)).trim().replace(/,/g,"").replace(/%$/,"");
-  const v=parseFloat(s);
-  return isNaN(v)?null:v;
+  const v=parseFloat(s); return isNaN(v)?null:v;
 }
 
-// 你的 GAS 部署網址
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwGUgr8LFnjZDSCT5qDZ0lpD0o8c2ztVdAwCsmI2kHRqR3ZvofkT6BLoJpJLe-fTOrO/exec"; 
 let RAW_DATA = [];
 
 $("#btnFetch").addEventListener("click", async () => {
-  const btn = $("#btnFetch");
-  const spinner = $("#btnSpinner");
-  const btnText = $("#btnText");
+  const btn = $("#btnFetch"); const spinner = $("#btnSpinner"); const btnText = $("#btnText");
   btn.disabled = true; spinner.style.display = "inline-block"; btnText.textContent = "載入中...";
-
   try {
     const res = await fetch(GAS_URL);
     const csvText = await res.text();
@@ -135,11 +96,8 @@ $("#btnFetch").addEventListener("click", async () => {
 });
 
 function processData() {
-  const wantType = $("#selType").value;
-  const dropZero = $("#chkFilterZeroSpread").checked;
-  const needIV = $("#chkHasIV").checked;
+  const wantType = $("#selType").value; const dropZero = $("#chkFilterZeroSpread").checked; const needIV = $("#chkHasIV").checked;
   const q = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
-
   return RAW_DATA.map(r => {
     const name = r["權證名稱"] || r["FLD_WAR_NM"] || "";
     const spread = num(r["買賣價差比"] || r["FLD_WAR_UP_DN_RATE"]);
@@ -147,24 +105,17 @@ function processData() {
     const exr = num(r["行使比例"] || r["FLD_N_UND_CONVER"]);
     const s1 = (spread != null && lev && lev !== 0) ? spread / Math.abs(lev) : null;
     return {
-      code: r["權證代碼"] || r["FLD_WAR_ID"],
-      name, cp: (/[售]/.test(name) || /P/.test(name)) ? "P" : "C",
+      code: r["權證代碼"] || r["FLD_WAR_ID"], name, cp: (/[售]/.test(name) || /P/.test(name)) ? "P" : "C",
       spread, leverage: lev, exercise: exr, s1, s2: (s1 && exr) ? s1 / exr : null,
-      days_left: num(r["距到期天數"] || r["FLD_PERIOD"]),
-      strike: r["履約價"] || r["FLD_N_STRIKE_PRC"],
-      price: r["權證成交價"] || r["FLD_WAR_TXN_PRICE"],
-      iv: num(r["成交價隱波(%)"] || r["FLD_IV_CLOSE_PRICE"]),
-      moneyness: r["價內外程度"] || r["FLD_IN_OUT"],
-      float_rate: num(r["流通在外比率(%)"] || r["FLD_OUT_VOL_RATE"])
+      days_left: num(r["距到期天數"] || r["FLD_PERIOD"]), strike: r["履約價"] || r["FLD_N_STRIKE_PRC"],
+      price: r["權證成交價"] || r["FLD_WAR_TXN_PRICE"], iv: num(r["成交價隱波(%)"] || r["FLD_IV_CLOSE_PRICE"]),
+      moneyness: r["價內外程度"] || r["FLD_IN_OUT"], float_rate: num(r["流通在外比率(%)"] || r["FLD_OUT_VOL_RATE"])
     };
   }).filter(x => {
     if (x.cp !== wantType) return false;
     if (dropZero && (x.spread === 0 || x.spread === null)) return false;
     if (needIV && (!x.iv || x.iv === 0)) return false;
-    
-    // 核心過濾邏輯：天數 < 60 或 S2 > 1500% 剔除
     if (x.days_left < 60 || (x.s2 * 100 > 1500)) return false;
-
     if (q.length) {
       const fullStr = (x.name + x.code).toLowerCase();
       if (!q.every(token => fullStr.includes(token))) return false;
@@ -177,89 +128,87 @@ function processData() {
 }
 
 function render() {
-  const rows = processData();
-  const limitVal = $("#selLimit").value;
+  const rows = processData(); const limitVal = $("#selLimit").value;
   const limit = limitVal === "all" ? rows.length : parseInt(limitVal);
-  const shown = rows.slice(0, limit);
-  const tb = $("#tbody");
-  tb.innerHTML = "";
-  
-  shown.forEach(r => {
+  const tb = $("#tbody"); tb.innerHTML = "";
+  rows.slice(0, limit).forEach(r => {
     const tr = document.createElement("tr");
-    
-    // 視覺化分級邏輯
     const ivClass = (r.iv && r.iv > 80) ? "purple-text" : "";
     const exrClass = (r.exercise != null && r.exercise < 0.01) ? "red-text" : (r.exercise >= 0.1 ? "gold-text" : "");
     const s1Class = (r.s1 && r.s1 < 0.1) ? "gold-text" : "";
-    
     let s2Class = "";
-    if (r.s2 != null) {
-      if (r.s2 < 1.5) s2Class = "gold-text"; // S2 < 150% 標金
-      else if (r.s2 > 10) s2Class = "red-text"; // S2 > 1000% 標紅
-    }
-
+    if (r.s2 != null) { if (r.s2 < 1.5) s2Class = "gold-text"; else if (r.s2 > 10) s2Class = "red-text"; }
     tr.innerHTML = `
       <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
-      <td>${r.name}</td>
-      <td><span class="tag ${r.cp}">${r.cp}</span></td>
-      <td>${fmtNum(r.spread, 3)}</td>
+      <td>${r.name}</td><td><span class="tag ${r.cp}">${r.cp}</span></td><td>${fmtNum(r.spread, 3)}</td>
       <td class="${Math.abs(r.leverage) > 5 ? 'gold-text' : ''}">${fmtNum(Math.abs(r.leverage), 2)}</td>
-      <td class="${exrClass}">${fmtNum(r.exercise, 3)}</td>
-      <td class="${s1Class}">${showPct100(r.s1)}</td>
-      <td class="${s2Class}">${showPct100(r.s2)}</td>
-      <td>${r.days_left || "—"}</td><td>${r.strike || "—"}</td>
-      <td>${fmtNum(num(r.price), 3)}</td>
-      <td class="${ivClass}">${fmtNum(r.iv, 2)}</td>
-      <td>${r.moneyness || "—"}</td>
+      <td class="${exrClass}">${fmtNum(r.exercise, 3)}</td><td class="${s1Class}">${showPct100(r.s1)}</td>
+      <td class="${s2Class}">${showPct100(r.s2)}</td><td>${r.days_left || "—"}</td><td>${r.strike || "—"}</td>
+      <td>${fmtNum(num(r.price), 3)}</td><td class="${ivClass}">${fmtNum(r.iv, 2)}</td><td>${r.moneyness || "—"}</td>
       <td>${r.float_rate != null ? r.float_rate.toFixed(2) + "%" : "—"}</td>
     `;
     tb.appendChild(tr);
   });
-  $("#resultCard").style.display = "block";
-  $("#meta2").textContent = `顯示前 ${shown.length} 筆 / 符合條件 ${rows.length} 筆`;
+  $("#resultCard").style.display = "block"; $("#meta2").textContent = `符合條件 ${rows.length} 筆`;
 }
 
-// 修復手機完整截圖邏輯
+// 修正：截圖優化邏輯 (解決漸層變色塊問題)
 $("#btnExportPng").addEventListener("click", async () => {
   const btn = $("#btnExportPng");
   const originalCard = $("#resultCard");
   btn.disabled = true; btn.textContent = "產生圖片中...";
+  
   try {
     const tempDiv = document.createElement("div");
     tempDiv.style.position = "absolute"; tempDiv.style.left = "-9999px"; tempDiv.style.width = "1300px";
     document.body.appendChild(tempDiv);
-
+    
     const cloneCard = originalCard.cloneNode(true);
     tempDiv.appendChild(cloneCard);
 
-    const cloneContainer = cloneCard.querySelector(".table-container");
-    if (cloneContainer) {
-      cloneContainer.style.maxHeight = "none"; 
-      cloneContainer.style.overflow = "visible";
-    }
-
-    const stickyEls = cloneCard.querySelectorAll(".sticky-col");
-    stickyEls.forEach(el => { 
-      el.style.position = "static"; 
-      el.style.backgroundColor = "transparent"; 
+    // 【重要：優化漸層渲染】
+    // 遍歷副本中的金標文字，將其改為實色金色，避免 html2canvas 渲染出錯
+    const goldTexts = cloneCard.querySelectorAll(".gold-text");
+    goldTexts.forEach(el => {
+      el.style.background = "none";
+      el.style.webkitBackgroundClip = "initial";
+      el.style.webkitTextFillColor = "initial";
+      el.style.color = "#E5C45A"; // 使用標準金固體色
     });
 
-    const canvas = await html2canvas(cloneCard, { backgroundColor: "#0A1221", scale: 2, width: 1300 });
+    // 處理按鈕漸層，改為簡單的實色背景
+    const goldBtns = cloneCard.querySelectorAll(".btn-link");
+    goldBtns.forEach(el => {
+      el.style.background = "#D9B84B";
+    });
+
+    const cloneContainer = cloneCard.querySelector(".table-container");
+    if (cloneContainer) {
+      cloneContainer.style.maxHeight = "none"; cloneContainer.style.overflow = "visible";
+    }
+    
+    const stickyEls = cloneCard.querySelectorAll(".sticky-col");
+    stickyEls.forEach(el => { el.style.position = "static"; el.style.backgroundColor = "transparent"; });
+
+    const canvas = await html2canvas(cloneCard, { 
+      backgroundColor: "#0A1221", 
+      scale: 2, 
+      width: 1300,
+      logging: false 
+    });
+
     const a = document.createElement("a");
     a.href = canvas.toDataURL("image/png");
     a.download = `MOMO_Warrant_${new Date().getTime()}.png`;
     a.click();
-
+    
     document.body.removeChild(tempDiv);
   } catch (e) { alert("匯出失敗"); }
   finally { btn.disabled = false; btn.textContent = "匯出 PNG"; }
 });
 
 let debounceTimer;
-$("#nameFilter").addEventListener("input", () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(render, 300);
-});
+$("#nameFilter").addEventListener("input", () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(render, 300); });
 ["selType","selSortKey","chkFilterZeroSpread","selLimit","chkHasIV"].forEach(id => $(`#${id}`).addEventListener("change", render));
 </script>
 </body>
