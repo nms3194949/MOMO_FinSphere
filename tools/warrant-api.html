@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MOMO權證篩選器 - 截圖優化版</title>
+<title>MOMO權證篩選器 - 智能搜尋與截圖優化版</title>
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/xlsx/dist/cpexcel.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -50,7 +50,7 @@
     </div>
     <div class="row">
       <button id="btnFetch" class="btn-link"><span class="spinner" id="btnSpinner"></span><span id="btnText">下載權證資料</span></button>
-      <input id="nameFilter" type="text" class="field" placeholder="標的搜尋 (如: 2330)"/>
+      <input id="nameFilter" type="text" class="field" placeholder="標的搜尋 (如: 2330 或 台積電)"/>
       <select id="selType" class="field" style="max-width:140px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
       <select id="selSortKey" class="field" style="max-width:260px"><option value="s1" selected>S1 (價差比 / 槓桿)</option><option value="spread">價差比</option><option value="leverage">槓桿</option><option value="days_left">距到期天數</option></select>
       <select id="selLimit" class="field" style="max-width:140px"><option value="10" selected>顯示 10 列</option><option value="all">顯示全部</option></select>
@@ -80,24 +80,39 @@ function num(x){
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwGUgr8LFnjZDSCT5qDZ0lpD0o8c2ztVdAwCsmI2kHRqR3ZvofkT6BLoJpJLe-fTOrO/exec"; 
 let RAW_DATA = [];
+let STOCK_MAP = {}; // 新增：用來存放後端傳來的代號與名稱對照表
 
 $("#btnFetch").addEventListener("click", async () => {
   const btn = $("#btnFetch"); const spinner = $("#btnSpinner"); const btnText = $("#btnText");
   btn.disabled = true; spinner.style.display = "inline-block"; btnText.textContent = "載入中...";
   try {
     const res = await fetch(GAS_URL);
-    const csvText = await res.text();
-    const wb = XLSX.read(csvText, { type: "string", codepage: 65001 });
+    // 改為解析 JSON 格式 (包含 csv 與 map)
+    const json = await res.json(); 
+    
+    if (json.error) throw new Error(json.error);
+    
+    STOCK_MAP = json.map || {}; // 儲存代號字典
+    
+    const wb = XLSX.read(json.csv, { type: "string", codepage: 65001 });
     RAW_DATA = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
     $("#topStatus").innerHTML = `來源總數：<span class="count-badge">${RAW_DATA.length.toLocaleString()}</span> 筆`;
     render();
-  } catch (e) { alert("連線 API 失敗"); }
+  } catch (e) { 
+    console.error(e);
+    alert("連線 API 失敗！請確認 GAS 後端是否已『建立新版本』重新部署。"); 
+  }
   finally { btn.disabled = false; spinner.style.display = "none"; btnText.textContent = "下載權證資料"; }
 });
 
 function processData() {
   const wantType = $("#selType").value; const dropZero = $("#chkFilterZeroSpread").checked; const needIV = $("#chkHasIV").checked;
-  const q = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
+  
+  // 取得搜尋輸入並進行智能轉換
+  const rawQ = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
+  // 【關鍵邏輯】如果輸入的是代號 (ex. 2330)，就查字典轉為名稱 (台積電)，否則保持原輸入
+  const q = rawQ.map(token => STOCK_MAP[token] ? STOCK_MAP[token].toLowerCase() : token);
+
   return RAW_DATA.map(r => {
     const name = r["權證名稱"] || r["FLD_WAR_NM"] || "";
     const spread = num(r["買賣價差比"] || r["FLD_WAR_UP_DN_RATE"]);
@@ -116,6 +131,7 @@ function processData() {
     if (dropZero && (x.spread === 0 || x.spread === null)) return false;
     if (needIV && (!x.iv || x.iv === 0)) return false;
     if (x.days_left < 60 || (x.s2 * 100 > 1500)) return false;
+    
     if (q.length) {
       const fullStr = (x.name + x.code).toLowerCase();
       if (!q.every(token => fullStr.includes(token))) return false;
@@ -166,17 +182,15 @@ $("#btnExportPng").addEventListener("click", async () => {
     const cloneCard = originalCard.cloneNode(true);
     tempDiv.appendChild(cloneCard);
 
-    // 【重要：優化漸層渲染】
-    // 遍歷副本中的金標文字，將其改為實色金色，避免 html2canvas 渲染出錯
+    // 優化漸層渲染
     const goldTexts = cloneCard.querySelectorAll(".gold-text");
     goldTexts.forEach(el => {
       el.style.background = "none";
       el.style.webkitBackgroundClip = "initial";
       el.style.webkitTextFillColor = "initial";
-      el.style.color = "#E5C45A"; // 使用標準金固體色
+      el.style.color = "#E5C45A"; 
     });
 
-    // 處理按鈕漸層，改為簡單的實色背景
     const goldBtns = cloneCard.querySelectorAll(".btn-link");
     goldBtns.forEach(el => {
       el.style.background = "#D9B84B";
