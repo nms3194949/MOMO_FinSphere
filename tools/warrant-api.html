@@ -13,37 +13,42 @@
     --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
     --gold-soft:#E9D18A; --gold-solid:#E5C45A;
     --line:#E9D18A55; --muted:#9fb0d0; --red:#FF6B6B; --purple:#BD93F9;
+    --green:#39C27A;
   }
   html,body{ margin:0;background:var(--deep);color:#fff;font-family:"Noto Sans TC",sans-serif; }
   .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .field{flex:1 1 200px;background:#0b1630;color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;outline:none;}
-  
   .btn-link{background:var(--gold-grad);color:#000;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;display:flex;align-items:center;transition:0.2s;}
   .btn-link:hover{transform:translateY(-1px); opacity:0.9;}
   .btn-link[disabled]{background:#4a4a4a !important; color:#888 !important; cursor:not-allowed; border:none !important;}
-  
   .btn-outline { background:transparent; border:1px solid var(--gold-soft); color:var(--gold-soft); }
   .btn-outline:hover { background:var(--gold-soft); color:#000; }
-
   .spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid #000; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  
   .table-container{overflow:auto;max-height:70vh;margin-top:10px;border:1px solid var(--line);border-radius:8px;}
   table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;}
   th,td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap; color:#fff !important;}
-  th{position:sticky;top:0;z-index:10;background:#0f1b34;color:var(--gold-soft) !important;}
+  th{position:sticky;top:0;z-index:10;background:#0f1b34;color:var(--gold-soft) !important; cursor:pointer; user-select:none;}
+  th:hover{background:#1a2a4a;}
+  th .sort-icon{margin-left:4px;font-size:11px;opacity:0.5;}
+  th.sort-asc .sort-icon::after{content:"▲"; opacity:1;}
+  th.sort-desc .sort-icon::after{content:"▼"; opacity:1;}
+  th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:"⇅";}
   .sticky-col{position:sticky;left:0;z-index:5;background:#0C152A;}
   th.sticky-col{z-index:11;}
   tbody tr:hover td { background-color: #1a2a4a !important; color: #fff !important; }
-  
   .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
   .tag.C{background:#E25A5A;color:#fff} .tag.P{background:#39C27A;color:#fff}
-  .gold-text{background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+  .gold-text{color:#E5C45A !important; font-weight:700;}
   .red-text{color:var(--red) !important; font-weight:700;}
   .purple-text{color:var(--purple) !important; font-weight:700;}
   .count-badge{color:var(--gold-solid); font-weight:bold; font-size:14px; border:1px solid var(--gold-soft); padding:2px 8px; border-radius:4px;}
+  .empty-state{text-align:center;padding:48px 0;color:var(--muted);}
+  .empty-state .icon{font-size:40px;margin-bottom:12px;}
+  .empty-state p{margin:4px 0; font-size:14px;}
+  .export-spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.15); border-top: 2px solid #000; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; display: none; }
 </style>
 </head>
 <body>
@@ -51,224 +56,364 @@
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
       <h3 style="margin:0">MOMO權證篩選器</h3>
-      <div id="topStatus" class="hint">等待載入資料...</div>
+      <div id="topStatus">等待載入資料...</div>
     </div>
     <div class="row">
       <button id="btnFetch" class="btn-link"><span class="spinner" id="btnSpinner"></span><span id="btnText">載入權證資料</span></button>
       <button id="btnForceFetch" class="btn-link btn-outline">強制更新</button>
-      
-      <input id="nameFilter" type="text" class="field" placeholder="標的搜尋 (如: 2330)"/>
-      <select id="selType" class="field" style="max-width:140px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
-      <select id="selSortKey" class="field" style="max-width:260px"><option value="s1" selected>S1 (價差比 / 槓桿)</option><option value="spread">價差比</option><option value="leverage">槓桿</option><option value="days_left">距到期天數</option></select>
-      <select id="selLimit" class="field" style="max-width:140px"><option value="10" selected>顯示 10 列</option><option value="all">顯示全部</option></select>
-      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkFilterZeroSpread" checked/>排除價差=0</label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer"><input type="checkbox" id="chkHasIV" checked/>排除無隱波</label>
-      <button id="btnExportPng" class="btn-link">匯出 PNG</button>
+      <input id="nameFilter" type="text" class="field" placeholder="標的搜尋 (如: 2330 或 台積電)"/>
+      <select id="selType" class="field" style="max-width:140px">
+        <option value="C" selected>認購 (C)</option>
+        <option value="P">認售 (P)</option>
+      </select>
+      <select id="selSortKey" class="field" style="max-width:260px">
+        <option value="s1" selected>S1 (價差比 / 槓桿)</option>
+        <option value="spread">價差比</option>
+        <option value="leverage">槓桿</option>
+        <option value="days_left">距到期天數</option>
+      </select>
+      <select id="selLimit" class="field" style="max-width:140px">
+        <option value="10" selected>顯示 10 列</option>
+        <option value="50">顯示 50 列</option>
+        <option value="100">顯示 100 列</option>
+        <option value="all">顯示全部</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+        <input type="checkbox" id="chkFilterZeroSpread" checked/>排除價差=0
+      </label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+        <input type="checkbox" id="chkHasIV" checked/>排除無隱波
+      </label>
+      <button id="btnExportPng" class="btn-link">
+        <span class="export-spinner" id="exportSpinner"></span>
+        <span id="exportText">匯出 PNG</span>
+      </button>
     </div>
   </div>
   <div id="resultCard" class="card" style="margin-top:12px;display:none">
-    <div class="hint" id="meta2" style="margin-bottom:8px"></div>
-    <div class="table-container"><table id="resultTable"><thead><tr>
-      <th class="sticky-col">代號</th><th>名稱</th><th>類型</th><th>價差比</th><th>槓桿</th><th>行使比例</th>
-      <th>S1 (價差比 / 槓桿)</th><th>S2 (S1 / 行使比例)</th><th>天數</th><th>履約價</th><th>成交價</th><th>隱波</th><th>價內外</th><th>流通比</th>
-    </tr></thead><tbody id="tbody"></tbody></table></div>
+    <div id="meta2" style="margin-bottom:8px;font-size:14px;color:var(--muted);"></div>
+    <div class="table-container">
+      <table id="resultTable">
+        <thead><tr>
+          <th class="sticky-col" data-key="">代號<span class="sort-icon"></span></th>
+          <th data-key="">名稱<span class="sort-icon"></span></th>
+          <th data-key="">類型<span class="sort-icon"></span></th>
+          <th data-key="spread">價差比<span class="sort-icon"></span></th>
+          <th data-key="leverage">槓桿<span class="sort-icon"></span></th>
+          <th data-key="exercise">行使比例<span class="sort-icon"></span></th>
+          <th data-key="s1">S1 (價差比/槓桿)<span class="sort-icon"></span></th>
+          <th data-key="s2">S2 (S1/行使比例)<span class="sort-icon"></span></th>
+          <th data-key="days_left">天數<span class="sort-icon"></span></th>
+          <th data-key="">履約價<span class="sort-icon"></span></th>
+          <th data-key="">成交價<span class="sort-icon"></span></th>
+          <th data-key="iv">隱波<span class="sort-icon"></span></th>
+          <th data-key="">價內外<span class="sort-icon"></span></th>
+          <th data-key="float_rate">流通比<span class="sort-icon"></span></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 <script>
-const $=s=>document.querySelector(s);
-const fmtNum=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(+v).toFixed(d);
-const showPct100=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
-const toHalf=(s)=>String(s||"").replace(/[\uFF01-\uFF5E]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0));
-function num(x){
-  if(x==null) return null;
-  let s=toHalf(String(x)).trim().replace(/,/g,"").replace(/%$/,"");
-  const v=parseFloat(s); return isNaN(v)?null:v;
+const $ = s => document.querySelector(s);
+const fmtNum = (v, d=2) => (v == null || isNaN(v) || !isFinite(v)) ? "—" : (+v).toFixed(d);
+const showPct100 = (v, d=2) => (v == null || isNaN(v) || !isFinite(v)) ? "—" : (v * 100).toFixed(d) + "%";
+const toHalf = s => String(s || "").replace(/[\uFF01-\uFF5E]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+
+function num(x) {
+  if (x == null) return null;
+  const s = toHalf(String(x)).trim().replace(/,/g, "").replace(/%$/, "");
+  const v = parseFloat(s);
+  return isNaN(v) ? null : v;
 }
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwGUgr8LFnjZDSCT5qDZ0lpD0o8c2ztVdAwCsmI2kHRqR3ZvofkT6BLoJpJLe-fTOrO/exec"; 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwGUgr8LFnjZDSCT5qDZ0lpD0o8c2ztVdAwCsmI2kHRqR3ZvofkT6BLoJpJLe-fTOrO/exec";
 let RAW_DATA = [];
-let STOCK_MAP = {}; 
+let PROCESSED_DATA = [];
+let STOCK_MAP = {};
+let STOCK_MAP_REVERSE = {};
+let sortKey = "s1";
+let sortDir = 1;
 
-// --- 快取設定 ---
 const CACHE_NAME = 'momo-warrant-cache-v1';
 const CACHE_TIME_KEY = 'momo-warrant-cache-time';
-const CACHE_EXPIRY = 60 * 60 * 1000; // 1小時 = 3600000 毫秒
+const CACHE_EXPIRY = 60 * 60 * 1000;
+const HAS_CACHE_API = typeof caches !== 'undefined';
 
-/**
- * 核心下載邏輯 (支援快取與強制更新)
- */
-async function loadWarrantData(forceUpdate = false) {
-  const btnFetch = $("#btnFetch");
-  const btnForce = $("#btnForceFetch");
-  const spinner = $("#btnSpinner"); 
-  const btnText = $("#btnText");
-
-  btnFetch.disabled = true; btnForce.disabled = true;
-  spinner.style.display = "inline-block"; 
-  btnText.textContent = forceUpdate ? "強制下載中..." : "載入中...";
-
-  try {
-    const now = Date.now();
-    const lastFetch = localStorage.getItem(CACHE_TIME_KEY);
-    let useCache = false;
-    let json;
-
-    // 1. 檢查是否可以使用暫存 (非強制更新且 1 小時內)
-    if (!forceUpdate && lastFetch && (now - parseInt(lastFetch) < CACHE_EXPIRY)) {
-      const cache = await caches.open(CACHE_NAME);
-      const cachedRes = await cache.match(GAS_URL);
-      if (cachedRes) {
-        json = await cachedRes.json();
-        useCache = true;
-      }
-    }
-
-    // 2. 如果沒暫存、暫存過期、或點擊了強制更新，就去網路抓新的
-    if (!useCache) {
-      const res = await fetch(GAS_URL);
-      const resClone = res.clone(); // 複製一份存入瀏覽器快取
-      json = await res.json();
-      
-      if (!json.error) {
-        const cache = await caches.open(CACHE_NAME);
-        await cache.put(GAS_URL, resClone);
-        localStorage.setItem(CACHE_TIME_KEY, now.toString()); // 更新時間標記
-      }
-    }
-
-    if (json.error) throw new Error(json.error);
-    
-    STOCK_MAP = json.map || {}; 
-    const wb = XLSX.read(json.csv, { type: "string", codepage: 65001 });
-    RAW_DATA = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
-    
-    // 3. 顯示更新狀態 (綠字代表秒開暫存，金字代表全新下載)
-    const fetchTime = new Date(parseInt(localStorage.getItem(CACHE_TIME_KEY))).toLocaleTimeString('zh-TW', {hour: '2-digit', minute:'2-digit'});
-    const statusHTML = useCache 
-        ? `來源總數：<span class="count-badge">${RAW_DATA.length.toLocaleString()}</span> 筆 <span style="font-size:13px;color:#39C27A;margin-left:8px;font-weight:bold;">⚡ 讀取暫存 (${fetchTime})</span>`
-        : `來源總數：<span class="count-badge">${RAW_DATA.length.toLocaleString()}</span> 筆 <span style="font-size:13px;color:var(--gold-soft);margin-left:8px;">🔄 最新下載 (${fetchTime})</span>`;
-    
-    $("#topStatus").innerHTML = statusHTML;
-    render();
-    
-  } catch (e) { 
-    console.error(e);
-    alert("連線 API 失敗！請確認 GAS 後端是否已『建立新版本』重新部署。"); 
-  } finally { 
-    btnFetch.disabled = false; btnForce.disabled = false;
-    spinner.style.display = "none"; 
-    btnText.textContent = "載入權證資料"; 
-  }
-}
-
-// 綁定按鈕事件
-$("#btnFetch").addEventListener("click", () => loadWarrantData(false));
-$("#btnForceFetch").addEventListener("click", () => loadWarrantData(true));
-
-// 網頁開啟時，如果有 1 小時內的有效暫存，自動秒速幫你載入畫面！
-window.addEventListener("DOMContentLoaded", () => {
-  const lastFetch = localStorage.getItem(CACHE_TIME_KEY);
-  const now = Date.now();
-  if (lastFetch && (now - parseInt(lastFetch) < CACHE_EXPIRY)) {
-      loadWarrantData(false); 
-  }
-});
-
-function processData() {
-  const wantType = $("#selType").value; const dropZero = $("#chkFilterZeroSpread").checked; const needIV = $("#chkHasIV").checked;
-  const rawQ = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
-  const q = rawQ.map(token => STOCK_MAP[token] ? STOCK_MAP[token].toLowerCase() : token);
-
-  return RAW_DATA.map(r => {
+function preprocessData() {
+  PROCESSED_DATA = RAW_DATA.map(r => {
     const name = r["權證名稱"] || r["FLD_WAR_NM"] || "";
     const spread = num(r["買賣價差比"] || r["FLD_WAR_UP_DN_RATE"]);
     const lev = num(r["實質槓桿"] || r["FLD_LEVERAGE"]);
     const exr = num(r["行使比例"] || r["FLD_N_UND_CONVER"]);
     const s1 = (spread != null && lev && lev !== 0) ? spread / Math.abs(lev) : null;
     return {
-      code: r["權證代碼"] || r["FLD_WAR_ID"], name, cp: (/[售]/.test(name) || /P/.test(name)) ? "P" : "C",
-      spread, leverage: lev, exercise: exr, s1, s2: (s1 && exr) ? s1 / exr : null,
-      days_left: num(r["距到期天數"] || r["FLD_PERIOD"]), strike: r["履約價"] || r["FLD_N_STRIKE_PRC"],
-      price: r["權證成交價"] || r["FLD_WAR_TXN_PRICE"], iv: num(r["成交價隱波(%)"] || r["FLD_IV_CLOSE_PRICE"]),
-      moneyness: r["價內外程度"] || r["FLD_IN_OUT"], float_rate: num(r["流通在外比率(%)"] || r["FLD_OUT_VOL_RATE"])
+      code: r["權證代碼"] || r["FLD_WAR_ID"],
+      name,
+      cp: (/[售]/.test(name) || /P/.test(name)) ? "P" : "C",
+      spread, leverage: lev, exercise: exr,
+      s1, s2: (s1 != null && exr) ? s1 / exr : null,
+      days_left: num(r["距到期天數"] || r["FLD_PERIOD"]),
+      strike: r["履約價"] || r["FLD_N_STRIKE_PRC"],
+      price: r["權證成交價"] || r["FLD_WAR_TXN_PRICE"],
+      iv: num(r["成交價隱波(%)"] || r["FLD_IV_CLOSE_PRICE"]),
+      moneyness: r["價內外程度"] || r["FLD_IN_OUT"],
+      float_rate: num(r["流通在外比率(%)"] || r["FLD_OUT_VOL_RATE"])
     };
-  }).filter(x => {
+  });
+}
+
+async function loadWarrantData(forceUpdate = false) {
+  const btnFetch = $("#btnFetch");
+  const btnForce = $("#btnForceFetch");
+  const spinner = $("#btnSpinner");
+  const btnText = $("#btnText");
+
+  btnFetch.disabled = true; btnForce.disabled = true;
+  spinner.style.display = "inline-block";
+  btnText.textContent = forceUpdate ? "強制下載中..." : "載入中...";
+
+  try {
+    const now = Date.now();
+    const lastFetchRaw = localStorage.getItem(CACHE_TIME_KEY);
+    const lastFetch = lastFetchRaw ? parseInt(lastFetchRaw) : NaN;
+    const cacheValid = !isNaN(lastFetch) && (now - lastFetch < CACHE_EXPIRY);
+
+    let useCache = false;
+    let json;
+
+    if (!forceUpdate && cacheValid && HAS_CACHE_API) {
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedRes = await cache.match(GAS_URL);
+        if (cachedRes) { json = await cachedRes.json(); useCache = true; }
+      } catch (e) {
+        console.warn("Cache 讀取失敗，改從網路下載", e);
+      }
+    }
+
+    if (!useCache) {
+      const res = await fetch(GAS_URL);
+      const resText = await res.text();
+      json = JSON.parse(resText);
+
+      if (!json.error) {
+        if (HAS_CACHE_API) {
+          try {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(GAS_URL, new Response(resText, { headers: { 'Content-Type': 'application/json' } }));
+          } catch (e) {
+            console.warn("Cache 寫入失敗", e);
+          }
+        }
+        localStorage.setItem(CACHE_TIME_KEY, now.toString());
+      }
+    }
+
+    if (json.error) throw new Error(json.error);
+
+    STOCK_MAP = json.map || {};
+    STOCK_MAP_REVERSE = {};
+    Object.entries(STOCK_MAP).forEach(([code, name]) => {
+      STOCK_MAP_REVERSE[name.toLowerCase()] = code;
+    });
+
+    try {
+      const wb = XLSX.read(json.csv, { type: "string", codepage: 65001 });
+      RAW_DATA = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
+    } catch (e) {
+      throw new Error("資料格式解析失敗，請嘗試強制更新：" + e.message);
+    }
+
+    preprocessData();
+
+    const fetchTime = new Date(parseInt(localStorage.getItem(CACHE_TIME_KEY)))
+      .toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+    $("#topStatus").innerHTML = useCache
+      ? `來源總數：<span class="count-badge">${RAW_DATA.length.toLocaleString()}</span> 筆 <span style="font-size:13px;color:var(--green);margin-left:8px;font-weight:bold;">⚡ 讀取暫存 (${fetchTime})</span>`
+      : `來源總數：<span class="count-badge">${RAW_DATA.length.toLocaleString()}</span> 筆 <span style="font-size:13px;color:var(--gold-soft);margin-left:8px;">🔄 最新下載 (${fetchTime})</span>`;
+
+    render();
+  } catch (e) {
+    console.error(e);
+    alert("載入失敗：" + e.message);
+  } finally {
+    btnFetch.disabled = false; btnForce.disabled = false;
+    spinner.style.display = "none";
+    btnText.textContent = "載入權證資料";
+  }
+}
+
+$("#btnFetch").addEventListener("click", () => loadWarrantData(false));
+$("#btnForceFetch").addEventListener("click", () => loadWarrantData(true));
+
+window.addEventListener("DOMContentLoaded", () => {
+  const lastFetchRaw = localStorage.getItem(CACHE_TIME_KEY);
+  const lastFetch = lastFetchRaw ? parseInt(lastFetchRaw) : NaN;
+  if (!isNaN(lastFetch) && (Date.now() - lastFetch < CACHE_EXPIRY)) {
+    loadWarrantData(false);
+  }
+});
+
+function filterAndSort() {
+  const wantType = $("#selType").value;
+  const dropZero = $("#chkFilterZeroSpread").checked;
+  const needIV = $("#chkHasIV").checked;
+  const rawQ = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
+
+  // ✅ 修正搜尋 bug：保留原始 token，同時展開對應的代號或名稱
+  // 輸入「鴻海」→ aliases=["鴻海","2317"]，任一命中即可
+  // 輸入「2317」→ aliases=["2317","鴻海"]，同樣可找到「鴻海永豐55購02」
+  const qPairs = rawQ.map(token => {
+    const aliases = [token];
+    if (STOCK_MAP[token]) aliases.push(STOCK_MAP[token].toLowerCase());
+    if (STOCK_MAP_REVERSE[token]) aliases.push(STOCK_MAP_REVERSE[token].toLowerCase());
+    return aliases;
+  });
+
+  return PROCESSED_DATA.filter(x => {
     if (x.cp !== wantType) return false;
     if (dropZero && (x.spread === 0 || x.spread === null)) return false;
     if (needIV && (!x.iv || x.iv === 0)) return false;
-    if (x.days_left < 60 || (x.s2 * 100 > 1500)) return false;
-    if (q.length) {
+    if (x.days_left !== null && x.days_left < 60) return false;
+    if (x.s2 != null && x.s2 * 100 > 1500) return false;
+    if (qPairs.length) {
       const fullStr = (x.name + x.code).toLowerCase();
-      if (!q.every(token => fullStr.includes(token))) return false;
+      if (!qPairs.every(aliases => aliases.some(alias => fullStr.includes(alias)))) return false;
     }
     return true;
   }).sort((a, b) => {
-    const key = $("#selSortKey").value;
-    return (a[key] || 0) - (b[key] || 0);
+    const va = a[sortKey] ?? Infinity;
+    const vb = b[sortKey] ?? Infinity;
+    return (va - vb) * sortDir;
   });
 }
 
 function render() {
-  const rows = processData(); const limitVal = $("#selLimit").value;
-  const limit = limitVal === "all" ? rows.length : parseInt(limitVal);
-  const tb = $("#tbody"); tb.innerHTML = "";
-  rows.slice(0, limit).forEach(r => {
-    const tr = document.createElement("tr");
-    const ivClass = (r.iv && r.iv > 80) ? "purple-text" : "";
-    const exrClass = (r.exercise != null && r.exercise < 0.01) ? "red-text" : (r.exercise >= 0.1 ? "gold-text" : "");
-    const s1Class = (r.s1 && r.s1 < 0.1) ? "gold-text" : "";
-    let s2Class = "";
-    if (r.s2 != null) { if (r.s2 < 1.5) s2Class = "gold-text"; else if (r.s2 > 10) s2Class = "red-text"; }
-    tr.innerHTML = `
-      <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
-      <td>${r.name}</td><td><span class="tag ${r.cp}">${r.cp}</span></td><td>${fmtNum(r.spread, 3)}</td>
-      <td class="${Math.abs(r.leverage) > 5 ? 'gold-text' : ''}">${fmtNum(Math.abs(r.leverage), 2)}</td>
-      <td class="${exrClass}">${fmtNum(r.exercise, 3)}</td><td class="${s1Class}">${showPct100(r.s1)}</td>
-      <td class="${s2Class}">${showPct100(r.s2)}</td><td>${r.days_left || "—"}</td><td>${r.strike || "—"}</td>
-      <td>${fmtNum(num(r.price), 3)}</td><td class="${ivClass}">${fmtNum(r.iv, 2)}</td><td>${r.moneyness || "—"}</td>
-      <td>${r.float_rate != null ? r.float_rate.toFixed(2) + "%" : "—"}</td>
-    `;
-    tb.appendChild(tr);
+  if (PROCESSED_DATA.length === 0) return;
+
+  const rows = filterAndSort();
+  const limitVal = $("#selLimit").value;
+  const MAX_ALL = 500;
+  const limit = limitVal === "all" ? Math.min(rows.length, MAX_ALL) : parseInt(limitVal);
+  const tb = $("#tbody");
+  tb.innerHTML = "";
+
+  if (rows.length === 0) {
+    tb.innerHTML = `<tr><td colspan="14" style="border:none;padding:0;">
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p style="font-size:16px;font-weight:bold;color:#fff;">無符合條件的權證</p>
+        <p>嘗試放寬篩選條件，或清空搜尋關鍵字</p>
+      </div>
+    </td></tr>`;
+  } else {
+    rows.slice(0, limit).forEach(r => {
+      const tr = document.createElement("tr");
+      const ivClass = (r.iv != null && r.iv > 80) ? "purple-text" : "";
+      const exrClass = (r.exercise != null && r.exercise < 0.01) ? "red-text"
+                     : (r.exercise != null && r.exercise >= 0.1) ? "gold-text" : "";
+      const s1Class = (r.s1 != null && r.s1 < 0.1) ? "gold-text" : "";
+      let s2Class = "";
+      if (r.s2 != null) {
+        if (r.s2 < 1.5) s2Class = "gold-text";
+        else if (r.s2 > 10) s2Class = "red-text";
+      }
+      tr.innerHTML = `
+        <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
+        <td>${r.name}</td>
+        <td><span class="tag ${r.cp}">${r.cp}</span></td>
+        <td>${fmtNum(r.spread, 3)}</td>
+        <td class="${Math.abs(r.leverage ?? 0) > 5 ? 'gold-text' : ''}">${fmtNum(Math.abs(r.leverage), 2)}</td>
+        <td class="${exrClass}">${fmtNum(r.exercise, 3)}</td>
+        <td class="${s1Class}">${showPct100(r.s1)}</td>
+        <td class="${s2Class}">${showPct100(r.s2)}</td>
+        <td>${r.days_left ?? "—"}</td>
+        <td>${r.strike || "—"}</td>
+        <td>${fmtNum(num(r.price), 3)}</td>
+        <td class="${ivClass}">${fmtNum(r.iv, 2)}</td>
+        <td>${r.moneyness || "—"}</td>
+        <td>${r.float_rate != null ? r.float_rate.toFixed(2) + "%" : "—"}</td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  $("#resultCard").style.display = "block";
+  let metaText = `符合條件 <strong style="color:var(--gold-solid)">${rows.length}</strong> 筆`;
+  if (limitVal === "all" && rows.length > MAX_ALL) {
+    metaText += ` <span style="color:var(--red);font-size:13px;">（顯示上限 ${MAX_ALL} 筆，請縮小搜尋範圍）</span>`;
+  } else if (rows.length > limit) {
+    metaText += ` <span style="color:var(--muted);font-size:13px;">（顯示前 ${limit} 筆）</span>`;
+  }
+  $("#meta2").innerHTML = metaText;
+
+  document.querySelectorAll("th[data-key]").forEach(th => {
+    th.classList.remove("sort-asc", "sort-desc");
+    if (th.dataset.key === sortKey) {
+      th.classList.add(sortDir === 1 ? "sort-asc" : "sort-desc");
+    }
   });
-  $("#resultCard").style.display = "block"; $("#meta2").textContent = `符合條件 ${rows.length} 筆`;
 }
 
+document.querySelectorAll("th[data-key]").forEach(th => {
+  if (!th.dataset.key) return;
+  th.addEventListener("click", () => {
+    const key = th.dataset.key;
+    if (sortKey === key) { sortDir *= -1; } else { sortKey = key; sortDir = 1; }
+    const sel = $("#selSortKey");
+    if ([...sel.options].some(o => o.value === key)) sel.value = key;
+    render();
+  });
+});
+
 $("#btnExportPng").addEventListener("click", async () => {
-  const btn = $("#btnExportPng"); const originalCard = $("#resultCard");
-  btn.disabled = true; btn.textContent = "產生圖片中...";
+  const btn = $("#btnExportPng");
+  const exportSpinner = $("#exportSpinner");
+  const exportText = $("#exportText");
+  btn.disabled = true;
+  exportSpinner.style.display = "inline-block";
+  exportText.textContent = "產生中...";
   try {
     const tempDiv = document.createElement("div");
-    tempDiv.style.position = "absolute"; tempDiv.style.left = "-9999px"; tempDiv.style.width = "1300px";
+    tempDiv.style.cssText = "position:absolute;left:-9999px;width:1300px;";
     document.body.appendChild(tempDiv);
-    
-    const cloneCard = originalCard.cloneNode(true);
+    const cloneCard = $("#resultCard").cloneNode(true);
     tempDiv.appendChild(cloneCard);
-
-    const goldTexts = cloneCard.querySelectorAll(".gold-text");
-    goldTexts.forEach(el => {
-      el.style.background = "none"; el.style.webkitBackgroundClip = "initial";
-      el.style.webkitTextFillColor = "initial"; el.style.color = "#E5C45A"; 
-    });
-    const goldBtns = cloneCard.querySelectorAll(".btn-link");
-    goldBtns.forEach(el => { el.style.background = "#D9B84B"; });
-
+    cloneCard.querySelectorAll(".gold-text").forEach(el => { el.style.color = "#E5C45A"; });
+    cloneCard.querySelectorAll(".btn-link").forEach(el => { el.style.background = "#D9B84B"; });
     const cloneContainer = cloneCard.querySelector(".table-container");
     if (cloneContainer) { cloneContainer.style.maxHeight = "none"; cloneContainer.style.overflow = "visible"; }
-    
-    const stickyEls = cloneCard.querySelectorAll(".sticky-col");
-    stickyEls.forEach(el => { el.style.position = "static"; el.style.backgroundColor = "transparent"; });
-
+    cloneCard.querySelectorAll(".sticky-col").forEach(el => { el.style.position = "static"; el.style.backgroundColor = "transparent"; });
     const canvas = await html2canvas(cloneCard, { backgroundColor: "#0A1221", scale: 2, width: 1300, logging: false });
     const a = document.createElement("a");
-    a.href = canvas.toDataURL("image/png"); a.download = `MOMO_Warrant_${new Date().getTime()}.png`; a.click();
+    a.href = canvas.toDataURL("image/png");
+    a.download = `MOMO_Warrant_${Date.now()}.png`;
+    a.click();
     document.body.removeChild(tempDiv);
-  } catch (e) { alert("匯出失敗"); }
-  finally { btn.disabled = false; btn.textContent = "匯出 PNG"; }
+  } catch (e) {
+    alert("匯出失敗：" + e.message);
+  } finally {
+    btn.disabled = false;
+    exportSpinner.style.display = "none";
+    exportText.textContent = "匯出 PNG";
+  }
+});
+
+$("#selSortKey").addEventListener("change", function() {
+  sortKey = this.value; sortDir = 1; render();
 });
 
 let debounceTimer;
-$("#nameFilter").addEventListener("input", () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(render, 300); });
-["selType","selSortKey","chkFilterZeroSpread","selLimit","chkHasIV"].forEach(id => $(`#${id}`).addEventListener("change", render));
+$("#nameFilter").addEventListener("input", () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(render, 300);
+});
+
+["selType", "chkFilterZeroSpread", "selLimit", "chkHasIV"].forEach(id => {
+  $(`#${id}`).addEventListener("change", render);
+});
 </script>
 </body>
 </html>
