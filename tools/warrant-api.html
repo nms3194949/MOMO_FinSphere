@@ -20,41 +20,48 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .field{flex:1 1 200px;background:#0b1630;color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;outline:none;}
+  .filter-input{width:60px;background:#0b1630;color:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:13px;outline:none;}
+  .filter-input:focus{border-color:var(--gold-soft);}
   .btn-link{background:var(--gold-grad);color:#000;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;display:flex;align-items:center;transition:0.2s;}
   .btn-link:hover{transform:translateY(-1px); opacity:0.9;}
   .btn-link[disabled]{background:#4a4a4a !important; color:#888 !important; cursor:not-allowed; border:none !important;}
-  .btn-outline { background:transparent; border:1px solid var(--gold-soft); color:var(--gold-soft); }
-  .btn-outline:hover { background:var(--gold-soft); color:#000; }
-  .spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid #000; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);}
+  .btn-outline:hover{background:var(--gold-soft);color:#000;}
+  .spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,0.1);border-top:2px solid #000;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;display:none;}
+  .export-spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,0.15);border-top:2px solid #000;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .filter-bar{width:100%;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+  .filter-bar label{display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap;color:var(--muted);}
   .table-container{overflow:auto;max-height:70vh;margin-top:10px;border:1px solid var(--line);border-radius:8px;}
   table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;}
-  th,td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap; color:#fff !important;}
-  th{position:sticky;top:0;z-index:10;background:#0f1b34;color:var(--gold-soft) !important; cursor:pointer; user-select:none;}
+  th,td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 12px;text-align:left;white-space:nowrap;color:#fff !important;}
+  th{position:sticky;top:0;z-index:10;background:#0f1b34;color:var(--gold-soft) !important;cursor:pointer;user-select:none;}
   th:hover{background:#1a2a4a;}
   th .sort-icon{margin-left:4px;font-size:11px;opacity:0.5;}
-  th.sort-asc .sort-icon::after{content:"▲"; opacity:1;}
-  th.sort-desc .sort-icon::after{content:"▼"; opacity:1;}
+  th.sort-asc .sort-icon::after{content:"▲";opacity:1;}
+  th.sort-desc .sort-icon::after{content:"▼";opacity:1;}
   th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:"⇅";}
   .sticky-col{position:sticky;left:0;z-index:5;background:#0C152A;}
   th.sticky-col{z-index:11;}
-  tbody tr:hover td { background-color: #1a2a4a !important; color: #fff !important; }
+  tbody tr:hover td{background-color:#1a2a4a !important;color:#fff !important;}
   .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
   .tag.C{background:#E25A5A;color:#fff} .tag.P{background:#39C27A;color:#fff}
-  .gold-text{color:#E5C45A !important; font-weight:700;}
-  .red-text{color:var(--red) !important; font-weight:700;}
-  .purple-text{color:var(--purple) !important; font-weight:700;}
-  .count-badge{color:var(--gold-solid); font-weight:bold; font-size:14px; border:1px solid var(--gold-soft); padding:2px 8px; border-radius:4px;}
+  .gold-text{color:#E5C45A !important;font-weight:700;}
+  .red-text{color:var(--red) !important;font-weight:700;}
+  .purple-text{color:var(--purple) !important;font-weight:700;}
+  .count-badge{color:var(--gold-solid);font-weight:bold;font-size:14px;border:1px solid var(--gold-soft);padding:2px 8px;border-radius:4px;}
   .empty-state{text-align:center;padding:48px 0;color:var(--muted);}
   .empty-state .icon{font-size:40px;margin-bottom:12px;}
-  .empty-state p{margin:4px 0; font-size:14px;}
-  .export-spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.15); border-top: 2px solid #000; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; display: none; }
+  .empty-state p{margin:4px 0;font-size:14px;}
+  .funnel{display:flex;align-items:center;gap:6px;font-size:14px;flex-wrap:wrap;}
+  .funnel-arrow{color:var(--muted);}
+  .funnel-warn{color:var(--red);font-size:13px;margin-left:4px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <h3 style="margin:0">MOMO權證篩選器</h3>
       <div id="topStatus">等待載入資料...</div>
     </div>
@@ -89,9 +96,21 @@
         <span id="exportText">匯出 PNG</span>
       </button>
     </div>
+
+    <!-- 自訂篩選條件列 -->
+    <div class="filter-bar">
+      <span style="color:var(--gold-soft);font-size:13px;font-weight:bold;white-space:nowrap;">⚙️ 篩選條件：</span>
+      <label>天數 ≥ <input id="filterDays" class="filter-input" type="number" value="60" min="0"/></label>
+      <label>S2 ≤ <input id="filterS2Max" class="filter-input" type="number" value="1500" min="0"/> %</label>
+      <label>S1 ≤ <input id="filterS1Max" class="filter-input" style="width:70px" type="number" placeholder="不限" min="0"/> %</label>
+      <label>隱波 ≤ <input id="filterIVMax" class="filter-input" style="width:70px" type="number" placeholder="不限" min="0"/> %</label>
+      <label>槓桿 ≥ <input id="filterLevMin" class="filter-input" type="number" placeholder="不限" min="0"/></label>
+      <button id="btnResetFilter" class="btn-link btn-outline" style="padding:4px 12px;font-size:12px;">重置條件</button>
+    </div>
   </div>
+
   <div id="resultCard" class="card" style="margin-top:12px;display:none">
-    <div id="meta2" style="margin-bottom:8px;font-size:14px;color:var(--muted);"></div>
+    <div id="meta2" style="margin-bottom:8px;"></div>
     <div class="table-container">
       <table id="resultTable">
         <thead><tr>
@@ -115,6 +134,7 @@
     </div>
   </div>
 </div>
+
 <script>
 const $ = s => document.querySelector(s);
 const fmtNum = (v, d=2) => (v == null || isNaN(v) || !isFinite(v)) ? "—" : (+v).toFixed(d);
@@ -140,6 +160,9 @@ const CACHE_NAME = 'momo-warrant-cache-v1';
 const CACHE_TIME_KEY = 'momo-warrant-cache-time';
 const CACHE_EXPIRY = 60 * 60 * 1000;
 const HAS_CACHE_API = typeof caches !== 'undefined';
+
+// 預設篩選條件
+const DEFAULT_FILTER = { days: 60, s2: 1500 };
 
 function preprocessData() {
   PROCESSED_DATA = RAW_DATA.map(r => {
@@ -203,9 +226,7 @@ async function loadWarrantData(forceUpdate = false) {
           try {
             const cache = await caches.open(CACHE_NAME);
             await cache.put(GAS_URL, new Response(resText, { headers: { 'Content-Type': 'application/json' } }));
-          } catch (e) {
-            console.warn("Cache 寫入失敗", e);
-          }
+          } catch (e) { console.warn("Cache 寫入失敗", e); }
         }
         localStorage.setItem(CACHE_TIME_KEY, now.toString());
       }
@@ -256,15 +277,30 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// 重置篩選條件
+$("#btnResetFilter").addEventListener("click", () => {
+  $("#filterDays").value = DEFAULT_FILTER.days;
+  $("#filterS2Max").value = DEFAULT_FILTER.s2;
+  $("#filterS1Max").value = "";
+  $("#filterIVMax").value = "";
+  $("#filterLevMin").value = "";
+  render();
+});
+
 function filterAndSort() {
   const wantType = $("#selType").value;
   const dropZero = $("#chkFilterZeroSpread").checked;
   const needIV = $("#chkHasIV").checked;
   const rawQ = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
 
-  // ✅ 修正搜尋 bug：保留原始 token，同時展開對應的代號或名稱
-  // 輸入「鴻海」→ aliases=["鴻海","2317"]，任一命中即可
-  // 輸入「2317」→ aliases=["2317","鴻海"]，同樣可找到「鴻海永豐55購02」
+  // 讀取自訂條件
+  const minDays = parseFloat($("#filterDays").value);
+  const maxS2   = parseFloat($("#filterS2Max").value);
+  const maxS1   = parseFloat($("#filterS1Max").value);
+  const maxIV   = parseFloat($("#filterIVMax").value);
+  const minLev  = parseFloat($("#filterLevMin").value);
+
+  // 搜尋 token 展開（保留原始 + 對應代號或名稱）
   const qPairs = rawQ.map(token => {
     const aliases = [token];
     if (STOCK_MAP[token]) aliases.push(STOCK_MAP[token].toLowerCase());
@@ -272,31 +308,47 @@ function filterAndSort() {
     return aliases;
   });
 
-  return PROCESSED_DATA.filter(x => {
-    if (x.cp !== wantType) return false;
+  // 同類型全部資料（用於漏斗第一層）
+  const allOfType = PROCESSED_DATA.filter(x => x.cp === wantType);
+
+  // 第一步：只做關鍵字篩選
+  const afterSearch = qPairs.length === 0 ? allOfType : allOfType.filter(x => {
+    const fullStr = (x.name + x.code).toLowerCase();
+    return qPairs.every(aliases => aliases.some(alias => fullStr.includes(alias)));
+  });
+
+  // 第二步：套用所有條件
+  const afterFilter = afterSearch.filter(x => {
     if (dropZero && (x.spread === 0 || x.spread === null)) return false;
     if (needIV && (!x.iv || x.iv === 0)) return false;
-    if (x.days_left !== null && x.days_left < 60) return false;
-    if (x.s2 != null && x.s2 * 100 > 1500) return false;
-    if (qPairs.length) {
-      const fullStr = (x.name + x.code).toLowerCase();
-      if (!qPairs.every(aliases => aliases.some(alias => fullStr.includes(alias)))) return false;
-    }
+    if (!isNaN(minDays) && x.days_left !== null && x.days_left < minDays) return false;
+    if (!isNaN(maxS2) && x.s2 != null && x.s2 * 100 > maxS2) return false;
+    if (!isNaN(maxS1) && x.s1 != null && x.s1 * 100 > maxS1) return false;
+    if (!isNaN(maxIV) && x.iv != null && x.iv > maxIV) return false;
+    if (!isNaN(minLev) && Math.abs(x.leverage ?? 0) < minLev) return false;
     return true;
   }).sort((a, b) => {
     const va = a[sortKey] ?? Infinity;
     const vb = b[sortKey] ?? Infinity;
     return (va - vb) * sortDir;
   });
+
+  return {
+    rows: afterFilter,
+    totalSearch: afterSearch.length,
+    totalAll: allOfType.length,
+    hasKeyword: qPairs.length > 0
+  };
 }
 
 function render() {
   if (PROCESSED_DATA.length === 0) return;
 
-  const rows = filterAndSort();
+  const { rows, totalSearch, totalAll, hasKeyword } = filterAndSort();
   const limitVal = $("#selLimit").value;
   const MAX_ALL = 500;
   const limit = limitVal === "all" ? Math.min(rows.length, MAX_ALL) : parseInt(limitVal);
+
   const tb = $("#tbody");
   tb.innerHTML = "";
 
@@ -305,7 +357,7 @@ function render() {
       <div class="empty-state">
         <div class="icon">🔍</div>
         <p style="font-size:16px;font-weight:bold;color:#fff;">無符合條件的權證</p>
-        <p>嘗試放寬篩選條件，或清空搜尋關鍵字</p>
+        <p>${hasKeyword && totalSearch > 0 ? "找到 " + totalSearch.toLocaleString() + " 筆資料，但全部被條件過濾掉了" : "嘗試放寬篩選條件，或清空搜尋關鍵字"}</p>
       </div>
     </td></tr>`;
   } else {
@@ -341,14 +393,37 @@ function render() {
   }
 
   $("#resultCard").style.display = "block";
-  let metaText = `符合條件 <strong style="color:var(--gold-solid)">${rows.length}</strong> 筆`;
-  if (limitVal === "all" && rows.length > MAX_ALL) {
-    metaText += ` <span style="color:var(--red);font-size:13px;">（顯示上限 ${MAX_ALL} 筆，請縮小搜尋範圍）</span>`;
-  } else if (rows.length > limit) {
-    metaText += ` <span style="color:var(--muted);font-size:13px;">（顯示前 ${limit} 筆）</span>`;
-  }
-  $("#meta2").innerHTML = metaText;
 
+  // 漏斗提示
+  const sourceCount = hasKeyword ? totalSearch : totalAll;
+  const sourceLabel = hasKeyword
+    ? `搜尋「${$("#nameFilter").value.trim()}」<strong style="color:#fff"> ${totalSearch.toLocaleString()}</strong> 筆`
+    : `全部 <strong style="color:#fff">${totalAll.toLocaleString()}</strong> 筆`;
+
+  let metaHTML = `<div class="funnel">
+    <span>${sourceLabel}</span>
+    <span class="funnel-arrow">→ 條件篩選後</span>
+    <strong style="color:var(--gold-solid)">${rows.length.toLocaleString()}</strong> 筆`;
+
+  if (hasKeyword && totalSearch === 0) {
+    metaHTML += `<span class="funnel-warn">⚠️ 找不到「${$("#nameFilter").value.trim()}」相關權證</span>`;
+  } else if (sourceCount > 0 && rows.length === 0) {
+    metaHTML += `<span class="funnel-warn">⚠️ 有資料但全被條件過濾，建議放寬篩選條件或點「重置條件」</span>`;
+  } else if (rows.length > 0 && rows.length < sourceCount) {
+    const pct = ((rows.length / sourceCount) * 100).toFixed(0);
+    metaHTML += `<span style="color:var(--muted);font-size:13px;">（保留 ${pct}%）</span>`;
+  }
+
+  if (limitVal === "all" && rows.length > MAX_ALL) {
+    metaHTML += `<span style="color:var(--red);font-size:13px;">顯示上限 ${MAX_ALL} 筆，請縮小範圍</span>`;
+  } else if (rows.length > limit) {
+    metaHTML += `<span style="color:var(--muted);font-size:13px;">顯示前 ${limit} 筆</span>`;
+  }
+
+  metaHTML += `</div>`;
+  $("#meta2").innerHTML = metaHTML;
+
+  // 更新表頭排序圖示
   document.querySelectorAll("th[data-key]").forEach(th => {
     th.classList.remove("sort-asc", "sort-desc");
     if (th.dataset.key === sortKey) {
@@ -357,6 +432,7 @@ function render() {
   });
 }
 
+// 表頭點擊排序
 document.querySelectorAll("th[data-key]").forEach(th => {
   if (!th.dataset.key) return;
   th.addEventListener("click", () => {
@@ -368,6 +444,7 @@ document.querySelectorAll("th[data-key]").forEach(th => {
   });
 });
 
+// 匯出 PNG
 $("#btnExportPng").addEventListener("click", async () => {
   const btn = $("#btnExportPng");
   const exportSpinner = $("#exportSpinner");
@@ -401,18 +478,18 @@ $("#btnExportPng").addEventListener("click", async () => {
   }
 });
 
-$("#selSortKey").addEventListener("change", function() {
-  sortKey = this.value; sortDir = 1; render();
-});
-
-let debounceTimer;
-$("#nameFilter").addEventListener("input", () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(render, 300);
-});
-
+// 下拉選單 & checkbox 事件
+$("#selSortKey").addEventListener("change", function() { sortKey = this.value; sortDir = 1; render(); });
 ["selType", "chkFilterZeroSpread", "selLimit", "chkHasIV"].forEach(id => {
   $(`#${id}`).addEventListener("change", render);
+});
+
+// 文字輸入 debounce
+let debounceTimer;
+const debounceRender = () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(render, 300); };
+$("#nameFilter").addEventListener("input", debounceRender);
+["filterDays", "filterS2Max", "filterS1Max", "filterIVMax", "filterLevMin"].forEach(id => {
+  $(`#${id}`).addEventListener("input", debounceRender);
 });
 </script>
 </body>
