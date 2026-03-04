@@ -385,7 +385,7 @@ function render() {
         <td>${r.strike || "—"}</td>
         <td>${fmtNum(num(r.price), 3)}</td>
         <td class="${ivClass}">${fmtNum(r.iv, 2)}</td>
-        <td>${r.moneyness || "—"}</td>
+        <td class="${r.moneyness && r.moneyness.includes('價外') ? 'gold-text' : ''}">${r.moneyness || "—"}</td>
         <td>${r.float_rate != null ? r.float_rate.toFixed(2) + "%" : "—"}</td>
       `;
       tb.appendChild(tr);
