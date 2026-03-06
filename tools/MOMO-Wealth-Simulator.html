@@ -75,28 +75,43 @@
     input:focus, select:focus{border-color:var(--gold);}
     input[type="range"]{width:100%;}
 
-    .gs-box {
-      background:rgba(0,0,0,0.3); padding:12px; border-radius:12px; margin-bottom:14px;
-      border:1px solid rgba(255,255,255,0.1);
+    .connection-panel {
+      background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: space-between;
     }
+    .status-group { display: flex; align-items: center; gap: 10px; }
+    .status-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+      transition: 0.3s;
+    }
+    .status-dot.green { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+    .status-dot.yellow { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: 0.5; } }
+    .status-text { font-size: 13px; font-weight: 900; color: #cbd5e1; }
+    .btn-settings {
+      background: rgba(255,255,255,0.1); border: none; color: #fff;
+      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;
+      transition: 0.2s;
+    }
+    .btn-settings:hover { background: rgba(255,255,255,0.2); }
+
+    #sheet-settings-area {
+      display: none;
+      background: #000; padding: 14px; border-radius: 12px; margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(-5px);} to{opacity:1; transform:translateY(0);} }
+
     .btn-action {
       width:100%; padding:10px; border-radius:10px; border:none; cursor:pointer; font-weight:900; margin-top:6px;
       transition:0.2s; color:#0A1221;
     }
     .btn-load { background:#34D399; } .btn-load:hover { background:#6ee7b7; }
     .btn-refresh { background:var(--accent-blue); margin-top:10px; } .btn-refresh:hover { background:#7dd3fc; }
-
-    #load-status{
-      margin-top:8px;
-      font-size:10px;
-      color:#93a4b7;
-      line-height:1.35;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.08);
-      background:rgba(0,0,0,0.22);
-    }
-    #load-status b{color:#e9f2ff;}
 
     .fund-filter{
       width:100%; margin-top:8px;
@@ -202,7 +217,7 @@
     }
     .sub-input label{margin:0 0 4px 0;color:#93a4b7;font-size:10px;}
     .sub-input input{background:transparent;border:none;padding:0;font-size:15px;font-weight:900;color:#fff;width:100%;}
-    
+     
     .strat-block.momo .auto-calced input { color: var(--gold-soft); }
     .strat-block.original .auto-calced input { color: #bfeaff; }
 
@@ -368,38 +383,15 @@
       animation: leadBreath 3.2s ease-in-out infinite;
     }
     @keyframes leadBreath{
-      0%,100%{
-        transform: translateY(0);
-        box-shadow:
-          0 12px 30px rgba(0,0,0,.25),
-          0 0 0 1px rgba(249,226,124,.10) inset,
-          0 0 22px rgba(249,226,124,.12);
-        filter:saturate(1.05);
-      }
-      50%{
-        transform: translateY(-1px);
-        box-shadow:
-          0 14px 36px rgba(0,0,0,.28),
-          0 0 0 1px rgba(249,226,124,.14) inset,
-          0 0 34px rgba(249,226,124,.20);
-        filter:saturate(1.12);
-      }
+      0%,100%{ transform: translateY(0); box-shadow: 0 12px 30px rgba(0,0,0,.25), 0 0 0 1px rgba(249,226,124,.10) inset, 0 0 22px rgba(249,226,124,.12); filter:saturate(1.05); }
+      50%{ transform: translateY(-1px); box-shadow: 0 14px 36px rgba(0,0,0,.28), 0 0 0 1px rgba(249,226,124,.14) inset, 0 0 34px rgba(249,226,124,.20); filter:saturate(1.12); }
     }
     .lead-card::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background: linear-gradient(115deg,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,.14) 45%,
-        rgba(255,255,255,0) 70%
-      );
+      content:""; position:absolute; inset:-40%;
+      background: linear-gradient(115deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.14) 45%, rgba(255,255,255,0) 70%);
       transform: translateX(-35%) rotate(12deg);
       animation: leadShine 2.8s ease-in-out infinite;
-      pointer-events:none;
-      z-index:0;
-      mix-blend-mode: screen;
-      opacity:.8;
+      pointer-events:none; z-index:0; mix-blend-mode: screen; opacity:.8;
     }
     @keyframes leadShine{
       0%{ transform: translateX(-55%) rotate(12deg); opacity:.15; }
@@ -407,26 +399,17 @@
       100%{ transform: translateX(55%) rotate(12deg); opacity:.15; }
     }
     .lead-card::after{
-      content:"";
-      position:absolute; inset:0;
+      content:""; position:absolute; inset:0;
       background:
         radial-gradient(circle at 18% 28%, rgba(255,255,255,.20) 0 1.5px, rgba(255,255,255,0) 2px),
         radial-gradient(circle at 34% 62%, rgba(255,255,255,.16) 0 1.2px, rgba(255,255,255,0) 2px),
         radial-gradient(circle at 66% 42%, rgba(255,255,255,.18) 0 1.4px, rgba(255,255,255,0) 2px),
         radial-gradient(circle at 82% 70%, rgba(255,255,255,.14) 0 1.1px, rgba(255,255,255,0) 2px);
-      opacity:.35;
-      animation: leadSpark 2.4s ease-in-out infinite;
-      pointer-events:none;
-      z-index:0;
+      opacity:.35; animation: leadSpark 2.4s ease-in-out infinite;
+      pointer-events:none; z-index:0;
     }
-    @keyframes leadSpark{
-      0%,100%{ opacity:.18; filter: blur(.1px); }
-      50%{ opacity:.42; filter: blur(0px); }
-    }
-    .lead-card .metric-top, .lead-card .big, .lead-card .sub, .lead-card .lead-pct{
-      position:relative;
-      z-index:2;
-    }
+    @keyframes leadSpark{ 0%,100%{ opacity:.18; filter: blur(.1px); } 50%{ opacity:.42; filter: blur(0px); } }
+    .lead-card .metric-top, .lead-card .big, .lead-card .sub, .lead-card .lead-pct{ position:relative; z-index:2; }
 
     .div-card{
       min-height: 132px;
@@ -440,7 +423,6 @@
         radial-gradient(120% 160% at 15% 20%, rgba(56,189,248,.14), rgba(0,0,0,0) 60%),
         linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.22));
     }
-    
     .ratio-card {
         background:
         radial-gradient(130% 150% at 85% 15%, rgba(192,132,252,.12), rgba(0,0,0,0) 60%),
@@ -448,170 +430,63 @@
         border:1px solid rgba(192,132,252,.2);
     }
     .ratio-val {
-        font-size:36px;
-        font-weight:1000;
-        letter-spacing:.2px;
-        margin:2px 0 6px 0;
-        line-height:1.05;
+        font-size:36px; font-weight:1000; letter-spacing:.2px; margin:2px 0 6px 0; line-height:1.05;
         background: linear-gradient(90deg, #E9D5FF, #C084FC);
-        -webkit-background-clip:text;
-        color: transparent;
+        -webkit-background-clip:text; color: transparent;
     }
-    /* 修正匯出時比值變色塊的問題 */
-    body.exporting .ratio-val {
-      background: none !important;
-      -webkit-background-clip: initial !important;
-      color: #C084FC !important;
-    }
+    body.exporting .ratio-val { background: none !important; -webkit-background-clip: initial !important; color: #C084FC !important; }
 
     .div-amount{
-      font-size:36px;
-      font-weight:1000;
-      letter-spacing:.2px;
-      margin:2px 0 6px 0;
-      line-height:1.05;
-      text-shadow:
-        0 0 18px rgba(249,226,124,.22),
-        0 0 2px rgba(0,0,0,.45);
+      font-size:36px; font-weight:1000; letter-spacing:.2px; margin:2px 0 6px 0; line-height:1.05;
+      text-shadow: 0 0 18px rgba(249,226,124,.22), 0 0 2px rgba(0,0,0,.45);
     }
     .div-amount.gold{
-      background: var(--gold-grad);
-      -webkit-background-clip:text;
-      color: transparent;
+      background: var(--gold-grad); -webkit-background-clip:text; color: transparent;
       animation: divGlow 2.6s ease-in-out infinite;
     }
     .div-amount.blu{
       background: linear-gradient(90deg, rgba(56,189,248,1), rgba(207,226,255,1));
-      -webkit-background-clip:text;
-      color: transparent;
+      -webkit-background-clip:text; color: transparent;
       animation: divGlowBlue 2.8s ease-in-out infinite;
     }
-    @keyframes divGlow{
-      0%,100%{ filter: drop-shadow(0 0 0 rgba(249,226,124,.0)); transform: translateY(0); }
-      50%{ filter: drop-shadow(0 0 10px rgba(249,226,124,.18)); transform: translateY(-1px); }
-    }
-    @keyframes divGlowBlue{
-      0%,100%{ filter: drop-shadow(0 0 0 rgba(56,189,248,.0)); transform: translateY(0); }
-      50%{ filter: drop-shadow(0 0 10px rgba(56,189,248,.16)); transform: translateY(-1px); }
-    }
+    @keyframes divGlow{ 0%,100%{ filter: drop-shadow(0 0 0 rgba(249,226,124,.0)); transform: translateY(0); } 50%{ filter: drop-shadow(0 0 10px rgba(249,226,124,.18)); transform: translateY(-1px); } }
+    @keyframes divGlowBlue{ 0%,100%{ filter: drop-shadow(0 0 0 rgba(56,189,248,.0)); transform: translateY(0); } 50%{ filter: drop-shadow(0 0 10px rgba(56,189,248,.16)); transform: translateY(-1px); } }
     .div-subhint{
-      font-size:11px;
-      color:#8aa0b8;
-      font-weight:900;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      font-size:11px; color:#8aa0b8; font-weight:900;
+      display:flex; align-items:center; gap:8px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .div-subhint b{color:#e9f2ff;}
 
-    .selection-preview{
-      border-top:1px dashed rgba(255,255,255,0.10);
-      padding-top:14px;
-    }
+    .selection-preview{ border-top:1px dashed rgba(255,255,255,0.10); padding-top:14px; }
     .selection-title{
-      color:#8aa0b8;
-      margin:0 0 10px 0;
-      font-size:13px;
-      font-weight:900;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
+      color:#8aa0b8; margin:0 0 10px 0; font-size:13px; font-weight:900;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
     .selection-title .hint{
-      font-size:10px;
-      color:#667788;
-      font-weight:800;
-      border:1px solid rgba(255,255,255,0.08);
-      background:rgba(0,0,0,0.22);
-      padding:6px 10px;
-      border-radius:999px;
+      font-size:10px; color:#667788; font-weight:800;
+      border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.22);
+      padding:6px 10px; border-radius:999px;
     }
-    .selection-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      align-items:stretch;
-    }
+    .selection-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:stretch; }
     @media (max-width:980px){ .selection-grid{grid-template-columns:1fr;} }
 
-    .sel-card{
-      background:rgba(0,0,0,0.22);
-      border-radius:14px;
-      padding:12px;
-      border:1px solid rgba(255,255,255,0.06);
-      box-shadow:0 10px 26px rgba(0,0,0,.18);
-      overflow:hidden;
-    }
-    .sel-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .sel-head .left{
-      display:flex;align-items:center;gap:10px;
-      font-weight:900;
-      color:#e9f2ff;
-      font-size:12px;
-    }
+    .sel-card{ background:rgba(0,0,0,0.22); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.06); box-shadow:0 10px 26px rgba(0,0,0,.18); overflow:hidden; }
+    .sel-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .sel-head .left{ display:flex;align-items:center;gap:10px; font-weight:900; color:#e9f2ff; font-size:12px; }
     .sel-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:12px;
-      border:1px solid rgba(255,255,255,0.10);
-      background:rgba(255,255,255,0.04);
-      color:#cfe2ff;
-      white-space:nowrap;
+      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+      font-weight:900; font-size:12px; border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.04); color:#cfe2ff; white-space:nowrap;
     }
     .sel-pill.gold{ border-color: rgba(249,226,124,.22); color:var(--gold-strong); background:rgba(249,226,124,.08); }
     .sel-pill.blue{ border-color: rgba(56,189,248,.22); color:#bfeaff; background:rgba(56,189,248,.08); }
-
-    .sel-list{
-      max-height: 160px;
-      overflow:auto;
-      padding-right:6px;
-    }
-    .sel-row{
-      display:grid;
-      grid-template-columns: 1fr 72px;
-      gap:10px;
-      align-items:center;
-      padding:8px 0;
-      border-top:1px solid rgba(255,255,255,0.06);
-    }
+    .sel-list{ max-height: 160px; overflow:auto; padding-right:6px; }
+    .sel-row{ display:grid; grid-template-columns: 1fr 72px; gap:10px; align-items:center; padding:8px 0; border-top:1px solid rgba(255,255,255,0.06); }
     .sel-row:first-child{ border-top:none; padding-top:2px; }
-    .sel-name{
-      font-weight:900;
-      font-size:11px;
-      color:#dbeafe;
-      line-height:1.25;
-      display:-webkit-box;
-      -webkit-box-orient:vertical;
-      -webkit-line-clamp:2;
-      overflow:hidden;
-    }
-    .sel-w{
-      text-align:right;
-      font-weight:900;
-      font-size:12px;
-      color:#fff;
-    }
-    .sel-empty{
-      color:#64748b;
-      font-size:11px;
-      font-weight:900;
-      padding:12px 0;
-    }
+    .sel-name{ font-weight:900; font-size:11px; color:#dbeafe; line-height:1.25; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+    .sel-w{ text-align:right; font-weight:900; font-size:12px; color:#fff; }
+    .sel-empty{ color:#64748b; font-size:11px; font-weight:900; padding:12px 0; }
 
     .validation-section{margin-top:14px; border-top:1px dashed rgba(255,255,255,0.10); padding-top:14px;}
     .validation-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -620,53 +495,52 @@
     .v-title{color:#fff;font-size:12px;margin-bottom:8px;font-weight:900;border-left:3px solid #666;padding-left:8px;}
     .v-chart-h{height:180px;position:relative;}
 
-    /* ✅ 隱藏敏感度圖表 (匯出時) */
+    .mdd-verify-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+    .mdd-verify-table th { text-align: left; color: #94a3b8; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .mdd-verify-table td { padding: 8px 6px; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 700; }
+    .mdd-verify-table .val-momo { color: var(--gold); }
+    .mdd-verify-table .val-bench { color: var(--accent-blue); }
+    .mdd-highlight { background: rgba(248, 113, 113, 0.1); border-radius: 4px; padding: 2px 4px; color: #fca5a5; }
+
+    /* ── 相關係數熱力圖 ─────────────────────────────────────────── */
+    .corr-section { margin-top:14px; }
+    .corr-tabs { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+    .corr-tab {
+      padding:7px 16px; border-radius:999px; border:none; cursor:pointer;
+      font-weight:900; font-size:12px; transition:.18s;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.10); color:#94A3B8;
+    }
+    .corr-tab.active-a  { background:rgba(249,226,124,.15); border-color:rgba(249,226,124,.35); color:var(--gold-strong); }
+    .corr-tab.active-b  { background:rgba(56,189,248,.12);  border-color:rgba(56,189,248,.35);  color:#bfeaff; }
+    .corr-tab.active-ab { background:rgba(192,132,252,.12); border-color:rgba(192,132,252,.35); color:#e9d5ff; }
+    .corr-box {
+      background:rgba(0,0,0,0.22); border-radius:14px;
+      padding:14px; border:1px solid rgba(255,255,255,0.06); overflow-x:auto;
+    }
+    .corr-empty { color:#64748b; font-size:12px; font-weight:900; padding:28px 0; text-align:center; }
+    .corr-canvas-wrap { position:relative; width:100%; }
+    .corr-canvas-wrap canvas { display:block; width:100% !important; }
+    /* 匯出時隱藏 */
+    body.exporting .corr-section { display:none !important; }
+    /* ───────────────────────────────────────────────────────────── */
+
     body.exporting .control-panel{display:none;}
     body.exporting .layout{grid-template-columns:1fr;}
     body.exporting .validation-section{display:none;}
     body.exporting .selection-preview{display:none;}
     body.exporting #sensitivity-chart-section { display: none !important; }
-
-    body.exporting .title-wrap h1{
-      background:none !important;
-      -webkit-background-clip:initial !important;
-      color: #F9E27C !important;
-    }
-    body.exporting .lead-card{
-      animation:none !important;
-      transform:none !important;
-      background: rgba(249,226,124,.18) !important;
-      border-color: rgba(249,226,124,.25) !important;
-      box-shadow: 0 10px 26px rgba(0,0,0,.22) !important;
-    }
-    body.exporting .lead-card::before,
-    body.exporting .lead-card::after{
-      display:none !important;
-    }
-    body.exporting .div-amount.gold,
-    body.exporting .div-amount.blu{
-      animation:none !important;
-    }
+    body.exporting .title-wrap h1{ background:none !important; -webkit-background-clip:initial !important; color: #F9E27C !important; }
+    body.exporting .lead-card{ animation:none !important; transform:none !important; background: rgba(249,226,124,.18) !important; border-color: rgba(249,226,124,.25) !important; box-shadow: 0 10px 26px rgba(0,0,0,.22) !important; }
+    body.exporting .lead-card::before, body.exporting .lead-card::after{ display:none !important; }
+    body.exporting .div-amount.gold, body.exporting .div-amount.blu{ animation:none !important; }
     body.exporting .div-amount.gold{ color:#F9E27C !important; background:none !important; -webkit-background-clip:initial !important; }
     body.exporting .div-amount.blu{ color:#BFEAFF !important; background:none !important; -webkit-background-clip:initial !important; }
 
     #momo-div-pct, #bench-div-pct { display:none !important; }
 
-    @media (max-width:900px){
-      body{padding:14px;}
-      #report-capture{padding:18px;border-radius:22px;}
-      .contact-card{min-width:unset; width:100%;}
-      .contact-text .t2{font-size:16px;}
-      .title-wrap h1{font-size:24px;}
-    }
-    @media (max-width:520px){
-      #report-capture{padding:14px;border-radius:18px;}
-      .header-row{gap:12px;}
-      .avatar-ring{width:48px;height:48px;}
-      .qrbox{padding:5px;}
-      .contact-text .t2{font-size:15px;}
-      .title-wrap h1{font-size:22px;}
-    }
+    @media (max-width:900px){ body{padding:14px;} #report-capture{padding:18px;border-radius:22px;} .contact-card{min-width:unset; width:100%;} .contact-text .t2{font-size:16px;} .title-wrap h1{font-size:24px;} }
+    @media (max-width:520px){ #report-capture{padding:14px;border-radius:18px;} .header-row{gap:12px;} .avatar-ring{width:48px;height:48px;} .qrbox{padding:5px;} .contact-text .t2{font-size:15px;} .title-wrap h1{font-size:22px;} }
   </style>
 </head>
 
@@ -679,7 +553,6 @@
         <div class="title-wrap">
           <h1 id="main-title">『MOMO雙贏策略』配置策略推演</h1>
         </div>
-
         <div class="contact-card">
           <div class="avatar-ring">
             <img id="advisor-avatar" alt="advisor" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -723,40 +596,40 @@
           </button>
         </div>
 
-        <div class="gs-box">
+        <div class="connection-panel">
+          <div class="status-group">
+            <div id="status-dot" class="status-dot"></div>
+            <div id="status-text" class="status-text">尚未連線</div>
+          </div>
+          <button class="btn-settings" onclick="toggleSettings()">⚙️ 設定來源</button>
+        </div>
+
+        <div id="sheet-settings-area">
           <label>Google Sheet ID</label>
           <input type="text" id="sheet-id" value="1hnk0iEVQv9NdXns_PZ0IGdc3WgkbbqoJs0Zw1EvLWl4" style="font-size:11px; margin-bottom:6px;" />
-
           <div style="display:flex; gap:8px;">
             <div style="flex:1;">
               <label style="font-size:10px; color:#aaa;">淨值 ID (GID)</label>
               <input type="text" id="sheet-gid" value="877412256" style="font-size:11px;" />
             </div>
             <div style="flex:1;">
-                <label style="font-size:10px; color:#aaa;">Config ID (GID)</label>
-                <input type="text" id="config-gid" value="1114691785" placeholder="填入GID" style="font-size:11px;" />
+              <label style="font-size:10px; color:#aaa;">Config ID (GID)</label>
+              <input type="text" id="config-gid" value="1114691785" placeholder="填入GID" style="font-size:11px;" />
             </div>
           </div>
-          
           <div style="display:flex; align-items:end; margin-top:8px;">
-              <button class="btn-action btn-load" type="button" onclick="fetchSheetData()" style="margin:0; font-size:11px;">
-                📡 讀取資料 & Config
-              </button>
+            <button class="btn-action btn-load" type="button" onclick="fetchSheetData()" style="margin:0; font-size:11px;">
+              📡 讀取資料 & Config
+            </button>
           </div>
-
-          <div id="load-status">
-            狀態：<b>尚未讀取</b><br/>
-            讀取順序：GViz(JSONP) → 失敗才 CSV fallback
-          </div>
+          <div id="load-detail-msg" style="margin-top:8px; font-size:10px; color:#666;"></div>
         </div>
 
         <div id="selector-ui" style="display:none;">
           <div class="block-header">📝 選擇投資組合成分</div>
-
           <input class="fund-filter" id="fund-filter" type="text"
                  placeholder="多關鍵字搜尋：例如『貝萊德 A2 美元』"
                  oninput="applyFundFilter()" />
-
           <div class="selector-status">
             <div class="sum-badge" id="selected-counts">A 已選 0 / B 已選 0</div>
             <label class="toggle-wrap" for="toggle-only-selected" title="勾選後只顯示已選基金">
@@ -764,22 +637,18 @@
               只看已選
             </label>
           </div>
-
           <div class="selector-tools">
             <button class="tool-btn danger" type="button" onclick="clearAllSelections()">全部清除</button>
             <button class="tool-btn gold" type="button" onclick="clearSelectionOnly('momo')">清除 A</button>
             <button class="tool-btn blue" type="button" onclick="clearSelectionOnly('bench')">清除 B</button>
           </div>
-
           <div class="fund-selector-container" id="fund-list-container"></div>
-
           <button class="btn-action btn-refresh" type="button" onclick="applySelection()">🔄 確認選擇並更新圖表</button>
           <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;" />
         </div>
 
         <div class="strat-block momo">
           <div class="block-header"><span style="color:var(--gold-soft)">MOMO 策略組合 (A)</span></div>
-
           <div id="dynamic-weights-area">
             <label style="margin-bottom:8px; color:var(--gold);">權重設定 (%)（可🔒鎖定）</label>
             <div id="weights-container"></div>
@@ -788,7 +657,6 @@
               <span>🔒 鎖定者固定，其餘自動補滿 100%</span>
             </div>
           </div>
-
           <div class="sub-input auto-calced" style="margin-top:10px;">
             <label>不含息 CAGR (%) (依選取區間自動計算)</label>
             <input type="number" id="momo-cagr" value="12.77" step="0.01" oninput="update()" />
@@ -801,7 +669,6 @@
 
         <div class="strat-block original">
           <div class="block-header"><span style="color:var(--accent-blue)">比較基準 (B)</span></div>
-
           <div id="dynamic-weights-area-bench">
             <label style="margin-bottom:8px; color:var(--accent-blue);">權重設定 (%)（可🔒鎖定）</label>
             <div id="weights-container-bench"></div>
@@ -810,7 +677,6 @@
               <span>🔒 鎖定者固定，其餘自動補滿 100%</span>
             </div>
           </div>
-
           <div class="sub-input auto-calced" style="margin-top:10px;">
             <label>不含息 CAGR (%) (依選取區間自動計算)</label>
             <input type="number" id="bench-cagr" value="1.51" step="0.01" oninput="update()" />
@@ -837,44 +703,31 @@
           <div class="kpi-row">
             <div class="metric-card">
               <div class="metric-top">
-                <div class="metric-title-group">
-                  <span class="dot gold"></span> MOMO｜總含息價值
-                </div>
+                <div class="metric-title-group"><span class="dot gold"></span> MOMO｜總含息價值</div>
                 <span class="pct" id="momo-nav-pct">+0.0%</span>
               </div>
-
               <div class="big" id="momo-total">$ 0</div>
-
               <div class="sub">期末本金：<b id="momo-principal" style="color:#fff;">$ 0</b></div>
               <div class="sub">累積領息：<b id="momo-acc-div" style="color:var(--gold-soft);">$ 0</b></div>
               <div class="sub" style="margin-top:2px; color:#F87171;">⚠️ 區間最大回撤：<b id="momo-mdd">-0.0%</b></div>
             </div>
-
             <div class="metric-card">
               <div class="metric-top">
-                <div class="metric-title-group">
-                  <span class="dot blue"></span> 原始方案｜總含息價值
-                </div>
+                <div class="metric-title-group"><span class="dot blue"></span> 原始方案｜總含息價值</div>
                 <span class="pct" id="bench-nav-pct">+0.0%</span>
               </div>
-
               <div class="big" id="bench-total">$ 0</div>
-
               <div class="sub">期末本金：<b id="bench-principal" style="color:#fff;">$ 0</b></div>
               <div class="sub">累積領息：<b id="bench-acc-div" style="color:#bfeaff;">$ 0</b></div>
               <div class="sub" style="margin-top:2px; color:#F87171;">⚠️ 區間最大回撤：<b id="bench-mdd">-0.0%</b></div>
             </div>
-
             <div class="metric-card lead-card" id="lead-card">
               <div class="lead-topline">
                 <div class="metric-top" style="margin:0; width:auto;">
-                   <div class="metric-title-group">
-                     <span class="dot lead"></span> 領先價值（A - B）
-                   </div>
+                  <div class="metric-title-group"><span class="dot lead"></span> 領先價值（A - B）</div>
                 </div>
                 <div class="lead-pct" id="lead-pct">+0.0%</div>
               </div>
-
               <div class="big" id="lead-value">$ 0</div>
               <div class="sub">本金差額：<b id="lead-principal-diff">$ 0</b></div>
               <div class="sub">領息差額：<b id="lead-div-diff">$ 0</b></div>
@@ -883,34 +736,20 @@
 
           <div class="kpi-row">
             <div class="metric-card div-card">
-              <div class="metric-top">
-                <div class="metric-title-group">
-                  <span class="dot gold"></span> MOMO｜累積領配息
-                </div>
-              </div>
+              <div class="metric-top"><div class="metric-title-group"><span class="dot gold"></span> MOMO｜累積領配息</div></div>
               <div class="div-amount gold" id="momo-div-amount">$ 0</div>
               <div class="div-subhint">估算依據：<b>起始本金 × 年配息率</b>（固定推估）</div>
             </div>
-
             <div class="metric-card div-card blue">
-              <div class="metric-top">
-                <div class="metric-title-group">
-                  <span class="dot blue"></span> 原始方案｜累積領配息
-                </div>
-              </div>
+              <div class="metric-top"><div class="metric-title-group"><span class="dot blue"></span> 原始方案｜累積領配息</div></div>
               <div class="div-amount blu" id="bench-div-amount">$ 0</div>
               <div class="div-subhint">估算依據：<b>起始本金 × 年配息率</b>（固定推估）</div>
             </div>
-
             <div class="metric-card metric-card ratio-card">
-               <div class="metric-top">
-                  <div class="metric-title-group">
-                    <span class="dot purple"></span> 領先/領息差額比
-                  </div>
-               </div>
-               <div class="ratio-val" id="ratio-val">0.00</div>
-               <div class="sub">領先價值：<b id="ratio-lead">$ 0</b></div>
-               <div class="sub">差額絕對值：<b id="ratio-diff">$ 0</b></div>
+              <div class="metric-top"><div class="metric-title-group"><span class="dot purple"></span> 領先/領息差額比</div></div>
+              <div class="ratio-val" id="ratio-val">0.00</div>
+              <div class="sub">領先價值：<b id="ratio-lead">$ 0</b></div>
+              <div class="sub">差額絕對值：<b id="ratio-diff">$ 0</b></div>
             </div>
           </div>
 
@@ -919,26 +758,20 @@
               <span>👁️ 組合選取明細（僅檢視）</span>
               <span class="hint">此區塊匯出截圖會自動隱藏</span>
             </div>
-
             <div class="selection-grid">
               <div class="sel-card">
                 <div class="sel-head">
                   <div class="left"><span class="dot gold"></span> A 組合（MOMO）</div>
                   <div class="sel-pill gold" id="sel-pill-a">已選 0｜合計 0.0%</div>
                 </div>
-                <div class="sel-list" id="sel-list-a">
-                  <div class="sel-empty">尚未選擇基金</div>
-                </div>
+                <div class="sel-list" id="sel-list-a"><div class="sel-empty">尚未選擇基金</div></div>
               </div>
-
               <div class="sel-card">
                 <div class="sel-head">
                   <div class="left"><span class="dot blue"></span> B 組合（基準）</div>
                   <div class="sel-pill blue" id="sel-pill-b">已選 0｜合計 0.0%</div>
                 </div>
-                <div class="sel-list" id="sel-list-b">
-                  <div class="sel-empty">尚未選擇基金</div>
-                </div>
+                <div class="sel-list" id="sel-list-b"><div class="sel-empty">尚未選擇基金</div></div>
               </div>
             </div>
           </div>
@@ -957,6 +790,41 @@
             </div>
           </div>
 
+          <div class="validation-section" style="border-top:none; margin-top:0; padding-top:0;">
+            <h4 style="color:#8aa0b8; margin:14px 0 6px 0; font-size:13px; font-weight:900;">📉 MDD 最大回撤驗證細節</h4>
+            <div style="background:rgba(0,0,0,0.22); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.06);">
+              <table class="mdd-verify-table">
+                <thead>
+                  <tr>
+                    <th>項目</th><th>歷史最高點 (日期)</th><th>回撤最低點 (日期)</th><th>跌幅 (MDD)</th>
+                  </tr>
+                </thead>
+                <tbody id="mdd-verify-body"></tbody>
+              </table>
+              <div style="margin-top:8px; font-size:10px; color:#64748b;">
+                * 計算公式：(最低點 - 最高點) ÷ 最高點 × 100%<br>
+                * 此計算基於目前選取的「進場區間」歷史數據
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ 相關係數分析區 ★ -->
+          <div class="validation-section corr-section" style="border-top:none;margin-top:0;padding-top:0;">
+            <h4 style="color:#8aa0b8;margin:14px 0 6px 0;font-size:13px;font-weight:900;">
+              🔗 基金相關係數矩陣（日報酬率）
+            </h4>
+            <div class="corr-tabs">
+              <button class="corr-tab active-a" onclick="switchCorrTab('a')"  id="ctab-a">A 組（MOMO）</button>
+              <button class="corr-tab"          onclick="switchCorrTab('b')"  id="ctab-b">B 組（基準）</button>
+              <button class="corr-tab"          onclick="switchCorrTab('ab')" id="ctab-ab">A + B 合併</button>
+            </div>
+            <div class="corr-box">
+              <div id="corr-content">
+                <div class="corr-empty">請先選擇基金並按「確認選擇並更新圖表」</div>
+              </div>
+            </div>
+          </div>
+
           <div id="sensitivity-chart-section" class="chart-wrapper" style="margin-top:14px; height: 320px;">
             <div class="chart-title">
               <h4>📊 敏感度分析：配息基金權重 (0% ~ 100%) vs 領先/領息差額比</h4>
@@ -967,7 +835,6 @@
 
         </div>
       </div>
-
     </div>
   </div>
 
@@ -1029,61 +896,47 @@
     let rawGlobalData = [];
     let allFundNames = [];
     let parsedBenchData = [], parsedMomoData = [], momoFundNames = [], benchFundNames = [];
-    // Config 對應表
     let fundConfigMap = {};
 
-    let mainChart = null, vBenchChart = null, vMomoChart = null, ratioChart = null; // ✅ Add ratioChart
+    let mainChart = null, vBenchChart = null, vMomoChart = null, ratioChart = null;
     const weightState = { momo: new Map(), bench: new Map() };
 
-    function setStatus(html){
-      const el = document.getElementById('load-status');
-      if(el) el.innerHTML = html;
+    function toggleSettings() {
+      const el = document.getElementById('sheet-settings-area');
+      el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+    }
+
+    function setConnectionStatus(status, msg) {
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      const detail = document.getElementById('load-detail-msg');
+      dot.className = 'status-dot';
+      if(status === 'loading') {
+        dot.classList.add('yellow'); text.innerText = "資料讀取中..."; text.style.color = "#fbbf24";
+      } else if(status === 'success') {
+        dot.classList.add('green'); text.innerText = "資料連線正常"; text.style.color = "#34d399";
+        document.getElementById('sheet-settings-area').style.display = 'none';
+      } else {
+        text.innerText = "連線失敗 / 未連線"; text.style.color = "#f87171";
+      }
+      if(detail) detail.innerHTML = msg || "";
     }
 
     function gvizJsonp(sheetId, gid){
       return new Promise((resolve, reject) => {
         const cbName = `__gviz_cb_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-        const timeoutMs = 12000;
         let done = false;
-
         const timer = setTimeout(() => {
-          if(done) return;
-          done = true;
-          cleanup();
+          if(done) return; done = true; cleanup();
           reject(new Error("GViz 逾時（可能未公開/未發布到網路）"));
-        }, timeoutMs);
-
-        function cleanup(){
-          try{ delete window[cbName]; }catch(_){}
-          const s = document.getElementById(cbName);
-          if(s && s.parentNode) s.parentNode.removeChild(s);
-          clearTimeout(timer);
-        }
-
-        window[cbName] = (resp) => {
-          if(done) return;
-          done = true;
-          cleanup();
-          resolve(resp);
-        };
-
+        }, 12000);
+        function cleanup(){ try{ delete window[cbName]; }catch(_){} const s=document.getElementById(cbName); if(s&&s.parentNode) s.parentNode.removeChild(s); clearTimeout(timer); }
+        window[cbName] = (resp) => { if(done) return; done=true; cleanup(); resolve(resp); };
         const script = document.createElement('script');
-        script.id = cbName;
-        script.async = true;
+        script.id = cbName; script.async = true;
         const tqx = `responseHandler:${cbName};out:json`;
-        script.src =
-          `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq` +
-          `?gid=${encodeURIComponent(gid)}` +
-          `&headers=1` +
-          `&tqx=${encodeURIComponent(tqx)}`;
-
-        script.onerror = () => {
-          if(done) return;
-          done = true;
-          cleanup();
-          reject(new Error("GViz JSONP 載入失敗"));
-        };
-
+        script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?gid=${encodeURIComponent(gid)}&headers=1&tqx=${encodeURIComponent(tqx)}`;
+        script.onerror = () => { if(done) return; done=true; cleanup(); reject(new Error("GViz JSONP 載入失敗")); };
         document.head.appendChild(script);
       });
     }
@@ -1094,8 +947,7 @@
       const headers = (t.cols || []).map(c => (c && c.label) ? String(c.label).trim() : "");
       const rows = [ headers ];
       (t.rows || []).forEach(r => {
-        const cells = (r.c || []);
-        const arr = cells.map(cell => {
+        const arr = (r.c || []).map(cell => {
           if(!cell) return null;
           return (cell.v !== undefined && cell.v !== null) ? cell.v : (cell.f ?? null);
         });
@@ -1109,100 +961,54 @@
       const res = await fetch(url, { cache:"no-store", redirect:"follow" });
       if (!res.ok) throw new Error("CSV fetch 失敗 (404/403/CORS)");
       const buffer = await res.arrayBuffer();
-      const decoder = new TextDecoder("utf-8");
-      const csvText = decoder.decode(buffer);
+      const csvText = new TextDecoder("utf-8").decode(buffer);
       const workbook = XLSX.read(csvText, {type: 'string'});
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       return XLSX.utils.sheet_to_json(sheet, {header: 1, raw: true});
     }
 
-    // ✅ 處理 Config 資料 (修正版：B欄名稱, D欄配息)
     function processConfigData(rows) {
-        fundConfigMap = {};
-        if(!rows || rows.length < 2) return;
-        
-        console.log("正在處理 Config 分頁資料 (來源: B欄名稱, D欄配息)...");
-        
-        for(let i=1; i<rows.length; i++) {
-            const row = rows[i];
-            const rawName = String(row[1] || "").trim(); // B欄 (index 1)
-            const rateRaw = row[3]; // D欄 (index 3)
-            
-            // 淨化名稱：轉小寫、移除空格、移除常見符號，作為對照 Key
-            const cleanKey = rawName.toLowerCase().replace(/\s+/g, '').replace(/[-_()]/g, '');
-            
-            let rate = 0;
-            if(typeof rateRaw === 'number') {
-                rate = rateRaw;
-            } else if(typeof rateRaw === 'string') {
-                rate = parseFloat(rateRaw.replace(/%/g, '').trim());
-            }
-
-            // 防呆：如果讀出來是 0.06 (小數)，轉成 6.0 (%)
-            if(rate > 0 && rate < 1) rate = rate * 100;
-
-            if(cleanKey && !isNaN(rate)) {
-                fundConfigMap[cleanKey] = rate;
-                fundConfigMap["__RAW__" + cleanKey] = rawName;
-            }
-        }
-        console.log(`✅ Config 讀取完成，共載入 ${Object.keys(fundConfigMap).length / 2} 筆配息資料`);
+      fundConfigMap = {};
+      if(!rows || rows.length < 2) return;
+      for(let i=1; i<rows.length; i++) {
+        const row = rows[i];
+        const rawName = String(row[1] || "").trim();
+        const rateRaw = row[3];
+        const cleanKey = rawName.toLowerCase().replace(/\s+/g, '').replace(/[-_()]/g, '');
+        let rate = 0;
+        if(typeof rateRaw === 'number') rate = rateRaw;
+        else if(typeof rateRaw === 'string') rate = parseFloat(rateRaw.replace(/%/g, '').trim());
+        if(rate > 0 && rate < 1) rate = rate * 100;
+        if(cleanKey && !isNaN(rate)) { fundConfigMap[cleanKey] = rate; fundConfigMap["__RAW__" + cleanKey] = rawName; }
+      }
     }
 
-    // ✅ 讀取資料主程式
     async function fetchSheetData() {
       const sheetId = document.getElementById('sheet-id').value.trim();
       const navGid = document.getElementById('sheet-gid').value.trim();
       const configGid = document.getElementById('config-gid').value.trim();
-
-      if (!sheetId) { alert("請輸入 Google Sheet ID"); return; }
-      if (!navGid) { alert("請輸入 淨值 GID"); return; }
-
+      if (!sheetId || !navGid) { alert("請輸入完整 ID"); return; }
+      setConnectionStatus('loading', '正連線至 Google Sheets...');
       const btn = document.querySelector('.btn-load');
-      const oldText = btn ? btn.innerHTML : "";
-      if(btn){ btn.innerHTML = "⏳ 連線中..."; btn.disabled = true; }
-
-      setStatus(`狀態：<b>讀取中…</b><br/>同步讀取 淨值 & Config`);
-
+      if(btn) btn.disabled = true;
       try {
-        const pNav = gvizJsonp(sheetId, navGid)
-             .then(resp => gvizToRows(resp))
-             .catch(() => fetchCsvFallback(sheetId, navGid));
-        
+        const pNav = gvizJsonp(sheetId, navGid).then(resp => gvizToRows(resp)).catch(() => fetchCsvFallback(sheetId, navGid));
         let pConfig = Promise.resolve([]);
-        if(configGid) {
-            pConfig = gvizJsonp(sheetId, configGid)
-                .then(resp => gvizToRows(resp))
-                .catch(() => fetchCsvFallback(sheetId, configGid));
-        }
-
+        if(configGid) pConfig = gvizJsonp(sheetId, configGid).then(resp => gvizToRows(resp)).catch(() => fetchCsvFallback(sheetId, configGid));
         const [navRows, configRows] = await Promise.all([pNav, pConfig]);
-
         if (!navRows || navRows.length < 2) throw new Error("淨值資料為空");
-        
-        // 1. 處理 Config
-        if(configRows && configRows.length > 1) {
-            processConfigData(configRows);
-        } else {
-            console.warn("⚠️ Config 資料為空或讀取失敗");
-        }
-
-        // 2. 處理 Nav
+        if(configRows && configRows.length > 1) processConfigData(configRows);
         processRawSheetData(navRows);
-
-        // 3. 強制刷新計算
         if(momoFundNames.length > 0) normalizeWeightsTo100('momo');
         if(benchFundNames.length > 0) normalizeWeightsTo100('bench');
-
         document.getElementById('selector-ui').style.display = 'block';
-        setStatus(`狀態：<b>讀取成功</b><br/>淨值筆數：${rawGlobalData.length}｜Config 對應：${Object.keys(fundConfigMap).length/2}`);
-
+        setConnectionStatus('success', `淨值筆數：${rawGlobalData.length}｜Config：${Object.keys(fundConfigMap).length/2}`);
       } catch (e) {
         console.error(e);
-        setStatus(`狀態：<b>讀取失敗</b><br/>${e.message}`);
-        alert(`❌ 讀取失敗！請檢查 ID/GID 與權限設定。\n錯誤：${e.message}`);
+        setConnectionStatus('error', `錯誤：${e.message}`);
+        alert(`❌ 讀取失敗！\n錯誤：${e.message}`);
       } finally {
-        if(btn){ btn.innerHTML = oldText; btn.disabled = false; }
+        if(btn) btn.disabled = false;
       }
     }
 
@@ -1210,18 +1016,14 @@
       const headers = rows[0] || [];
       allFundNames = headers.slice(1).map(h => String(h ?? "").trim()).filter(Boolean);
       rawGlobalData = [];
-
       for (let i = 1; i < rows.length; i++) {
         const cols = rows[i];
         if (!cols || cols.length === 0) continue;
-
         const dt = parseDateLoose(cols[0]);
         if (!dt) continue;
-
-        const rowObj = { dt: dt, dateKey: dateKey(dt), valsRaw: {}, valsFilled: {} };
+        const rowObj = { dt, dateKey: dateKey(dt), valsRaw: {}, valsFilled: {} };
         for (let j = 0; j < allFundNames.length; j++) {
-          const colIdx = j + 1;
-          let val = cols[colIdx];
+          let val = cols[j+1];
           if (typeof val === 'string') val = parseFloat(val.replace(/,/g, ''));
           const clean = (Number.isFinite(val) && val > 0) ? val : null;
           rowObj.valsRaw[allFundNames[j]] = clean;
@@ -1230,8 +1032,6 @@
         rawGlobalData.push(rowObj);
       }
       rawGlobalData.sort((a,b) => a.dt - b.dt);
-
-      // Forward fill
       const lastValid = {};
       allFundNames.forEach(n => lastValid[n] = null);
       rawGlobalData.forEach(row => {
@@ -1240,7 +1040,6 @@
           else row.valsFilled[n] = lastValid[n];
         });
       });
-
       renderFundSelectors();
       renderSelectionPreview();
       update();
@@ -1257,85 +1056,60 @@
       const qRaw = (document.getElementById('fund-filter')?.value || "").trim().toLowerCase();
       const tokens = qRaw ? qRaw.split(/\s+/).filter(Boolean) : [];
       const onlySelected = !!document.getElementById('toggle-only-selected')?.checked;
-
       const items = document.querySelectorAll('#fund-list-container .fund-item');
       items.forEach((el, idx) => {
         if(idx === 0) return;
-
         const name = (el.dataset.name || "");
         const momo = el.querySelector('.momo-chk')?.checked;
         const bench = el.querySelector('.bench-chk')?.checked;
-
-        let okSearch = true;
-        if(tokens.length){
-          okSearch = tokens.every(t => name.includes(t));
-        }
-        let okSelected = true;
-        if(onlySelected){
-          okSelected = !!(momo || bench);
-        }
-
+        let okSearch = !tokens.length || tokens.every(t => name.includes(t));
+        let okSelected = !onlySelected || !!(momo || bench);
         el.style.display = (okSearch && okSelected) ? '' : 'none';
       });
-
       updateSelectedCounts();
     }
 
     function renderFundSelectors() {
       const container = document.getElementById('fund-list-container');
       container.innerHTML = `
-        <div class="fund-item" style="position:sticky; top:0; background:#000; z-index:2; border-bottom:1px solid rgba(255,255,255,0.12); color:#fff; padding-top:10px; padding-bottom:10px;">
-          <div style="padding-left:4px; font-weight:900;">基金名稱</div>
-          <div class="chk-col" style="color:var(--gold); font-weight:900;">MOMO<br>(A)</div>
-          <div class="chk-col" style="color:var(--accent-blue); font-weight:900;">基準<br>(B)</div>
-        </div>
-      `;
-
+        <div class="fund-item" style="position:sticky;top:0;background:#000;z-index:2;border-bottom:1px solid rgba(255,255,255,0.12);color:#fff;padding-top:10px;padding-bottom:10px;">
+          <div style="padding-left:4px;font-weight:900;">基金名稱</div>
+          <div class="chk-col" style="color:var(--gold);font-weight:900;">MOMO<br>(A)</div>
+          <div class="chk-col" style="color:var(--accent-blue);font-weight:900;">基準<br>(B)</div>
+        </div>`;
       allFundNames.forEach((name) => {
         const color = getBrandColor(name);
         const div = document.createElement('div');
-        div.className = 'fund-item';
-        div.dataset.name = name.toLowerCase();
+        div.className = 'fund-item'; div.dataset.name = name.toLowerCase();
         div.innerHTML = `
           <div class="fund-name" title="${name}">
             <span class="brand-dot" style="background:${color}"></span>
-            <span class="brand-text" style="color:${color}; opacity:.95">${name}</span>
+            <span class="brand-text" style="color:${color};opacity:.95">${name}</span>
           </div>
           <div class="chk-col"><input type="checkbox" class="momo-chk" data-name="${name}" /></div>
-          <div class="chk-col"><input type="checkbox" class="bench-chk" data-name="${name}" /></div>
-        `;
-
+          <div class="chk-col"><input type="checkbox" class="bench-chk" data-name="${name}" /></div>`;
         div.querySelector('.momo-chk').addEventListener('change', () => { updateSelectedCounts(); applyFundFilter(); });
         div.querySelector('.bench-chk').addEventListener('change', () => { updateSelectedCounts(); applyFundFilter(); });
-
         container.appendChild(div);
       });
-
-      applyFundFilter();
-      updateSelectedCounts();
+      applyFundFilter(); updateSelectedCounts();
     }
 
     function clearAllSelections(){
       document.querySelectorAll('.momo-chk,.bench-chk').forEach(c => c.checked = false);
       momoFundNames = []; benchFundNames = [];
       parsedMomoData = []; parsedBenchData = [];
-      generateWeightInputs('momo', []);
-      generateWeightInputs('bench', []);
-      updateValidationChart('momo');
-      updateValidationChart('bench');
-      renderSelectionPreview();
-      applyFundFilter();
-      update();
+      generateWeightInputs('momo', []); generateWeightInputs('bench', []);
+      updateValidationChart('momo'); updateValidationChart('bench');
+      renderSelectionPreview(); applyFundFilter(); update();
     }
 
     function clearSelectionOnly(type){
       const cls = type === 'momo' ? '.momo-chk' : '.bench-chk';
       document.querySelectorAll(cls).forEach(c => c.checked = false);
-      if(type === 'momo'){ momoFundNames = []; parsedMomoData = []; generateWeightInputs('momo', []); updateValidationChart('momo'); }
-      if(type === 'bench'){ benchFundNames = []; parsedBenchData = []; generateWeightInputs('bench', []); updateValidationChart('bench'); }
-      renderSelectionPreview();
-      applyFundFilter();
-      update();
+      if(type === 'momo'){ momoFundNames=[]; parsedMomoData=[]; generateWeightInputs('momo',[]); updateValidationChart('momo'); }
+      if(type === 'bench'){ benchFundNames=[]; parsedBenchData=[]; generateWeightInputs('bench',[]); updateValidationChart('bench'); }
+      renderSelectionPreview(); applyFundFilter(); update();
     }
 
     function applySelection() {
@@ -1343,1004 +1117,620 @@
       const benchChks = document.querySelectorAll('.bench-chk:checked');
       momoFundNames = Array.from(momoChks).map(c => c.dataset.name);
       benchFundNames = Array.from(benchChks).map(c => c.dataset.name);
-
-      if (momoFundNames.length === 0 && benchFundNames.length === 0) {
-        alert("請至少選擇一支基金！");
-        return;
-      }
-
-      parsedMomoData = rawGlobalData.map(row => ({ dt: row.dt, date: row.dateKey, vals: momoFundNames.map(n => row.valsRaw[n]) }));
-      parsedBenchData = rawGlobalData.map(row => ({ dt: row.dt, date: row.dateKey, vals: benchFundNames.map(n => row.valsRaw[n]) }));
-
-      generateWeightInputs('momo', momoFundNames);
-      generateWeightInputs('bench', benchFundNames);
-
-      normalizeWeightsTo100('momo');
-      normalizeWeightsTo100('bench');
-
-      updateValidationChart('momo');
-      updateValidationChart('bench');
-      renderSelectionPreview();
-      updateSelectedCounts();
-      update();
+      if (momoFundNames.length === 0 && benchFundNames.length === 0) { alert("請至少選擇一支基金！"); return; }
+      parsedMomoData = rawGlobalData.map(row => ({ dt:row.dt, date:row.dateKey, vals:momoFundNames.map(n=>row.valsRaw[n]) }));
+      parsedBenchData = rawGlobalData.map(row => ({ dt:row.dt, date:row.dateKey, vals:benchFundNames.map(n=>row.valsRaw[n]) }));
+      generateWeightInputs('momo', momoFundNames); generateWeightInputs('bench', benchFundNames);
+      normalizeWeightsTo100('momo'); normalizeWeightsTo100('bench');
+      updateValidationChart('momo'); updateValidationChart('bench');
+      renderSelectionPreview(); updateSelectedCounts(); update();
     }
 
-    function getRowEls(type){
-      const containerId = type === 'momo' ? 'weights-container' : 'weights-container-bench';
-      return Array.from(document.querySelectorAll(`#${containerId} .weight-row`));
-    }
-    function readWeightsFromDOM(type){
-      const rows = getRowEls(type);
-      return rows.map(r => {
-        const name = r.dataset.name;
-        const val = parseFloat(r.querySelector('.weight-input')?.value) || 0;
-        const locked = !!r.querySelector('.lock-chk')?.checked;
-        return { name, val, locked, row: r };
-      });
-    }
-    function writeWeightToDOM(item, val){
-      const input = item.row.querySelector('.weight-input');
-      if(input) input.value = (Math.round(val * 10) / 10).toFixed(1);
-    }
-    function syncStateFromDOM(type){
-      const arr = readWeightsFromDOM(type);
-      arr.forEach(it => {
-        weightState[type].set(it.name, { value: it.val, locked: it.locked });
-      });
-      setSumBadge(type);
-    }
+    function getRowEls(type){ const cId=type==='momo'?'weights-container':'weights-container-bench'; return Array.from(document.querySelectorAll(`#${cId} .weight-row`)); }
+    function readWeightsFromDOM(type){ return getRowEls(type).map(r=>({ name:r.dataset.name, val:parseFloat(r.querySelector('.weight-input')?.value)||0, locked:!!r.querySelector('.lock-chk')?.checked, row:r })); }
+    function writeWeightToDOM(item,val){ const i=item.row.querySelector('.weight-input'); if(i) i.value=(Math.round(val*10)/10).toFixed(1); }
+    function syncStateFromDOM(type){ readWeightsFromDOM(type).forEach(it=>weightState[type].set(it.name,{value:it.val,locked:it.locked})); setSumBadge(type); }
     function setSumBadge(type){
-      const arr = readWeightsFromDOM(type);
-      const sum = arr.reduce((a,b)=>a+(b.val||0),0);
-      const el = document.getElementById(type === 'momo' ? 'sum-badge-momo' : 'sum-badge-bench');
+      const arr=readWeightsFromDOM(type), sum=arr.reduce((a,b)=>a+(b.val||0),0);
+      const el=document.getElementById(type==='momo'?'sum-badge-momo':'sum-badge-bench');
       if(!el) return;
-      el.textContent = `合計：${(Math.round(sum*10)/10).toFixed(1)}%`;
+      el.textContent=`合計：${(Math.round(sum*10)/10).toFixed(1)}%`;
       el.classList.remove('good','warn');
-      if(Math.abs(sum - 100) <= 0.2) el.classList.add('good');
-      else el.classList.add('warn');
+      el.classList.add(Math.abs(sum-100)<=0.2?'good':'warn');
     }
 
-    // ✅ 計算加權平均配息率 (含模糊搜尋)
     function updateWeightedDiv(type) {
-        const arr = readWeightsFromDOM(type);
-        if(!arr || arr.length === 0) return;
-        
-        const totalWeight = arr.reduce((a,b) => a + (b.val||0), 0);
-        let weightedRate = 0;
-        let foundCount = 0;
-
-        arr.forEach(item => {
-            const w = item.val || 0;
-            const currentName = item.name;
-            const searchKey = currentName.toLowerCase().replace(/\s+/g, '').replace(/[-_()]/g, '');
-            
-            // 嘗試直接查找
-            let rate = fundConfigMap[searchKey];
-
-            // 找不到則模糊搜尋
-            if (rate === undefined) {
-                const fuzzyKey = Object.keys(fundConfigMap).find(k => 
-                    !k.startsWith("__RAW__") && (k.includes(searchKey) || searchKey.includes(k))
-                );
-                if(fuzzyKey) {
-                    rate = fundConfigMap[fuzzyKey];
-                    // console.log(`🔍 模糊比對成功: [${currentName}] -> ${rate}%`);
-                }
-            }
-
-            if (rate !== undefined) {
-                weightedRate += rate * w;
-                foundCount++;
-            } else {
-                console.warn(`⚠️ 找不到配息率: [${currentName}]`);
-            }
-        });
-
-        let finalRate = 0;
-        if(totalWeight > 0) {
-            finalRate = weightedRate / totalWeight; 
-        }
-
-        const inputId = type === 'momo' ? 'momo-div' : 'bench-div';
-        const inputEl = document.getElementById(inputId);
-        if(inputEl) {
-            inputEl.value = finalRate.toFixed(2);
-            inputEl.style.color = (foundCount === 0 && arr.length > 0) ? '#ff6b6b' : '';
-        }
+      const arr = readWeightsFromDOM(type);
+      if(!arr || arr.length===0) return;
+      const totalWeight = arr.reduce((a,b)=>a+(b.val||0),0);
+      let weightedRate = 0, foundCount = 0;
+      arr.forEach(item => {
+        const w = item.val||0;
+        const searchKey = item.name.toLowerCase().replace(/\s+/g,'').replace(/[-_()]/g,'');
+        let rate = fundConfigMap[searchKey];
+        if(rate===undefined){ const fk=Object.keys(fundConfigMap).find(k=>!k.startsWith("__RAW__")&&(k.includes(searchKey)||searchKey.includes(k))); if(fk) rate=fundConfigMap[fk]; }
+        if(rate!==undefined){ weightedRate+=rate*w; foundCount++; }
+      });
+      const finalRate = totalWeight>0 ? weightedRate/totalWeight : 0;
+      const inputEl = document.getElementById(type==='momo'?'momo-div':'bench-div');
+      if(inputEl){ inputEl.value=finalRate.toFixed(2); inputEl.style.color=(foundCount===0&&arr.length>0)?'#ff6b6b':''; }
     }
 
     function normalizeWeightsTo100(type, changedName=null){
-      const arr = readWeightsFromDOM(type);
-      if(arr.length === 0) { renderSelectionPreview(); return; }
-
-      const locked = arr.filter(x=>x.locked);
-      const unlocked = arr.filter(x=>!x.locked);
-
-      let lockedSum = locked.reduce((a,b)=>a + (b.val||0), 0);
-      lockedSum = Math.max(0, lockedSum);
-
-      if(lockedSum > 100){
-        const ratio = 100 / lockedSum;
-        locked.forEach(it => writeWeightToDOM(it, (it.val||0) * ratio));
-        unlocked.forEach(it => writeWeightToDOM(it, 0));
-        syncStateFromDOM(type);
-        renderSelectionPreview();
-        updateWeightedDiv(type); // ✅ 更新配息
-        return;
-      }
-
-      const budget = 100 - lockedSum;
-      if(unlocked.length === 0){
-        syncStateFromDOM(type);
-        renderSelectionPreview();
-        updateWeightedDiv(type); // ✅ 更新配息
-        return;
-      }
-
-      let fixedName = changedName && unlocked.some(x=>x.name===changedName) ? changedName : null;
-
+      const arr=readWeightsFromDOM(type);
+      if(arr.length===0){ renderSelectionPreview(); return; }
+      const locked=arr.filter(x=>x.locked), unlocked=arr.filter(x=>!x.locked);
+      let lockedSum=Math.max(0,locked.reduce((a,b)=>a+(b.val||0),0));
+      if(lockedSum>100){ const ratio=100/lockedSum; locked.forEach(it=>writeWeightToDOM(it,(it.val||0)*ratio)); unlocked.forEach(it=>writeWeightToDOM(it,0)); syncStateFromDOM(type); renderSelectionPreview(); updateWeightedDiv(type); return; }
+      const budget=100-lockedSum;
+      if(unlocked.length===0){ syncStateFromDOM(type); renderSelectionPreview(); updateWeightedDiv(type); return; }
+      let fixedName=changedName&&unlocked.some(x=>x.name===changedName)?changedName:null;
       if(fixedName){
-        const fixedItem = unlocked.find(x=>x.name===fixedName);
-        let fixedVal = Math.min(Math.max(fixedItem.val||0, 0), budget);
-        writeWeightToDOM(fixedItem, fixedVal);
-
-        const others = unlocked.filter(x=>x.name!==fixedName);
-        if(others.length === 0){
-          writeWeightToDOM(fixedItem, budget);
-          syncStateFromDOM(type);
-          renderSelectionPreview();
-          updateWeightedDiv(type); // ✅ 更新配息
-          return;
-        }
-
-        const otherSum = others.reduce((a,b)=>a+(b.val||0),0);
-        const remain = Math.max(0, budget - fixedVal);
-
-        if(otherSum <= 0){
-          const each = remain / others.length;
-          others.forEach(it => writeWeightToDOM(it, each));
-        } else {
-          others.forEach(it => writeWeightToDOM(it, (it.val||0) / otherSum * remain));
-        }
+        const fi=unlocked.find(x=>x.name===fixedName);
+        let fv=Math.min(Math.max(fi.val||0,0),budget);
+        writeWeightToDOM(fi,fv);
+        const others=unlocked.filter(x=>x.name!==fixedName);
+        if(others.length===0){ writeWeightToDOM(fi,budget); syncStateFromDOM(type); renderSelectionPreview(); updateWeightedDiv(type); return; }
+        const os=others.reduce((a,b)=>a+(b.val||0),0), remain=Math.max(0,budget-fv);
+        if(os<=0) others.forEach(it=>writeWeightToDOM(it,remain/others.length));
+        else others.forEach(it=>writeWeightToDOM(it,(it.val||0)/os*remain));
       } else {
-        const sumU = unlocked.reduce((a,b)=>a+(b.val||0),0);
-        if(sumU <= 0){
-          const each = budget / unlocked.length;
-          unlocked.forEach(it => writeWeightToDOM(it, each));
-        } else {
-          unlocked.forEach(it => writeWeightToDOM(it, (it.val||0) / sumU * budget));
-        }
+        const sumU=unlocked.reduce((a,b)=>a+(b.val||0),0);
+        if(sumU<=0) unlocked.forEach(it=>writeWeightToDOM(it,budget/unlocked.length));
+        else unlocked.forEach(it=>writeWeightToDOM(it,(it.val||0)/sumU*budget));
       }
-
-      syncStateFromDOM(type);
-      renderSelectionPreview();
-      updateWeightedDiv(type); // ✅ 更新配息
+      syncStateFromDOM(type); renderSelectionPreview(); updateWeightedDiv(type);
     }
 
-    function onWeightChange(type, name){
-      syncStateFromDOM(type);
-      normalizeWeightsTo100(type, name);
-      update();
-    }
-    function onLockToggle(type){
-      syncStateFromDOM(type);
-      normalizeWeightsTo100(type, null);
-      update();
-    }
+    function onWeightChange(type,name){ syncStateFromDOM(type); normalizeWeightsTo100(type,name); update(); }
+    function onLockToggle(type){ syncStateFromDOM(type); normalizeWeightsTo100(type,null); update(); }
 
     function generateWeightInputs(type, names) {
-      const containerId = type === 'momo' ? 'weights-container' : 'weights-container-bench';
-      const areaId = type === 'momo' ? 'dynamic-weights-area' : 'dynamic-weights-area-bench';
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-      if (names.length <= 0) {
-        document.getElementById(areaId).style.display = 'none';
-        setSumBadge(type);
-        renderSelectionPreview();
-        return;
-      }
-
-      const avg = (100 / names.length);
-      names.forEach(n => {
-        if(!weightState[type].has(n)){
-          weightState[type].set(n, { value: avg, locked: false });
-        }
-      });
-
-      names.forEach(n => {
-        const st = weightState[type].get(n) || { value: avg, locked: false };
-
-        const row = document.createElement('div');
-        row.className = 'weight-row';
-        row.dataset.name = n;
-
-        row.innerHTML = `
-          <label title="${n}">${n}</label>
-          <input type="number" class="weight-input" value="${(Math.round((st.value||0)*10)/10).toFixed(1)}" step="0.1" />
-          <div class="weight-lock" title="鎖定此比例">
-            <input type="checkbox" class="lock-chk" ${st.locked ? 'checked' : ''} />
-            <span>🔒</span>
-          </div>
-        `;
-
-        const input = row.querySelector('.weight-input');
-        const lock = row.querySelector('.lock-chk');
-        input.addEventListener('change', () => onWeightChange(type, n));
-        lock.addEventListener('change', () => onLockToggle(type));
+      const containerId=type==='momo'?'weights-container':'weights-container-bench';
+      const areaId=type==='momo'?'dynamic-weights-area':'dynamic-weights-area-bench';
+      const container=document.getElementById(containerId);
+      container.innerHTML='';
+      if(names.length<=0){ document.getElementById(areaId).style.display='none'; setSumBadge(type); renderSelectionPreview(); return; }
+      const avg=100/names.length;
+      names.forEach(n=>{ if(!weightState[type].has(n)) weightState[type].set(n,{value:avg,locked:false}); });
+      names.forEach(n=>{
+        const st=weightState[type].get(n)||{value:avg,locked:false};
+        const row=document.createElement('div'); row.className='weight-row'; row.dataset.name=n;
+        row.innerHTML=`<label title="${n}">${n}</label><input type="number" class="weight-input" value="${(Math.round((st.value||0)*10)/10).toFixed(1)}" step="0.1" /><div class="weight-lock" title="鎖定此比例"><input type="checkbox" class="lock-chk" ${st.locked?'checked':''} /><span>🔒</span></div>`;
+        row.querySelector('.weight-input').addEventListener('change',()=>onWeightChange(type,n));
+        row.querySelector('.lock-chk').addEventListener('change',()=>onLockToggle(type));
         container.appendChild(row);
       });
-
-      document.getElementById(areaId).style.display = 'block';
-      syncStateFromDOM(type);
-      renderSelectionPreview();
+      document.getElementById(areaId).style.display='block';
+      syncStateFromDOM(type); renderSelectionPreview();
     }
 
     function getWeights(type) {
-      const names = type === 'momo' ? momoFundNames : benchFundNames;
-      if (names.length === 0) return [];
-      const arr = readWeightsFromDOM(type);
-      const map = new Map(arr.map(x => [x.name, x.val]));
-      const w = names.map(n => Math.max(0, map.get(n) || 0));
-      const sum = w.reduce((a,b)=>a+b,0);
-      if(sum <= 0) return new Array(names.length).fill(1/names.length);
-      return w.map(x => x/sum);
+      const names=type==='momo'?momoFundNames:benchFundNames;
+      if(names.length===0) return [];
+      const arr=readWeightsFromDOM(type), map=new Map(arr.map(x=>[x.name,x.val]));
+      const w=names.map(n=>Math.max(0,map.get(n)||0)), sum=w.reduce((a,b)=>a+b,0);
+      if(sum<=0) return new Array(names.length).fill(1/names.length);
+      return w.map(x=>x/sum);
     }
 
     function renderSelectionPreview(){
-      const pillA = document.getElementById('sel-pill-a');
-      const pillB = document.getElementById('sel-pill-b');
-      const listA = document.getElementById('sel-list-a');
-      const listB = document.getElementById('sel-list-b');
-      if(!pillA || !pillB || !listA || !listB) return;
-
-      function build(type){
-        const names = type === 'momo' ? momoFundNames : benchFundNames;
-        const arr = readWeightsFromDOM(type).map(x => ({ name:x.name, w: (x.val||0) }));
-        const map = new Map(arr.map(x => [x.name, x.w]));
-        const items = names.map(n => ({ name:n, w: (map.get(n) ?? 0) }));
-        const sum = items.reduce((a,b)=>a+b.w,0);
-        return { items, sum, count: names.length };
-      }
-
-      const A = build('momo');
-      const B = build('bench');
-
-      pillA.textContent = `已選 ${A.count}｜合計 ${A.sum.toFixed(1)}%`;
-      pillB.textContent = `已選 ${B.count}｜合計 ${B.sum.toFixed(1)}%`;
-
-      function renderList(el, items){
-        if(!items || items.length === 0){
-          el.innerHTML = `<div class="sel-empty">尚未選擇基金</div>`;
-          return;
-        }
-        el.innerHTML = items.map(it => `
-          <div class="sel-row">
-            <div class="sel-name" title="${it.name}">${it.name}</div>
-            <div class="sel-w">${(Math.round((it.w||0)*10)/10).toFixed(1)}%</div>
-          </div>
-        `).join('');
-      }
-
-      renderList(listA, A.items);
-      renderList(listB, B.items);
+      const pillA=document.getElementById('sel-pill-a'), pillB=document.getElementById('sel-pill-b');
+      const listA=document.getElementById('sel-list-a'), listB=document.getElementById('sel-list-b');
+      if(!pillA||!pillB||!listA||!listB) return;
+      function build(type){ const names=type==='momo'?momoFundNames:benchFundNames; const arr=readWeightsFromDOM(type).map(x=>({name:x.name,w:x.val||0})); const map=new Map(arr.map(x=>[x.name,x.w])); const items=names.map(n=>({name:n,w:map.get(n)??0})); return {items,sum:items.reduce((a,b)=>a+b.w,0),count:names.length}; }
+      const A=build('momo'), B=build('bench');
+      pillA.textContent=`已選 ${A.count}｜合計 ${A.sum.toFixed(1)}%`;
+      pillB.textContent=`已選 ${B.count}｜合計 ${B.sum.toFixed(1)}%`;
+      function renderList(el,items){ if(!items||items.length===0){ el.innerHTML='<div class="sel-empty">尚未選擇基金</div>'; return; } el.innerHTML=items.map(it=>`<div class="sel-row"><div class="sel-name" title="${it.name}">${it.name}</div><div class="sel-w">${(Math.round((it.w||0)*10)/10).toFixed(1)}%</div></div>`).join(''); }
+      renderList(listA,A.items); renderList(listB,B.items);
     }
 
-    function createVChart(ctx, labels, datasets) {
-      return new Chart(ctx, {
-        type:'line',
-        data:{ labels, datasets },
-        options:{
-          responsive:true, maintainAspectRatio:false,
-          scales:{ x:{ display:false }, y:{ grid:{color:'rgba(255,255,255,0.06)'}, ticks:{display:false} } },
-          plugins:{ legend:{display:false}, tooltip:{enabled:false} }
-        }
-      });
-    }
+    function createVChart(ctx,labels,datasets){ return new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,0.06)'},ticks:{display:false}}},plugins:{legend:{display:false},tooltip:{enabled:false}}}}); }
 
     function updateValidationChart(type){
-      const id = type==='bench' ? 'valBenchChart' : 'valMomoChart';
-      const names = type==='bench' ? benchFundNames : momoFundNames;
-      const canvas = document.getElementById(id);
+      const id=type==='bench'?'valBenchChart':'valMomoChart';
+      const names=type==='bench'?benchFundNames:momoFundNames;
+      const canvas=document.getElementById(id);
       if(!canvas) return;
-      const ctx = canvas.getContext('2d');
-
-      if(!names || names.length === 0 || !rawGlobalData || rawGlobalData.length === 0){
-        if(type==='bench' && vBenchChart) {vBenchChart.destroy(); vBenchChart=null;}
-        if(type==='momo' && vMomoChart) {vMomoChart.destroy(); vMomoChart=null;}
+      const ctx=canvas.getContext('2d');
+      if(!names||names.length===0||!rawGlobalData||rawGlobalData.length===0){
+        if(type==='bench'&&vBenchChart){vBenchChart.destroy();vBenchChart=null;}
+        if(type==='momo'&&vMomoChart){vMomoChart.destroy();vMomoChart=null;}
         return;
       }
-
-      const startIdxs = [];
-      for(const n of names){
-        let s=-1;
-        for(let k=0;k<rawGlobalData.length;k++){
-          const v = rawGlobalData[k].valsFilled[n];
-          if(v!==null && v>0){ s=k; break; }
-        }
-        if(s>=0) startIdxs.push(s);
-      }
-      const globalStart = startIdxs.length ? Math.min(...startIdxs) : 0;
-
-      const sliced = rawGlobalData.slice(globalStart);
-      const labels = sliced.map(r => r.dateKey);
-
-      const momoColors  = ['#F9E27C','#F87171','#34D399','#A78BFA','#FB923C','#FFFFFF'];
-      const benchColors = ['#38BDF8','#A78BFA','#34D399','#F9E27C','#FB923C','#F87171','#FFFFFF'];
-
-      const ds = names.map((n,i)=>{
-        let startVal=null, startPos=-1;
-        for(let k=0;k<sliced.length;k++){
-          const v = sliced[k].valsFilled[n];
-          if(v!==null && v>0){ startVal=v; startPos=k; break; }
-        }
-
-        const data = sliced.map((row,idx)=>{
-          if(startVal===null) return null;
-          if(idx < startPos) return null;
-          const v = row.valsFilled[n];
-          if(v===null) return null;
-          return ((v-startVal)/startVal)*100;
-        });
-
-        const color = (type==='bench') ? benchColors[i % benchColors.length] : momoColors[i % momoColors.length];
-        return { label:n, data, borderColor:color, borderWidth:1.6, pointRadius:0, tension:0.12, spanGaps:true };
+      const startIdxs=[];
+      for(const n of names){ let s=-1; for(let k=0;k<rawGlobalData.length;k++){const v=rawGlobalData[k].valsFilled[n]; if(v!==null&&v>0){s=k;break;}} if(s>=0) startIdxs.push(s); }
+      const globalStart=startIdxs.length?Math.min(...startIdxs):0;
+      const sliced=rawGlobalData.slice(globalStart), labels=sliced.map(r=>r.dateKey);
+      const momoColors=['#F9E27C','#F87171','#34D399','#A78BFA','#FB923C','#FFFFFF'];
+      const benchColors=['#38BDF8','#A78BFA','#34D399','#F9E27C','#FB923C','#F87171','#FFFFFF'];
+      const ds=names.map((n,i)=>{
+        let startVal=null,startPos=-1;
+        for(let k=0;k<sliced.length;k++){const v=sliced[k].valsFilled[n];if(v!==null&&v>0){startVal=v;startPos=k;break;}}
+        const data=sliced.map((row,idx)=>{if(startVal===null||idx<startPos) return null; const v=row.valsFilled[n]; return v===null?null:((v-startVal)/startVal)*100;});
+        const color=(type==='bench')?benchColors[i%benchColors.length]:momoColors[i%momoColors.length];
+        return {label:n,data,borderColor:color,borderWidth:1.6,pointRadius:0,tension:0.12,spanGaps:true};
       });
-
-      if(type==='bench'){
-        if(vBenchChart) vBenchChart.destroy();
-        vBenchChart = createVChart(ctx, labels, ds);
-      }else{
-        if(vMomoChart) vMomoChart.destroy();
-        vMomoChart = createVChart(ctx, labels, ds);
-      }
+      if(type==='bench'){if(vBenchChart) vBenchChart.destroy(); vBenchChart=createVChart(ctx,labels,ds);}
+      else{if(vMomoChart) vMomoChart.destroy(); vMomoChart=createVChart(ctx,labels,ds);}
     }
 
-    function calculateMaxDrawdown(prices) {
-      if (!prices || prices.length < 2) return 0;
-      let maxPeak = prices[0];
-      let maxDrawdown = 0;
-      for (let p of prices) {
-        if (p > maxPeak) maxPeak = p;
-        const dd = (p - maxPeak) / maxPeak;
-        if (dd < maxDrawdown) maxDrawdown = dd;
+    function calculateMaxDrawdown(prices){ if(!prices||prices.length<2) return 0; let maxPeak=prices[0],maxDD=0; for(let p of prices){if(p>maxPeak)maxPeak=p; const dd=(p-maxPeak)/maxPeak; if(dd<maxDD)maxDD=dd;} return maxDD*100; }
+
+    function getDrawdownDetails(prices,dates){
+      if(!prices||prices.length<2) return null;
+      let maxPeak=-Infinity,peakDate="-",maxDD=0,troughVal=-Infinity,troughDate="-",peakAtMaxDD=-Infinity,peakDateAtMaxDD="-";
+      for(let i=0;i<prices.length;i++){
+        const p=prices[i],d=dates[i];
+        if(p>maxPeak){maxPeak=p;peakDate=d;}
+        const dd=(p-maxPeak)/maxPeak;
+        if(dd<maxDD){maxDD=dd;troughVal=p;troughDate=d;peakAtMaxDD=maxPeak;peakDateAtMaxDD=peakDate;}
       }
-      return maxDrawdown * 100;
+      return {mddPct:maxDD*100,peakVal:peakAtMaxDD,peakDate:peakDateAtMaxDD,troughVal,troughDate};
     }
 
-    function processHistoryPrincipal(p0, lookbackYears){
-      if(parsedMomoData.length === 0 || parsedBenchData.length === 0) {
-        return { labels:[], momoPrincipal:[], benchPrincipal:[], lastDate:new Date() };
+    function processHistoryPrincipal(p0,lookbackYears){
+      if(parsedMomoData.length===0||parsedBenchData.length===0) return {labels:[],momoPrincipal:[],benchPrincipal:[],lastDate:new Date()};
+      const wMomo=getWeights('momo'),wBench=getWeights('bench'),combined=[];
+      for(let k=0;k<parsedMomoData.length;k++){
+        const mRow=parsedMomoData[k],bRow=parsedBenchData[k];
+        const mValid=mRow.vals.length===0?false:mRow.vals.every(v=>v!==null&&v>0);
+        const bValid=bRow.vals.length===0?false:bRow.vals.every(v=>v!==null&&v>0);
+        if(mValid&&bValid) combined.push({date:mRow.date,dt:mRow.dt,mVals:mRow.vals,bVals:bRow.vals});
       }
-      const wMomo = getWeights('momo');
-      const wBench = getWeights('bench');
-      const combined = [];
-
-      for(let k=0; k<parsedMomoData.length; k++){
-        const mRow = parsedMomoData[k];
-        const bRow = parsedBenchData[k];
-        const mValid = (mRow.vals.length===0) ? false : mRow.vals.every(v => v!==null && v>0);
-        const bValid = (bRow.vals.length===0) ? false : bRow.vals.every(v => v!==null && v>0);
-        if(mValid && bValid){
-          combined.push({ date: mRow.date, dt: mRow.dt, mVals: mRow.vals, bVals: bRow.vals });
-        }
+      if(combined.length<2) return {labels:[],momoPrincipal:[],benchPrincipal:[],lastDate:new Date()};
+      let cut=combined;
+      if(lookbackYears&&lookbackYears>0){
+        const lastDt=combined[combined.length-1].dt;
+        const cutoff=new Date(lastDt.getFullYear(),lastDt.getMonth(),lastDt.getDate()-Math.round(lookbackYears*365));
+        const sliced=combined.filter(r=>r.dt>=cutoff);
+        if(sliced.length>=2) cut=sliced;
       }
-      if(combined.length < 2) return { labels:[], momoPrincipal:[], benchPrincipal:[], lastDate:new Date() };
-
-      let cut = combined;
-      if(lookbackYears && lookbackYears > 0){
-        const lastDt = combined[combined.length-1].dt;
-        const cutoff = new Date(lastDt.getFullYear(), lastDt.getMonth(), lastDt.getDate() - Math.round(lookbackYears*365));
-        const sliced = combined.filter(r => r.dt >= cutoff);
-        if(sliced.length >= 2) cut = sliced;
-      }
-
-      const mBase = cut[0].mVals;
-      const bBase = cut[0].bVals;
-
-      function calcIndex(vals, baseVals, weights){
-        let sum = 0;
-        for(let i=0; i<vals.length; i++) sum += (vals[i] / baseVals[i]) * (weights[i] ?? 0);
-        return sum;
-      }
-
-      const momoIdx = cut.map(r => calcIndex(r.mVals, mBase, wMomo));
-      const benchIdx = cut.map(r => calcIndex(r.bVals, bBase, wBench));
-
-      return {
-        labels: cut.map(r => r.date),
-        momoPrincipal: momoIdx.map(x => p0 * x),
-        benchPrincipal: benchIdx.map(x => p0 * x),
-        lastDate: cut[cut.length-1].dt
-      };
+      const mBase=cut[0].mVals,bBase=cut[0].bVals;
+      function calcIndex(vals,baseVals,weights){ let sum=0; for(let i=0;i<vals.length;i++) sum+=(vals[i]/baseVals[i])*(weights[i]??0); return sum; }
+      const momoIdx=cut.map(r=>calcIndex(r.mVals,mBase,wMomo));
+      const benchIdx=cut.map(r=>calcIndex(r.bVals,bBase,wBench));
+      return {labels:cut.map(r=>r.date),momoPrincipal:momoIdx.map(x=>p0*x),benchPrincipal:benchIdx.map(x=>p0*x),lastDate:cut[cut.length-1].dt};
     }
 
-    // ✅ 新增：模擬不同權重下的投資組合結果
-    function calculateScenario(weightFund0) {
-        // 1. 計算 MOMO 組合的模擬權重 (第一支基金權重為 weightFund0，其餘按原比例分配)
-        if(momoFundNames.length === 0) return { finalWealth:0, totalDiv:0 };
-        
-        let simWeights = [];
-        if(momoFundNames.length === 1) {
-            simWeights = [1]; // 只有一支基金，權重強制 100% (雖然使用者想看 0~100%，但邏輯上必須是100%)
-        } else {
-            // 第一支固定為 weightFund0
-            simWeights.push(weightFund0);
-            
-            // 剩下的權重 (1 - weightFund0) 分配給其餘基金
-            const remainingBudget = 1 - weightFund0;
-            
-            // 取得目前 UI 上「其他基金」的權重比例
-            const currentWeights = getWeights('momo'); // 例如 [0.6, 0.4]
-            const othersOriginalSum = currentWeights.slice(1).reduce((a,b)=>a+b, 0);
-            
-            if(othersOriginalSum > 0) {
-                // 按比例分配
-                for(let i=1; i<currentWeights.length; i++) {
-                    const normalizedW = currentWeights[i] / othersOriginalSum;
-                    simWeights.push(normalizedW * remainingBudget);
-                }
-            } else {
-                // 如果其他基金原本都是 0，則平均分配剩餘預算
-                const otherCount = momoFundNames.length - 1;
-                for(let i=0; i<otherCount; i++) {
-                    simWeights.push(remainingBudget / otherCount);
-                }
-            }
-        }
-
-        // 2. 模擬歷史走勢 (複製 processHistoryPrincipal 的邏輯，但使用 simWeights)
-        const p0 = parseFloat(document.getElementById('p0').value)||0;
-        const lookbackYears = parseInt(document.getElementById('entry-window').value)||0;
-        
-        // --- 簡化版 History Logic ---
-        let cut = [];
-        // 為了效能，這裡假設 parsedMomoData 已經 ready
-        const combined = [];
-        for(let k=0; k<parsedMomoData.length; k++){
-            const mRow = parsedMomoData[k];
-            // 這裡不需要 bench 也能算 momo，但為了時間對齊還是檢查一下
-            if(mRow.vals.length > 0 && mRow.vals.every(v=>v!==null && v>0)){
-                combined.push({ mVals: mRow.vals, dt: mRow.dt });
-            }
-        }
-        if(combined.length < 2) return { finalWealth:0, totalDiv:0 };
-
-        // 處理區間
-        cut = combined;
-        if(lookbackYears > 0){
-            const lastDt = combined[combined.length-1].dt;
-            const cutoff = new Date(lastDt.getFullYear(), lastDt.getMonth(), lastDt.getDate() - Math.round(lookbackYears*365));
-            cut = combined.filter(r => r.dt >= cutoff);
-        }
-        if(cut.length < 2) return { finalWealth:0, totalDiv:0 };
-
-        // 計算歷史 Index
-        const mBase = cut[0].mVals;
-        const momoEndIdx = cut.map(r => {
-            let sum = 0;
-            for(let i=0; i<r.mVals.length; i++) sum += (r.mVals[i] / mBase[i]) * (simWeights[i] ?? 0);
-            return sum;
-        });
-        const currentPrincipal = p0 * momoEndIdx[momoEndIdx.length-1]; // 歷史期末本金
-
-        // 3. 計算 CAGR (針對這個組合)
-        const startDate = cut[0].dt;
-        const endDate = cut[cut.length-1].dt;
-        const yearsDiff = (endDate - startDate) / (1000 * 3600 * 24 * 365.25);
-        let simCagr = 0;
-        if(yearsDiff > 0.1) {
-            simCagr = Math.pow(momoEndIdx[momoEndIdx.length-1], 1/yearsDiff) - 1;
-        }
-
-        // 4. 計算配息率 (針對這個組合)
-        let simDivRate = 0;
-        for(let i=0; i<momoFundNames.length; i++) {
-            const name = momoFundNames[i];
-            const searchKey = name.toLowerCase().replace(/\s+/g, '').replace(/[-_()]/g, '');
-            // 模糊搜尋邏輯
-            let rate = fundConfigMap[searchKey];
-            if(rate === undefined) {
-                const fuzzyKey = Object.keys(fundConfigMap).find(k => !k.startsWith("__RAW__") && (k.includes(searchKey) || searchKey.includes(k)));
-                if(fuzzyKey) rate = fundConfigMap[fuzzyKey];
-            }
-            if(rate !== undefined) simDivRate += rate * simWeights[i];
-        }
-
-        // 5. 推演未來 (Projection)
-        const projYears = parseInt(document.getElementById('proj-years').value)||3;
-        const futurePrincipal = currentPrincipal * Math.pow(1 + simCagr, projYears); // 複利推演
-
-        // 6. 計算總領息 (歷史+未來)
-        // 簡單估算：總年數 * 本金 * 配息率 (這只是約略值，與主圖邏輯一致)
-        const totalYears = yearsDiff + projYears;
-        const totalDiv = p0 * (simDivRate/100) * totalYears;
-
-        return {
-            finalWealth: futurePrincipal + totalDiv, // 含息總資產
-            totalDiv: totalDiv
-        };
+    function calculateScenario(weightFund0){
+      if(momoFundNames.length===0) return {finalWealth:0,totalDiv:0};
+      let simWeights=[];
+      if(momoFundNames.length===1){ simWeights=[1]; }
+      else{
+        simWeights.push(weightFund0);
+        const cw=getWeights('momo'),oos=cw.slice(1).reduce((a,b)=>a+b,0),rb=1-weightFund0;
+        if(oos>0) for(let i=1;i<cw.length;i++) simWeights.push((cw[i]/oos)*rb);
+        else{ const oc=momoFundNames.length-1; for(let i=0;i<oc;i++) simWeights.push(rb/oc); }
+      }
+      const p0=parseFloat(document.getElementById('p0').value)||0;
+      const lookbackYears=parseInt(document.getElementById('entry-window').value)||0;
+      const projYears=parseInt(document.getElementById('proj-years').value)||3;
+      let simDivRate=0;
+      for(let i=0;i<momoFundNames.length;i++){
+        const name=momoFundNames[i],sk=name.toLowerCase().replace(/\s+/g,'').replace(/[-_()]/g,'');
+        let rate=fundConfigMap[sk];
+        if(rate===undefined){const fk=Object.keys(fundConfigMap).find(k=>!k.startsWith("__RAW__")&&(k.includes(sk)||sk.includes(k)));if(fk) rate=fundConfigMap[fk];}
+        if(rate!==undefined) simDivRate+=rate*simWeights[i];
+      }
+      let cut=[],combined=[];
+      for(let k=0;k<parsedMomoData.length;k++){const mRow=parsedMomoData[k];if(mRow.vals.length>0&&mRow.vals.every(v=>v!==null&&v>0)) combined.push({mVals:mRow.vals,dt:mRow.dt,dateKey:mRow.dateKey});}
+      if(combined.length<2) return {finalWealth:0,totalDiv:0};
+      if(lookbackYears>0){const ld=combined[combined.length-1].dt;const co=new Date(ld.getFullYear(),ld.getMonth(),ld.getDate()-Math.round(lookbackYears*365));cut=combined.filter(r=>r.dt>=co);}
+      if(cut.length<2) return {finalWealth:0,totalDiv:0};
+      const mBase=cut[0].mVals;
+      let accDiv=0;
+      const startIdxVal=cut[0].mVals.reduce((sum,v,i)=>sum+(v/mBase[i])*(simWeights[i]??0),0);
+      const endIdxVal=cut[cut.length-1].mVals.reduce((sum,v,i)=>sum+(v/mBase[i])*(simWeights[i]??0),0);
+      for(let i=1;i<cut.length;i++){const d1=cut[i-1].dt,d2=cut[i].dt;let dd=1;const diff=(d2-d1)/(1000*60*60*24);if(Number.isFinite(diff)&&diff>0)dd=diff;accDiv+=(p0*(simDivRate/100)/365)*dd;}
+      const currentPrincipal=p0*(endIdxVal/startIdxVal);
+      const startDate=cut[0].dt,endDate=cut[cut.length-1].dt;
+      const yearsDiff=(endDate-startDate)/(1000*3600*24*365.25);
+      let simCagr=0;
+      if(yearsDiff>0.1) simCagr=Math.pow(endIdxVal/startIdxVal,1/yearsDiff)-1;
+      const futurePrincipal=currentPrincipal*Math.pow(1+simCagr,projYears);
+      const futureDiv=p0*(simDivRate/100)*projYears;
+      return {finalWealth:futurePrincipal+accDiv+futureDiv,totalDiv:accDiv+futureDiv};
     }
 
-    // ✅ 新增：更新比值走勢圖
-    function updateRatioChart() {
-        if(momoFundNames.length === 0) return;
-
-        // 1. 取得基準 (Benchmark) 的固定數據 (不隨 X 軸變動)
-        // 為了準確，我們直接用 buildSeries 跑一次目前的 Benchmark 結果
-        // 這裡稍微偷懶，直接讀取 UI 上的最終數字 (因為 update() 已經跑完了)
-        // 但為了精確，還是建議重新計算。這裡採用計算 B 的一次性邏輯。
-        // ... (簡化起見，我們假設 Benchmark 值在整個 X 軸是固定的)
-        
-        // 重新呼叫一次 buildSeries 取得當前的 Bench 數值 (因為 buildSeries 會讀取 DOM，這是最準的)
-        // 注意：buildSeries 會更新 UI，我們不希望它更新 UI，所以這裡單獨模擬 Benchmark
-        // 實作上，我們可以在 calculateScenario 裡面把 Bench 也算一次 (權重固定)
-        
-        // 先算一次 Benchmark (權重不變)
-        // 其實可以直接用主圖的數據，因為 Benchmark 不會因為 Slider 變動
-        const benchTotalStr = document.getElementById('bench-total').innerText.replace(/[$,\s]/g,'');
-        const benchDivStr = document.getElementById('bench-div-amount').innerText.replace(/[$,\s]/g,'');
-        const benchTotal = parseFloat(benchTotalStr) || 0;
-        const benchDiv = parseFloat(benchDivStr) || 0;
-
-        const xLabels = [];
-        const yValues = [];
-
-        // 2. 迴圈 0% ~ 100%
-        for(let w=0; w<=1.01; w+=0.1) { // 0, 0.1, ... 1.0
-            const weight = Math.min(w, 1); // 修正浮點數誤差
-            const label = Math.round(weight * 100) + "%";
-            xLabels.push(label);
-
-            const momoResult = calculateScenario(weight);
-            
-            const leadValue = momoResult.finalWealth - benchTotal;
-            const diffDiv = momoResult.totalDiv - benchDiv;
-            
-            let ratio = 0;
-            if(Math.abs(diffDiv) > 1) {
-                ratio = Math.abs(leadValue / diffDiv);
-            }
-            yValues.push(ratio);
-        }
-
-        // 3. 繪圖
-        const ctx = document.getElementById('ratioChart').getContext('2d');
-        if(ratioChart) ratioChart.destroy();
-
-        // 漸層色
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(192, 132, 252, 0.5)'); // Purple
-        gradient.addColorStop(1, 'rgba(192, 132, 252, 0.0)');
-
-        ratioChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: xLabels,
-                datasets: [{
-                    label: '領先/領息差額比 (倍)',
-                    data: yValues,
-                    borderColor: '#C084FC', // Purple
-                    backgroundColor: gradient,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: '#fff',
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            title: (c) => `配息基金權重：${c[0].label}`,
-                            label: (c) => `比值：${c.raw.toFixed(2)} 倍`
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#94A3B8' }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#94A3B8' },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+    function updateRatioChart(benchTotalWealth,benchTotalDiv){
+      if(momoFundNames.length===0) return;
+      const p0=parseFloat(document.getElementById('p0').value)||0;
+      const safeBenchTotal=benchTotalWealth||p0, safeBenchDiv=benchTotalDiv||0;
+      const xLabels=[],yValues=[];
+      for(let w=0;w<=1.01;w+=0.1){
+        const weight=Math.min(w,1);
+        xLabels.push(Math.round(weight*100)+"%");
+        const r=calculateScenario(weight);
+        const lead=r.finalWealth-safeBenchTotal, diffDiv=r.totalDiv-safeBenchDiv;
+        yValues.push(Math.abs(diffDiv)>1?Math.abs(lead/diffDiv):0);
+      }
+      const ctx=document.getElementById('ratioChart').getContext('2d');
+      if(ratioChart) ratioChart.destroy();
+      const gradient=ctx.createLinearGradient(0,0,0,400);
+      gradient.addColorStop(0,'rgba(192,132,252,0.5)'); gradient.addColorStop(1,'rgba(192,132,252,0.0)');
+      ratioChart=new Chart(ctx,{type:'line',data:{labels:xLabels,datasets:[{label:'領先/領息差額比 (倍)',data:yValues,borderColor:'#C084FC',backgroundColor:gradient,borderWidth:3,fill:true,tension:0.3,pointBackgroundColor:'#fff',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{title:c=>`配息基金權重：${c[0].label}`,label:c=>`比值：${c.raw.toFixed(2)} 倍`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#94A3B8'}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#94A3B8'},beginAtZero:true}}}});
     }
 
-    function toggleFuture() {
-      showFuture = !showFuture;
-      const btn = document.getElementById('btn-toggle-future');
-      if (showFuture) { btn.innerText = "📊 隱藏未來推演線"; btn.style.color = "var(--gold-soft)"; }
-      else { btn.innerText = "📈 顯示未來推演線"; btn.style.color = "var(--muted)"; }
+    function toggleFuture(){
+      showFuture=!showFuture;
+      const btn=document.getElementById('btn-toggle-future');
+      if(showFuture){btn.innerText="📊 隱藏未來推演線";btn.style.color="var(--gold-soft)";}
+      else{btn.innerText="📈 顯示未來推演線";btn.style.color="var(--muted)";}
       update();
     }
 
-    // ✅ 修正版：自動計算歷史 CAGR 並填入，然後畫圖
     function buildSeries(){
-      const p0 = parseFloat(document.getElementById('p0').value)||0;
-      const years = parseInt(document.getElementById('proj-years').value)||3;
-      document.getElementById('year-display').innerText = years;
-      document.getElementById('year-badge').innerText = showFuture ? `第 ${years} 年` : "歷史尾端";
-
-      const lookbackYears = parseInt(document.getElementById('entry-window').value)||0;
-
-      // 1. 先取得歷史走勢數據
-      const hist = processHistoryPrincipal(p0, lookbackYears);
-      
-      // 2. ✅【新增邏輯】根據歷史數據計算 CAGR 並自動填入
-      if(hist.labels.length > 1) {
-          const startDate = parseDateLoose(hist.labels[0]);
-          const endDate = hist.lastDate instanceof Date ? hist.lastDate : parseDateLoose(hist.labels[hist.labels.length-1]);
-          
-          let yearsDiff = 0;
-          if(startDate && endDate) {
-              const diffTime = endDate.getTime() - startDate.getTime();
-              yearsDiff = diffTime / (1000 * 3600 * 24 * 365.25); // 換算成年
-          }
-
-          if(yearsDiff > 0.1) { // 至少要有0.1年才計算
-              // MOMO CAGR
-              const mStart = hist.momoPrincipal[0];
-              const mEnd = hist.momoPrincipal[hist.momoPrincipal.length-1];
-              const mCagr = (Math.pow(mEnd / mStart, 1 / yearsDiff) - 1) * 100;
-              
-              // Bench CAGR
-              const bStart = hist.benchPrincipal[0];
-              const bEnd = hist.benchPrincipal[hist.benchPrincipal.length-1];
-              const bCagr = (Math.pow(bEnd / bStart, 1 / yearsDiff) - 1) * 100;
-
-              // 填入 DOM
-              const mInput = document.getElementById('momo-cagr');
-              const bInput = document.getElementById('bench-cagr');
-              if(mInput) mInput.value = mCagr.toFixed(2);
-              if(bInput) bInput.value = bCagr.toFixed(2);
-          }
+      const p0=parseFloat(document.getElementById('p0').value)||0;
+      const years=parseInt(document.getElementById('proj-years').value)||3;
+      document.getElementById('year-display').innerText=years;
+      document.getElementById('year-badge').innerText=showFuture?`第 ${years} 年`:"歷史尾端";
+      const lookbackYears=parseInt(document.getElementById('entry-window').value)||0;
+      const hist=processHistoryPrincipal(p0,lookbackYears);
+      if(hist.labels.length>1){
+        const startDate=parseDateLoose(hist.labels[0]);
+        const endDate=hist.lastDate instanceof Date?hist.lastDate:parseDateLoose(hist.labels[hist.labels.length-1]);
+        let yearsDiff=0;
+        if(startDate&&endDate) yearsDiff=(endDate-startDate)/(1000*3600*24*365.25);
+        if(yearsDiff>0.1){
+          const mStart=hist.momoPrincipal[0],mEnd=hist.momoPrincipal[hist.momoPrincipal.length-1];
+          const bStart=hist.benchPrincipal[0],bEnd=hist.benchPrincipal[hist.benchPrincipal.length-1];
+          const mCagr=(Math.pow(mEnd/mStart,1/yearsDiff)-1)*100;
+          const bCagr=(Math.pow(bEnd/bStart,1/yearsDiff)-1)*100;
+          const mI=document.getElementById('momo-cagr'),bI=document.getElementById('bench-cagr');
+          if(mI) mI.value=mCagr.toFixed(2);
+          if(bI) bI.value=bCagr.toFixed(2);
+        }
       }
-
-      // 3. 重新讀取剛剛填入的 CAGR (用於繪製未來線)
-      const momoCagr = parseFloat(document.getElementById('momo-cagr').value)||0;
-      const momoDiv  = parseFloat(document.getElementById('momo-div').value)||0;
-      const benchCagr = parseFloat(document.getElementById('bench-cagr').value)||0;
-      const benchDiv  = parseFloat(document.getElementById('bench-div').value)||0;
-
-      const labels = hist.labels.slice();
-      const mp = hist.momoPrincipal.slice();
-      const bp = hist.benchPrincipal.slice();
-
-      if(labels.length === 0) {
-        return { labels:[], momoP:[0], benchP:[0], momoCumDiv:[0], benchCumDiv:[0], histLen:0, nowIdx:0, endIndex:0 };
-      }
-
-      const histLen = labels.length;
-      const nowIdx = histLen - 1;
-
-      const lastMp = mp[mp.length-1];
-      const lastBp = bp[bp.length-1];
-
-      if (showFuture) {
-        const totalDays = years * 365;
-        // 使用剛剛自動算出來的 CAGR 進行推演
-        const dailyM = Math.pow(1 + momoCagr/100, 1/365) - 1;
-        const dailyB = Math.pow(1 + benchCagr/100, 1/365) - 1;
-        let currMp = lastMp, currBp = lastBp;
-        const baseDt = hist.lastDate instanceof Date ? hist.lastDate : new Date();
-
-        for(let i=1; i<=totalDays; i++){
-          currMp *= (1 + dailyM); currBp *= (1 + dailyB);
-          if(i % 5 === 0 || i === totalDays){
-            const dt = new Date(baseDt.getFullYear(), baseDt.getMonth(), baseDt.getDate() + i);
+      const momoCagr=parseFloat(document.getElementById('momo-cagr').value)||0;
+      const momoDiv=parseFloat(document.getElementById('momo-div').value)||0;
+      const benchCagr=parseFloat(document.getElementById('bench-cagr').value)||0;
+      const benchDiv=parseFloat(document.getElementById('bench-div').value)||0;
+      const labels=hist.labels.slice(), mp=hist.momoPrincipal.slice(), bp=hist.benchPrincipal.slice();
+      if(labels.length===0) return {labels:[],momoP:[0],benchP:[0],momoCumDiv:[0],benchCumDiv:[0],histLen:0,nowIdx:0,endIndex:0};
+      const histLen=labels.length, nowIdx=histLen-1;
+      if(showFuture){
+        const totalDays=years*365;
+        const dailyM=Math.pow(1+momoCagr/100,1/365)-1, dailyB=Math.pow(1+benchCagr/100,1/365)-1;
+        let currMp=mp[mp.length-1], currBp=bp[bp.length-1];
+        const baseDt=hist.lastDate instanceof Date?hist.lastDate:new Date();
+        for(let i=1;i<=totalDays;i++){
+          currMp*=(1+dailyM); currBp*=(1+dailyB);
+          if(i%5===0||i===totalDays){
+            const dt=new Date(baseDt.getFullYear(),baseDt.getMonth(),baseDt.getDate()+i);
             labels.push(dateKey(dt)); mp.push(currMp); bp.push(currBp);
           }
         }
       }
-
-      const momoCumDiv = new Array(labels.length).fill(0);
-      const benchCumDiv = new Array(labels.length).fill(0);
-      let accM = 0, accB = 0;
-
-      for(let i=1; i<labels.length; i++){
-        let daysDiff = 1;
-        const d1 = parseDateLoose(labels[i-1]);
-        const d2 = parseDateLoose(labels[i]);
-        if(d1 && d2) {
-          const diff = (d2.getTime() - d1.getTime()) / (1000*60*60*24);
-          if(Number.isFinite(diff) && diff > 0) daysDiff = diff;
-        }
-
-        accM += (p0 * (momoDiv/100) / 365) * daysDiff;
-        accB += (p0 * (benchDiv/100) / 365) * daysDiff;
-
-        momoCumDiv[i] = accM;
-        benchCumDiv[i] = accB;
+      const momoCumDiv=new Array(labels.length).fill(0), benchCumDiv=new Array(labels.length).fill(0);
+      let accM=0,accB=0;
+      for(let i=1;i<labels.length;i++){
+        let daysDiff=1;
+        const d1=parseDateLoose(labels[i-1]),d2=parseDateLoose(labels[i]);
+        if(d1&&d2){const diff=(d2-d1)/(1000*60*60*24);if(Number.isFinite(diff)&&diff>0)daysDiff=diff;}
+        accM+=(p0*(momoDiv/100)/365)*daysDiff; accB+=(p0*(benchDiv/100)/365)*daysDiff;
+        momoCumDiv[i]=accM; benchCumDiv[i]=accB;
       }
-
-      return { labels, histLen, nowIdx, momoP: mp, benchP: bp, momoCumDiv, benchCumDiv, endIndex: labels.length - 1 };
+      return {labels,histLen,nowIdx,momoP:mp,benchP:bp,momoCumDiv,benchCumDiv,endIndex:labels.length-1};
     }
 
     function initMainChart(){
-      const ctx = document.getElementById("mainChart").getContext("2d");
-      mainChart = new Chart(ctx, {
-        type:'line',
-        data:{ labels:[], datasets:[] },
-        options:{
-          responsive:true, maintainAspectRatio:false,
-          interaction:{ mode:'index', intersect:false },
-          elements:{ point:{ radius:0, hoverRadius:5 } },
-          layout:{ padding:{ bottom: 34, left: 6, right: 8, top: 6 } },
-          scales:{
-            x:{
-              grid:{color:'rgba(255,255,255,0.05)'},
-              ticks:{
-                color:'#8aa0b8',
-                maxTicksLimit: 9,
-                autoSkip: true,
-                padding: 16,
-                maxRotation: 45,
-                minRotation: 35
-              }
-            },
-            y:{
-              grid:{color:'rgba(255,255,255,0.06)'},
-              ticks:{ color:'#8aa0b8', callback:(v)=> money(v).replace('$ ','$') }
-            }
-          },
-          plugins:{
-            legend:{ labels:{ color:'#c9d6e6', boxWidth:12, boxHeight:12, usePointStyle:true } },
-            tooltip:{ callbacks:{ label:(c)=> `${c.dataset.label}：${money(c.raw)}` } }
-          }
-        }
-      });
+      const ctx=document.getElementById("mainChart").getContext("2d");
+      mainChart=new Chart(ctx,{type:'line',data:{labels:[],datasets:[]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},elements:{point:{radius:0,hoverRadius:5}},layout:{padding:{bottom:34,left:6,right:8,top:6}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8aa0b8',maxTicksLimit:9,autoSkip:true,padding:16,maxRotation:45,minRotation:35}},y:{grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#8aa0b8',callback:v=>money(v).replace('$ ','$')}}},plugins:{legend:{labels:{color:'#c9d6e6',boxWidth:12,boxHeight:12,usePointStyle:true}},tooltip:{callbacks:{label:c=>`${c.dataset.label}：${money(c.raw)}`}}}}});
     }
 
-    let leadAnim = null;
-    function animateNum(el, from, to, ms=520){
+    let leadAnim=null, lastLeadValue=0;
+    function animateNum(el,from,to,ms=520){
+      if(!el) return; if(leadAnim) cancelAnimationFrame(leadAnim);
+      const t0=performance.now(),d=to-from,ease=x=>1-Math.pow(1-x,3);
+      function tick(t){const p=Math.min(1,(t-t0)/ms);el.textContent=money(from+d*ease(p));if(p<1)leadAnim=requestAnimationFrame(tick);}
+      leadAnim=requestAnimationFrame(tick);
+    }
+
+    function setLeadCard(leadValue,benchTotal,principalDiff,divDiff){
+      const elV=document.getElementById('lead-value'),elPct=document.getElementById('lead-pct');
+      const elP=document.getElementById('lead-principal-diff'),elD=document.getElementById('lead-div-diff');
+      animateNum(elV,lastLeadValue,leadValue,560); lastLeadValue=leadValue;
+      let pct=0; if(benchTotal&&Math.abs(benchTotal)>1e-9) pct=(leadValue/benchTotal)*100;
+      if(elPct){elPct.textContent=`${pct>=0?'+':''}${pct.toFixed(1)}%`;elPct.classList.remove('positive','negative');elPct.classList.add(pct>=0?'positive':'negative');}
+      if(elP) elP.textContent=money(principalDiff);
+      if(elD) elD.textContent=money(divDiff);
+      const ratioEl=document.getElementById('ratio-val'),rLead=document.getElementById('ratio-lead'),rDiff=document.getElementById('ratio-diff');
+      if(ratioEl&&rLead&&rDiff){
+        const absDiff=Math.abs(divDiff);
+        ratioEl.textContent=absDiff>1?(Math.abs(leadValue)/absDiff).toFixed(2)+" 倍":"N/A";
+        rLead.textContent=money(leadValue); rDiff.textContent=money(absDiff);
+      }
+    }
+
+    function setPctBadge(el,pct){
       if(!el) return;
-      if(leadAnim) cancelAnimationFrame(leadAnim);
-      const t0 = performance.now();
-      const d = to - from;
-      const ease = x => 1 - Math.pow(1-x, 3);
-      function tick(t){
-        const p = Math.min(1, (t - t0)/ms);
-        const v = from + d*ease(p);
-        el.textContent = money(v);
-        if(p<1) leadAnim = requestAnimationFrame(tick);
-      }
-      leadAnim = requestAnimationFrame(tick);
-    }
-
-    let lastLeadValue = 0;
-
-    function setLeadCard(leadValue, benchTotal, principalDiff, divDiff){
-      const elV = document.getElementById('lead-value');
-      const elPct = document.getElementById('lead-pct');
-      const elP = document.getElementById('lead-principal-diff');
-      const elD = document.getElementById('lead-div-diff');
-
-      animateNum(elV, lastLeadValue, leadValue, 560);
-      lastLeadValue = leadValue;
-
-      let pct = 0;
-      if(benchTotal && Math.abs(benchTotal) > 1e-9) pct = (leadValue / benchTotal) * 100;
-
-      if(elPct){
-        elPct.textContent = `${pct>=0?'+':''}${pct.toFixed(1)}%`;
-        elPct.classList.remove('positive','negative');
-        if(pct >= 0) elPct.classList.add('positive');
-        else elPct.classList.add('negative');
-      }
-      if(elP) elP.textContent = money(principalDiff);
-      if(elD) elD.textContent = money(divDiff);
-    
-      // ✅ 計算比值並更新新卡片
-      const ratioEl = document.getElementById('ratio-val');
-      const rLead = document.getElementById('ratio-lead');
-      const rDiff = document.getElementById('ratio-diff');
-
-      if(ratioEl && rLead && rDiff){
-        const absLead = Math.abs(leadValue);
-        const absDiff = Math.abs(divDiff); // 取絕對值
-        
-        let ratioVal = "N/A";
-        if(absDiff > 1) { // 避免除以0
-            ratioVal = (absLead / absDiff).toFixed(2) + " 倍";
-        }
-
-        ratioEl.textContent = ratioVal;
-        rLead.textContent = money(leadValue);
-        rDiff.textContent = money(absDiff);
-      }
-    }
-
-    function setPctBadge(el, pct){
-      if(!el) return;
-      el.textContent = `${pct>=0?'+':''}${pct.toFixed(1)}%`;
-      el.classList.remove('up','down');
-      el.classList.add(pct>=0 ? 'up' : 'down');
+      el.textContent=`${pct>=0?'+':''}${pct.toFixed(1)}%`;
+      el.classList.remove('up','down'); el.classList.add(pct>=0?'up':'down');
     }
 
     function update(){
-      renderSelectionPreview();
-      updateSelectedCounts();
-
-      const s = buildSeries();
+      renderSelectionPreview(); updateSelectedCounts();
+      const s=buildSeries();
       if(!mainChart) initMainChart();
-
-      if(s.labels.length === 0 && mainChart) {
-        mainChart.data.labels = [];
-        mainChart.data.datasets = [];
-        mainChart.update();
-        setLeadCard(0, 1, 0, 0);
-        setPctBadge(document.getElementById('momo-nav-pct'), 0);
-        setPctBadge(document.getElementById('bench-nav-pct'), 0);
-        document.getElementById('momo-mdd').innerText = "-0.0%";
-        document.getElementById('bench-mdd').innerText = "-0.0%";
-        document.getElementById('momo-div-amount').innerText = "$ 0";
-        document.getElementById('bench-div-amount').innerText = "$ 0";
+      if(s.labels.length===0&&mainChart){
+        mainChart.data.labels=[]; mainChart.data.datasets=[]; mainChart.update();
+        setLeadCard(0,1,0,0); setPctBadge(document.getElementById('momo-nav-pct'),0); setPctBadge(document.getElementById('bench-nav-pct'),0);
+        document.getElementById('momo-mdd').innerText="-0.0%"; document.getElementById('bench-mdd').innerText="-0.0%";
+        document.getElementById('momo-div-amount').innerText="$ 0"; document.getElementById('bench-div-amount').innerText="$ 0";
         return;
       }
-
-      const ctx = mainChart.ctx;
-      const gradientMomo = ctx.createLinearGradient(0, 0, 0, 400);
-      gradientMomo.addColorStop(0, 'rgba(249, 226, 124, 0.35)');
-      gradientMomo.addColorStop(1, 'rgba(249, 226, 124, 0.0)');
-
-      const segmentStyle = { borderDash: c => (c.p0DataIndex > s.nowIdx ? [6,6] : undefined) };
-
-      mainChart.data.labels = s.labels;
-
-      mainChart.data.datasets = [
-        {
-          label:'MOMO策略 淨值(不含息)',
-          data: s.momoP,
-          borderColor:'#F9E27C',
-          backgroundColor: gradientMomo,
-          borderWidth:3,
-          cubicInterpolationMode:'monotone',
-          tension:0.08,
-          fill:1,
-          segment: segmentStyle
-        },
-        {
-          label:'比較基準(B) 淨值(不含息)',
-          data: s.benchP,
-          borderColor:'#38BDF8',
-          backgroundColor:'rgba(56,189,248,0.06)',
-          borderWidth:3,
-          cubicInterpolationMode:'monotone',
-          tension:0.08,
-          fill:false,
-          segment: segmentStyle
-        },
-        {
-          label:'初始水位',
-          data: s.labels.map(()=> s.momoP[0]),
-          borderColor:'rgba(255,255,255,0.28)',
-          borderWidth:1.5,
-          tension:0,
-          fill:false,
-          borderDash:[3,6]
-        }
+      const ctx=mainChart.ctx;
+      const gradientMomo=ctx.createLinearGradient(0,0,0,400);
+      gradientMomo.addColorStop(0,'rgba(249,226,124,0.35)'); gradientMomo.addColorStop(1,'rgba(249,226,124,0.0)');
+      const segmentStyle={borderDash:c=>c.p0DataIndex>s.nowIdx?[6,6]:undefined};
+      mainChart.data.labels=s.labels;
+      mainChart.data.datasets=[
+        {label:'MOMO策略 淨值(不含息)',data:s.momoP,borderColor:'#F9E27C',backgroundColor:gradientMomo,borderWidth:3,cubicInterpolationMode:'monotone',tension:0.08,fill:1,segment:segmentStyle},
+        {label:'比較基準(B) 淨值(不含息)',data:s.benchP,borderColor:'#38BDF8',backgroundColor:'rgba(56,189,248,0.06)',borderWidth:3,cubicInterpolationMode:'monotone',tension:0.08,fill:false,segment:segmentStyle},
+        {label:'初始水位',data:s.labels.map(()=>s.momoP[0]),borderColor:'rgba(255,255,255,0.28)',borderWidth:1.5,tension:0,fill:false,borderDash:[3,6]}
       ];
-
       mainChart.update();
+      const i=s.endIndex;
+      const momoP=s.momoP[i]||0, benchP=s.benchP[i]||0;
+      const momoDiv=s.momoCumDiv[i]||0, benchDiv=s.benchCumDiv[i]||0;
+      const momoTotalWealth=momoP+momoDiv, benchTotalWealth=benchP+benchDiv;
+      document.getElementById('momo-total').innerText=money(momoTotalWealth);
+      document.getElementById('bench-total').innerText=money(benchTotalWealth);
+      document.getElementById('momo-principal').innerText=money(momoP);
+      document.getElementById('bench-principal').innerText=money(benchP);
+      if(document.getElementById('momo-acc-div')) document.getElementById('momo-acc-div').innerText=money(momoDiv);
+      if(document.getElementById('bench-acc-div')) document.getElementById('bench-acc-div').innerText=money(benchDiv);
+      document.getElementById('momo-div-amount').innerText=money(momoDiv);
+      document.getElementById('bench-div-amount').innerText=money(benchDiv);
+      setPctBadge(document.getElementById('momo-nav-pct'),((momoP/(s.momoP[0]||1))-1)*100);
+      setPctBadge(document.getElementById('bench-nav-pct'),((benchP/(s.benchP[0]||1))-1)*100);
+      const momoHistP=s.momoP.slice(0,s.histLen), benchHistP=s.benchP.slice(0,s.histLen);
+      document.getElementById('momo-mdd').innerText=`${calculateMaxDrawdown(momoHistP).toFixed(1)}%`;
+      document.getElementById('bench-mdd').innerText=`${calculateMaxDrawdown(benchHistP).toFixed(1)}%`;
+      const leadValue=momoTotalWealth-benchTotalWealth;
+      setLeadCard(leadValue,benchTotalWealth,momoP-benchP,momoDiv-benchDiv);
+      const verifyBody=document.getElementById('mdd-verify-body');
+      if(verifyBody){
+        const hDates=s.labels.slice(0,s.histLen),hMomo=s.momoP.slice(0,s.histLen),hBench=s.benchP.slice(0,s.histLen);
+        const momoDD=getDrawdownDetails(hMomo,hDates), benchDD=getDrawdownDetails(hBench,hDates);
+        const fmtD=d=>d?d:"-", fmtV=v=>v>0?money(v):"$0";
+        let html="";
+        if(momoDD) html+=`<tr class="val-momo"><td>MOMO 組合</td><td>${fmtV(momoDD.peakVal)}<br><span style="font-weight:400;color:#94a3b8;font-size:10px;">${fmtD(momoDD.peakDate)}</span></td><td>${fmtV(momoDD.troughVal)}<br><span style="font-weight:400;color:#94a3b8;font-size:10px;">${fmtD(momoDD.troughDate)}</span></td><td><span class="mdd-highlight">${momoDD.mddPct.toFixed(2)}%</span></td></tr>`;
+        if(benchDD) html+=`<tr class="val-bench"><td>比較基準</td><td>${fmtV(benchDD.peakVal)}<br><span style="font-weight:400;color:#94a3b8;font-size:10px;">${fmtD(benchDD.peakDate)}</span></td><td>${fmtV(benchDD.troughVal)}<br><span style="font-weight:400;color:#94a3b8;font-size:10px;">${fmtD(benchDD.troughDate)}</span></td><td><span class="mdd-highlight">${benchDD.mddPct.toFixed(2)}%</span></td></tr>`;
+        verifyBody.innerHTML=html;
+      }
+      updateRatioChart(benchTotalWealth,benchDiv);
+    }
 
-      const i = s.endIndex;
+    // ══════════════════════════════════════════════════════════════
+    //  相關係數熱力圖
+    // ══════════════════════════════════════════════════════════════
+    let currentCorrTab = 'a';
 
-      const momoP = s.momoP[i] || 0;
-      const benchP = s.benchP[i] || 0;
-      const momoDiv = s.momoCumDiv[i] || 0;
-      const benchDiv = s.benchCumDiv[i] || 0;
+    function switchCorrTab(tab) {
+      currentCorrTab = tab;
+      ['a','b','ab'].forEach(t => {
+        const el = document.getElementById('ctab-' + t);
+        if(!el) return;
+        el.className = 'corr-tab';
+        if(t === tab) el.classList.add('active-' + t);
+      });
+      renderCorrMatrix();
+    }
 
-      const momoTotalWealth = momoP + momoDiv;
-      const benchTotalWealth = benchP + benchDiv;
+    function getCorrNames(tab) {
+      if(tab === 'a')  return [...momoFundNames];
+      if(tab === 'b')  return [...benchFundNames];
+      return [...new Set([...momoFundNames, ...benchFundNames])];
+    }
 
-      document.getElementById('momo-total').innerText = money(momoTotalWealth);
-      document.getElementById('bench-total').innerText = money(benchTotalWealth);
+    function getDailyReturns(names) {
+      if(!rawGlobalData || rawGlobalData.length < 2 || names.length === 0) return {};
+      const lookbackYears = parseInt(document.getElementById('entry-window').value) || 0;
+      let data = rawGlobalData;
+      if(lookbackYears > 0) {
+        const last = data[data.length-1].dt;
+        const cutoff = new Date(last.getFullYear(), last.getMonth(), last.getDate() - Math.round(lookbackYears*365));
+        const sliced = data.filter(r => r.dt >= cutoff);
+        if(sliced.length >= 2) data = sliced;
+      }
+      const result = {};
+      names.forEach(name => {
+        const rets = [];
+        for(let i = 1; i < data.length; i++) {
+          const prev = data[i-1].valsFilled[name];
+          const curr = data[i  ].valsFilled[name];
+          if(prev && curr && prev > 0) rets.push((curr-prev)/prev);
+          else rets.push(null);
+        }
+        result[name] = rets;
+      });
+      return result;
+    }
 
-      document.getElementById('momo-principal').innerText = money(momoP);
-      document.getElementById('bench-principal').innerText = money(benchP);
+    function pearson(a, b) {
+      const pairs = [];
+      for(let i = 0; i < Math.min(a.length, b.length); i++)
+        if(a[i] !== null && b[i] !== null) pairs.push([a[i], b[i]]);
+      const n = pairs.length;
+      if(n < 5) return null;
+      const mA = pairs.reduce((s,p)=>s+p[0],0)/n;
+      const mB = pairs.reduce((s,p)=>s+p[1],0)/n;
+      let num=0,dA=0,dB=0;
+      for(const [x,y] of pairs){const da=x-mA,db=y-mB;num+=da*db;dA+=da*da;dB+=db*db;}
+      if(dA===0||dB===0) return null;
+      return num/Math.sqrt(dA*dB);
+    }
 
-      if(document.getElementById('momo-acc-div'))
-         document.getElementById('momo-acc-div').innerText = money(momoDiv);
-      if(document.getElementById('bench-acc-div'))
-         document.getElementById('bench-acc-div').innerText = money(benchDiv);
+    // ── 顏色映射（高對比版）──────────────────────────────────────
+    // -1.0 → 鮮藍   -0.5 → 藍紫   0 → 深灰   +0.5 → 橙紅   +1.0 → 金（對角線）
+    function corrColor(v, alpha) {
+      const a = alpha ?? 0.92;
+      if(v === null) return `rgba(22,28,40,${a})`;   // 無資料：幾乎黑
+      if(v === 1)    return `rgba(249,226,124,${a})`; // 對角線：金色
 
-      document.getElementById('momo-div-amount').innerText = money(momoDiv);
-      document.getElementById('bench-div-amount').innerText = money(benchDiv);
+      const t = (v + 1) / 2; // 0 ~ 1
 
-      const momoStart = s.momoP[0] || 1;
-      const benchStart = s.benchP[0] || 1;
-      const momoPct = ((momoP / momoStart) - 1) * 100;
-      const benchPct = ((benchP / benchStart) - 1) * 100;
+      // 色控制點：  t=0 → 藍, t=0.5 → 暗灰, t=1 → 紅
+      // 用三段線性插值讓過渡更銳利
+      let r, g, b;
+      if(t < 0.5) {
+        // 藍(0,100,220) → 暗灰(40,44,58)
+        const f = t / 0.5;
+        r = Math.round(0   + f * 40);
+        g = Math.round(100 + f * (44 - 100));
+        b = Math.round(220 + f * (58 - 220));
+      } else {
+        // 暗灰(40,44,58) → 紅(210,30,30)
+        const f = (t - 0.5) / 0.5;
+        r = Math.round(40  + f * (210 - 40));
+        g = Math.round(44  + f * (30  - 44));
+        b = Math.round(58  + f * (30  - 58));
+      }
+      return `rgba(${r},${g},${b},${a})`;
+    }
 
-      setPctBadge(document.getElementById('momo-nav-pct'), momoPct);
-      setPctBadge(document.getElementById('bench-nav-pct'), benchPct);
+    function renderCorrMatrix() {
+      const container = document.getElementById('corr-content');
+      if(!container) return;
+      const names = getCorrNames(currentCorrTab);
+      if(names.length === 0){
+        container.innerHTML = '<div class="corr-empty">此組合尚未選擇任何基金</div>'; return;
+      }
+      if(names.length === 1){
+        container.innerHTML = '<div class="corr-empty">至少需要 2 支基金才能計算相關係數</div>'; return;
+      }
 
-      const momoHistP = s.momoP.slice(0, s.histLen);
-      const benchHistP = s.benchP.slice(0, s.histLen);
+      // 建構相關係數矩陣
+      const rets = getDailyReturns(names), n = names.length;
+      const matrix = [];
+      for(let i=0;i<n;i++){ matrix[i]=[]; for(let j=0;j<n;j++) matrix[i][j]=(i===j)?1:pearson(rets[names[i]],rets[names[j]]); }
 
-      const momoMDD = calculateMaxDrawdown(momoHistP);
-      const benchMDD = calculateMaxDrawdown(benchHistP);
+      // ── 尺寸計算（縮小版，避免標題被截）──
+      // 標題文字空間：斜 45° 時文字長度投影到 Y 軸需要 LABEL_W 高度
+      // 策略：把 CELL_SZ 壓小，LABEL_W 固定給足夠空間給文字
+      const CELL_SZ  = Math.min(56, Math.max(32, Math.floor(340 / n)));  // 每格最大 56px
+      const LABEL_W  = Math.min(130, Math.max(80, CELL_SZ * 2.0));       // 標題區域隨格子縮放
+      const FONT_SZ  = Math.max(9,  Math.min(12, CELL_SZ * 0.26));       // 格內數字
+      const LFONT    = Math.max(10, Math.min(12, CELL_SZ * 0.24));       // 軸標題
 
-      document.getElementById('momo-mdd').innerText = `${momoMDD.toFixed(1)}%`;
-      document.getElementById('bench-mdd').innerText = `${benchMDD.toFixed(1)}%`;
+      const W = LABEL_W + CELL_SZ * n;
+      const H = LABEL_W + CELL_SZ * n;  // 正方形
 
-      const leadValue = momoTotalWealth - benchTotalWealth;
-      const principalDiff = momoP - benchP;
-      const divDiff = momoDiv - benchDiv;
+      container.innerHTML = `<div class="corr-canvas-wrap"><canvas id="corr-canvas" width="${W}" height="${H}" style="max-width:100%;height:auto;"></canvas></div>`;
+      const ctx = document.getElementById('corr-canvas').getContext('2d');
 
-      setLeadCard(leadValue, benchTotalWealth, principalDiff, divDiff);
-      
-      // ✅ 每次更新都重新畫敏感度圖
-      updateRatioChart();
+      // ── 欄標題（斜 45°，繪製完整名稱不截斷）──
+      ctx.save();
+      ctx.font = `700 ${LFONT}px 'Noto Sans TC',sans-serif`;
+      ctx.fillStyle = '#CBD5E1';
+      ctx.textAlign  = 'left';
+      ctx.textBaseline = 'bottom';
+      for(let j = 0; j < n; j++) {
+        const cx = LABEL_W + j * CELL_SZ + CELL_SZ / 2;
+        ctx.save();
+        ctx.translate(cx, LABEL_W - 8);
+        ctx.rotate(-Math.PI / 4);
+        // 不做截斷，讓旋轉後文字完整顯示在 LABEL_W 空間內
+        ctx.fillText(names[j], 0, 0);
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // ── 列標題（靠右對齊，縮短顯示）──
+      ctx.font = `700 ${LFONT}px 'Noto Sans TC',sans-serif`;
+      ctx.fillStyle = '#CBD5E1';
+      ctx.textAlign  = 'right';
+      ctx.textBaseline = 'middle';
+      for(let i = 0; i < n; i++) {
+        // 最多顯示 10 個字，超出加「…」
+        const label = names[i].length > 10 ? names[i].slice(0, 9) + '…' : names[i];
+        ctx.fillText(label, LABEL_W - 8, LABEL_W + i * CELL_SZ + CELL_SZ / 2);
+      }
+
+      // ── 格子 ──
+      for(let i = 0; i < n; i++) for(let j = 0; j < n; j++) {
+        const v   = matrix[i][j];
+        const x   = LABEL_W + j * CELL_SZ;
+        const y   = LABEL_W + i * CELL_SZ;
+        const pad = 2;
+
+        // 背景色塊
+        ctx.fillStyle = corrColor(v);
+        ctx.beginPath();
+        ctx.roundRect(x + pad, y + pad, CELL_SZ - pad*2, CELL_SZ - pad*2, 5);
+        ctx.fill();
+
+        // 數值文字
+        ctx.font = `900 ${FONT_SZ}px 'Noto Sans TC',sans-serif`;
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        const cx = x + CELL_SZ / 2, cy = y + CELL_SZ / 2;
+
+        if(v !== null) {
+          // 對角線黑字；其他白字（低相關接近中灰時加陰影提升可讀性）
+          ctx.fillStyle = (i === j) ? '#0A1221' : '#FFFFFF';
+          if(i !== j){
+            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur  = 3;
+          }
+          ctx.fillText(i === j ? '1.00' : v.toFixed(2), cx, cy);
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = '#475569';
+          ctx.fillText('N/A', cx, cy);
+        }
+      }
+
+      // ── 色階圖例（右下角）──
+      const LW = Math.min(140, CELL_SZ * 3), LH = 11;
+      const LX = W - LW - 4, LY = H - LH - 22;
+      const grad = ctx.createLinearGradient(LX, 0, LX + LW, 0);
+      grad.addColorStop(0,    corrColor(-1));
+      grad.addColorStop(0.25, corrColor(-0.5));
+      grad.addColorStop(0.5,  corrColor(0));
+      grad.addColorStop(0.75, corrColor(0.5));
+      grad.addColorStop(1,    corrColor(0.99)); // 略小於 1 避免金色
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.roundRect(LX, LY, LW, LH, 3); ctx.fill();
+
+      // 圖例邊框
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth   = 0.5;
+      ctx.beginPath(); ctx.roundRect(LX, LY, LW, LH, 3); ctx.stroke();
+
+      ctx.font = '700 9px sans-serif'; ctx.fillStyle = '#94A3B8'; ctx.shadowBlur = 0;
+      ctx.textAlign = 'left';   ctx.textBaseline = 'top'; ctx.fillText('-1',  LX, LY + LH + 3);
+      ctx.textAlign = 'center'; ctx.fillText('0',  LX + LW/2, LY + LH + 3);
+      ctx.textAlign = 'right';  ctx.fillText('+1', LX + LW,   LY + LH + 3);
     }
 
     async function exportImg() {
       const t = document.getElementById("report-capture");
       const originalScrollPos = window.scrollY;
-
-      const safetyTimer = setTimeout(() => {
-        console.warn("截圖逾時，強制還原介面");
-        cleanupUI();
-      }, 8000);
-
-      function cleanupUI() {
-        clearTimeout(safetyTimer);
-        document.body.classList.remove('exporting');
-        setTimeout(() => {
-          try { if(mainChart) mainChart.resize(); } catch(e) { console.error("圖表重繪失敗", e); }
-          window.scrollTo(0, originalScrollPos);
-        }, 100);
+      const safetyTimer = setTimeout(() => { cleanupUI(); }, 8000);
+      function cleanupUI(){
+        clearTimeout(safetyTimer); document.body.classList.remove('exporting');
+        setTimeout(()=>{ try{if(mainChart)mainChart.resize();}catch(e){} window.scrollTo(0,originalScrollPos); },100);
       }
-
       try {
         document.body.classList.add('exporting');
         await new Promise(r => setTimeout(r, 300));
-
-        const c = await html2canvas(t, {
-          backgroundColor: "#0A1221",
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          scrollY: 0,
-          windowWidth: 1280,
-          width: 1180
-        });
-
-        const a = document.createElement("a");
-        a.download = "MOMO_Report_GS.png";
-        a.href = c.toDataURL();
-        a.click();
-
-      } catch (err) {
+        const c = await html2canvas(t, { backgroundColor:"#0A1221", scale:2, useCORS:true, allowTaint:false, scrollY:0, windowWidth:1280, width:1180 });
+        const a = document.createElement("a"); a.download="MOMO_Report_GS.png"; a.href=c.toDataURL(); a.click();
+      } catch(err) {
         console.error("截圖過程發生錯誤:", err);
         alert("截圖失敗，可能是圖片跨域或記憶體不足問題，請重新整理後再試。");
-      } finally {
-        cleanupUI();
-      }
+      } finally { cleanupUI(); }
     }
 
     window.onload = async () => {
       const img = document.getElementById("advisor-avatar");
       img.src = ADVISOR_AVATAR_URL;
       img.onerror = () => { img.src = "https://via.placeholder.com/60"; };
-
-      new QRCode(document.getElementById("qrcode-target"), {
-        text: LINE_QR_URL,
-        width:44,
-        height:44
-      });
-
+      new QRCode(document.getElementById("qrcode-target"), { text: LINE_QR_URL, width:44, height:44 });
       fetchSheetData();
     };
   </script>
