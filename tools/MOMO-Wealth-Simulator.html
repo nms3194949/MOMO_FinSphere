@@ -848,6 +848,7 @@
       const s = String(v).trim();
       if(!s) return null;
       const g = s.match(/^Date\((\d{4}),(\d{1,2}),(\d{1,2})\)$/);
+      // GViz 月份是 0-based，直接用（不需 -1）
       if(g) return new Date(parseInt(g[1],10), parseInt(g[2],10), parseInt(g[3],10));
       const m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})(?:\s.*)?$/);
       if(m) return new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3]));
@@ -863,6 +864,23 @@
     }
     const nf0 = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 });
     const money = v => `$ ${nf0.format(Math.round(v || 0))}`;
+
+    // ── 防抖：避免快速輸入觸發大量重算 ──────────────────────────
+    let _updateTimer = null;
+    function update(immediate=false){
+      if(immediate){ _doUpdate(); return; }
+      clearTimeout(_updateTimer);
+      _updateTimer = setTimeout(_doUpdate, 120);
+    }
+    // ── RAF 節流：applyFundFilter 在每個 frame 最多執行一次 ──────
+    let _filterRaf = null;
+    function applyFundFilter(){
+      if(_filterRaf) return;
+      _filterRaf = requestAnimationFrame(() => {
+        _filterRaf = null;
+        _doApplyFundFilter();
+      });
+    }
 
     const BRAND_COLORS = [
       { keys: ["施羅德","Schroder"], color:"#A78BFA" },
@@ -1042,7 +1060,7 @@
       });
       renderFundSelectors();
       renderSelectionPreview();
-      update();
+      update(true);
     }
 
     function updateSelectedCounts(){
@@ -1052,7 +1070,7 @@
       if(el) el.textContent = `A 已選 ${a} / B 已選 ${b}`;
     }
 
-    function applyFundFilter(){
+    function _doApplyFundFilter(){
       const qRaw = (document.getElementById('fund-filter')?.value || "").trim().toLowerCase();
       const tokens = qRaw ? qRaw.split(/\s+/).filter(Boolean) : [];
       const onlySelected = !!document.getElementById('toggle-only-selected')?.checked;
@@ -1123,7 +1141,7 @@
       generateWeightInputs('momo', momoFundNames); generateWeightInputs('bench', benchFundNames);
       normalizeWeightsTo100('momo'); normalizeWeightsTo100('bench');
       updateValidationChart('momo'); updateValidationChart('bench');
-      renderSelectionPreview(); updateSelectedCounts(); update();
+      renderSelectionPreview(); updateSelectedCounts(); update(true);
     }
 
     function getRowEls(type){ const cId=type==='momo'?'weights-container':'weights-container-bench'; return Array.from(document.querySelectorAll(`#${cId} .weight-row`)); }
@@ -1283,7 +1301,7 @@
       let cut=combined;
       if(lookbackYears&&lookbackYears>0){
         const lastDt=combined[combined.length-1].dt;
-        const cutoff=new Date(lastDt.getFullYear(),lastDt.getMonth(),lastDt.getDate()-Math.round(lookbackYears*365));
+        const cutoff=new Date(lastDt.getFullYear(),lastDt.getMonth(),lastDt.getDate()-Math.round(lookbackYears*365.25));
         const sliced=combined.filter(r=>r.dt>=cutoff);
         if(sliced.length>=2) cut=sliced;
       }
@@ -1317,12 +1335,15 @@
       let cut=[],combined=[];
       for(let k=0;k<parsedMomoData.length;k++){const mRow=parsedMomoData[k];if(mRow.vals.length>0&&mRow.vals.every(v=>v!==null&&v>0)) combined.push({mVals:mRow.vals,dt:mRow.dt,dateKey:mRow.dateKey});}
       if(combined.length<2) return {finalWealth:0,totalDiv:0};
-      if(lookbackYears>0){const ld=combined[combined.length-1].dt;const co=new Date(ld.getFullYear(),ld.getMonth(),ld.getDate()-Math.round(lookbackYears*365));cut=combined.filter(r=>r.dt>=co);}
+      if(lookbackYears>0){const ld=combined[combined.length-1].dt;const co=new Date(ld.getFullYear(),ld.getMonth(),ld.getDate()-Math.round(lookbackYears*365.25));cut=combined.filter(r=>r.dt>=co);}
       if(cut.length<2) return {finalWealth:0,totalDiv:0};
       const mBase=cut[0].mVals;
       let accDiv=0;
-      const startIdxVal=cut[0].mVals.reduce((sum,v,i)=>sum+(v/mBase[i])*(simWeights[i]??0),0);
-      const endIdxVal=cut[cut.length-1].mVals.reduce((sum,v,i)=>sum+(v/mBase[i])*(simWeights[i]??0),0);
+      // startIdxVal 恆為 sum(simWeights)，正常情況下為 1；直接用 endIdx/startIdx 計算相對漲幅
+      const weightSum = simWeights.reduce((a,b)=>a+b, 0) || 1;
+      const calcIdx = (vals) => vals.reduce((sum,v,i)=>sum+(v/mBase[i])*(simWeights[i]??0), 0) / weightSum;
+      const startIdxVal = 1; // 基期恆為 1（已正規化）
+      const endIdxVal   = calcIdx(cut[cut.length-1].mVals);
       for(let i=1;i<cut.length;i++){const d1=cut[i-1].dt,d2=cut[i].dt;let dd=1;const diff=(d2-d1)/(1000*60*60*24);if(Number.isFinite(diff)&&diff>0)dd=diff;accDiv+=(p0*(simDivRate/100)/365)*dd;}
       const currentPrincipal=p0*(endIdxVal/startIdxVal);
       const startDate=cut[0].dt,endDate=cut[cut.length-1].dt;
@@ -1339,8 +1360,11 @@
       const p0=parseFloat(document.getElementById('p0').value)||0;
       const safeBenchTotal=benchTotalWealth||p0, safeBenchDiv=benchTotalDiv||0;
       const xLabels=[],yValues=[];
-      for(let w=0;w<=1.01;w+=0.1){
-        const weight=Math.min(w,1);
+      // 提前計算 11 點；calculateScenario 內部會重新 filter，可接受
+      // 但限制點數避免過度運算（11 點已足夠呈現曲線）
+      const steps = 10;
+      for(let wi=0; wi<=steps; wi++){
+        const weight = wi/steps;
         xLabels.push(Math.round(weight*100)+"%");
         const r=calculateScenario(weight);
         const lead=r.finalWealth-safeBenchTotal, diffDiv=r.totalDiv-safeBenchDiv;
@@ -1403,13 +1427,21 @@
           }
         }
       }
+      // 配息累積：歷史段直接用已有的 dt 物件，未來段從 labels 解析（只解析一次）
+      // 預先建立所有日期物件，避免迴圈內重複 parse
+      const labelDts = labels.map((l, idx) => {
+        if(idx < hist.labels.length) return hist.labels.length > 0 ? parseDateLoose(l) : null;
+        return parseDateLoose(l);
+      });
       const momoCumDiv=new Array(labels.length).fill(0), benchCumDiv=new Array(labels.length).fill(0);
       let accM=0,accB=0;
+      const mDailyRate = p0*(momoDiv/100)/365;
+      const bDailyRate = p0*(benchDiv/100)/365;
       for(let i=1;i<labels.length;i++){
         let daysDiff=1;
-        const d1=parseDateLoose(labels[i-1]),d2=parseDateLoose(labels[i]);
+        const d1=labelDts[i-1], d2=labelDts[i];
         if(d1&&d2){const diff=(d2-d1)/(1000*60*60*24);if(Number.isFinite(diff)&&diff>0)daysDiff=diff;}
-        accM+=(p0*(momoDiv/100)/365)*daysDiff; accB+=(p0*(benchDiv/100)/365)*daysDiff;
+        accM+=mDailyRate*daysDiff; accB+=bDailyRate*daysDiff;
         momoCumDiv[i]=accM; benchCumDiv[i]=accB;
       }
       return {labels,histLen,nowIdx,momoP:mp,benchP:bp,momoCumDiv,benchCumDiv,endIndex:labels.length-1};
@@ -1450,7 +1482,7 @@
       el.classList.remove('up','down'); el.classList.add(pct>=0?'up':'down');
     }
 
-    function update(){
+    function _doUpdate(){
       renderSelectionPreview(); updateSelectedCounts();
       const s=buildSeries();
       if(!mainChart) initMainChart();
@@ -1532,7 +1564,7 @@
       let data = rawGlobalData;
       if(lookbackYears > 0) {
         const last = data[data.length-1].dt;
-        const cutoff = new Date(last.getFullYear(), last.getMonth(), last.getDate() - Math.round(lookbackYears*365));
+        const cutoff = new Date(last.getFullYear(), last.getMonth(), last.getDate() - Math.round(lookbackYears*365.25));
         const sliced = data.filter(r => r.dt >= cutoff);
         if(sliced.length >= 2) data = sliced;
       }
@@ -1551,17 +1583,33 @@
     }
 
     function pearson(a, b) {
-      const pairs = [];
-      for(let i = 0; i < Math.min(a.length, b.length); i++)
-        if(a[i] !== null && b[i] !== null) pairs.push([a[i], b[i]]);
-      const n = pairs.length;
+      // 單趟計算：同時累加 sum_x, sum_y, sum_xy, sum_x2, sum_y2（Welford 法不適用，直接雙趟仍 O(n)）
+      let n=0, sA=0, sB=0, sAB=0, sA2=0, sB2=0;
+      const len = Math.min(a.length, b.length);
+      for(let i=0; i<len; i++){
+        if(a[i]===null || b[i]===null) continue;
+        n++; sA+=a[i]; sB+=b[i]; sAB+=a[i]*b[i]; sA2+=a[i]*a[i]; sB2+=b[i]*b[i];
+      }
       if(n < 5) return null;
-      const mA = pairs.reduce((s,p)=>s+p[0],0)/n;
-      const mB = pairs.reduce((s,p)=>s+p[1],0)/n;
-      let num=0,dA=0,dB=0;
-      for(const [x,y] of pairs){const da=x-mA,db=y-mB;num+=da*db;dA+=da*da;dB+=db*db;}
-      if(dA===0||dB===0) return null;
-      return num/Math.sqrt(dA*dB);
+      const num = n*sAB - sA*sB;
+      const den = Math.sqrt((n*sA2 - sA*sA) * (n*sB2 - sB*sB));
+      if(den === 0) return null;
+      return num / den;
+    }
+
+    function buildCorrMatrix(rets, names) {
+      const n = names.length;
+      const matrix = Array.from({length:n}, () => new Array(n).fill(null));
+      for(let i=0; i<n; i++){
+        matrix[i][i] = 1;
+        for(let j=i+1; j<n; j++){
+          // 只計算上三角，下三角直接鏡像（節省約 50% 計算量）
+          const r = pearson(rets[names[i]], rets[names[j]]);
+          matrix[i][j] = r;
+          matrix[j][i] = r;
+        }
+      }
+      return matrix;
     }
 
     // ── 顏色映射（高對比版）──────────────────────────────────────
@@ -1603,10 +1651,9 @@
         container.innerHTML = '<div class="corr-empty">至少需要 2 支基金才能計算相關係數</div>'; return;
       }
 
-      // 建構相關係數矩陣
-      const rets = getDailyReturns(names), n = names.length;
-      const matrix = [];
-      for(let i=0;i<n;i++){ matrix[i]=[]; for(let j=0;j<n;j++) matrix[i][j]=(i===j)?1:pearson(rets[names[i]],rets[names[j]]); }
+      // 建構相關係數矩陣（上三角計算後鏡像，避免重複）
+      const rets   = getDailyReturns(names), n = names.length;
+      const matrix = buildCorrMatrix(rets, names);
 
       // ── 尺寸計算（縮小版，避免標題被截）──
       // 標題文字空間：斜 45° 時文字長度投影到 Y 軸需要 LABEL_W 高度
