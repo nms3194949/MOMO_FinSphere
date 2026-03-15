@@ -313,8 +313,8 @@ function filterAndSort() {
 
   // 第一步：只做關鍵字篩選
   const afterSearch = qPairs.length === 0 ? allOfType : allOfType.filter(x => {
-    const fullStr = (x.name + x.code).toLowerCase();
-    return qPairs.every(aliases => aliases.some(alias => fullStr.includes(alias)));
+const nameStr = x.name.toLowerCase();
+if (!qPairs.every(aliases => aliases.some(alias => nameStr.includes(alias)))) return false;
   });
 
   // 第二步：套用所有條件
