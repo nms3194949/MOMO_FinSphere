@@ -97,7 +97,6 @@
       </button>
     </div>
 
-    <!-- 自訂篩選條件列 -->
     <div class="filter-bar">
       <span style="color:var(--gold-soft);font-size:13px;font-weight:bold;white-space:nowrap;">⚙️ 篩選條件：</span>
       <label>天數 ≥ <input id="filterDays" class="filter-input" type="number" value="60" min="0"/></label>
@@ -161,7 +160,6 @@ const CACHE_TIME_KEY = 'momo-warrant-cache-time';
 const CACHE_EXPIRY = 60 * 60 * 1000;
 const HAS_CACHE_API = typeof caches !== 'undefined';
 
-// 預設篩選條件
 const DEFAULT_FILTER = { days: 60, s2: 1500 };
 
 function preprocessData() {
@@ -277,7 +275,6 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 重置篩選條件
 $("#btnResetFilter").addEventListener("click", () => {
   $("#filterDays").value = DEFAULT_FILTER.days;
   $("#filterS2Max").value = DEFAULT_FILTER.s2;
@@ -293,14 +290,12 @@ function filterAndSort() {
   const needIV = $("#chkHasIV").checked;
   const rawQ = toHalf($("#nameFilter").value).toLowerCase().split(/\s+/).filter(Boolean);
 
-  // 讀取自訂條件
   const minDays = parseFloat($("#filterDays").value);
   const maxS2   = parseFloat($("#filterS2Max").value);
   const maxS1   = parseFloat($("#filterS1Max").value);
   const maxIV   = parseFloat($("#filterIVMax").value);
   const minLev  = parseFloat($("#filterLevMin").value);
 
-  // 搜尋 token 展開（保留原始 + 對應代號或名稱）
   const qPairs = rawQ.map(token => {
     const aliases = [token];
     if (STOCK_MAP[token]) aliases.push(STOCK_MAP[token].toLowerCase());
@@ -308,16 +303,14 @@ function filterAndSort() {
     return aliases;
   });
 
-  // 同類型全部資料（用於漏斗第一層）
   const allOfType = PROCESSED_DATA.filter(x => x.cp === wantType);
 
-  // 第一步：只做關鍵字篩選
+  // ✅ 修正：加上 return，只比對名稱欄位
   const afterSearch = qPairs.length === 0 ? allOfType : allOfType.filter(x => {
-const nameStr = x.name.toLowerCase();
-if (!qPairs.every(aliases => aliases.some(alias => nameStr.includes(alias)))) return false;
+    const nameStr = x.name.toLowerCase();
+    return qPairs.every(aliases => aliases.some(alias => nameStr.includes(alias)));
   });
 
-  // 第二步：套用所有條件
   const afterFilter = afterSearch.filter(x => {
     if (dropZero && (x.spread === 0 || x.spread === null)) return false;
     if (needIV && (!x.iv || x.iv === 0)) return false;
@@ -394,7 +387,6 @@ function render() {
 
   $("#resultCard").style.display = "block";
 
-  // 漏斗提示
   const sourceCount = hasKeyword ? totalSearch : totalAll;
   const sourceLabel = hasKeyword
     ? `搜尋「${$("#nameFilter").value.trim()}」<strong style="color:#fff"> ${totalSearch.toLocaleString()}</strong> 筆`
@@ -423,7 +415,6 @@ function render() {
   metaHTML += `</div>`;
   $("#meta2").innerHTML = metaHTML;
 
-  // 更新表頭排序圖示
   document.querySelectorAll("th[data-key]").forEach(th => {
     th.classList.remove("sort-asc", "sort-desc");
     if (th.dataset.key === sortKey) {
@@ -432,7 +423,6 @@ function render() {
   });
 }
 
-// 表頭點擊排序
 document.querySelectorAll("th[data-key]").forEach(th => {
   if (!th.dataset.key) return;
   th.addEventListener("click", () => {
@@ -444,7 +434,6 @@ document.querySelectorAll("th[data-key]").forEach(th => {
   });
 });
 
-// 匯出 PNG
 $("#btnExportPng").addEventListener("click", async () => {
   const btn = $("#btnExportPng");
   const exportSpinner = $("#exportSpinner");
@@ -478,13 +467,11 @@ $("#btnExportPng").addEventListener("click", async () => {
   }
 });
 
-// 下拉選單 & checkbox 事件
 $("#selSortKey").addEventListener("change", function() { sortKey = this.value; sortDir = 1; render(); });
 ["selType", "chkFilterZeroSpread", "selLimit", "chkHasIV"].forEach(id => {
   $(`#${id}`).addEventListener("change", render);
 });
 
-// 文字輸入 debounce
 let debounceTimer;
 const debounceRender = () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(render, 300); };
 $("#nameFilter").addEventListener("input", debounceRender);
