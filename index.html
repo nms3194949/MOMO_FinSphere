@@ -1036,15 +1036,37 @@
   }
 
   /* === Calc logic === */
-  const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
-  const SLOPE = 1; const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
+  const STRATEGY = { start:5, rise:10, peak:15 };
+  const SLOPE = 0; const MONTHLY_MULT = { start:1, rise:1, peak:1 };
   const state = { baseCAGR: STRATEGY.rise, monthlyMul: MONTHLY_MULT.rise, principal: 1_000_000, dist: 8 };
   function safeNum(v,def=0){ v=+v; return Number.isFinite(v)?v:def; }
-  function compute({principal, dist, baseCAGR, monthlyMul}){
-    const monthlyBase = principal*(dist/100)/12; const monthly = monthlyBase * (monthlyMul ?? 1);
-    const grow = Math.max(0, baseCAGR - SLOPE*dist); const after3y = principal*Math.pow(1+grow/100,3);
-    const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1); const total = after3y + div3y;
-    const totalRate = principal>0 ? (total/principal - 1)*100 : 0; return { monthly, grow, after3y, div3y, total, totalRate };
+  function compute({principal, dist, baseCAGR}){
+    const leverage    = 2.5;
+    const totalAsset  = principal * leverage;           // 實際操作資產（含槓桿）
+    const financing   = totalAsset - principal;         // 融資金額（三年後還）
+
+    // 月配息（以 totalAsset 為基礎）
+    const monthly = totalAsset * (dist / 100) / 12;
+
+    // 三年總配息
+    const div3y = totalAsset * (dist / 100) * 3;
+
+    // 三年後資產 = totalAsset × (1+CAGR)^3
+    const assetAfter3y = totalAsset * Math.pow(1 + baseCAGR / 100, 3);
+
+    // 三年後本金 = 三年後資產 - 還融資
+    const after3y = assetAfter3y - financing;
+
+    // 年化本金成長率（方案A：以用戶本金為基礎）
+    const grow = principal > 0
+      ? (Math.pow(after3y / principal, 1 / 3) - 1) * 100
+      : 0;
+
+    // 三年總報酬 = 三年後本金 + 三年總配息
+    const total = after3y + div3y;
+    const totalRate = principal > 0 ? (total / principal - 1) * 100 : 0;
+
+    return { monthly, grow, after3y, div3y, total, totalRate };
   }
 
   const STRATEGY_INFO = {
