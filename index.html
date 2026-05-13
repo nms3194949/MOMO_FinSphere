@@ -126,7 +126,7 @@
   .nav a[aria-current="page"], .nav a:hover{background:var(--gold-grad);color:#0A1221}
 
   .section{margin-top:24px}
-    
+   
   .card, .card2, .tool-card, .panel, .factor-card, .mcs-hero-section {
     background: rgba(12, 21, 42, 0.75);
     backdrop-filter: blur(12px);
@@ -143,7 +143,7 @@
     box-shadow: 0 12px 30px rgba(201, 162, 39, 0.12), inset 0 0 20px rgba(201, 162, 39, 0.03);
     border-color: rgba(233, 209, 138, 0.5);
   }
-    
+   
   .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;transition:.2s}
   .btn-gold{background:var(--gold-grad);color:#0A1221;border:none}
   .btn-gold:hover{filter:brightness(1.1)}
@@ -154,7 +154,7 @@
   .hero h1{margin:6px 0 8px;font-size:clamp(22px, 2.6vw, 32px);background:var(--gold-grad);-webkit-background-clip:text;color:transparent}
   .hero p{color:var(--muted);margin:0}
   .hero small{color:var(--gold-soft); font-size: 13px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px;}
-    
+   
   @keyframes breathe-dot { 
     0% { opacity: 0.4; transform: scale(0.9); } 
     50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px currentColor; } 
@@ -197,7 +197,7 @@
     opacity: 0.6;
   }
   .mcs-hero-inner { display: flex; align-items: stretch; gap: 30px; padding: 24px; }
-    
+   
   .hero-gauge-col {
     flex: 0 0 180px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -258,7 +258,7 @@
   }
   @media (max-width:900px){ .mcs-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media (max-width:600px){ .mcs-grid { grid-template-columns:1fr; } }
-    
+   
   .tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
   #ig-section{margin-top:60px;padding:40px 0;background: transparent}
   #ig-section h2{font-size:22px;font-weight:700;margin:0 0 18px 0;color:var(--gold-soft)}
@@ -286,7 +286,7 @@
   .block:last-child{padding-bottom:0;border-bottom:0}
   .block .label{font-size:13.5px;font-weight:800;color:rgba(233,209,138,.9)}
   .gauge{width:100%}
-    
+   
   .gauge-bar {
     transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     will-change: width;
@@ -317,7 +317,7 @@
   #calc label{display:block;font-weight:800;font-size:13px;color:rgba(233,209,138,.9);margin-bottom:6px}
   #calc input[type="number"]{width:100%;background:rgba(14, 22, 42, 0.5);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
   #calc .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    
+   
   #calc input[type="range"]{
     -webkit-appearance: none; width:100%; background: transparent; margin: 10px 0;
   }
@@ -418,7 +418,7 @@
   }
   @keyframes fade-in-tooltip { to { opacity: 1; transform: translateX(0); } }
   @media(max-width: 768px) { .float-line-btn { bottom: 90px; right: 16px; width: 54px; height: 54px; } }
-    
+   
   details { margin-bottom:10px; background:rgba(255,255,255,0.03); border-radius:10px; overflow:hidden; transition:background .2s; }
   details:hover { background:rgba(255,255,255,0.05); }
   summary { font-weight:bold; padding:14px; color:var(--ink); cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; }
@@ -1094,7 +1094,7 @@
     bar.style.width = data.risk + '%';
     bar.style.background = data.riskColor;
   }
-    
+   
   function explodeGold(x, y) {
     const colors = ['#F9E27C', '#D9B84B', '#B88A1E', '#FFFFFF'];
     const particles = [];
@@ -1165,10 +1165,10 @@
         else { ctaEl.style.display = 'none'; }
     }
   }
-    
+   
   function persist(){ try{ localStorage.setItem('momo-calc', JSON.stringify(state)); }catch(_){} }
   function restore(){ try{ const s = JSON.parse(localStorage.getItem('momo-calc')); if(s && typeof s==='object'){ if(typeof s.baseCAGR==='number') state.baseCAGR=s.baseCAGR; if(typeof s.monthlyMul==='number') state.monthlyMul=s.monthlyMul; if(typeof s.principal==='number') state.principal=s.principal; if(typeof s.dist==='number') state.dist=s.dist; } }catch(_){} }
-    
+   
   function fromURL(){
     const p=new URLSearchParams(location.search);
     if(p.has('principal')) state.principal=clamp(safeNum(p.get('principal'), state.principal), 0, 1e9);
@@ -1420,8 +1420,8 @@
         // 年均成長率
         const growthEl = document.getElementById('div-growth-rate');
         if (growthEl && data.growthRate !== '') growthEl.textContent = data.growthRate + '%';
-      })
-// 🌟 新增這裡：投資狀態
+
+        // 🌟 新增這裡：投資狀態
         const statusEl = document.getElementById('div-investment-status');
         if (statusEl && data.status) statusEl.textContent = data.status;
       })
@@ -1429,7 +1429,7 @@
         // 靜默失敗，保留靜態預設值，不影響使用者體驗
         console.warn('配息資料載入失敗，顯示靜態預設值', err);
       });
-}
+  }
 
   function boot(){
     initSmartGreeting();
