@@ -749,7 +749,7 @@
             </div>
             <div class="stat-card">
               <div class="stat-label">投資狀態</div>
-              <div class="stat-val status">策略進行中</div>
+              <div class="stat-val status" id="div-investment-status">策略進行中</div>
             </div>
           </div>
         </div>
@@ -1421,11 +1421,15 @@
         const growthEl = document.getElementById('div-growth-rate');
         if (growthEl && data.growthRate !== '') growthEl.textContent = data.growthRate + '%';
       })
+// 🌟 新增這裡：投資狀態
+        const statusEl = document.getElementById('div-investment-status');
+        if (statusEl && data.status) statusEl.textContent = data.status;
+      })
       .catch(err => {
         // 靜默失敗，保留靜態預設值，不影響使用者體驗
         console.warn('配息資料載入失敗，顯示靜態預設值', err);
       });
-  }
+}
 
   function boot(){
     initSmartGreeting();
