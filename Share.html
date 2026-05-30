@@ -1,56 +1,82 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOMO雙贏策略圖卡分享</title>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    background: #0A1221;
-    color: #F6E6B0;
-    font-family: "Microsoft JhengHei", sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-.container { text-align: center; padding: 30px; }
-.logo { font-size: 32px; font-weight: bold; margin-bottom: 12px; }
-.subtitle { font-size: 16px; opacity: .8; }
-.loading { margin-top: 20px; font-size: 18px; }
-</style>
-</head>
-<body>
-<div class="container">
-    <!-- ✅ 移除多餘的 ``` 圍欄 -->
-    <div class="logo">MOMO 雙贏策略</div>
-    <div class="subtitle">MOMO雙贏策略圖卡分享</div>
-    <div id="status" class="loading">正在初始化...</div>
-</div>
 <script>
 const LIFF_ID = "2008793227-34uhksMV";
-const IMAGE_URL = "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/MOMO-Fund.png";
 
 async function shareCard() {
-    const flexPayload = {
-        type: "flex",
-        altText: "MOMO雙贏策略",
-        contents: {
-            type: "bubble",
-            size: "giga",
-            hero: {
-                type: "image",
-                url: IMAGE_URL,
-                size: "full",
-                aspectRatio: "3:4",
-                aspectMode: "cover",
-                action: { type: "uri", uri: IMAGE_URL }
+    const result = await liff.shareTargetPicker([
+        {
+            type: "flex",
+            altText: "MOMO雙贏策略",
+            contents: {
+                type: "carousel",
+                contents: [
+                    {
+                        type: "bubble", size: "giga",
+                        hero: {
+                            type: "image",
+                            url: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/MOMO-Fund.png",
+                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
+                            action: { type: "uri", uri: "https://liff.line.me/2008793227-34uhksMV" }
+                        }
+                    },
+                    {
+                        type: "bubble", size: "giga",
+                        hero: {
+                            type: "image",
+                            url: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_AB.png",
+                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
+                            action: { type: "uri", uri: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_AB.png" }
+                        }
+                    },
+                    {
+                        type: "bubble", size: "giga",
+                        hero: {
+                            type: "image",
+                            url: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_ALLIANZ.png",
+                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
+                            action: { type: "uri", uri: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_ALLIANZ.png" }
+                        }
+                    },
+                    {
+                        type: "bubble", size: "giga",
+                        hero: {
+                            type: "image",
+                            url: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_AMUNDI.png",
+                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
+                            action: { type: "uri", uri: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_AMUNDI.png" }
+                        }
+                    },
+                    {
+                        type: "bubble", size: "giga",
+                        hero: {
+                            type: "image",
+                            url: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_BLK.png",
+                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
+                            action: { type: "uri", uri: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_BLK.png" }
+                        }
+                    },
+                    {
+                        type: "bubble", size: "giga",
+                        hero: {
+                            type: "image",
+                            url: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_EASTSPRING.png",
+                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
+                            action: { type: "uri", uri: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_EASTSPRING.png" }
+                        }
+                    },
+                    {
+                        type: "bubble", size: "giga",
+                        hero: {
+                            type: "image",
+                            url: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_SCHRODERS.png",
+                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
+                            action: { type: "uri", uri: "https://github.com/nms3194949/MOMO_FinSphere/raw/main/Cash_SCHRODERS.png" }
+                        }
+                    }
+                ]
             }
         }
-    };
-    const result = await liff.shareTargetPicker([flexPayload]);
+    ]);
+
     if (result || result === null) {
         liff.closeWindow();
     }
@@ -60,7 +86,6 @@ async function main() {
     try {
         document.getElementById("status").innerText = "正在初始化分享系統...";
         await liff.init({ liffId: LIFF_ID });
-
         if (!liff.isInClient()) {
             document.getElementById("status").innerText = "請從 LINE App 內開啟此功能";
             return;
@@ -69,7 +94,6 @@ async function main() {
             document.getElementById("status").innerText = "此環境不支援分享功能";
             return;
         }
-
         document.getElementById("status").innerText = "正在開啟分享視窗...";
         await shareCard();
     } catch (error) {
@@ -80,5 +104,3 @@ async function main() {
 
 main();
 </script>
-</body>
-</html>
