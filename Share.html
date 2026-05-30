@@ -33,14 +33,15 @@ const LIFF_ID = "2008793227-34uhksMV";
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzLTMeKabdT9vj3EuuqGBxIQY3m_b-zsQIFgpfgy6JZRYYHO_8uUeqy3Ay7m33UhvKK/exec";
 
 // ==========================================
-// 文字內容 → Flex bubble（與 GAS buildTextBubble_ 對應）
+// 文字內容 → Flex bubble
 // ==========================================
 function buildTextBubble(text) {
   const BG   = '#0c152a';
   const GOLD = '#d2c696';
   const SUB  = '#8A9AB0';
 
-  const lines  = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  // ★ 先清除 \r，避免 Windows 換行符號造成判斷錯誤
+  const lines = text.replace(/\r/g, '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const blocks = [];
 
   lines.forEach(line => {
@@ -115,8 +116,10 @@ async function shareCard() {
     }
   }));
 
-  // ★ 如果有分享文字，加文字 bubble（只加一次，取第一個有文字的）
-  const cardWithText = data.cards.find(c => c.shareText);
+  // ★ 確認有沒有抓到文字（debug 用，確認正常後可移除）
+  const cardWithText = data.cards.find(c => c.shareText && c.shareText.trim());
+  document.getElementById("status").innerText = "文字: " + (cardWithText ? cardWithText.shareText.substring(0, 10) : '無');
+
   if (cardWithText) {
     bubbles.push(buildTextBubble(cardWithText.shareText));
   }
