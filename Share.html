@@ -29,13 +29,17 @@ body {
     <div id="status" class="loading">正在初始化...</div>
 </div>
 <script>
-const LIFF_ID  = "2008793227-34uhksMV";
-const GAS_URL  = "https://script.google.com/macros/s/AKfycbzLTMeKabdT9vj3EuuqGBxIQY3m_b-zsQIFgpfgy6JZRYYHO_8uUeqy3Ay7m33UhvKK/exec?api=getShareCards";
+const LIFF_ID = "2008793227-34uhksMV";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzLTMeKabdT9vj3EuuqGBxIQY3m_b-zsQIFgpfgy6JZRYYHO_8uUeqy3Ay7m33UhvKK/exec";
 
 async function shareCard() {
+    // 讀取 URL 參數 set，預設 all
+    const urlParams = new URLSearchParams(window.location.search);
+    const set = urlParams.get('set') || 'all';
+
     document.getElementById("status").innerText = "正在載入圖卡清單...";
 
-    const res  = await fetch(GAS_URL);
+    const res  = await fetch(GAS_URL + '?api=getShareCards&set=' + encodeURIComponent(set));
     const data = await res.json();
 
     if (!data.ok || !data.cards || !data.cards.length) {
@@ -44,14 +48,11 @@ async function shareCard() {
     }
 
     const bubbles = data.cards.map(card => ({
-        type: "bubble",
-        size: "giga",
+        type: "bubble", size: "giga",
         hero: {
             type: "image",
             url: card.imageUrl,
-            size: "full",
-            aspectRatio: "3:4",
-            aspectMode: "cover",
+            size: "full", aspectRatio: "3:4", aspectMode: "cover",
             action: { type: "uri", uri: card.actionUri }
         }
     }));
