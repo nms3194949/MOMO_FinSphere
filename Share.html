@@ -1,1 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>MOMO Share Center</title>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#0A1221;
+    color:#F6E6B0;
+    font-family:"Microsoft JhengHei",sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    text-align:center;
+    padding:30px;
+}
+
+.logo{
+    font-size:32px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.subtitle{
+    font-size:16px;
+    opacity:.8;
+}
+
+.loading{
+    margin-top:20px;
+    font-size:18px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="logo">
+        MOMO 雙贏策略
+    </div>
+
+    <div class="subtitle">
+        圖卡分享中心
+    </div>
+
+    <div id="status" class="loading">
+        正在開啟分享視窗...
+    </div>
+</div>
+
+<script>
+
+const LIFF_ID = "2008793227-34uhksMV";
+
+async function shareImageCard(imgUrl){
+
+    const flexPayload = {
+        type: "flex",
+        altText: "MOMO雙贏策略",
+        contents: {
+            type: "bubble",
+            size: "giga",
+            hero: {
+                type: "image",
+                url: imgUrl,
+                size: "full",
+                aspectRatio: "3:4",
+                aspectMode: "cover",
+                action: {
+                    type: "uri",
+                    uri: imgUrl
+                }
+            }
+        }
+    };
+
+    await liff.shareTargetPicker([flexPayload]);
+
+    liff.closeWindow();
+}
+
+async function main(){
+
+    try{
+
+        await liff.init({
+            liffId: LIFF_ID
+        });
+
+        const params = new URLSearchParams(window.location.search);
+
+        const img = params.get("img");
+
+        if(!img){
+
+            document.getElementById("status").innerHTML =
+                "❌ 找不到圖片網址";
+
+            return;
+        }
+
+        document.getElementById("status").innerHTML =
+            "📤 正在準備分享...";
+
+        await shareImageCard(img);
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById("status").innerHTML =
+            "❌ " + error.message;
+    }
+}
+
+main();
+
+</script>
+
+</body>
+</html>
