@@ -28,96 +28,48 @@ body {
     <div class="subtitle">MOMO雙贏策略圖卡分享</div>
     <div id="status" class="loading">正在初始化...</div>
 </div>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-const LIFF_ID = "2008793227-34uhksMV";
-const BASE = "https://nms3194949.github.io/MOMO_FinSphere/";
+const LIFF_ID  = "2008793227-34uhksMV";
+const GAS_URL  = "https://script.google.com/macros/s/AKfycbzLTMeKabdT9vj3EuuqGBxIQY3m_b-zsQIFgpfgy6JZRYYHO_8uUeqy3Ay7m33UhvKK/exec?api=getShareCards";
 
 async function shareCard() {
-    const result = await liff.shareTargetPicker([
-        {
-            type: "flex",
-            altText: "MOMO雙贏策略",
-            contents: {
-                type: "carousel",
-                contents: [
-                    {
-                        type: "bubble", size: "giga",
-                        hero: {
-                            type: "image",
-                            url: BASE + "MOMO-Fund.png",
-                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: "https://liff.line.me/2008793227-34uhksMV" }
-                        }
-                    },
-                    {
-                        type: "bubble", size: "giga",
-                        hero: {
-                            type: "image",
-                            url: BASE + "Cash_AB.png",
-                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: BASE + "Cash_AB.png" }
-                        }
-                    },
-                    {
-                        type: "bubble", size: "giga",
-                        hero: {
-                            type: "image",
-                            url: BASE + "Cash_ALLIANZ.png",
-                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: BASE + "Cash_ALLIANZ.png" }
-                        }
-                    },
-                    {
-                        type: "bubble", size: "giga",
-                        hero: {
-                            type: "image",
-                            url: BASE + "Cash_AMUNDI.png",
-                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: BASE + "Cash_AMUNDI.png" }
-                        }
-                    },
-                    {
-                        type: "bubble", size: "giga",
-                        hero: {
-                            type: "image",
-                            url: BASE + "Cash_BLK.png",
-                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: BASE + "Cash_BLK.png" }
-                        }
-                    },
-                    {
-                        type: "bubble", size: "giga",
-                        hero: {
-                            type: "image",
-                            url: BASE + "Cash_EASTSPRING.png",
-                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: BASE + "Cash_EASTSPRING.png" }
-                        }
-                    },
-                    {
-                        type: "bubble", size: "giga",
-                        hero: {
-                            type: "image",
-                            url: BASE + "Cash_SCHRODERS.png",
-                            size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: BASE + "Cash_SCHRODERS.png" }
-                        }
-                    }
-                ]
-            }
-        }
-    ]);
+    document.getElementById("status").innerText = "正在載入圖卡清單...";
 
-    if (result || result === null) {
-        liff.closeWindow();
+    const res  = await fetch(GAS_URL);
+    const data = await res.json();
+
+    if (!data.ok || !data.cards || !data.cards.length) {
+        document.getElementById("status").innerText = "❌ 無法載入圖卡清單";
+        return;
     }
+
+    const bubbles = data.cards.map(card => ({
+        type: "bubble",
+        size: "giga",
+        hero: {
+            type: "image",
+            url: card.imageUrl,
+            size: "full",
+            aspectRatio: "3:4",
+            aspectMode: "cover",
+            action: { type: "uri", uri: card.actionUri }
+        }
+    }));
+
+    const result = await liff.shareTargetPicker([{
+        type: "flex",
+        altText: "MOMO雙贏策略",
+        contents: { type: "carousel", contents: bubbles }
+    }]);
+
+    if (result || result === null) liff.closeWindow();
 }
 
 async function main() {
     try {
         document.getElementById("status").innerText = "正在初始化分享系統...";
         await liff.init({ liffId: LIFF_ID });
+
         if (!liff.isInClient()) {
             document.getElementById("status").innerText = "請從 LINE App 內開啟此功能";
             return;
@@ -126,6 +78,7 @@ async function main() {
             document.getElementById("status").innerText = "此環境不支援分享功能";
             return;
         }
+
         document.getElementById("status").innerText = "正在開啟分享視窗...";
         await shareCard();
     } catch (error) {
