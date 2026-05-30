@@ -117,8 +117,7 @@ async function shareCard() {
   }));
 
   // ★ 確認有沒有抓到文字（debug 用，確認正常後可移除）
-  const cardWithText = data.cards.find(c => c.shareText && c.shareText.trim());
-  document.getElementById("status").innerText = "文字: " + (cardWithText ? cardWithText.shareText.substring(0, 10) : '無');
+const cardWithText = data.cards.find(c => c.shareText && c.shareText.trim());
 
   if (cardWithText) {
     bubbles.push(buildTextBubble(cardWithText.shareText));
