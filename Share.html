@@ -2,6 +2,8 @@
 const LIFF_ID = "2008793227-34uhksMV";
 
 async function shareCard() {
+    const BASE = "https://nms3194949.github.io/MOMO_FinSphere/";
+    
     const result = await liff.shareTargetPicker([
         {
             type: "flex",
@@ -13,7 +15,7 @@ async function shareCard() {
                         type: "bubble", size: "giga",
                         hero: {
                             type: "image",
-                            url: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/MOMO-Fund.png",
+                            url: BASE + "MOMO-Fund.png",
                             size: "full", aspectRatio: "3:4", aspectMode: "cover",
                             action: { type: "uri", uri: "https://liff.line.me/2008793227-34uhksMV" }
                         }
@@ -22,54 +24,54 @@ async function shareCard() {
                         type: "bubble", size: "giga",
                         hero: {
                             type: "image",
-                            url: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_AB.png",
+                            url: BASE + "Cash_AB.png",
                             size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_AB.png" }
+                            action: { type: "uri", uri: BASE + "Cash_AB.png" }
                         }
                     },
                     {
                         type: "bubble", size: "giga",
                         hero: {
                             type: "image",
-                            url: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_ALLIANZ.png",
+                            url: BASE + "Cash_ALLIANZ.png",
                             size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_ALLIANZ.png" }
+                            action: { type: "uri", uri: BASE + "Cash_ALLIANZ.png" }
                         }
                     },
                     {
                         type: "bubble", size: "giga",
                         hero: {
                             type: "image",
-                            url: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_AMUNDI.png",
+                            url: BASE + "Cash_AMUNDI.png",
                             size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_AMUNDI.png" }
+                            action: { type: "uri", uri: BASE + "Cash_AMUNDI.png" }
                         }
                     },
                     {
                         type: "bubble", size: "giga",
                         hero: {
                             type: "image",
-                            url: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_BLK.png",
+                            url: BASE + "Cash_BLK.png",
                             size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_BLK.png" }
+                            action: { type: "uri", uri: BASE + "Cash_BLK.png" }
                         }
                     },
                     {
                         type: "bubble", size: "giga",
                         hero: {
                             type: "image",
-                            url: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_EASTSPRING.png",
+                            url: BASE + "Cash_EASTSPRING.png",
                             size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_EASTSPRING.png" }
+                            action: { type: "uri", uri: BASE + "Cash_EASTSPRING.png" }
                         }
                     },
                     {
                         type: "bubble", size: "giga",
                         hero: {
                             type: "image",
-                            url: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_SCHRODERS.png",
+                            url: BASE + "Cash_SCHRODERS.png",
                             size: "full", aspectRatio: "3:4", aspectMode: "cover",
-                            action: { type: "uri", uri: "https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/Cash_SCHRODERS.png" }
+                            action: { type: "uri", uri: BASE + "Cash_SCHRODERS.png" }
                         }
                     }
                 ]
