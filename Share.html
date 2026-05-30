@@ -1,10 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MOMO Share Center</title>
+<title>MOMO 基金小幫手分享中心</title>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
@@ -33,7 +35,7 @@ body{
 .logo{
     font-size:32px;
     font-weight:bold;
-    margin-bottom:15px;
+    margin-bottom:12px;
 }
 
 .subtitle{
@@ -52,24 +54,31 @@ body{
 <body>
 
 <div class="container">
-    <div class="logo">
-        MOMO 雙贏策略
-    </div>
 
-    <div class="subtitle">
-        圖卡分享中心
-    </div>
+```
+<div class="logo">
+    MOMO 雙贏策略
+</div>
 
-    <div id="status" class="loading">
-        正在開啟分享視窗...
-    </div>
+<div class="subtitle">
+    基金小幫手分享中心
+</div>
+
+<div id="status" class="loading">
+    正在初始化...
+</div>
+```
+
 </div>
 
 <script>
 
 const LIFF_ID = "2008793227-34uhksMV";
 
-async function shareImageCard(imgUrl){
+const IMAGE_URL =
+"https://raw.githubusercontent.com/nms3194949/MOMO_FinSphere/main/MOMO-Fund.png";
+
+async function shareCard() {
 
     const flexPayload = {
         type: "flex",
@@ -79,56 +88,67 @@ async function shareImageCard(imgUrl){
             size: "giga",
             hero: {
                 type: "image",
-                url: imgUrl,
+                url: IMAGE_URL,
                 size: "full",
                 aspectRatio: "3:4",
                 aspectMode: "cover",
                 action: {
                     type: "uri",
-                    uri: imgUrl
+                    uri: IMAGE_URL
                 }
             }
         }
     };
 
-    await liff.shareTargetPicker([flexPayload]);
+    const result = await liff.shareTargetPicker([flexPayload]);
 
-    liff.closeWindow();
+    if (result || result === null) {
+        liff.closeWindow();
+    }
 }
 
-async function main(){
+async function main() {
 
-    try{
+    try {
+
+        document.getElementById("status").innerText =
+        "正在初始化分享系統...";
 
         await liff.init({
             liffId: LIFF_ID
         });
 
-        const params = new URLSearchParams(window.location.search);
+        if (!liff.isInClient()) {
 
-        const img = params.get("img");
-
-        if(!img){
-
-            document.getElementById("status").innerHTML =
-                "❌ 找不到圖片網址";
+            document.getElementById("status").innerText =
+            "請從 LINE App 內開啟此功能";
 
             return;
         }
 
-        document.getElementById("status").innerHTML =
-            "📤 正在準備分享...";
+        if (!liff.isApiAvailable('shareTargetPicker')) {
 
-        await shareImageCard(img);
+            document.getElementById("status").innerText =
+            "此環境不支援分享功能";
+
+            return;
+        }
+
+        document.getElementById("status").innerText =
+        "正在開啟分享視窗...";
+
+        await shareCard();
 
     }
     catch(error){
 
         console.error(error);
 
-        document.getElementById("status").innerHTML =
-            "❌ " + error.message;
+        document.getElementById("status").innerText =
+        "❌ " + error.message;
+
     }
+
 }
 
 main();
@@ -136,4 +156,5 @@ main();
 </script>
 
 </body>
+
 </html>
