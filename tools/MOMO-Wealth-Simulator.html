@@ -239,7 +239,7 @@
       <div class="control-panel">
         <div class="input-group">
           <label>目前本金 (TWD)</label>
-          <input type="number" id="p0" value="3000000" step="10000" oninput="update()" />
+          <input type="number" id="p0" value="1000000" step="10000" oninput="update()" />
         </div>
         <div class="input-group">
           <label>
@@ -838,6 +838,9 @@
       // ✅ 選完基金後自動計算加權配息率
       calcWeightedYield('momo');
       calcWeightedYield('bench');
+      // ✅ 自動計算歷史 CAGR
+      calcAndFillCagr('momo');
+      calcAndFillCagr('bench');
       updateValidationChart('momo'); updateValidationChart('bench');
       renderSelectionPreview(); updateSelectedCounts(); update();
     }
@@ -884,8 +887,9 @@
     function onWeightChange(type,name){
       syncStateFromDOM(type);
       normalizeWeightsTo100(type,name);
-      // ✅ 調整權重後重算配息率
+      // ✅ 調整權重後重算配息率和 CAGR
       calcWeightedYield(type);
+      calcAndFillCagr(type);
       update();
     }
     function onLockToggle(type){
@@ -1440,7 +1444,11 @@
       if (labelEl) labelEl.textContent = label;
       // debounce：滑桿停止拖動 80ms 後才重算，避免每格都觸發
       if (_entryTimer) clearTimeout(_entryTimer);
-      _entryTimer = setTimeout(update, 80);
+      _entryTimer = setTimeout(() => {
+        calcAndFillCagr('momo');
+        calcAndFillCagr('bench');
+        update();
+      }, 80);
     }
 
 
@@ -1458,6 +1466,57 @@
         this.closePath();
         return this;
       };
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    // 從歷史加權組合淨值計算 CAGR
+    // 使用目前進場區間的起訖點，公式：(終值/初值)^(1/年數) - 1
+    // ─────────────────────────────────────────────────────────
+    function calcAndFillCagr(type) {
+      const names   = type === 'momo' ? momoFundNames : benchFundNames;
+      const inputId = type === 'momo' ? 'momo-cagr' : 'bench-cagr';
+      const el      = document.getElementById(inputId);
+      if (!el || names.length === 0) return;
+
+      const lookbackYears = parseFloat(document.getElementById('entry-window').value) || 0;
+      const weights       = getWeights(type); // 正規化，總和 = 1
+
+      // 收集每個日期的加權組合淨值（用 valsFilled 確保連續）
+      const combined = [];
+      for (const row of rawGlobalData) {
+        let weightedNav = 0, valid = true;
+        for (let i = 0; i < names.length; i++) {
+          const v = row.valsFilled[names[i]];
+          if (v === null || v <= 0) { valid = false; break; }
+          weightedNav += v * (weights[i] || 0);
+        }
+        if (valid) combined.push({ dt: row.dt, nav: weightedNav });
+      }
+      if (combined.length < 2) return;
+
+      // 套用進場區間（與 processHistoryPrincipal 邏輯一致）
+      let cut = combined;
+      if (lookbackYears > 0) {
+        const lastDt = combined[combined.length - 1].dt;
+        const cutoff = new Date(lastDt.getFullYear(), lastDt.getMonth(),
+                                lastDt.getDate() - Math.round(lookbackYears * 365));
+        const sliced = combined.filter(r => r.dt >= cutoff);
+        if (sliced.length >= 2) cut = sliced;
+      }
+
+      const startNav = cut[0].nav;
+      const endNav   = cut[cut.length - 1].nav;
+      const days     = (cut[cut.length - 1].dt - cut[0].dt) / (1000 * 60 * 60 * 24);
+      const years    = days / 365;
+
+      if (startNav <= 0 || years < 0.1) return; // 資料太短不算
+
+      const cagr = (Math.pow(endNav / startNav, 1 / years) - 1) * 100;
+      el.value   = cagr.toFixed(2);
+      el.style.borderColor = cagr >= 0 ? 'rgba(52,211,153,0.5)' : 'rgba(239,68,68,0.5)';
+      // 1秒後恢復邊框顏色
+      setTimeout(() => { el.style.borderColor = ''; }, 1000);
     }
 
     window.onload = async () => {
