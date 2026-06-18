@@ -324,6 +324,10 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 <script>
 const $=s=>document.querySelector(s);
 const toHalf=s=>String(s||"").replace(/[\uFF01-\uFF5E]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
+
+/* ===== 統一正規化：全形→半形 + NFC + 小寫 ===== */
+const norm=s=>toHalf(String(s||'')).normalize('NFC').toLowerCase();
+
 function num(x){if(x==null)return null;const s=toHalf(String(x)).trim().replace(/,/g,"").replace(/%$/,"");const v=parseFloat(s);return isNaN(v)?null:v;}
 const fmt=(v,d=4)=>(v==null||isNaN(v)||!isFinite(v))?"—":(+v).toFixed(d);
 const pct100=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
@@ -470,12 +474,6 @@ function renderMatrix(p){
     if(i===0)tr.className='now';
     if(isAlert)tr.className='warn-row';
 
-    function roiCell(roi,isGood){
-      if(roi===null)return '<td>—</td>';
-      const cls=roi>0?'pct-pos':roi<-30?'pct-lo':'pct-neg';
-      return`<td><span class="${cls}">${(roi>=0?'+':'')+roi.toFixed(2)}%</span><br><span style="font-size:11px;color:var(--muted)">${isGood?'賣 '+rTarget.sell.toFixed(4):''}</span></td>`;
-    }
-
     const remLabel=isAlert
       ?`<span style="color:var(--red);font-weight:700">${remDays}天 ⚠</span>`
       :isWarn
@@ -502,7 +500,6 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>swit
 
 /* ===== 帶入計算 ===== */
 function loadToCalc(r){
-  // 解鎖唯讀欄位，填入，再鎖回
   ['cK','cRatio','cIV','cSpread'].forEach(id=>$('#'+id).removeAttribute('readonly'));
   $('#cK').value=num(r.strike)||'';
   $('#cRatio').value=r.exercise!=null?r.exercise:'';
@@ -510,17 +507,11 @@ function loadToCalc(r){
   $('#cSpread').value=r.spread!=null?r.spread:'';
   ['cK','cRatio','cIV','cSpread'].forEach(id=>$('#'+id).setAttribute('readonly',''));
 
-  // 天數
   $('#cT').value=r.days_left!=null?r.days_left:'';
-
-  // 類型
   $('#cType').value=r.cp==='P'?'put':'call';
-
-  // 標的名稱
   $('#calcTarget').textContent=(r.name||r.code)+' ('+r.code+')';
   $('#calcBadge').style.display='inline-block';
 
-  // 清空手動區（讓使用者重新填）
   $('#cCostS').value='';
   $('#cNowS').value='';
   $('#cTargetS').value='';
@@ -529,7 +520,6 @@ function loadToCalc(r){
   $('#matrixSection').style.display='none';
   $('#warnBanner').style.display='none';
 
-  // 換證警示
   if(r.days_left!=null && r.days_left<=60){
     const warn=$('#warnBanner');
     warn.className='warn-banner red';warn.style.display='block';
@@ -610,7 +600,7 @@ async function loadData(force=false){
     }
     if(json.error)throw new Error(json.error);
     STOCK_MAP=json.map||{};
-    Object.entries(STOCK_MAP).forEach(([c,n])=>{STOCK_REV[n.toLowerCase()]=c;});
+    Object.entries(STOCK_MAP).forEach(([c,n])=>{STOCK_REV[norm(n)]=c;});
     const wb=XLSX.read(json.csv,{type:"string",codepage:65001});
     RAW=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
     preprocess();
@@ -623,7 +613,7 @@ async function loadData(force=false){
 
 $('#btnFetch').addEventListener('click',()=>loadData(false));
 $('#btnForce').addEventListener('click',()=>loadData(true));
-$('#btnReset').addEventListener('click',()=>{$('#fDays').value=60;$('#fS2').value=1500;$('#fS1').value='';$('#fIV').value='';$('#fLev').value='';render();});
+$('#btnReset').addEventListener('click',()=>{$('#fDays').value=60;$('#fS2').value='';$('#fS1').value='';$('#fIV').value='';$('#fLev').value='';render();});
 window.addEventListener('DOMContentLoaded',()=>{
   const ts=parseInt(localStorage.getItem(CACHE_TS)||'NaN');
   if(!isNaN(ts)&&Date.now()-ts<CACHE_EXP)loadData(false);
@@ -632,19 +622,29 @@ window.addEventListener('DOMContentLoaded',()=>{
 function filterSort(){
   const type=$('#selType').value;
   const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked;
-  const q=toHalf($('#nameFilter').value).toLowerCase().split(/\s+/).filter(Boolean);
+
+  /* ===== 修正：用 norm() 統一正規化搜尋詞和資料 ===== */
+  const rawQ=norm($('#nameFilter').value);
+  const q=rawQ.split(/\s+/).filter(Boolean);
+
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
   const maxS1=parseFloat($('#fS1').value),maxIV=parseFloat($('#fIV').value),minLev=parseFloat($('#fLev').value);
   const all=PROC.filter(x=>x.cp===type);
+
   const afterQ=q.length===0?all:all.filter(x=>{
-    const n=x.name.toLowerCase();
+    /* 把名稱和代號都正規化後比對 */
+    const n=norm(x.name)+' '+norm(x.code);
     return q.every(tok=>{
-      const a=[tok];
-      if(STOCK_MAP[tok])a.push(STOCK_MAP[tok].toLowerCase());
-      if(STOCK_REV[tok])a.push(STOCK_REV[tok]);
-      return a.some(al=>n.includes(al));
+      /* 直接比對 */
+      if(n.includes(tok))return true;
+      /* 代號 → 股票名稱 */
+      if(STOCK_MAP[tok]&&n.includes(norm(STOCK_MAP[tok])))return true;
+      /* 股票名稱 → 代號（STOCK_REV key 已在 loadData 時 norm 過） */
+      if(STOCK_REV[tok]&&n.includes(norm(STOCK_REV[tok])))return true;
+      return false;
     });
   });
+
   const rows=afterQ.filter(x=>{
     if(dropZ&&(!x.spread||x.spread===0))return false;
     if(needIV&&(!x.iv||x.iv===0))return false;
