@@ -105,9 +105,45 @@ tbody tr:hover td{background:#1a2a4a}
 
 hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 
-@media(max-width:600px){
+/* ===== 手機卡片版 ===== */
+.wcard-list{display:none;flex-direction:column;gap:10px;margin-top:10px}
+.wcard{background:var(--card2);border:1px solid var(--line2);border-radius:var(--radius);padding:12px 14px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.wcard:active{background:#162040}
+.wcard-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.wcard-code{font-size:13px;font-weight:700;color:var(--gold-soft)}
+.wcard-name{font-size:14px;font-weight:600;color:#fff;flex:1}
+.wcard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 10px}
+.wcard-item .wl{font-size:10px;color:var(--muted);margin-bottom:1px}
+.wcard-item .wv{font-size:13px;font-weight:700;color:#fff}
+.wcard-divider{border:none;border-top:1px solid var(--line);margin:8px 0}
+.wcard-bottom{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)}
+/* 手機篩選抽屜 */
+.mob-filter-btn{display:none;width:100%;margin-top:8px}
+.mob-filter-drawer{display:none;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.mob-filter-drawer.open{display:flex}
+.mob-fi-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mob-fi-label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.mob-fi-label input{background:#07101f;color:#fff;border:1px solid var(--line2);border-radius:6px;padding:6px 8px;font-size:13px;outline:none;width:100%}
+.mob-fi-label input:focus{border-color:var(--gold)}
+
+@media(max-width:768px){
+  .wrap{padding:10px 8px 4rem}
+  /* 桌機元素隱藏 */
+  .tbl-wrap{display:none}
+  .filter-bar{display:none}
+  .mob-filter-btn{display:flex}
+  .wcard-list{display:flex}
+  /* 頂部控制列簡化 */
+  .desktop-controls{display:none}
+  .mob-controls{display:flex !important}
   .g2,.g3,.g4{grid-template-columns:1fr 1fr}
   .rt-item .rv{font-size:17px}
+  .rt-row{gap:10px}
+}
+@media(min-width:769px){
+  .mob-controls{display:none !important}
+  .mob-filter-btn{display:none !important}
+  .wcard-list{display:none !important}
 }
 </style>
 </head>
@@ -129,7 +165,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
   <!-- ===== TAB 1 篩選器 ===== -->
   <div class="tab-panel active" id="tab-screener">
     <div class="card">
-      <div class="row" style="margin-bottom:0">
+      <div class="row desktop-controls" style="margin-bottom:0">
         <button class="btn" id="btnFetch"><span class="spinner" id="sp1"></span><span id="btnText">載入權證資料</span></button>
         <button class="btn btn-outline" id="btnForce">強制更新</button>
         <input class="field" id="nameFilter" type="text" placeholder="搜尋標的（代號或名稱）"/>
@@ -153,6 +189,37 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkIV" checked/>排除無隱波</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkLowIV" checked/>排除隱波&lt;5%</label>
       </div>
+
+      <!-- 手機版控制列 -->
+      <div class="mob-controls" style="display:none;gap:8px;flex-wrap:wrap;align-items:center">
+        <input class="field" id="nameFilterMob" type="text" placeholder="搜尋標的" style="flex:1;min-width:0"/>
+        <select class="field" id="selTypeMob" style="max-width:110px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
+        <select class="field" id="selSortKeyMob" style="max-width:130px">
+          <option value="s1" selected>排序：S1</option>
+          <option value="move5pct">排序：漲5%</option>
+          <option value="eff_delta">排序：Delta</option>
+          <option value="days_left">排序：天數</option>
+          <option value="spread">排序：價差比</option>
+        </select>
+      </div>
+      <button class="btn btn-outline mob-filter-btn" id="btnMobFilter">⚙ 篩選條件</button>
+      <div class="mob-filter-drawer" id="mobFilterDrawer">
+        <div class="mob-fi-row">
+          <label class="mob-fi-label">天數 ≥ <input type="number" id="fDaysMob" value="60"/></label>
+          <label class="mob-fi-label">漲5%報酬 ≥ <input type="number" id="fMove5Mob" value="10"/> %</label>
+        </div>
+        <div class="mob-fi-row">
+          <label class="mob-fi-label">有效Delta ≥ <input type="number" id="fEffDeltaMob" placeholder="不限"/></label>
+          <label class="mob-fi-label">S2 ≤ <input type="number" id="fS2Mob" placeholder="不限"/> %</label>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkZeroMob" checked/>排除價差=0</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkIVMob" checked/>排除無隱波</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkLowIVMob" checked/>排除隱波&lt;5%</label>
+        </div>
+        <button class="btn btn-outline btn-sm" id="btnResetMob">重置</button>
+      </div>
+
       <div class="filter-bar">
         <span style="color:var(--gold-soft);font-size:12px;font-weight:700">篩選：</span>
         <label>天數 ≥ <input class="fi" id="fDays" type="number" value="60"/></label>
@@ -191,6 +258,9 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <tbody id="tbody"></tbody>
         </table>
       </div>
+      <!-- 手機卡片清單 -->
+      <div class="wcard-list" id="wcardList"></div>
+
       <div style="margin-top:8px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap">
         <span><span class="eff-good">■</span> 達標（有效Delta ≥ 0.03 / 漲5%報酬 ≥ 10%）</span>
         <span><span class="eff-bad">■</span> 未達門檻 / 價差比 &gt; 15% / 隱波 &lt; 5%（異常）</span>
@@ -610,7 +680,7 @@ async function loadData(force=false){
     preprocess();
     const ft=new Date(parseInt(localStorage.getItem(CACHE_TS))).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
     $('#topStatus').innerHTML=`<span class="count-badge">${RAW.length.toLocaleString()}</span> 筆 <span style="color:${usedCache?'var(--green)':'var(--gold-soft)'}">　${usedCache?'⚡ 暫存':'🔄 最新'} (${ft})</span>`;
-    render();
+    renderAll();
   }catch(e){alert('載入失敗：'+e.message);}
   finally{$('#btnFetch').disabled=false;$('#btnForce').disabled=false;$('#sp1').style.display='none';$('#btnText').textContent='載入權證資料';}
 }
@@ -722,6 +792,144 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
 ['selType','chkZero','selLimit','chkIV','chkLowIV'].forEach(id=>$('#'+id).addEventListener('change',render));
 let dbt;const dbR=()=>{clearTimeout(dbt);dbt=setTimeout(render,280);};
 ['nameFilter','fDays','fS2','fS1','fIV','fLev','fEffDelta','fMove5'].forEach(id=>$('#'+id).addEventListener('input',dbR));
+
+/* ===== 手機版 filterSort ===== */
+function filterSortMob(){
+  const isMob=window.innerWidth<=768;
+  const type=isMob?$('#selTypeMob').value:$('#selType').value;
+  const dropZ=isMob?$('#chkZeroMob').checked:$('#chkZero').checked;
+  const needIV=isMob?$('#chkIVMob').checked:$('#chkIV').checked;
+  const dropLowIV=isMob?$('#chkLowIVMob').checked:$('#chkLowIV').checked;
+  const rawQ=norm(isMob?$('#nameFilterMob').value:$('#nameFilter').value);
+  const q=rawQ.split(/\s+/).filter(Boolean);
+  const minD=parseFloat(isMob?$('#fDaysMob').value:$('#fDays').value);
+  const maxS2=parseFloat(isMob?$('#fS2Mob').value:$('#fS2').value);
+  const minEffDelta=parseFloat(isMob?$('#fEffDeltaMob').value:$('#fEffDelta').value);
+  const minMove5=parseFloat(isMob?$('#fMove5Mob').value:$('#fMove5').value);
+  const sk=isMob?$('#selSortKeyMob').value:sortKey;
+
+  const all=PROC.filter(x=>x.cp===type);
+  const afterQ=q.length===0?all:all.filter(x=>{
+    const n=norm(x.name)+' '+norm(x.code);
+    return q.every(tok=>{
+      if(n.includes(tok))return true;
+      if(STOCK_MAP[tok]&&n.includes(norm(STOCK_MAP[tok])))return true;
+      if(STOCK_REV[tok]&&n.includes(norm(STOCK_REV[tok])))return true;
+      return false;
+    });
+  });
+  return afterQ.filter(x=>{
+    if(dropZ&&(!x.spread||x.spread===0))return false;
+    if(needIV&&(!x.iv||x.iv===0))return false;
+    if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
+    if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
+    if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
+    if(!isNaN(minEffDelta)&&(x.eff_delta==null||x.eff_delta<minEffDelta))return false;
+    if(!isNaN(minMove5)&&(x.move5pct==null||x.move5pct<minMove5))return false;
+    return true;
+  }).sort((a,b)=>{const va=a[sk]??Infinity,vb=b[sk]??Infinity;return va-vb;});
+}
+
+/* ===== renderMobile ===== */
+function renderMobile(){
+  if(PROC.length===0)return;
+  const rows=filterSortMob();
+  const list=$('#wcardList'); list.innerHTML='';
+
+  $('#metaBar').textContent='篩選後 '+rows.length+' 筆';
+
+  rows.slice(0,50).forEach(r=>{
+    const effGood=r.eff_delta!=null&&r.eff_delta>=0.03;
+    const move5Good=r.move5pct!=null&&r.move5pct>=10;
+    const effCls=effGood?'eff-good':'eff-bad';
+    const move5Cls=move5Good?'eff-good':'eff-bad';
+    const ivCls=r.iv!=null&&r.iv<5?'eff-bad':r.iv>80?'purple':'';
+    const daysColor=r.days_left!=null&&r.days_left<=60?'var(--red)':r.days_left<=90?'var(--amber)':'#fff';
+    const spreadCls=r.spread!=null&&r.spread>15?'eff-bad':'';
+    const move5Str=r.move5pct!=null?(r.move5pct>=0?'+':'')+r.move5pct.toFixed(1)+'%':'—';
+    const s1Str=r.s1!=null?pct100(r.s1):'—';
+    const s2Str=r.s2!=null?pct100(r.s2):'—';
+    const s2Cls=r.s2!=null?(r.s2*100>1500?'eff-bad':''):'';
+
+    const div=document.createElement('div');
+    div.className='wcard';
+    div.innerHTML=`
+      <div class="wcard-header">
+        <span class="wcard-code">${r.code}</span>
+        <span class="wcard-name">${r.name}</span>
+        <span class="tag ${r.cp}">${r.cp}</span>
+      </div>
+      <div class="wcard-grid">
+        <div class="wcard-item">
+          <div class="wl">漲5%報酬</div>
+          <div class="wv ${move5Cls}">${move5Str}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">有效Delta</div>
+          <div class="wv ${effCls}">${r.eff_delta!=null?r.eff_delta.toFixed(2):'—'}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">天數</div>
+          <div class="wv" style="color:${daysColor}">${r.days_left??'—'}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">槓桿</div>
+          <div class="wv">${fmt(Math.abs(r.leverage),2)}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">S1</div>
+          <div class="wv">${s1Str}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">S2</div>
+          <div class="wv ${s2Cls}">${s2Str}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">隱波</div>
+          <div class="wv ${ivCls}">${fmt(r.iv,1)}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">價差比</div>
+          <div class="wv ${spreadCls}">${fmt(r.spread,2)}</div>
+        </div>
+        <div class="wcard-item">
+          <div class="wl">價內外</div>
+          <div class="wv" style="font-size:11px;font-weight:400;color:var(--muted)">${r.moneyness||'—'}</div>
+        </div>
+      </div>
+    `;
+    div.addEventListener('click',()=>loadToCalc(r));
+    list.appendChild(div);
+  });
+
+  $('#resultCard').style.display='block';
+}
+
+/* ===== render 統一入口 ===== */
+function renderAll(){
+  if(window.innerWidth<=768){renderMobile();}else{render();}
+}
+
+/* ===== 手機版事件綁定 ===== */
+$('#btnMobFilter').addEventListener('click',()=>{
+  $('#mobFilterDrawer').classList.toggle('open');
+});
+$('#btnResetMob').addEventListener('click',()=>{
+  $('#fDaysMob').value=60;$('#fS2Mob').value='';
+  $('#fEffDeltaMob').value='';$('#fMove5Mob').value=10;
+  $('#chkZeroMob').checked=true;$('#chkIVMob').checked=true;$('#chkLowIVMob').checked=true;
+  renderAll();
+});
+let dbtM;const dbRM=()=>{clearTimeout(dbtM);dbtM=setTimeout(renderAll,280);};
+['nameFilterMob','fDaysMob','fS2Mob','fEffDeltaMob','fMove5Mob'].forEach(id=>{
+  const el=$('#'+id);if(el)el.addEventListener('input',dbRM);
+});
+['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob'].forEach(id=>{
+  const el=$('#'+id);if(el)el.addEventListener('change',renderAll);
+});
+window.addEventListener('resize',()=>{if(PROC.length>0)renderAll();});
+
+/* ===== loadData 改呼叫 renderAll ===== */
 </script>
 </body>
 </html>
