@@ -17,19 +17,16 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--deep);color:#fff;font-family:"Noto Sans TC",-apple-system,sans-serif;font-size:15px;line-height:1.5}
-.wrap{max-width:1100px;margin:0 auto;padding:14px 12px 3rem}
+.wrap{max-width:1200px;margin:0 auto;padding:14px 12px 3rem}
 
-/* tabs */
 .tabs{display:flex;border-bottom:1px solid var(--line2);margin-bottom:12px}
 .tab{padding:9px 24px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
 .tab-panel{display:none}.tab-panel.active{display:block}
 
-/* card */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px}
 .card2{background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px}
 
-/* form */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
 .g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px}
@@ -39,22 +36,17 @@ html,body{background:var(--deep);color:#fff;font-family:"Noto Sans TC",-apple-sy
 .f input[type=date]{color-scheme:dark}
 .f input.readonly{color:var(--muted);background:#07101f;cursor:default}
 
-/* buttons */
 .btn{background:var(--gold-grad);color:#000;border:none;border-radius:var(--radius-sm);padding:9px 14px;font-weight:700;cursor:pointer;font-size:14px;transition:.15s;display:inline-flex;align-items:center;gap:6px}
 .btn:hover{opacity:.88;transform:translateY(-1px)}
 .btn:disabled{background:#252525;color:#555;cursor:not-allowed;transform:none;opacity:1}
 .btn-outline{background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft)}
 .btn-outline:hover{background:var(--gold-soft);color:#000}
 .btn-sm{padding:4px 10px;font-size:12px;border-radius:6px}
-.btn-red{background:transparent;border:1px solid var(--red);color:var(--red)}
-.btn-red:hover{background:var(--red);color:#fff}
 .spinner{width:13px;height:13px;border:2px solid rgba(0,0,0,.15);border-top:2px solid #000;border-radius:50%;animation:spin .8s linear infinite;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* section label */
 .slbl{font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;margin:.9rem 0 .5rem}
 
-/* screener table */
 .tbl-wrap{overflow:auto;max-height:52vh;border:1px solid var(--line);border-radius:8px;margin-top:10px}
 table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
 th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;white-space:nowrap}
@@ -79,7 +71,6 @@ tbody tr:hover td{background:#1a2a4a}
 .field{background:#07101f;color:#fff;border:1px solid var(--line2);border-radius:8px;padding:8px 10px;font-size:14px;outline:none;flex:1 1 150px}
 .field:focus{border-color:var(--gold)}
 
-/* matrix table */
 .matrix-wrap{overflow-x:auto;border:1px solid var(--line2);border-radius:var(--radius-sm);margin-top:6px}
 .matrix{width:100%;border-collapse:collapse;font-size:13px}
 .matrix th{background:#0a1628;color:var(--gold-soft);padding:8px 12px;font-size:11px;font-weight:600;border-bottom:1px solid var(--line2);white-space:nowrap;text-align:center}
@@ -93,27 +84,26 @@ tbody tr:hover td{background:#1a2a4a}
 .pct-lo{color:#FF9999}
 .warn-row td{background:#1a0a0a !important}
 
-/* realtime box */
 .rt-box{background:var(--card2);border:1px solid var(--line2);border-radius:var(--radius-sm);padding:12px 16px}
 .rt-row{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline}
 .rt-item .rl{font-size:11px;color:var(--muted);margin-bottom:2px}
 .rt-item .rv{font-size:20px;font-weight:700;color:#fff}
 .rt-item .rs{font-size:11px;color:var(--muted);margin-top:1px}
 
-/* warn banner */
 .warn-banner{border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-weight:700;margin-bottom:10px;display:none}
 .warn-banner.red{background:var(--red-bg);border:1px solid var(--red);color:var(--red)}
 .warn-banner.amber{background:#251500;border:1px solid var(--amber);color:var(--amber)}
 
-/* loaded badge */
 .loaded-badge{display:inline-block;background:#085041;color:#9FE1CB;padding:2px 10px;border-radius:6px;font-size:12px;font-weight:700;margin-left:8px;vertical-align:middle}
 
-/* moneyness */
 .mn-itm{display:inline-block;background:#085041;color:#9FE1CB;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-left:3px}
 .mn-otm{display:inline-block;background:#4A1B0C;color:#F5C4B3;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-left:3px}
 .mn-atm{display:inline-block;background:#412402;color:#FAC775;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-left:3px}
 
-/* divider */
+/* 有效Delta / 一檔獲利 顏色 */
+.eff-good{color:var(--gold);font-weight:700}
+.eff-bad{color:var(--red);font-weight:700}
+
 hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 
 @media(max-width:600px){
@@ -151,6 +141,8 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <option value="leverage">排序：槓桿</option>
           <option value="days_left">排序：天數</option>
           <option value="iv">排序：隱波</option>
+          <option value="eff_delta">排序：有效Delta</option>
+          <option value="tick_profit">排序：一檔獲利</option>
         </select>
         <select class="field" id="selLimit" style="max-width:110px">
           <option value="20" selected>20 列</option>
@@ -168,6 +160,8 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <label>S1 ≤ <input class="fi" id="fS1" type="number" placeholder="不限"/></label>
         <label>隱波 ≤ <input class="fi" id="fIV" type="number" placeholder="不限"/></label>
         <label>槓桿 ≥ <input class="fi" id="fLev" type="number" placeholder="不限"/></label>
+        <label>有效Delta ≥ <input class="fi" id="fEffDelta" type="number" placeholder="不限" style="width:58px"/></label>
+        <label>一檔獲利 ≥ <input class="fi" id="fTickProfit" type="number" placeholder="不限" style="width:58px"/> 元</label>
         <button class="btn btn-outline btn-sm" id="btnReset">重置</button>
       </div>
     </div>
@@ -189,11 +183,18 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
             <th>履約價</th>
             <th>成交價</th>
             <th data-key="iv">隱波<span class="sort-icon"></span></th>
+            <th data-key="eff_delta">有效Delta<span class="sort-icon"></span></th>
+            <th data-key="tick_profit">一檔獲利<span class="sort-icon"></span></th>
             <th>價內外</th>
             <th>帶入計算</th>
           </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
+      </div>
+      <!-- 圖例 -->
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap">
+        <span><span class="eff-good">■</span> 有效Delta ≥ 0.03 且 一檔獲利 ≥ 0.1元（適合）</span>
+        <span><span class="eff-bad">■</span> 未達門檻（不適合）</span>
       </div>
     </div>
   </div>
@@ -201,8 +202,6 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
   <!-- ===== TAB 2 計算 ===== -->
   <div class="tab-panel" id="tab-calc">
     <div class="card">
-
-      <!-- 標的資訊列 -->
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         <div style="font-size:14px;font-weight:500">
           計算標的：<span id="calcTarget" style="color:var(--gold)">尚未帶入</span>
@@ -211,7 +210,6 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <button class="btn btn-outline btn-sm" onclick="switchTab('screener')">← 回篩選器</button>
       </div>
 
-      <!-- 權證基本參數（唯讀，從篩選器帶入） -->
       <div class="slbl">權證基本參數（從篩選器自動帶入）</div>
       <div class="card2" style="margin-bottom:10px">
         <div class="g4" style="margin-bottom:9px">
@@ -232,7 +230,6 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <div style="margin-top:8px;font-size:12px;color:var(--muted)">IV 盤中可能被券商壓低，保守估計時可手動下調 5~10%（點欄位可編輯）</div>
       </div>
 
-      <!-- 手動輸入區 -->
       <div class="slbl">你的判斷（手動填入）</div>
       <div class="g4" style="margin-bottom:10px">
         <div class="f">
@@ -253,7 +250,6 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         </div>
       </div>
 
-      <!-- 盤中即時查詢 -->
       <div id="realtimeBox" style="display:none;margin-bottom:12px">
         <div class="slbl">盤中即時合理價</div>
         <div class="rt-box">
@@ -279,20 +275,23 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
               <div class="rs" id="rtROIsub"></div>
             </div>
             <div class="rt-item">
-              <div class="rl">Delta × 比例</div>
+              <div class="rl">有效 Delta</div>
               <div class="rv" id="rtDelta" style="font-size:16px">—</div>
-              <div class="rs">股票漲1元，權證約變動</div>
+              <div class="rs" id="rtDeltaSub">股票漲1元，權證約變動</div>
+            </div>
+            <div class="rt-item">
+              <div class="rl">一檔獲利</div>
+              <div class="rv" id="rtTickProfit" style="font-size:16px">—</div>
+              <div class="rs" id="rtTickSub">元／檔</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 換證警示 -->
       <div id="warnBanner" class="warn-banner"></div>
 
-      <!-- 報酬矩陣 -->
       <div id="matrixSection" style="display:none">
-        <div class="slbl">報酬矩陣：三情境 × 五時間點</div>
+        <div class="slbl">報酬矩陣：三情境 × 多時間點</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
           買入成本基準：<span id="matrixCostNote" style="color:var(--gold-soft)">—</span>　
           目標：<span id="matrixTargetNote" style="color:var(--green)">—</span>　
@@ -324,13 +323,21 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 <script>
 const $=s=>document.querySelector(s);
 const toHalf=s=>String(s||"").replace(/[\uFF01-\uFF5E]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
-
-/* ===== 統一正規化：全形→半形 + NFC + 小寫 ===== */
 const norm=s=>toHalf(String(s||'')).normalize('NFC').toLowerCase();
-
 function num(x){if(x==null)return null;const s=toHalf(String(x)).trim().replace(/,/g,"").replace(/%$/,"");const v=parseFloat(s);return isNaN(v)?null:v;}
 const fmt=(v,d=4)=>(v==null||isNaN(v)||!isFinite(v))?"—":(+v).toFixed(d);
 const pct100=(v,d=2)=>(v==null||isNaN(v)||!isFinite(v))?"—":(v*100).toFixed(d)+"%";
+
+/* ===== tick size ===== */
+function tickSize(price){
+  if(!price||price<=0)return 1;
+  if(price<=10)return 0.01;
+  if(price<=50)return 0.05;
+  if(price<=100)return 0.1;
+  if(price<=500)return 0.5;
+  if(price<=1000)return 1;
+  return 5;
+}
 
 /* ===== Black-Scholes ===== */
 function ncdf(x){const t=1/(1+0.2316419*Math.abs(x));const d=0.3989423*Math.exp(-x*x/2);const p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p;}
@@ -345,14 +352,25 @@ function bsDelta(type,S,K,T,r,v){
   const d1=(Math.log(S/K)+(r+v*v/2)*T)/(v*Math.sqrt(T));
   return type==='call'?ncdf(d1):ncdf(d1)-1;
 }
-function mnClass(type,S,K){
-  const r=type==='call'?(S-K)/K:(K-S)/K;
-  if(r>0.015)return'mn-itm';if(r<-0.015)return'mn-otm';return'mn-atm';
+
+/* ===== 計算有效Delta & 一檔獲利（篩選器用，以成交價為現貨估算）===== */
+function calcEffDelta(r){
+  if(!r.iv||!r.exercise||!r.days_left||!r.strike)return{eff_delta:null,tick_profit:null};
+  const S=num(r.price_underlying)||num(r.strike); // 用履約價當近似現貨（無現貨欄位時）
+  const K=num(r.strike);
+  const T=r.days_left/365;
+  const v=r.iv/100;
+  const ratio=r.exercise;
+  const type=r.cp==='P'?'put':'call';
+  if(!S||!K||!T||!v||!ratio)return{eff_delta:null,tick_profit:null};
+  const delta=bsDelta(type,S,K,T,0.02,v);
+  const eff=Math.abs(delta)*ratio;
+  const tick=eff*tickSize(S);
+  return{eff_delta:eff,tick_profit:tick};
 }
-function mnLabel(type,S,K){
-  const r=type==='call'?(S-K)/K:(K-S)/K;
-  if(r>0.015)return'ITM';if(r<-0.015)return'OTM';return'ATM';
-}
+
+function mnClass(type,S,K){const r=type==='call'?(S-K)/K:(K-S)/K;if(r>0.015)return'mn-itm';if(r<-0.015)return'mn-otm';return'mn-atm';}
+function mnLabel(type,S,K){const r=type==='call'?(S-K)/K:(K-S)/K;if(r>0.015)return'ITM';if(r<-0.015)return'OTM';return'ATM';}
 
 /* ===== 取得計算參數 ===== */
 function getP(){
@@ -372,8 +390,7 @@ function getP(){
   };
 }
 
-/* ===== 計算單一情境報酬率 ===== */
-function calcROI(p, S, remDays, costBuy){
+function calcROI(p,S,remDays,costBuy){
   const T=remDays/365;
   const theory=bs(p.type,S,p.K,T,p.r,p.v)*p.ratio;
   const sell=theory*(1-p.spread/2);
@@ -386,7 +403,6 @@ function updateAll(){
   const p=getP();
   if(!p.K||!p.ratio||!p.v||!p.totalDays)return;
 
-  // 換證警示
   const warn=$('#warnBanner');
   if(p.totalDays<=60){
     warn.className='warn-banner red';warn.style.display='block';
@@ -398,7 +414,6 @@ function updateAll(){
     warn.style.display='none';
   }
 
-  // 盤中即時查詢
   if(p.nowS>0 && p.costS>0){
     $('#realtimeBox').style.display='block';
     const theory=bs(p.type,p.nowS,p.K,p.T,p.r,p.v)*p.ratio;
@@ -406,9 +421,13 @@ function updateAll(){
     const costTheory=bs(p.type,p.costS,p.K,p.T,p.r,p.v)*p.ratio;
     const costBuy=costTheory*(1+p.spread/2);
     const roi=costBuy>0?((sell-costBuy)/costBuy)*100:0;
-    const delta=bsDelta(p.type,p.nowS,p.K,p.T,p.r,p.v)*p.ratio;
+    const delta=bsDelta(p.type,p.nowS,p.K,p.T,p.r,p.v);
+    const effDelta=Math.abs(delta)*p.ratio;
+    const tick=tickSize(p.nowS);
+    const tickProfit=effDelta*tick;
     const mn=mnLabel(p.type,p.nowS,p.K);
     const mnCls=mnClass(p.type,p.nowS,p.K);
+
     $('#rtNowS').innerHTML=p.nowS+'<span class="'+mnCls+'" style="margin-left:5px;font-size:12px">'+mn+'</span>';
     $('#rtTheory').textContent=fmt(theory,4);
     $('#rtSell').textContent=fmt(sell,4);
@@ -416,12 +435,22 @@ function updateAll(){
     roiEl.textContent=(roi>=0?'+':'')+roi.toFixed(2)+'%';
     roiEl.style.color=roi>0?'var(--green)':roi<0?'var(--red)':'#fff';
     $('#rtROIsub').textContent='買入成本 '+fmt(costBuy,4)+' 元';
-    $('#rtDelta').textContent=delta.toFixed(5)+' 元';
+
+    // 有效 Delta
+    const dEl=$('#rtDelta');
+    dEl.textContent=effDelta.toFixed(5);
+    dEl.style.color=effDelta>=0.03?'var(--gold)':'var(--red)';
+    $('#rtDeltaSub').textContent='股票漲1元，權證約變動 '+(effDelta>=0.03?'✓':'✗ 過低');
+
+    // 一檔獲利
+    const tEl=$('#rtTickProfit');
+    tEl.textContent=tickProfit.toFixed(4)+' 元';
+    tEl.style.color=tickProfit>=0.1?'var(--gold)':'var(--red)';
+    $('#rtTickSub').textContent='一檔='+tick+'元 '+(tickProfit>=0.1?'✓ 有感':'✗ 無感');
   } else {
     $('#realtimeBox').style.display='none';
   }
 
-  // 報酬矩陣
   if(p.costS>0 && p.targetS>0 && p.stopS>0){
     $('#matrixSection').style.display='block';
     renderMatrix(p);
@@ -433,26 +462,19 @@ function updateAll(){
 function renderMatrix(p){
   const costTheory=bs(p.type,p.costS,p.K,p.T,p.r,p.v)*p.ratio;
   const costBuy=costTheory*(1+p.spread/2);
-
   const targetChg=p.costS>0?((p.targetS-p.costS)/p.costS*100):0;
   const stopChg=p.costS>0?((p.stopS-p.costS)/p.costS*100):0;
 
   $('#matrixCostNote').textContent='買入股價 '+p.costS+'，實質成本 '+fmt(costBuy,4)+' 元';
-  $('#matrixTargetNote').textContent='目標 '+p.targetS+' 元（'+( targetChg>=0?'+':'')+targetChg.toFixed(1)+'%）';
+  $('#matrixTargetNote').textContent='目標 '+p.targetS+' 元（'+(targetChg>=0?'+':'')+targetChg.toFixed(1)+'%）';
   $('#matrixStopNote').textContent='停損 '+p.stopS+' 元（'+(stopChg>=0?'+':'')+stopChg.toFixed(1)+'%）';
   $('#colTarget').textContent='目標達成（'+(targetChg>=0?'+':'')+targetChg.toFixed(1)+'%）';
   $('#colStop').textContent='停損觸及（'+(stopChg>=0?'+':'')+stopChg.toFixed(1)+'%）';
 
   const holdPoints=[
-    {label:'今天賣出',days:0},
-    {label:'+15 天',days:15},
-    {label:'+30 天',days:30},
-    {label:'+45 天',days:45},
-    {label:'+60 天',days:60},
-    {label:'+75 天',days:75},
-    {label:'+90 天',days:90},
-    {label:'+105 天',days:105},
-    {label:'+120 天',days:120},
+    {label:'今天賣出',days:0},{label:'+15 天',days:15},{label:'+30 天',days:30},
+    {label:'+45 天',days:45},{label:'+60 天',days:60},{label:'+75 天',days:75},
+    {label:'+90 天',days:90},{label:'+105 天',days:105},{label:'+120 天',days:120},
   ];
 
   const tb=$('#matrixBody'); tb.innerHTML='';
@@ -461,25 +483,19 @@ function renderMatrix(p){
     if(remDays<=0){
       const tr=document.createElement('tr');
       tr.innerHTML=`<td>${hp.label}</td><td colspan="4" style="text-align:center;color:var(--red);font-size:12px">已超過到期日</td>`;
-      tb.appendChild(tr);
-      return;
+      tb.appendChild(tr);return;
     }
     const rTarget=calcROI(p,p.targetS,remDays,costBuy);
     const rFlat=calcROI(p,p.costS,remDays,costBuy);
     const rStop=calcROI(p,p.stopS,remDays,costBuy);
-
-    const isWarn=remDays<=60;
-    const isAlert=remDays<=30;
+    const isWarn=remDays<=60,isAlert=remDays<=30;
     const tr=document.createElement('tr');
     if(i===0)tr.className='now';
     if(isAlert)tr.className='warn-row';
-
     const remLabel=isAlert
       ?`<span style="color:var(--red);font-weight:700">${remDays}天 ⚠</span>`
-      :isWarn
-      ?`<span style="color:var(--amber)">${remDays}天</span>`
+      :isWarn?`<span style="color:var(--amber)">${remDays}天</span>`
       :`<span style="color:var(--muted)">${remDays}天</span>`;
-
     tr.innerHTML=`
       <td style="font-weight:${i===0?700:400};color:${i===0?'var(--gold)':'var(--muted)'}">${hp.label}</td>
       <td style="text-align:center">${remLabel}</td>
@@ -506,52 +522,28 @@ function loadToCalc(r){
   $('#cIV').value=r.iv!=null?r.iv:'';
   $('#cSpread').value=r.spread!=null?r.spread:'';
   ['cK','cRatio','cIV','cSpread'].forEach(id=>$('#'+id).setAttribute('readonly',''));
-
   $('#cT').value=r.days_left!=null?r.days_left:'';
   $('#cType').value=r.cp==='P'?'put':'call';
   $('#calcTarget').textContent=(r.name||r.code)+' ('+r.code+')';
   $('#calcBadge').style.display='inline-block';
-
-  $('#cCostS').value='';
-  $('#cNowS').value='';
-  $('#cTargetS').value='';
-  $('#cStopS').value='';
-  $('#realtimeBox').style.display='none';
-  $('#matrixSection').style.display='none';
-  $('#warnBanner').style.display='none';
-
+  $('#cCostS').value='';$('#cNowS').value='';$('#cTargetS').value='';$('#cStopS').value='';
+  $('#realtimeBox').style.display='none';$('#matrixSection').style.display='none';$('#warnBanner').style.display='none';
   if(r.days_left!=null && r.days_left<=60){
-    const warn=$('#warnBanner');
-    warn.className='warn-banner red';warn.style.display='block';
+    const warn=$('#warnBanner');warn.className='warn-banner red';warn.style.display='block';
     warn.textContent='⚠ 剩餘天數 '+r.days_left+' 天，已達換證警戒線！建議評估換成更長天期的權證。';
   } else if(r.days_left!=null && r.days_left<=90){
-    const warn=$('#warnBanner');
-    warn.className='warn-banner amber';warn.style.display='block';
+    const warn=$('#warnBanner');warn.className='warn-banner amber';warn.style.display='block';
     warn.textContent='📌 剩餘 '+r.days_left+' 天，進入時間價值加速衰退區，請留意 Theta 損耗。';
   }
-
   switchTab('calc');
 }
 
-/* ===== 允許手動調整唯讀欄位（點兩下解鎖） ===== */
 ['cK','cRatio','cIV','cSpread'].forEach(id=>{
   const el=$('#'+id);
-  el.addEventListener('dblclick',function(){
-    this.removeAttribute('readonly');
-    this.classList.remove('readonly');
-    this.focus();
-  });
-  el.addEventListener('blur',function(){
-    this.setAttribute('readonly','');
-    this.classList.add('readonly');
-    updateAll();
-  });
+  el.addEventListener('dblclick',function(){this.removeAttribute('readonly');this.classList.remove('readonly');this.focus();});
+  el.addEventListener('blur',function(){this.setAttribute('readonly','');this.classList.add('readonly');updateAll();});
 });
-
-/* ===== 手動輸入觸發計算 ===== */
-['cCostS','cNowS','cTargetS','cStopS','cT'].forEach(id=>{
-  $('#'+id).addEventListener('input',updateAll);
-});
+['cCostS','cNowS','cTargetS','cStopS','cT'].forEach(id=>$('#'+id).addEventListener('input',updateAll));
 $('#cIV').addEventListener('change',updateAll);
 
 /* ===== 篩選器資料載入 ===== */
@@ -568,16 +560,35 @@ function preprocess(){
     const lev=num(r["實質槓桿"]||r["FLD_LEVERAGE"]);
     const exr=num(r["行使比例"]||r["FLD_N_UND_CONVER"]);
     const s1=(spread!=null&&lev&&lev!==0)?spread/Math.abs(lev):null;
+    const iv=num(r["成交價隱波(%)"]||r["FLD_IV_CLOSE_PRICE"]);
+    const days_left=num(r["距到期天數"]||r["FLD_PERIOD"]);
+    const strike=r["履約價"]||r["FLD_N_STRIKE_PRC"];
+    const cp=(/[售]/.test(name))?"P":"C";
+
+    // 有效 Delta & 一檔獲利
+    let eff_delta=null, tick_profit=null;
+    if(iv&&exr&&days_left&&strike){
+      const K=num(strike);
+      const S=K; // 以履約價近似現貨（無現貨欄位）
+      const T=days_left/365;
+      const v=iv/100;
+      if(K>0&&T>0&&v>0){
+        const type=cp==='P'?'put':'call';
+        const delta=bsDelta(type,S,K,T,0.02,v);
+        eff_delta=Math.abs(delta)*exr;
+        tick_profit=eff_delta*tickSize(K);
+      }
+    }
+
     return{
-      code:r["權證代碼"]||r["FLD_WAR_ID"],name,
-      cp:(/[售]/.test(name))?"P":"C",
+      code:r["權證代碼"]||r["FLD_WAR_ID"],name,cp,
       spread,leverage:lev,exercise:exr,
       s1,s2:(s1!=null&&exr)?s1/exr:null,
-      days_left:num(r["距到期天數"]||r["FLD_PERIOD"]),
-      strike:r["履約價"]||r["FLD_N_STRIKE_PRC"],
+      days_left,strike,
       price:r["權證成交價"]||r["FLD_WAR_TXN_PRICE"],
-      iv:num(r["成交價隱波(%)"]||r["FLD_IV_CLOSE_PRICE"]),
+      iv,
       moneyness:r["價內外程度"]||r["FLD_IN_OUT"],
+      eff_delta,tick_profit,
     };
   });
 }
@@ -613,7 +624,11 @@ async function loadData(force=false){
 
 $('#btnFetch').addEventListener('click',()=>loadData(false));
 $('#btnForce').addEventListener('click',()=>loadData(true));
-$('#btnReset').addEventListener('click',()=>{$('#fDays').value=60;$('#fS2').value='';$('#fS1').value='';$('#fIV').value='';$('#fLev').value='';render();});
+$('#btnReset').addEventListener('click',()=>{
+  $('#fDays').value=60;$('#fS2').value='';$('#fS1').value='';
+  $('#fIV').value='';$('#fLev').value='';$('#fEffDelta').value='';$('#fTickProfit').value='';
+  render();
+});
 window.addEventListener('DOMContentLoaded',()=>{
   const ts=parseInt(localStorage.getItem(CACHE_TS)||'NaN');
   if(!isNaN(ts)&&Date.now()-ts<CACHE_EXP)loadData(false);
@@ -622,24 +637,19 @@ window.addEventListener('DOMContentLoaded',()=>{
 function filterSort(){
   const type=$('#selType').value;
   const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked;
-
-  /* ===== 修正：用 norm() 統一正規化搜尋詞和資料 ===== */
   const rawQ=norm($('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
-
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
   const maxS1=parseFloat($('#fS1').value),maxIV=parseFloat($('#fIV').value),minLev=parseFloat($('#fLev').value);
-  const all=PROC.filter(x=>x.cp===type);
+  const minEffDelta=parseFloat($('#fEffDelta').value);
+  const minTickProfit=parseFloat($('#fTickProfit').value);
 
+  const all=PROC.filter(x=>x.cp===type);
   const afterQ=q.length===0?all:all.filter(x=>{
-    /* 把名稱和代號都正規化後比對 */
     const n=norm(x.name)+' '+norm(x.code);
     return q.every(tok=>{
-      /* 直接比對 */
       if(n.includes(tok))return true;
-      /* 代號 → 股票名稱 */
       if(STOCK_MAP[tok]&&n.includes(norm(STOCK_MAP[tok])))return true;
-      /* 股票名稱 → 代號（STOCK_REV key 已在 loadData 時 norm 過） */
       if(STOCK_REV[tok]&&n.includes(norm(STOCK_REV[tok])))return true;
       return false;
     });
@@ -653,6 +663,8 @@ function filterSort(){
     if(!isNaN(maxS1)&&x.s1!=null&&x.s1*100>maxS1)return false;
     if(!isNaN(maxIV)&&x.iv!=null&&x.iv>maxIV)return false;
     if(!isNaN(minLev)&&Math.abs(x.leverage??0)<minLev)return false;
+    if(!isNaN(minEffDelta)&&(x.eff_delta==null||x.eff_delta<minEffDelta))return false;
+    if(!isNaN(minTickProfit)&&(x.tick_profit==null||x.tick_profit<minTickProfit))return false;
     return true;
   }).sort((a,b)=>{const va=a[sortKey]??Infinity,vb=b[sortKey]??Infinity;return(va-vb)*sortDir;});
   return{rows,allQ:afterQ.length,allType:all.length,hasQ:q.length>0};
@@ -665,11 +677,18 @@ function render(){
   const limit=lv==='all'?Math.min(rows.length,500):parseInt(lv);
   const tb=$('#tbody'); tb.innerHTML='';
   if(rows.length===0){
-    tb.innerHTML='<tr><td colspan="14" style="padding:28px;text-align:center;color:var(--muted)">無符合條件的權證，請放寬篩選條件</td></tr>';
+    tb.innerHTML='<tr><td colspan="16" style="padding:28px;text-align:center;color:var(--muted)">無符合條件的權證，請放寬篩選條件</td></tr>';
   } else {
     rows.slice(0,limit).forEach(r=>{
       const tr=document.createElement('tr');
       const daysWarn=r.days_left!=null&&r.days_left<=60?'style="color:var(--red);font-weight:700"':r.days_left<=90?'style="color:var(--amber)"':'';
+
+      // 有效 Delta 顏色判斷
+      const effGood=r.eff_delta!=null&&r.eff_delta>=0.03;
+      const tickGood=r.tick_profit!=null&&r.tick_profit>=0.1;
+      const effCls=r.eff_delta==null?'':(effGood?'eff-good':'eff-bad');
+      const tickCls=r.tick_profit==null?'':(tickGood?'eff-good':'eff-bad');
+
       tr.innerHTML=`
         <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
         <td>${r.name}</td>
@@ -683,6 +702,8 @@ function render(){
         <td>${r.strike||'—'}</td>
         <td>${fmt(num(r.price),3)}</td>
         <td class="${r.iv>80?'purple':''}">${fmt(r.iv,2)}</td>
+        <td class="${effCls}">${r.eff_delta!=null?r.eff_delta.toFixed(5):'—'}</td>
+        <td class="${tickCls}">${r.tick_profit!=null?r.tick_profit.toFixed(4)+' 元':'—'}</td>
         <td>${r.moneyness||'—'}</td>
         <td><button class="btn btn-sm" onclick='loadToCalc(${JSON.stringify(r)})'>帶入 →</button></td>
       `;
@@ -702,7 +723,7 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
 });
 ['selType','chkZero','selLimit','chkIV'].forEach(id=>$('#'+id).addEventListener('change',render));
 let dbt;const dbR=()=>{clearTimeout(dbt);dbt=setTimeout(render,280);};
-['nameFilter','fDays','fS2','fS1','fIV','fLev'].forEach(id=>$('#'+id).addEventListener('input',dbR));
+['nameFilter','fDays','fS2','fS1','fIV','fLev','fEffDelta','fTickProfit'].forEach(id=>$('#'+id).addEventListener('input',dbR));
 </script>
 </body>
 </html>
