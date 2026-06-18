@@ -202,11 +202,13 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <button class="btn" id="btnFetchMob" style="flex:1"><span class="spinner" id="sp1Mob"></span><span id="btnTextMob">載入資料</span></button>
           <button class="btn btn-outline" id="btnForceMob">強制更新</button>
         </div>
-        <!-- 第二列：搜尋框 -->
-        <input class="field" id="nameFilterMob" type="text" placeholder="搜尋標的（代號或名稱）" style="width:100%"/>
-        <!-- 第三列：認購/認售 + 排序 + 升降序小按鈕 -->
+        <!-- 第二列：搜尋框 + 認購/認售 -->
         <div style="display:flex;gap:6px;align-items:center">
+          <input class="field" id="nameFilterMob" type="text" placeholder="搜尋標的" style="width:160px"/>
           <select class="field" id="selTypeMob" style="max-width:110px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
+        </div>
+        <!-- 第三列：排序 + 升降序小按鈕 -->
+        <div style="display:flex;gap:6px;align-items:center">
           <select class="field" id="selSortKeyMob" style="flex:1">
             <option value="s1" selected>排序：S1</option>
             <option value="move5pct">排序：漲5%</option>
