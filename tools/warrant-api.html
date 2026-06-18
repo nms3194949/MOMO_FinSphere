@@ -200,13 +200,14 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         </div>
         <input class="field" id="nameFilterMob" type="text" placeholder="搜尋標的" style="flex:1;min-width:0"/>
         <select class="field" id="selTypeMob" style="max-width:110px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
-        <select class="field" id="selSortKeyMob" style="max-width:130px">
+        <select class="field" id="selSortKeyMob" style="max-width:120px">
           <option value="s1" selected>排序：S1</option>
           <option value="move5pct">排序：漲5%</option>
           <option value="eff_delta">排序：Delta</option>
           <option value="days_left">排序：天數</option>
           <option value="spread">排序：價差比</option>
         </select>
+        <button class="btn btn-outline" id="btnMobSortDir" style="padding:8px 12px;font-size:13px;white-space:nowrap">↓ 大→小</button>
       </div>
       <button class="btn btn-outline mob-filter-btn" id="btnMobFilter">⚙ 篩選條件</button>
       <div class="mob-filter-drawer" id="mobFilterDrawer">
@@ -619,6 +620,7 @@ const CACHE_NAME='momo-warrant-v2',CACHE_TS='momo-ts2',CACHE_EXP=60*60*1000;
 const HAS_CACHE=typeof caches!=='undefined';
 let RAW=[],PROC=[],STOCK_MAP={},STOCK_REV={};
 let sortKey='s1',sortDir=1;
+let mobSortDir=-1; // 手機版預設降序（大到小）
 
 function preprocess(){
   PROC=RAW.map(r=>{
@@ -796,7 +798,13 @@ function render(){
 }
 
 document.querySelectorAll('th[data-key]').forEach(th=>{
-  th.addEventListener('click',()=>{const k=th.dataset.key;if(sortKey===k){sortDir*=-1;}else{sortKey=k;sortDir=1;}render();});
+  th.addEventListener('click',()=>{
+    const k=th.dataset.key;
+    const descFirst=['eff_delta','move5pct','leverage'];
+    if(sortKey===k){sortDir*=-1;}
+    else{sortKey=k;sortDir=descFirst.includes(k)?-1:1;}
+    render();
+  });
 });
 ['selType','chkZero','selLimit','chkIV','chkLowIV'].forEach(id=>$('#'+id).addEventListener('change',render));
 let dbt;const dbR=()=>{clearTimeout(dbt);dbt=setTimeout(render,280);};
@@ -836,7 +844,11 @@ function filterSortMob(){
     if(!isNaN(minEffDelta)&&(x.eff_delta==null||x.eff_delta<minEffDelta))return false;
     if(!isNaN(minMove5)&&(x.move5pct==null||x.move5pct<minMove5))return false;
     return true;
-  }).sort((a,b)=>{const va=a[sk]??Infinity,vb=b[sk]??Infinity;return va-vb;});
+  }).sort((a,b)=>{
+    const fallback=mobSortDir===1?Infinity:-Infinity;
+    const va=a[sk]??fallback,vb=b[sk]??fallback;
+    return(va-vb)*mobSortDir;
+  });
 }
 
 /* ===== renderMobile ===== */
@@ -938,6 +950,13 @@ let dbtM;const dbRM=()=>{clearTimeout(dbtM);dbtM=setTimeout(renderAll,280);};
   const el=$('#'+id);if(el)el.addEventListener('change',renderAll);
 });
 window.addEventListener('resize',()=>{if(PROC.length>0)renderAll();});
+
+/* ===== 手機版排序方向切換 ===== */
+$('#btnMobSortDir').addEventListener('click',()=>{
+  mobSortDir*=-1;
+  $('#btnMobSortDir').textContent=mobSortDir===1?'↑ 小→大':'↓ 大→小';
+  renderAll();
+});
 
 /* ===== 手機版載入按鈕 ===== */
 $('#btnFetchMob').addEventListener('click',()=>loadData(false));
