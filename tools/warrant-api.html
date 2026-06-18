@@ -116,7 +116,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 .wcard-name{font-size:14px;font-weight:600;color:#fff;flex:1}
 .wcard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 10px}
 .wcard-item .wl{font-size:10px;color:var(--muted);margin-bottom:1px}
-.wcard-item .wv{font-size:13px;font-weight:700;color:#fff}
+.wcard-item .wv{font-size:13px;font-weight:700;color:var(--muted)}
 .wcard-divider{border:none;border-top:1px solid var(--line);margin:8px 0}
 .wcard-bottom{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)}
 /* 手機篩選抽屜 */
@@ -857,6 +857,7 @@ function renderMobile(){
     const spreadCls=r.spread!=null&&r.spread>15?'eff-bad':'';
     const move5Str=r.move5pct!=null?(r.move5pct>=0?'+':'')+r.move5pct.toFixed(1)+'%':'—';
     const s1Str=r.s1!=null?pct100(r.s1):'—';
+    const s1Cls=r.s1!=null&&r.s1<0.1?'eff-good':'';
     const s2Str=r.s2!=null?pct100(r.s2):'—';
     const s2Cls=r.s2!=null?(r.s2*100>1500?'eff-bad':''):'';
 
@@ -883,11 +884,11 @@ function renderMobile(){
         </div>
         <div class="wcard-item">
           <div class="wl">槓桿</div>
-          <div class="wv">${fmt(Math.abs(r.leverage),2)}</div>
+          <div class="wv ${Math.abs(r.leverage??0)>5?'eff-good':''}">${fmt(Math.abs(r.leverage),2)}</div>
         </div>
         <div class="wcard-item">
           <div class="wl">S1</div>
-          <div class="wv">${s1Str}</div>
+          <div class="wv ${s1Cls}">${s1Str}</div>
         </div>
         <div class="wcard-item">
           <div class="wl">S2</div>
