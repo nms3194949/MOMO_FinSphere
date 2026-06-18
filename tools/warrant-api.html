@@ -151,6 +151,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         </select>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkZero" checked/>排除價差=0</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkIV" checked/>排除無隱波</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkLowIV" checked/>排除隱波&lt;5%</label>
       </div>
       <div class="filter-bar">
         <span style="color:var(--gold-soft);font-size:12px;font-weight:700">篩選：</span>
@@ -628,7 +629,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 function filterSort(){
   const type=$('#selType').value;
-  const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked;
+  const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked,dropLowIV=$('#chkLowIV').checked;
   const rawQ=norm($('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
@@ -650,6 +651,7 @@ function filterSort(){
   const rows=afterQ.filter(x=>{
     if(dropZ&&(!x.spread||x.spread===0))return false;
     if(needIV&&(!x.iv||x.iv===0))return false;
+    if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
     if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
     if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
     if(!isNaN(maxS1)&&x.s1!=null&&x.s1*100>maxS1)return false;
@@ -717,7 +719,7 @@ function render(){
 document.querySelectorAll('th[data-key]').forEach(th=>{
   th.addEventListener('click',()=>{const k=th.dataset.key;if(sortKey===k){sortDir*=-1;}else{sortKey=k;sortDir=1;}render();});
 });
-['selType','chkZero','selLimit','chkIV'].forEach(id=>$('#'+id).addEventListener('change',render));
+['selType','chkZero','selLimit','chkIV','chkLowIV'].forEach(id=>$('#'+id).addEventListener('change',render));
 let dbt;const dbR=()=>{clearTimeout(dbt);dbt=setTimeout(render,280);};
 ['nameFilter','fDays','fS2','fS1','fIV','fLev','fEffDelta','fMove5'].forEach(id=>$('#'+id).addEventListener('input',dbR));
 </script>
