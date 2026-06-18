@@ -283,6 +283,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <span><span class="eff-bad">■</span> 未達門檻 / 價差比 &gt; 15% / 隱波 &lt; 5%（異常）</span>
         <span style="color:var(--purple)">■ 隱波 &gt; 80%（過高）</span>
         <span style="color:var(--muted)">漲5%報酬：以履約價為近似現貨，BS重算之報酬%</span>
+        <span style="font-size:11px;color:var(--muted)">🟢 有真實股價　🔴 無股價（用履約價估算，Delta 可能失真）</span>
       </div>
     </div>
   </div>
@@ -683,6 +684,7 @@ function preprocess(){
       iv,
       moneyness:r["價內外程度"]||r["FLD_IN_OUT"],
       eff_delta,move5pct,
+      has_price:realPrice!=null, // 是否有真實股價
     };
   });
 }
@@ -807,7 +809,7 @@ function render(){
         <td>${r.strike||'—'}</td>
         <td>${fmt(num(r.price),3)}</td>
         <td class="${ivCls}">${fmt(r.iv,2)}</td>
-        <td class="${effCls}">${r.eff_delta!=null?r.eff_delta.toFixed(2):'—'}</td>
+        <td class="${effCls}">${r.eff_delta!=null?r.eff_delta.toFixed(2):'—'} <span style="font-size:9px">${r.has_price?'🟢':'🔴'}</span></td>
         <td class="${move5Cls}">${move5Str}</td>
         <td>${r.moneyness||'—'}</td>
         <td><button class="btn btn-sm" onclick='loadToCalc(${JSON.stringify(r)})'>帶入 →</button></td>
@@ -905,6 +907,7 @@ function renderMobile(){
       <div class="wcard-header">
         <span class="wcard-code">${r.code}</span>
         <span class="wcard-name">${r.name}</span>
+        <span style="font-size:11px">${r.has_price?'🟢':'🔴'}</span>
         <span class="tag ${r.cp}">${r.cp}</span>
       </div>
       <div class="wcard-grid">
