@@ -193,6 +193,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkZero" checked/>排除價差=0</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkIV" checked/>排除無隱波</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkLowIV" checked/>排除隱波&lt;5%</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNeedPrice"/>僅顯示有股價🟢</label>
       </div>
 
       <!-- 手機版控制列 -->
@@ -233,6 +234,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkZeroMob" checked/>排除價差=0</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkIVMob" checked/>排除無隱波</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkLowIVMob" checked/>排除隱波&lt;5%</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNeedPriceMob"/>僅顯示有股價🟢</label>
         </div>
         <button class="btn btn-outline btn-sm" id="btnResetMob">重置</button>
       </div>
@@ -738,7 +740,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 function filterSort(){
   const type=$('#selType').value;
-  const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked,dropLowIV=$('#chkLowIV').checked;
+  const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked,dropLowIV=$('#chkLowIV').checked,needPrice=$('#chkNeedPrice').checked;
   const rawQ=norm($('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
@@ -761,6 +763,7 @@ function filterSort(){
     if(dropZ&&(!x.spread||x.spread===0))return false;
     if(needIV&&(!x.iv||x.iv===0))return false;
     if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
+    if(needPrice&&!x.has_price)return false;
     if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
     if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
     if(!isNaN(maxS1)&&x.s1!=null&&x.s1*100>maxS1)return false;
@@ -834,7 +837,7 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
     render();
   });
 });
-['selType','chkZero','selLimit','chkIV','chkLowIV'].forEach(id=>$('#'+id).addEventListener('change',render));
+['selType','chkZero','selLimit','chkIV','chkLowIV','chkNeedPrice'].forEach(id=>$('#'+id).addEventListener('change',render));
 let dbt;const dbR=()=>{clearTimeout(dbt);dbt=setTimeout(render,280);};
 ['nameFilter','fDays','fS2','fS1','fIV','fLev','fEffDelta','fMove5'].forEach(id=>$('#'+id).addEventListener('input',dbR));
 
@@ -845,6 +848,7 @@ function filterSortMob(){
   const dropZ=isMob?$('#chkZeroMob').checked:$('#chkZero').checked;
   const needIV=isMob?$('#chkIVMob').checked:$('#chkIV').checked;
   const dropLowIV=isMob?$('#chkLowIVMob').checked:$('#chkLowIV').checked;
+  const needPrice=isMob?$('#chkNeedPriceMob').checked:$('#chkNeedPrice').checked;
   const rawQ=norm(isMob?$('#nameFilterMob').value:$('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat(isMob?$('#fDaysMob').value:$('#fDays').value);
@@ -867,6 +871,7 @@ function filterSortMob(){
     if(dropZ&&(!x.spread||x.spread===0))return false;
     if(needIV&&(!x.iv||x.iv===0))return false;
     if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
+    if(needPrice&&!x.has_price)return false;
     if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
     if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
     if(!isNaN(minEffDelta)&&(x.eff_delta==null||x.eff_delta<minEffDelta))return false;
@@ -975,7 +980,7 @@ let dbtM;const dbRM=()=>{clearTimeout(dbtM);dbtM=setTimeout(renderAll,280);};
 ['nameFilterMob','fDaysMob','fS2Mob','fEffDeltaMob','fMove5Mob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('input',dbRM);
 });
-['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob'].forEach(id=>{
+['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob','chkNeedPriceMob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('change',renderAll);
 });
 window.addEventListener('resize',()=>{if(PROC.length>0)renderAll();});
