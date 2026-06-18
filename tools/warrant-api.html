@@ -686,7 +686,7 @@ function render(){
         <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
         <td>${r.name}</td>
         <td><span class="tag ${r.cp}">${r.cp}</span></td>
-        <td>${fmt(r.spread,3)}</td>
+        <td class="${r.spread!=null&&r.spread>15?'eff-bad':''}">${fmt(r.spread,3)}</td>
         <td class="${Math.abs(r.leverage??0)>5?'gold':''}">${fmt(Math.abs(r.leverage),2)}</td>
         <td class="${r.exercise<0.01?'red':r.exercise>=0.1?'gold':''}">${fmt(r.exercise,3)}</td>
         <td class="${r.s1!=null&&r.s1<0.1?'gold':''}">${pct100(r.s1)}</td>
