@@ -100,7 +100,6 @@ tbody tr:hover td{background:#1a2a4a}
 .mn-otm{display:inline-block;background:#4A1B0C;color:#F5C4B3;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-left:3px}
 .mn-atm{display:inline-block;background:#412402;color:#FAC775;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-left:3px}
 
-/* 有效Delta / 一檔獲利 顏色 */
 .eff-good{color:var(--gold);font-weight:700}
 .eff-bad{color:var(--red);font-weight:700}
 
@@ -142,7 +141,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <option value="days_left">排序：天數</option>
           <option value="iv">排序：隱波</option>
           <option value="eff_delta">排序：有效Delta</option>
-          <option value="tick_profit">排序：一檔獲利</option>
+          <option value="move5pct">排序：漲5%報酬</option>
         </select>
         <select class="field" id="selLimit" style="max-width:110px">
           <option value="20" selected>20 列</option>
@@ -161,7 +160,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <label>隱波 ≤ <input class="fi" id="fIV" type="number" placeholder="不限"/></label>
         <label>槓桿 ≥ <input class="fi" id="fLev" type="number" placeholder="不限"/></label>
         <label>有效Delta ≥ <input class="fi" id="fEffDelta" type="number" placeholder="不限" style="width:58px"/></label>
-        <label>一檔獲利 ≥ <input class="fi" id="fTickProfit" type="number" placeholder="不限" style="width:58px"/> 元</label>
+        <label>漲5%報酬 ≥ <input class="fi" id="fMove5" type="number" value="10" style="width:48px"/> %</label>
         <button class="btn btn-outline btn-sm" id="btnReset">重置</button>
       </div>
     </div>
@@ -184,17 +183,17 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
             <th>成交價</th>
             <th data-key="iv">隱波<span class="sort-icon"></span></th>
             <th data-key="eff_delta">有效Delta<span class="sort-icon"></span></th>
-            <th data-key="tick_profit">一檔獲利<span class="sort-icon"></span></th>
+            <th data-key="move5pct">漲5%報酬<span class="sort-icon"></span></th>
             <th>價內外</th>
             <th>帶入計算</th>
           </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-      <!-- 圖例 -->
       <div style="margin-top:8px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap">
-        <span><span class="eff-good">■</span> 有效Delta ≥ 0.03 且 一檔獲利 ≥ 0.1元（適合）</span>
+        <span><span class="eff-good">■</span> 有效Delta ≥ 0.03 且 漲5%報酬 ≥ 10%（適合）</span>
         <span><span class="eff-bad">■</span> 未達門檻（不適合）</span>
+        <span style="color:var(--muted)">漲5%報酬：以履約價為近似現貨，BS重算新股價理論價之報酬%</span>
       </div>
     </div>
   </div>
@@ -232,22 +231,10 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 
       <div class="slbl">你的判斷（手動填入）</div>
       <div class="g4" style="margin-bottom:10px">
-        <div class="f">
-          <label>買入時股價（成本基準）</label>
-          <input type="number" id="cCostS" placeholder="例：2300" inputmode="decimal"/>
-        </div>
-        <div class="f">
-          <label>盤中當前股價</label>
-          <input type="number" id="cNowS" placeholder="例：2350" inputmode="decimal"/>
-        </div>
-        <div class="f">
-          <label>目標股價（停利）</label>
-          <input type="number" id="cTargetS" placeholder="例：2500" inputmode="decimal"/>
-        </div>
-        <div class="f">
-          <label>停損股價</label>
-          <input type="number" id="cStopS" placeholder="例：2200" inputmode="decimal"/>
-        </div>
+        <div class="f"><label>買入時股價（成本基準）</label><input type="number" id="cCostS" placeholder="例：1000" inputmode="decimal"/></div>
+        <div class="f"><label>盤中當前股價</label><input type="number" id="cNowS" placeholder="例：1050" inputmode="decimal"/></div>
+        <div class="f"><label>目標股價（停利）</label><input type="number" id="cTargetS" placeholder="例：1100" inputmode="decimal"/></div>
+        <div class="f"><label>停損股價</label><input type="number" id="cStopS" placeholder="例：950" inputmode="decimal"/></div>
       </div>
 
       <div id="realtimeBox" style="display:none;margin-bottom:12px">
@@ -277,12 +264,12 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
             <div class="rt-item">
               <div class="rl">有效 Delta</div>
               <div class="rv" id="rtDelta" style="font-size:16px">—</div>
-              <div class="rs" id="rtDeltaSub">股票漲1元，權證約變動</div>
+              <div class="rs" id="rtDeltaSub"></div>
             </div>
             <div class="rt-item">
-              <div class="rl">一檔獲利</div>
-              <div class="rv" id="rtTickProfit" style="font-size:16px">—</div>
-              <div class="rs" id="rtTickSub">元／檔</div>
+              <div class="rl">標的漲5%報酬</div>
+              <div class="rv" id="rtMove5" style="font-size:16px">—</div>
+              <div class="rs" id="rtMove5Sub"></div>
             </div>
           </div>
         </div>
@@ -315,7 +302,6 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           報酬率 = （合理賣價 − 實質買入成本）÷ 實質買入成本 × 100%　|　合理賣價 = 理論價 × (1 − 價差/2)　|　實質買入成本 = 買入時理論價 × (1 + 價差/2)
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -353,20 +339,18 @@ function bsDelta(type,S,K,T,r,v){
   return type==='call'?ncdf(d1):ncdf(d1)-1;
 }
 
-/* ===== 計算有效Delta & 一檔獲利（篩選器用，以成交價為現貨估算）===== */
-function calcEffDelta(r){
-  if(!r.iv||!r.exercise||!r.days_left||!r.strike)return{eff_delta:null,tick_profit:null};
-  const S=num(r.price_underlying)||num(r.strike); // 用履約價當近似現貨（無現貨欄位時）
-  const K=num(r.strike);
-  const T=r.days_left/365;
-  const v=r.iv/100;
-  const ratio=r.exercise;
-  const type=r.cp==='P'?'put':'call';
-  if(!S||!K||!T||!v||!ratio)return{eff_delta:null,tick_profit:null};
-  const delta=bsDelta(type,S,K,T,0.02,v);
-  const eff=Math.abs(delta)*ratio;
-  const tick=eff*tickSize(S);
-  return{eff_delta:eff,tick_profit:tick};
+/* ===== 標的漲/跌5%的權證報酬% ===== */
+function calcMove5pct(type, S, K, T, v, ratio, spread, pct){
+  // pct: 認購用+0.05, 認售用-0.05
+  const r=0.02;
+  const S_new=S*(1+pct);
+  const theory_orig=bs(type,S,K,T,r,v)*ratio;
+  const theory_new=bs(type,S_new,K,T,r,v)*ratio;
+  if(theory_orig<=0)return null;
+  // 用含價差的實際買賣價計算報酬
+  const cost=theory_orig*(1+spread/2);
+  const sell=theory_new*(1-spread/2);
+  return((sell-cost)/cost)*100;
 }
 
 function mnClass(type,S,K){const r=type==='call'?(S-K)/K:(K-S)/K;if(r>0.015)return'mn-itm';if(r<-0.015)return'mn-otm';return'mn-atm';}
@@ -423,10 +407,12 @@ function updateAll(){
     const roi=costBuy>0?((sell-costBuy)/costBuy)*100:0;
     const delta=bsDelta(p.type,p.nowS,p.K,p.T,p.r,p.v);
     const effDelta=Math.abs(delta)*p.ratio;
-    const tick=tickSize(p.nowS);
-    const tickProfit=effDelta*tick;
     const mn=mnLabel(p.type,p.nowS,p.K);
     const mnCls=mnClass(p.type,p.nowS,p.K);
+
+    // 標的漲5%報酬（認購漲5%，認售跌5%）
+    const movePct=p.type==='call'?0.05:-0.05;
+    const move5=calcMove5pct(p.type,p.nowS,p.K,p.T,p.v,p.ratio,p.spread,movePct);
 
     $('#rtNowS').innerHTML=p.nowS+'<span class="'+mnCls+'" style="margin-left:5px;font-size:12px">'+mn+'</span>';
     $('#rtTheory').textContent=fmt(theory,4);
@@ -436,17 +422,20 @@ function updateAll(){
     roiEl.style.color=roi>0?'var(--green)':roi<0?'var(--red)':'#fff';
     $('#rtROIsub').textContent='買入成本 '+fmt(costBuy,4)+' 元';
 
-    // 有效 Delta
     const dEl=$('#rtDelta');
     dEl.textContent=effDelta.toFixed(5);
     dEl.style.color=effDelta>=0.03?'var(--gold)':'var(--red)';
     $('#rtDeltaSub').textContent='股票漲1元，權證約變動 '+(effDelta>=0.03?'✓':'✗ 過低');
 
-    // 一檔獲利
-    const tEl=$('#rtTickProfit');
-    tEl.textContent=tickProfit.toFixed(4)+' 元';
-    tEl.style.color=tickProfit>=0.1?'var(--gold)':'var(--red)';
-    $('#rtTickSub').textContent='一檔='+tick+'元 '+(tickProfit>=0.1?'✓ 有感':'✗ 無感');
+    const m5El=$('#rtMove5');
+    if(move5!=null){
+      m5El.textContent=(move5>=0?'+':'')+move5.toFixed(2)+'%';
+      m5El.style.color=move5>=10?'var(--gold)':'var(--red)';
+      $('#rtMove5Sub').textContent=(p.type==='call'?'標的漲5%':'標的跌5%')+' '+(move5>=10?'✓':'✗ < 10%');
+    } else {
+      m5El.textContent='—';
+      m5El.style.color='var(--muted)';
+    }
   } else {
     $('#realtimeBox').style.display='none';
   }
@@ -565,18 +554,20 @@ function preprocess(){
     const strike=r["履約價"]||r["FLD_N_STRIKE_PRC"];
     const cp=(/[售]/.test(name))?"P":"C";
 
-    // 有效 Delta & 一檔獲利
-    let eff_delta=null, tick_profit=null;
+    let eff_delta=null, move5pct=null;
     if(iv&&exr&&days_left&&strike){
       const K=num(strike);
-      const S=K; // 以履約價近似現貨（無現貨欄位）
+      const S=K;
       const T=days_left/365;
       const v=iv/100;
-      if(K>0&&T>0&&v>0){
+      const sp=spread||0;
+      if(K>0&&T>0&&v>0&&exr>0){
         const type=cp==='P'?'put':'call';
         const delta=bsDelta(type,S,K,T,0.02,v);
         eff_delta=Math.abs(delta)*exr;
-        tick_profit=eff_delta*tickSize(K);
+        // 認購用+5%，認售用-5%
+        const movePct=type==='call'?0.05:-0.05;
+        move5pct=calcMove5pct(type,S,K,T,v,exr,sp/100,movePct);
       }
     }
 
@@ -588,7 +579,7 @@ function preprocess(){
       price:r["權證成交價"]||r["FLD_WAR_TXN_PRICE"],
       iv,
       moneyness:r["價內外程度"]||r["FLD_IN_OUT"],
-      eff_delta,tick_profit,
+      eff_delta,move5pct,
     };
   });
 }
@@ -626,7 +617,7 @@ $('#btnFetch').addEventListener('click',()=>loadData(false));
 $('#btnForce').addEventListener('click',()=>loadData(true));
 $('#btnReset').addEventListener('click',()=>{
   $('#fDays').value=60;$('#fS2').value='';$('#fS1').value='';
-  $('#fIV').value='';$('#fLev').value='';$('#fEffDelta').value='';$('#fTickProfit').value='';
+  $('#fIV').value='';$('#fLev').value='';$('#fEffDelta').value='';$('#fMove5').value=10;
   render();
 });
 window.addEventListener('DOMContentLoaded',()=>{
@@ -642,7 +633,7 @@ function filterSort(){
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
   const maxS1=parseFloat($('#fS1').value),maxIV=parseFloat($('#fIV').value),minLev=parseFloat($('#fLev').value);
   const minEffDelta=parseFloat($('#fEffDelta').value);
-  const minTickProfit=parseFloat($('#fTickProfit').value);
+  const minMove5=parseFloat($('#fMove5').value);
 
   const all=PROC.filter(x=>x.cp===type);
   const afterQ=q.length===0?all:all.filter(x=>{
@@ -664,7 +655,7 @@ function filterSort(){
     if(!isNaN(maxIV)&&x.iv!=null&&x.iv>maxIV)return false;
     if(!isNaN(minLev)&&Math.abs(x.leverage??0)<minLev)return false;
     if(!isNaN(minEffDelta)&&(x.eff_delta==null||x.eff_delta<minEffDelta))return false;
-    if(!isNaN(minTickProfit)&&(x.tick_profit==null||x.tick_profit<minTickProfit))return false;
+    if(!isNaN(minMove5)&&(x.move5pct==null||x.move5pct<minMove5))return false;
     return true;
   }).sort((a,b)=>{const va=a[sortKey]??Infinity,vb=b[sortKey]??Infinity;return(va-vb)*sortDir;});
   return{rows,allQ:afterQ.length,allType:all.length,hasQ:q.length>0};
@@ -683,11 +674,13 @@ function render(){
       const tr=document.createElement('tr');
       const daysWarn=r.days_left!=null&&r.days_left<=60?'style="color:var(--red);font-weight:700"':r.days_left<=90?'style="color:var(--amber)"':'';
 
-      // 有效 Delta 顏色判斷
       const effGood=r.eff_delta!=null&&r.eff_delta>=0.03;
-      const tickGood=r.tick_profit!=null&&r.tick_profit>=0.1;
+      const move5Good=r.move5pct!=null&&r.move5pct>=10;
       const effCls=r.eff_delta==null?'':(effGood?'eff-good':'eff-bad');
-      const tickCls=r.tick_profit==null?'':(tickGood?'eff-good':'eff-bad');
+      // 漲5%報酬：兩個條件都過才金色，任一不過就紅色
+      const move5Cls=r.move5pct==null?'':(move5Good&&effGood?'eff-good':'eff-bad');
+
+      const move5Str=r.move5pct!=null?(r.move5pct>=0?'+':'')+r.move5pct.toFixed(1)+'%':'—';
 
       tr.innerHTML=`
         <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
@@ -703,7 +696,7 @@ function render(){
         <td>${fmt(num(r.price),3)}</td>
         <td class="${r.iv>80?'purple':''}">${fmt(r.iv,2)}</td>
         <td class="${effCls}">${r.eff_delta!=null?r.eff_delta.toFixed(5):'—'}</td>
-        <td class="${tickCls}">${r.tick_profit!=null?r.tick_profit.toFixed(4)+' 元':'—'}</td>
+        <td class="${move5Cls}">${move5Str}</td>
         <td>${r.moneyness||'—'}</td>
         <td><button class="btn btn-sm" onclick='loadToCalc(${JSON.stringify(r)})'>帶入 →</button></td>
       `;
@@ -723,7 +716,7 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
 });
 ['selType','chkZero','selLimit','chkIV'].forEach(id=>$('#'+id).addEventListener('change',render));
 let dbt;const dbR=()=>{clearTimeout(dbt);dbt=setTimeout(render,280);};
-['nameFilter','fDays','fS2','fS1','fIV','fLev','fEffDelta','fTickProfit'].forEach(id=>$('#'+id).addEventListener('input',dbR));
+['nameFilter','fDays','fS2','fS1','fIV','fLev','fEffDelta','fMove5'].forEach(id=>$('#'+id).addEventListener('input',dbR));
 </script>
 </body>
 </html>
