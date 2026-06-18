@@ -116,7 +116,10 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 .wcard-name{font-size:14px;font-weight:600;color:#fff;flex:1}
 .wcard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 10px}
 .wcard-item .wl{font-size:10px;color:var(--muted);margin-bottom:1px}
-.wcard-item .wv{font-size:13px;font-weight:700;color:var(--muted)}
+.wcard-item .wv{font-size:13px;font-weight:700;color:#cdd8ee}
+.wcard-item .wv.eff-good{color:var(--gold) !important;font-weight:700}
+.wcard-item .wv.eff-bad{color:var(--red) !important;font-weight:700}
+.wcard-item .wv.purple{color:var(--purple) !important}
 .wcard-divider{border:none;border-top:1px solid var(--line);margin:8px 0}
 .wcard-bottom{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)}
 /* 手機篩選抽屜 */
@@ -193,21 +196,26 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
       </div>
 
       <!-- 手機版控制列 -->
-      <div class="mob-controls" style="display:none;gap:8px;flex-wrap:wrap;align-items:center">
-        <div style="display:flex;gap:6px;width:100%">
+      <div class="mob-controls" style="display:none;gap:6px;flex-direction:column">
+        <!-- 第一列：載入按鈕 -->
+        <div style="display:flex;gap:6px">
           <button class="btn" id="btnFetchMob" style="flex:1"><span class="spinner" id="sp1Mob"></span><span id="btnTextMob">載入資料</span></button>
           <button class="btn btn-outline" id="btnForceMob">強制更新</button>
         </div>
-        <input class="field" id="nameFilterMob" type="text" placeholder="搜尋標的" style="flex:1;min-width:0"/>
-        <select class="field" id="selTypeMob" style="max-width:110px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
-        <select class="field" id="selSortKeyMob" style="max-width:120px">
-          <option value="s1" selected>排序：S1</option>
-          <option value="move5pct">排序：漲5%</option>
-          <option value="eff_delta">排序：Delta</option>
-          <option value="days_left">排序：天數</option>
-          <option value="spread">排序：價差比</option>
-        </select>
-        <button class="btn btn-outline" id="btnMobSortDir" style="padding:8px 12px;font-size:13px;white-space:nowrap">↓ 大→小</button>
+        <!-- 第二列：搜尋框 -->
+        <input class="field" id="nameFilterMob" type="text" placeholder="搜尋標的（代號或名稱）" style="width:100%"/>
+        <!-- 第三列：認購/認售 + 排序 + 升降序小按鈕 -->
+        <div style="display:flex;gap:6px;align-items:center">
+          <select class="field" id="selTypeMob" style="max-width:110px"><option value="C" selected>認購 (C)</option><option value="P">認售 (P)</option></select>
+          <select class="field" id="selSortKeyMob" style="flex:1">
+            <option value="s1" selected>排序：S1</option>
+            <option value="move5pct">排序：漲5%</option>
+            <option value="eff_delta">排序：Delta</option>
+            <option value="days_left">排序：天數</option>
+            <option value="spread">排序：價差比</option>
+          </select>
+          <button id="btnMobSortDir" style="background:var(--card2);border:1px solid var(--line2);color:var(--gold-soft);border-radius:6px;padding:8px 10px;font-size:16px;cursor:pointer;white-space:nowrap;flex-shrink:0">↓</button>
+        </div>
       </div>
       <button class="btn btn-outline mob-filter-btn" id="btnMobFilter">⚙ 篩選條件</button>
       <div class="mob-filter-drawer" id="mobFilterDrawer">
@@ -954,7 +962,7 @@ window.addEventListener('resize',()=>{if(PROC.length>0)renderAll();});
 /* ===== 手機版排序方向切換 ===== */
 $('#btnMobSortDir').addEventListener('click',()=>{
   mobSortDir*=-1;
-  $('#btnMobSortDir').textContent=mobSortDir===1?'↑ 小→大':'↓ 大→小';
+  $('#btnMobSortDir').textContent=mobSortDir===1?'↑':'↓';
   renderAll();
 });
 
