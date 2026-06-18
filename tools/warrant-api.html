@@ -628,7 +628,7 @@ $('#cIV').addEventListener('change',updateAll);
 const GAS_URL="https://script.google.com/macros/s/AKfycbxtbwd2I9ZElRqtGF5EsieJnFtM-AZuarVDf8merOarSpgzkwwECbTjWwdXzAway5OLqw/exec";
 const CACHE_NAME='momo-warrant-v2',CACHE_TS='momo-ts2',CACHE_EXP=60*60*1000;
 const HAS_CACHE=typeof caches!=='undefined';
-let RAW=[],PROC=[],STOCK_MAP={},STOCK_REV={};
+let RAW=[],PROC=[],STOCK_MAP={},STOCK_REV={},STOCK_PRICES={};
 let sortKey='s1',sortDir=1;
 let mobSortDir=-1; // 手機版預設降序（大到小）
 
@@ -644,10 +644,24 @@ function preprocess(){
     const strike=r["履約價"]||r["FLD_N_STRIKE_PRC"];
     const cp=(/[售]/.test(name))?"P":"C";
 
+    // 從 STOCK_PRICES 找真實股價，優先用真實股價算 Delta
+    // 反查邏輯：權證名稱前2~5字比對 STOCK_MAP 名稱找代號
+    let underlyingCode=null;
+    for(let len=5;len>=2;len--){
+      if(name.length<len)continue;
+      const prefix=name.substring(0,len);
+      const found=Object.entries(STOCK_MAP).find(([c,n])=>{
+        const cleanN=n.replace(/[*＊].*|[-－KY].*/g,"").trim();
+        return n===prefix||cleanN===prefix;
+      });
+      if(found){underlyingCode=found[0];break;}
+    }
+    const realPrice=underlyingCode&&STOCK_PRICES[underlyingCode]?STOCK_PRICES[underlyingCode]:null;
+
     let eff_delta=null, move5pct=null;
     if(iv&&exr&&days_left&&strike){
       const K=num(strike);
-      const S=K;
+      const S=realPrice||K; // 有真實股價用真實股價，否則 fallback 到履約價
       const T=days_left/365;
       const v=iv/100;
       const sp=spread||0;
@@ -655,7 +669,6 @@ function preprocess(){
         const type=cp==='P'?'put':'call';
         const delta=bsDelta(type,S,K,T,0.02,v);
         eff_delta=Math.abs(delta)*exr;
-        // 認購用+5%，認售用-5%
         const movePct=type==='call'?0.05:-0.05;
         move5pct=calcMove5pct(type,S,K,T,v,exr,sp/100,movePct);
       }
@@ -694,12 +707,15 @@ async function loadData(force=false){
     }
     if(json.error)throw new Error(json.error);
     STOCK_MAP=json.map||{};
+    STOCK_PRICES=json.prices||{};
     Object.entries(STOCK_MAP).forEach(([c,n])=>{STOCK_REV[norm(n)]=c;});
     const wb=XLSX.read(json.csv,{type:"string",codepage:65001});
     RAW=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
     preprocess();
     const ft=new Date(parseInt(localStorage.getItem(CACHE_TS))).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-    $('#topStatus').innerHTML=`<span class="count-badge">${RAW.length.toLocaleString()}</span> 筆 <span style="color:${usedCache?'var(--green)':'var(--gold-soft)'}">　${usedCache?'⚡ 暫存':'🔄 最新'} (${ft})</span>`;
+    const priceCount=Object.keys(STOCK_PRICES).length;
+    const priceNote=priceCount>0?` <span style="color:var(--green);font-size:11px">📈 ${priceCount}支股價</span>`:' <span style="color:var(--amber);font-size:11px">⚠ 無股價資料</span>';
+    $('#topStatus').innerHTML=`<span class="count-badge">${RAW.length.toLocaleString()}</span> 筆 <span style="color:${usedCache?'var(--green)':'var(--gold-soft)'}">　${usedCache?'⚡ 暫存':'🔄 最新'} (${ft})</span>${priceNote}`;
     renderAll();
   }catch(e){alert('載入失敗：'+e.message);}
   finally{$('#btnFetch').disabled=false;$('#btnForce').disabled=false;$('#sp1').style.display='none';$('#btnText').textContent='載入權證資料';
