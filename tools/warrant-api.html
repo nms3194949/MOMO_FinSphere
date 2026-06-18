@@ -750,7 +750,7 @@ function filterSort(){
     return q.every(tok=>{
       if(n.includes(tok))return true;
       if(STOCK_MAP[tok]&&n.includes(norm(STOCK_MAP[tok])))return true;
-      if(STOCK_REV[tok]&&n.includes(norm(STOCK_REV[tok])))return true;
+      if(STOCK_REV[tok]&&norm(x.code)===norm(STOCK_REV[tok]))return true;
       return false;
     });
   });
@@ -857,7 +857,7 @@ function filterSortMob(){
     return q.every(tok=>{
       if(n.includes(tok))return true;
       if(STOCK_MAP[tok]&&n.includes(norm(STOCK_MAP[tok])))return true;
-      if(STOCK_REV[tok]&&n.includes(norm(STOCK_REV[tok])))return true;
+      if(STOCK_REV[tok]&&norm(x.code)===norm(STOCK_REV[tok]))return true;
       return false;
     });
   });
