@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MOMO FinSphere — 市場季節性分析</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--surf:#161b22;--surf2:#21262d;--bd:#30363d;
+  --tx:#e6edf3;--mu:#7d8590;--gold:#d4a843;
+  --gr:#3fb950;--rd:#f85149;--bl:#58a6ff;--or:#f0883e;
+}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px}
+header{padding:18px 24px 0;border-bottom:1px solid var(--bd)}
+.logo{font-size:17px;font-weight:700;color:var(--gold)}
+.logo em{color:var(--mu);font-style:normal;font-weight:400;font-size:13px;margin-left:8px}
+nav{display:flex;gap:2px;margin-top:14px}
+.nb{padding:8px 18px;border:none;background:none;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;font-size:13px;transition:.12s}
+.nb.on{color:var(--tx);border-color:var(--gold)}
+.nb:hover:not(.on){color:var(--tx)}
+main{padding:18px 24px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.mb{padding:5px 11px;border:1px solid var(--bd);background:var(--surf2);color:var(--mu);border-radius:6px;cursor:pointer;font-size:12px;transition:.12s}
+.mb.on{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
+.mb:hover:not(.on){color:var(--tx);border-color:var(--mu)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid;border-radius:20px;cursor:pointer;font-size:12px;user-select:none;transition:opacity .15s}
+.pill.off{opacity:.3}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.sc{background:var(--surf);border:1px solid var(--bd);border-radius:8px;padding:11px 14px}
+.sc-l{font-size:11px;color:var(--mu);margin-bottom:5px}
+.sc-v{font-size:20px;font-weight:700}
+.pos{color:var(--gr)}.neg{color:var(--rd)}
+.cc{background:var(--surf);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:16px}
+.cc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.cc-t{font-size:14px;font-weight:600}
+.cc-s{font-size:11px;color:var(--mu)}
+.cb{position:relative;width:100%;height:300px}
+.ins{background:var(--surf2);border-left:3px solid var(--gold);border-radius:0 6px 6px 0;padding:9px 13px;font-size:12px;color:var(--mu);line-height:1.7;margin-bottom:14px}
+.hm-wrap{overflow-x:auto}
+.hm{border-collapse:collapse;width:100%;font-size:11px}
+.hm th{padding:5px 6px;color:var(--mu);font-weight:500;text-align:center;border-bottom:1px solid var(--bd);white-space:nowrap}
+.hm td{padding:4px 5px;text-align:center;border-radius:3px;cursor:default;white-space:nowrap;transition:filter .1s}
+.hm td:hover{filter:brightness(1.35)}
+.yl{color:var(--mu);font-weight:600;text-align:left!important;padding-left:10px!important}
+.ar td{border-top:1px solid var(--bd);font-weight:700}
+/* loader */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100}
+.spin{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.load-msg{font-size:13px;color:var(--mu);min-height:20px;transition:opacity .2s}
+/* progress bar */
+#prog-wrap{width:280px;display:none}
+#prog-track{width:100%;height:4px;background:var(--surf2);border-radius:2px;overflow:hidden}
+#prog-fill{height:100%;width:0%;background:var(--gold);border-radius:2px;transition:width .5s ease}
+#prog-meta{display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--bd)}
+/* step list */
+#step-list{width:280px;display:none;flex-direction:column;gap:4px}
+.step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--bd);transition:color .3s}
+.step.done{color:var(--gr)}.step.active{color:var(--tx)}
+.step-icon{font-size:14px;min-width:16px;text-align:center}
+/* error */
+#err-box{display:none;background:var(--surf2);border:1px solid var(--rd);border-radius:10px;padding:20px 24px;max-width:400px;text-align:center}
+.err-t{color:var(--rd);font-weight:600;margin-bottom:8px;font-size:15px}
+.err-m{font-size:12px;color:var(--mu);line-height:1.8;text-align:left}
+.retry{margin-top:14px;padding:7px 20px;background:none;border:1px solid var(--gold);color:var(--gold);border-radius:6px;cursor:pointer;font-size:13px}
+.retry:hover{background:var(--gold);color:#000}
+/* status bar */
+.gs-bar{padding:10px 24px;background:var(--surf2);border-top:1px solid var(--bd);font-size:11px;color:var(--mu);display:flex;align-items:center;gap:10px}
+.gs-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--mu)}
+.gs-dot.ok{background:var(--gr)}.gs-dot.err{background:var(--rd)}.gs-dot.loading{background:var(--gold);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var(--mu)}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="spin" id="spin-icon"></div>
+  <div class="load-msg" id="load-msg">準備連線...</div>
+  <div id="prog-wrap">
+    <div id="prog-track"><div id="prog-fill"></div></div>
+    <div id="prog-meta"><span id="prog-step">—</span><span id="prog-pct">0%</span></div>
+  </div>
+  <div id="step-list">
+    <div class="step" id="st0"><span class="step-icon">○</span>連線 Google Sheets</div>
+    <div class="step" id="st1"><span class="step-icon">○</span>讀取 SeasonalityJSON</div>
+    <div class="step" id="st2"><span class="step-icon">○</span>解析 DJI 資料</div>
+    <div class="step" id="st3"><span class="step-icon">○</span>解析 NASDAQ / NDQ100</div>
+    <div class="step" id="st4"><span class="step-icon">○</span>解析 Russell 2000</div>
+    <div class="step" id="st5"><span class="step-icon">○</span>解析台股加權指數</div>
+    <div class="step" id="st6"><span class="step-icon">○</span>計算月份平均 &amp; 熱力圖</div>
+    <div class="step" id="st7"><span class="step-icon">○</span>渲染圖表</div>
+  </div>
+  <div id="err-box">
+    <div class="err-t">載入失敗</div>
+    <div class="err-m" id="err-msg"></div>
+    <button class="retry" onclick="fetchData()">重試</button>
+  </div>
+</div>
+
+<header>
+  <div class="logo">MOMO FinSphere <em>市場季節性分析</em></div>
+  <nav>
+    <button class="nb on" data-v="intra">月內走勢</button>
+    <button class="nb" data-v="monthly">月份總覽</button>
+  </nav>
+</header>
+
+<main>
+  <div class="row" id="mRow"></div>
+  <div class="row"><div id="pills"></div></div>
+  <div id="v-intra">
+    <div class="stats">
+      <div class="sc"><div class="sc-l">月末平均報酬</div><div class="sc-v" id="s0">—</div></div>
+      <div class="sc"><div class="sc-l">月內最高點</div><div class="sc-v pos" id="s1">—</div></div>
+      <div class="sc"><div class="sc-l">最高在第幾日</div><div class="sc-v" style="color:var(--bl)" id="s2">—</div></div>
+      <div class="sc"><div class="sc-l">最低在第幾日</div><div class="sc-v" style="color:var(--or)" id="s3">—</div></div>
+    </div>
+    <div class="ins" id="ins"></div>
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t" id="ct"></span>
+        <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
+      </div>
+      <div class="cb"><canvas id="lc" role="img" aria-label="月內走勢圖"></canvas></div>
+    </div>
+  </div>
+  <div id="v-monthly" style="display:none">
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t">各月份歷史平均報酬</span>
+        <span class="cc-s">點擊長條可跳至月內走勢</span>
+      </div>
+      <div class="cb" style="height:240px"><canvas id="bc" role="img" aria-label="月份平均圖"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t" id="hmt">熱力圖</span>
+        <span class="cc-s">綠＝正報酬 紅＝負報酬 ｜ 點擊指數圓點切換</span>
+      </div>
+      <div class="hm-wrap"><table class="hm" id="hm"></table></div>
+    </div>
+  </div>
+</main>
+
+<div class="gs-bar">
+  <span class="gs-dot" id="gd"></span>
+  <span id="gs-txt">—</span>
+  <button onclick="fetchData()" style="margin-left:auto;padding:3px 10px;border:1px solid var(--bd);background:none;color:var(--mu);border-radius:5px;cursor:pointer;font-size:11px">重新整理</button>
+</div>
+<footer>資料來源：Investing.com 歷史收盤價。DJI/NASDAQ100/Russell2000：2001–2026；NASDAQ：2001–2019；台股加權：2011–2026。僅供參考，不構成投資建議。</footer>
+
+<script>
+var GAS_URL =  + GAS_URL + ;
+var D = null, cm = 5, cv = 'intra', hid = {};
+var lChart = null, bChart = null, _timer = null;
+
+var SR = [
+  {k:'DJI',        lb:'DJI',          c:'#d4a843', ds:[]},
+  {k:'NASDAQ',     lb:'NASDAQ',       c:'#58a6ff', ds:[6,3]},
+  {k:'NASDAQ100',  lb:'NDQ 100',      c:'#bc8cff', ds:[3,3]},
+  {k:'Russell2000',lb:'Russell 2000', c:'#39d353', ds:[8,2,2,2]},
+  {k:'TWII',       lb:'台股加權',     c:'#f0883e', ds:[4,2]},
+];
+SR.forEach(function(_,i){ hid[i]=false; });
+var MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+var INS=[
+  '月初至第12日穩步上升，NASDAQ系列月底強力拉升。Russell 2000月末趨弱。DJI表現保守穩健。',
+  '整體偏弱，NASDAQ下行明顯。台股2月因農曆年效應異常強勢（+2.9%），與美股完全背離。',
+  'NASDAQ100/DJI受賣壓偏弱，Russell 2000月末跌幅最大（約-1%）。台股3月橫盤偏弱。',
+  '全年最強月份之一。NASDAQ100月末平均+2.4%，DJI+1.8%。台股4月月末可達+1.6%。',
+  '五窮月，整體先跌後漲。NASDAQ100月末仍有+1.5%，DJI僅+0.2%。',
+  '六絕月，前3日有假反彈，第7日後持續下行。台股6月相對抗跌（+1.0%）。',
+  '7月反轉月！月初先蹲，第8日起強力反彈。NASDAQ100月末+2.1%最強，DJI+1.5%。',
+  'DJI/NASDAQ100月末勉強轉正。台股8月最慘（-0.8%）。整體月份表現分歧大。',
+  '九月效應顯著，全年最弱月。DJI/Russell 2000月末約-0.9%，台股-0.8%。建議降低持倉。',
+  '第四季資金入場，全月強勢。NASDAQ100月末+2.8%，DJI+1.3%。台股10月月末波動大需注意。',
+  '全年最強月份！Russell 2000月末+3.2%，NASDAQ100+2.6%，DJI+2.6%。感恩節行情明顯。',
+  '聖誕行情，月末效果顯著。Russell 2000+1.6%，DJI+0.8%。台股12月月末強拉至+1.1%。',
+];
+
+// ── progress helpers ────────────────────────────────────────
+var STEPS = [
+  {id:'st0', pct:10,  label:'連線 Google Sheets'},
+  {id:'st1', pct:25,  label:'讀取 SeasonalityJSON'},
+  {id:'st2', pct:40,  label:'解析 DJI 資料'},
+  {id:'st3', pct:55,  label:'解析 NASDAQ / NDQ100'},
+  {id:'st4', pct:68,  label:'解析 Russell 2000'},
+  {id:'st5', pct:78,  label:'解析台股加權指數'},
+  {id:'st6', pct:88,  label:'計算月份平均 & 熱力圖'},
+  {id:'st7', pct:95,  label:'渲染圖表'},
+];
+var _stepIdx = 0;
+
+function startProgress() {
+  _stepIdx = 0;
+  document.getElementById('prog-wrap').style.display = 'block';
+  document.getElementById('step-list').style.display = 'flex';
+  document.getElementById('err-box').style.display   = 'none';
+  document.getElementById('load-msg').textContent = '正在載入資料...';
+  STEPS.forEach(function(s){ setStep(s.id, 'pending'); });
+  setFill(0);
+  if (_timer) clearInterval(_timer);
+  _timer = setInterval(function() {
+    if (_stepIdx >= STEPS.length) { clearInterval(_timer); return; }
+    var s = STEPS[_stepIdx];
+    if (_stepIdx > 0) setStep(STEPS[_stepIdx-1].id, 'done');
+    setStep(s.id, 'active');
+    setFill(s.pct);
+    document.getElementById('load-msg').textContent = s.label + '...';
+    _stepIdx++;
+  }, 700);
+}
+
+function setStep(id, state) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'step ' + (state === 'done' ? 'done' : state === 'active' ? 'active' : '');
+  el.querySelector('.step-icon').textContent = state==='done' ? '✓' : state==='active' ? '▶' : '○';
+}
+
+function setFill(pct) {
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent  = pct + '%';
+}
+
+function setStatus(cls, txt) {
+  document.getElementById('gd').className   = 'gs-dot ' + cls;
+  document.getElementById('gs-txt').textContent = txt;
+}
+
+// ── fetch ───────────────────────────────────────────────────
+function fetchData() {
+  document.getElementById('loader').style.display = 'flex';
+  document.getElementById('spin-icon').style.display = 'block';
+  setStatus('loading', '連線中...');
+  startProgress();
+  var t0 = Date.now();
+
+  fetch(GAS_URL)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      document.getElementById('load-msg').textContent = '正在解析 JSON...';
+      setFill(97);
+      return r.json();
+    })
+    .then(function(json) {
+      clearInterval(_timer);
+      // mark all steps done
+      STEPS.forEach(function(s){ setStep(s.id, 'done'); });
+      setFill(100);
+      document.getElementById('load-msg').textContent = '載入完成！';
+      document.getElementById('spin-icon').style.display = 'none';
+      D = json;
+      var elapsed = ((Date.now()-t0)/1000).toFixed(1);
+      var ts = json.generated_at
+        ? new Date(json.generated_at).toLocaleString('zh-TW') : '—';
+      setTimeout(function() {
+        document.getElementById('loader').style.display = 'none';
+        setStatus('ok', '✓ 已從 Google Sheets 載入　計算時間：' + ts + '　耗時 ' + elapsed + 's');
+        initUI();
+        selM(cm);
+        drawMonthly();
+      }, 500);
+    })
+    .catch(function(e) {
+      clearInterval(_timer);
+      setFill(0);
+      document.getElementById('spin-icon').style.display  = 'none';
+      document.getElementById('prog-wrap').style.display  = 'none';
+      document.getElementById('step-list').style.display  = 'none';
+      document.getElementById('load-msg').style.display   = 'none';
+      document.getElementById('err-box').style.display    = 'block';
+      document.getElementById('err-msg').innerHTML =
+        '錯誤：<code style="color:var(--rd)">' + e.message + '</code><br><br>' +
+        '① GAS 已部署為「網頁應用程式」？<br>' +
+        '② 執行身分：我　存取對象：所有人<br>' +
+        '③ 已執行過 calcAllSeasonality()？';
+      setStatus('err', '載入失敗 — ' + e.message);
+    });
+}
+
+// ── init UI (after data loaded) ─────────────────────────────
+function initUI() {
+  var mr = document.getElementById('mRow');
+  if (mr.children.length) return;
+  MN.forEach(function(m,i){
+    var b=document.createElement('button'); b.className='mb'; b.textContent=m;
+    b.onclick=function(){selM(i);}; mr.appendChild(b);
+  });
+  var pw = document.getElementById('pills');
+  SR.forEach(function(s,i){
+    var p=document.createElement('span'); p.className='pill';
+    p.style.borderColor=s.c; p.style.color=s.c;
+    p.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+s.c+';flex-shrink:0"></span>'+s.lb;
+    p.onclick=function(){hid[i]=!hid[i];p.classList.toggle('off',hid[i]);draw();};
+    pw.appendChild(p);
+  });
+  document.querySelectorAll('.nb').forEach(function(b){
+    b.onclick=function(){
+      cv=b.dataset.v;
+      document.querySelectorAll('.nb').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      document.getElementById('v-intra').style.display=cv==='intra'?'':'none';
+      document.getElementById('v-monthly').style.display=cv==='monthly'?'':'none';
+      draw();
+    };
+  });
+  lChart=new Chart(document.getElementById('lc').getContext('2d'),{
+    type:'line',data:{labels:[],datasets:[]},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
+        callbacks:{title:function(i){return '第'+(i[0].dataIndex+1)+'交易日';},
+                   label:function(c){return ' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+'%';}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},autoSkip:false,maxRotation:0}},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
+           title:{display:true,text:'累積報酬（%）',color:'#7d8590',font:{size:11}}}
+      }
+    }
+  });
+  bChart=new Chart(document.getElementById('bc').getContext('2d'),{
+    type:'bar',data:{labels:MN,datasets:[]},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
+        callbacks:{label:function(c){return ' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+'%';}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}}}
+      },
+      onClick:function(_,els){if(!els.length)return;selM(els[0].index);document.querySelector('.nb[data-v="intra"]').click();}
+    }
+  });
+}
+
+function selM(m){cm=m;document.querySelectorAll('.mb').forEach(function(b,i){b.classList.toggle('on',i===m);});draw();}
+function actIdx(){return SR.map(function(_,i){return i;}).filter(function(i){return !hid[i];});}
+function draw(){if(!D)return;cv==='intra'?drawIntra():drawMonthly();}
+
+function drawIntra(){
+  var k=String(cm+1);
+  var maxL=Math.max.apply(null,SR.map(function(s){return(D.intramonth[s.k][k]||[]).length;}));
+  lChart.data.labels=Array.from({length:maxL},function(_,i){return'D'+(i+1);});
+  lChart.data.datasets=SR.map(function(s,i){return{label:s.lb,data:D.intramonth[s.k][k]||[],
+    borderColor:s.c,backgroundColor:s.c+'18',borderWidth:2,borderDash:s.ds,
+    pointRadius:3,pointHoverRadius:5,tension:0.3,fill:false,hidden:hid[i]};});
+  lChart.update();
+  document.getElementById('ct').textContent=MN[cm]+' 月內各交易日歷史平均累積報酬';
+  document.getElementById('ins').textContent=INS[cm];
+  var ai=actIdx();
+  var ends=ai.map(function(i){var a=D.intramonth[SR[i].k][k]||[];return a[a.length-1]||0;});
+  var avg=ends.length?ends.reduce(function(a,b){return a+b;},0)/ends.length:0;
+  var hi=-Infinity,lo=Infinity,hd=0,ld=0;
+  ai.forEach(function(i){(D.intramonth[SR[i].k][k]||[]).forEach(function(v,d){
+    if(v>hi){hi=v;hd=d+1;}if(v<lo){lo=v;ld=d+1;}});});
+  var e=document.getElementById('s0');
+  e.textContent=(avg>=0?'+':'')+avg.toFixed(2)+'%';
+  e.className='sc-v '+(avg>=0?'pos':'neg');
+  document.getElementById('s1').textContent=hi===-Infinity?'—':'+'+hi.toFixed(2)+'%';
+  document.getElementById('s2').textContent=hd?'D'+hd:'—';
+  document.getElementById('s3').textContent=ld?'D'+ld:'—';
+}
+
+function drawMonthly(){
+  var ai=actIdx();
+  bChart.data.datasets=ai.map(function(i){
+    var s=SR[i];
+    var vals=Array.from({length:12},function(_,m){return D.monthly_avg[s.k][String(m+1)]||0;});
+    return{label:s.lb,data:vals,backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
+           borderColor:s.c,borderWidth:1,borderRadius:4};
+  });
+  bChart.update();
+  if(!ai.length)return;
+  var s=SR[ai[0]];
+  document.getElementById('hmt').textContent=s.lb+' — 各年各月報酬（%）';
+  var yrs=Object.keys(D.monthly_returns[s.k]).filter(function(y){return Object.keys(D.monthly_returns[s.k][y]).length>0;}).sort();
+  var avgRow='<tr class="ar"><td class="yl">平均</td>'+
+    Array.from({length:12},function(_,m){var v=D.monthly_avg[s.k][String(m+1)]||0;
+      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>3?'#fff':'var(--tx)')+'">'+
+        (v>0?'+':'')+v.toFixed(1)+'%</td>';}).join('')+'</tr>';
+  var rows=yrs.map(function(y){return'<tr><td class="yl">'+y+'</td>'+
+    Array.from({length:12},function(_,m){var v=D.monthly_returns[s.k][y][String(m+1)];
+      if(v===undefined)return'<td style="color:var(--bd)">—</td>';
+      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>8?'#fff':'var(--tx)')+'">'+
+        (v>0?'+':'')+v.toFixed(1)+'</td>';}).join('')+'</tr>';}).join('');
+  document.getElementById('hm').innerHTML=
+    '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
+}
+
+function hc(v){
+  if(!v)return'transparent';
+  var t=Math.min(Math.abs(v)/12,1);
+  return v>0?'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')':'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')';
+}
+
+fetchData();
+</script>
+</body>
+</html>
