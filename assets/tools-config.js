@@ -71,6 +71,15 @@ window.MOMO_TOOLS_CONFIG = [
     external: true,
     showOnHome: true
   },
+   {
+    id: "seasonality",
+    category: "season",
+    title: "長周期交易平均",
+    desc: "監控交易變化，找到甜蜜進出點。",
+    href: "/MOMO_FinSphere/tools/seasonality.html",
+    external: true,
+    showOnHome: true
+  },
   {
     id: "etf-dashboard",
     // [修正 4] 統一 Category 大小寫 (依據你的偏好，這裡保持 ETF 或改為 etf 皆可，建議統一)
