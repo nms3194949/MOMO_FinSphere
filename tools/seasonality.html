@@ -86,13 +86,10 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
   </div>
   <div id="step-list">
     <div class="step" id="st0"><span class="step-icon">○</span>連線 Google Sheets</div>
-    <div class="step" id="st1"><span class="step-icon">○</span>讀取 SeasonalityJSON</div>
-    <div class="step" id="st2"><span class="step-icon">○</span>解析 DJI 資料</div>
-    <div class="step" id="st3"><span class="step-icon">○</span>解析 NASDAQ / NDQ100</div>
-    <div class="step" id="st4"><span class="step-icon">○</span>解析 Russell 2000</div>
-    <div class="step" id="st5"><span class="step-icon">○</span>解析台股加權指數</div>
-    <div class="step" id="st6"><span class="step-icon">○</span>計算月份平均 &amp; 熱力圖</div>
-    <div class="step" id="st7"><span class="step-icon">○</span>渲染圖表</div>
+    <div class="step" id="st1"><span class="step-icon">○</span>下載 SeasonalityJSON 工作表</div>
+    <div class="step" id="st2"><span class="step-icon">○</span>解析 CSV 內容</div>
+    <div class="step" id="st3"><span class="step-icon">○</span>還原 JSON 資料結構</div>
+    <div class="step" id="st4"><span class="step-icon">○</span>渲染圖表</div>
   </div>
   <div id="err-box">
     <div class="err-t">載入失敗</div>
@@ -154,7 +151,10 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
 <footer>資料來源：Investing.com 歷史收盤價。DJI/NASDAQ100/Russell2000：2001–2026；NASDAQ：2001–2019；台股加權：2011–2026。僅供參考，不構成投資建議。</footer>
 
 <script>
-var GAS_URL =  + GAS_URL + ;
+// ── 資料來源：直接讀取 Google Sheets CSV（SeasonalityJSON 工作表）──
+// 不需要 GAS 執行，穩定度最高
+var CSV_URL =  + CSV_URL + ;
+
 var D = null, cm = 5, cv = 'intra', hid = {};
 var lChart = null, bChart = null, _timer = null;
 
@@ -184,14 +184,11 @@ var INS=[
 
 // ── progress helpers ────────────────────────────────────────
 var STEPS = [
-  {id:'st0', pct:10,  label:'連線 Google Sheets'},
-  {id:'st1', pct:25,  label:'讀取 SeasonalityJSON'},
-  {id:'st2', pct:40,  label:'解析 DJI 資料'},
-  {id:'st3', pct:55,  label:'解析 NASDAQ / NDQ100'},
-  {id:'st4', pct:68,  label:'解析 Russell 2000'},
-  {id:'st5', pct:78,  label:'解析台股加權指數'},
-  {id:'st6', pct:88,  label:'計算月份平均 & 熱力圖'},
-  {id:'st7', pct:95,  label:'渲染圖表'},
+  {id:'st0', pct:15,  label:'連線 Google Sheets'},
+  {id:'st1', pct:40,  label:'下載 SeasonalityJSON 工作表'},
+  {id:'st2', pct:65,  label:'解析 CSV 內容'},
+  {id:'st3', pct:82,  label:'還原 JSON 資料結構'},
+  {id:'st4', pct:92,  label:'渲染圖表'},
 ];
 var _stepIdx = 0;
 
@@ -200,57 +197,117 @@ function startProgress() {
   document.getElementById('prog-wrap').style.display = 'block';
   document.getElementById('step-list').style.display = 'flex';
   document.getElementById('err-box').style.display   = 'none';
-  document.getElementById('load-msg').textContent = '正在載入資料...';
-  STEPS.forEach(function(s){ setStep(s.id, 'pending'); });
+  document.getElementById('load-msg').textContent = '正在連線...';
+  STEPS.forEach(function(s){ setStep(s.id,'pending'); });
   setFill(0);
   if (_timer) clearInterval(_timer);
   _timer = setInterval(function() {
     if (_stepIdx >= STEPS.length) { clearInterval(_timer); return; }
     var s = STEPS[_stepIdx];
-    if (_stepIdx > 0) setStep(STEPS[_stepIdx-1].id, 'done');
-    setStep(s.id, 'active');
+    if (_stepIdx > 0) setStep(STEPS[_stepIdx-1].id,'done');
+    setStep(s.id,'active');
     setFill(s.pct);
     document.getElementById('load-msg').textContent = s.label + '...';
     _stepIdx++;
-  }, 700);
+  }, 800);
 }
 
 function setStep(id, state) {
   var el = document.getElementById(id);
   if (!el) return;
-  el.className = 'step ' + (state === 'done' ? 'done' : state === 'active' ? 'active' : '');
-  el.querySelector('.step-icon').textContent = state==='done' ? '✓' : state==='active' ? '▶' : '○';
+  el.className = 'step ' + (state==='done'?'done':state==='active'?'active':'');
+  el.querySelector('.step-icon').textContent = state==='done'?'✓':state==='active'?'▶':'○';
 }
-
 function setFill(pct) {
-  document.getElementById('prog-fill').style.width = pct + '%';
-  document.getElementById('prog-pct').textContent  = pct + '%';
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-pct').textContent  = pct+'%';
 }
-
 function setStatus(cls, txt) {
-  document.getElementById('gd').className   = 'gs-dot ' + cls;
+  document.getElementById('gd').className      = 'gs-dot '+cls;
   document.getElementById('gs-txt').textContent = txt;
 }
 
-// ── fetch ───────────────────────────────────────────────────
+function showError(code, extra) {
+  clearInterval(_timer);
+  setFill(0);
+  document.getElementById('spin-icon').style.display = 'none';
+  document.getElementById('prog-wrap').style.display = 'none';
+  document.getElementById('step-list').style.display = 'none';
+  document.getElementById('load-msg').style.display  = 'none';
+  document.getElementById('err-box').style.display   = 'block';
+  var title, body, hint;
+  if (code==='timeout') {
+    title='請求逾時（>30秒）';
+    body='Google Sheets 未在時限內回應。';
+    hint='• 確認 Sheets 已設定「共用給所有人」或「發佈至網路」<br>• 檢查 SeasonalityJSON 工作表有資料<br>• 稍後重試';
+  } else if (code==='empty') {
+    title='工作表內容為空';
+    body='SeasonalityJSON 工作表的 A1 儲存格沒有資料。';
+    hint='請在 Google Sheets 執行「季節性分析 → 重新計算所有指數」後重試。';
+  } else if (code==='json') {
+    title='JSON 解析失敗';
+    body='工作表內容不是有效的 JSON 格式。';
+    hint='請確認 SeasonalityJSON 的 A1 儲存格內容以 { 開頭，並重新執行 calcAllSeasonality()。';
+  } else if (code==='share') {
+    title='試算表未公開分享';
+    body='無法存取此 Google Sheets，可能未設定公開。';
+    hint='請在 Google Sheets 點「共用」→「知道連結的所有人」→「檢視者」，或「檔案 → 發佈至網路」。';
+  } else if (code==='network' || (extra||'').indexOf('fetch')!==-1) {
+    title='網路連線失敗';
+    body='無法連線至 Google Sheets。';
+    hint='① 此頁面必須用 https:// 開啟（不可用 file://）<br>② 確認網路正常<br>③ 本機測試請用：python -m http.server 8080';
+  } else {
+    title='未知錯誤';
+    body=extra||code;
+    hint='請按 F12 開啟主控台，截圖錯誤訊息以便排查。';
+  }
+  document.getElementById('err-msg').innerHTML=
+    '<div style="color:var(--rd);font-weight:600;font-size:14px;margin-bottom:8px">'+title+'</div>'+
+    '<div style="color:var(--tx);margin-bottom:10px">'+body+'</div>'+
+    '<div style="background:var(--bg);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--mu);line-height:2">'+hint+'</div>';
+  setStatus('err','載入失敗：'+title);
+}
+
+// ── fetch CSV from Sheets ────────────────────────────────────
 function fetchData() {
-  document.getElementById('loader').style.display = 'flex';
+  document.getElementById('loader').style.display    = 'flex';
   document.getElementById('spin-icon').style.display = 'block';
-  setStatus('loading', '連線中...');
+  document.getElementById('load-msg').style.display  = 'block';
+  setStatus('loading','連線中...');
   startProgress();
   var t0 = Date.now();
 
-  fetch(GAS_URL)
+  var _timeout = setTimeout(function(){
+    showError('timeout', null);
+  }, 30000);
+
+  // 加 timestamp 避免瀏覽器 cache 造成讀不到最新資料
+  fetch(CSV_URL + '&t=' + Date.now())
     .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      document.getElementById('load-msg').textContent = '正在解析 JSON...';
-      setFill(97);
-      return r.json();
+      clearTimeout(_timeout);
+      if (r.status === 401 || r.status === 403) throw {code:'share'};
+      if (!r.ok) throw {code:'network', msg:'HTTP '+r.status};
+      document.getElementById('load-msg').textContent = '正在解析 CSV...';
+      setFill(70);
+      return r.text();
     })
-    .then(function(json) {
+    .then(function(csv) {
+      // CSV 的 A1 就是整個 JSON 字串
+      // Google export 會把內容用雙引號包住，需要 unescape
+      var raw = csv.trim();
+      // 去除 Google CSV 包的外層引號與跳脫
+      if (raw.charAt(0)==='"') {
+        raw = raw.slice(1, raw.charAt(raw.length-1)==='"' ? raw.length-1 : raw.length);
+        raw = raw.replace(/""/g, '"');
+      }
+      if (!raw || raw.length < 10) throw {code:'empty'};
+      document.getElementById('load-msg').textContent = '還原 JSON 資料...';
+      setFill(85);
+      var json;
+      try { json = JSON.parse(raw); } catch(e) { throw {code:'json'}; }
+      if (!json.intramonth) throw {code:'json'};
       clearInterval(_timer);
-      // mark all steps done
-      STEPS.forEach(function(s){ setStep(s.id, 'done'); });
+      STEPS.forEach(function(s){ setStep(s.id,'done'); });
       setFill(100);
       document.getElementById('load-msg').textContent = '載入完成！';
       document.getElementById('spin-icon').style.display = 'none';
@@ -258,32 +315,21 @@ function fetchData() {
       var elapsed = ((Date.now()-t0)/1000).toFixed(1);
       var ts = json.generated_at
         ? new Date(json.generated_at).toLocaleString('zh-TW') : '—';
-      setTimeout(function() {
+      setTimeout(function(){
         document.getElementById('loader').style.display = 'none';
-        setStatus('ok', '✓ 已從 Google Sheets 載入　計算時間：' + ts + '　耗時 ' + elapsed + 's');
-        initUI();
-        selM(cm);
-        drawMonthly();
-      }, 500);
+        setStatus('ok','✓ 已從 Google Sheets 載入　計算時間：'+ts+'　耗時 '+elapsed+'s');
+        initUI(); selM(cm); drawMonthly();
+      }, 400);
     })
     .catch(function(e) {
+      clearTimeout(_timeout);
       clearInterval(_timer);
-      setFill(0);
-      document.getElementById('spin-icon').style.display  = 'none';
-      document.getElementById('prog-wrap').style.display  = 'none';
-      document.getElementById('step-list').style.display  = 'none';
-      document.getElementById('load-msg').style.display   = 'none';
-      document.getElementById('err-box').style.display    = 'block';
-      document.getElementById('err-msg').innerHTML =
-        '錯誤：<code style="color:var(--rd)">' + e.message + '</code><br><br>' +
-        '① GAS 已部署為「網頁應用程式」？<br>' +
-        '② 執行身分：我　存取對象：所有人<br>' +
-        '③ 已執行過 calcAllSeasonality()？';
-      setStatus('err', '載入失敗 — ' + e.message);
+      if (e && e.code) showError(e.code, e.msg||null);
+      else showError('network', String(e));
     });
 }
 
-// ── init UI (after data loaded) ─────────────────────────────
+// ── init UI ─────────────────────────────────────────────────
 function initUI() {
   var mr = document.getElementById('mRow');
   if (mr.children.length) return;
@@ -371,14 +417,16 @@ function drawMonthly(){
   bChart.data.datasets=ai.map(function(i){
     var s=SR[i];
     var vals=Array.from({length:12},function(_,m){return D.monthly_avg[s.k][String(m+1)]||0;});
-    return{label:s.lb,data:vals,backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
-           borderColor:s.c,borderWidth:1,borderRadius:4};
+    return{label:s.lb,data:vals,
+      backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
+      borderColor:s.c,borderWidth:1,borderRadius:4};
   });
   bChart.update();
   if(!ai.length)return;
   var s=SR[ai[0]];
   document.getElementById('hmt').textContent=s.lb+' — 各年各月報酬（%）';
-  var yrs=Object.keys(D.monthly_returns[s.k]).filter(function(y){return Object.keys(D.monthly_returns[s.k][y]).length>0;}).sort();
+  var yrs=Object.keys(D.monthly_returns[s.k]).filter(function(y){
+    return Object.keys(D.monthly_returns[s.k][y]).length>0;}).sort();
   var avgRow='<tr class="ar"><td class="yl">平均</td>'+
     Array.from({length:12},function(_,m){var v=D.monthly_avg[s.k][String(m+1)]||0;
       return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>3?'#fff':'var(--tx)')+'">'+
