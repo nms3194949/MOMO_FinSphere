@@ -179,26 +179,36 @@ var D = null, cm = 5, cv = 'intra', hid = {}, curHmIdx = 0;
 var lChart = null, bChart = null, vixLineChart = null, _timer = null;
 var SR = []; // 從 GAS meta 動態建立
 
-// 顏色和虛線樣式循環池（VIX 固定紅色，其餘依序套用）
-var COLOR_POOL = ['#d4a843','#58a6ff','#bc8cff','#39d353','#f0883e','#61afef','#e06c75','#98c379','#56b6c2','#c678dd'];
+// 固定顏色對照表（避免不同指數撞色）
+var COLOR_MAP = {
+  'DJI':         '#d4a843',  // 金黃
+  'S&P 500':     '#00bfff',  // 天藍（深）
+  'SP500':       '#00bfff',  // 天藍（深）
+  'NASDAQ':      '#bc8cff',  // 紫
+  'NASDAQ100':   '#3fb950',  // 綠
+  'Russell2000': '#f0883e',  // 橘
+  'TWII':        '#ff6eb4',  // 粉紅
+  'VIX':         '#f85149',  // 紅（固定）
+};
+// 備用顏色池（未在 COLOR_MAP 的指數依序套用）
+var COLOR_POOL = ['#40e0d0','#ffd700','#61afef','#98c379','#56b6c2','#c678dd','#e06c75'];
 var DASH_POOL  = [[],[6,3],[3,3],[8,2,2,2],[4,2],[6,2],[2,2],[8,4],[4,4],[6,2,2,2]];
 
 function buildSR() {
   if (!D || !D.meta) return;
   SR = [];
   hid = {};
-  var ci = 0;
+  var poolIdx = 0;
   Object.keys(D.meta).forEach(function(k) {
-    if (k === 'VIX') return; // VIX 單獨處理，不進 SR
-    var m = D.meta[k];
+    if (k === 'VIX') return;
+    var color = COLOR_MAP[k] || COLOR_POOL[poolIdx++ % COLOR_POOL.length];
     SR.push({
       k:  k,
-      lb: m.label || k,
-      c:  COLOR_POOL[ci % COLOR_POOL.length],
-      ds: DASH_POOL[ci % DASH_POOL.length]
+      lb: D.meta[k].label || k,
+      c:  color,
+      ds: DASH_POOL[SR.length % DASH_POOL.length]
     });
     hid[SR.length-1] = false;
-    ci++;
   });
 }
 
