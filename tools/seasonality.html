@@ -488,6 +488,10 @@ function initUI() {
         b.classList.add('on');
         document.getElementById('v-intra').style.display=cv==='intra'?'':'none';
         document.getElementById('v-monthly').style.display=cv==='monthly'?'':'none';
+        // 切到月份總覽時隱藏月內專屬卡片
+        if(cv==='monthly'){
+          document.getElementById('vix-intra-card').style.display='none';
+        }
         draw();
       };
     });
