@@ -124,6 +124,14 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       </div>
       <div class="cb"><canvas id="lc" role="img" aria-label="月內走勢圖"></canvas></div>
     </div>
+    <!-- VIX 月內走勢 -->
+    <div class="cc" id="vix-intra-card" style="display:none">
+      <div class="cc-h">
+        <span class="cc-t" id="vix-intra-title"></span>
+        <span class="cc-s">VIX 歷史平均，Y軸＝月初至今變化幅度（%）｜上升＝恐慌加劇</span>
+      </div>
+      <div class="cb" style="height:200px"><canvas id="vix-lc" role="img" aria-label="VIX月內走勢圖"></canvas></div>
+    </div>
   </div>
   <div id="v-monthly" style="display:none">
     <div class="cc">
@@ -139,6 +147,14 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <span class="cc-s">綠＝正報酬 紅＝負報酬 ｜ 點擊指數圓點切換</span>
       </div>
       <div class="hm-wrap"><table class="hm" id="hm"></table></div>
+    </div>
+    <!-- VIX 月份熱力圖 -->
+    <div class="cc" id="vix-monthly-card" style="display:none">
+      <div class="cc-h">
+        <span class="cc-t">VIX 各月份平均水位熱力圖</span>
+        <span class="cc-s">顏色越深紅＝平均恐慌越高，越深綠＝市場越平靜</span>
+      </div>
+      <div class="hm-wrap"><table class="hm" id="vix-hm"></table></div>
     </div>
   </div>
 </main>
@@ -156,7 +172,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
 var CSV_URL = 'https://docs.google.com/spreadsheets/d/1o0CxoDf7QGJV5Dr2YCvUfu1OL6CdGi1Cb4XVWt9IFI4/export?format=csv&gid=534897987';
 
 var D = null, cm = 5, cv = 'intra', hid = {};
-var lChart = null, bChart = null, _timer = null;
+var lChart = null, bChart = null, vixLineChart = null, _timer = null;
 
 var SR = [
   {k:'DJI',        lb:'DJI',          c:'#d4a843', ds:[]},
@@ -382,7 +398,22 @@ function initUI() {
       onClick:function(_,els){if(!els.length)return;selM(els[0].index);document.querySelector('.nb[data-v="intra"]').click();}
     }
   });
-}
+  // VIX 月內走勢折線圖
+  vixLineChart = new Chart(document.getElementById('vix-lc').getContext('2d'),{
+    type:'line', data:{labels:[],datasets:[]},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
+        callbacks:{title:function(i){return '第'+(i[0].dataIndex+1)+'交易日';},
+                   label:function(c){return ' VIX 變化: '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},autoSkip:false,maxRotation:0}},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},
+           ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
+           title:{display:true,text:'VIX 變化幅度（%）',color:'#7d8590',font:{size:11}}}
+      }
+    }
+  });
 
 function selM(m){cm=m;document.querySelectorAll('.mb').forEach(function(b,i){b.classList.toggle('on',i===m);});draw();}
 function actIdx(){return SR.map(function(_,i){return i;}).filter(function(i){return !hid[i];});}
@@ -410,6 +441,32 @@ function drawIntra(){
   document.getElementById('s1').textContent=hi===-Infinity?'—':'+'+hi.toFixed(2)+'%';
   document.getElementById('s2').textContent=hd?'D'+hd:'—';
   document.getElementById('s3').textContent=ld?'D'+ld:'—';
+  // VIX 月內走勢
+  drawVixIntra(k);
+}
+
+function drawVixIntra(k) {
+  var card = document.getElementById('vix-intra-card');
+  if (!D.intramonth || !D.intramonth['VIX'] || !D.intramonth['VIX'][k] || !D.intramonth['VIX'][k].length) {
+    card.style.display = 'none'; return;
+  }
+  card.style.display = '';
+  var vixData = D.intramonth['VIX'][k];
+  var labels = Array.from({length:vixData.length}, function(_,i){ return 'D'+(i+1); });
+  document.getElementById('vix-intra-title').textContent = MN[cm] + ' VIX 月內歷史平均變化';
+  vixLineChart.data.labels = labels;
+  vixLineChart.data.datasets = [{
+    label:'VIX',
+    data: vixData,
+    borderColor:'#f85149',
+    backgroundColor:'rgba(248,81,73,0.1)',
+    borderWidth:2,
+    pointRadius:3,
+    pointHoverRadius:5,
+    tension:0.3,
+    fill:true
+  }];
+  vixLineChart.update();
 }
 
 function drawMonthly(){
@@ -438,6 +495,56 @@ function drawMonthly(){
         (v>0?'+':'')+v.toFixed(1)+'</td>';}).join('')+'</tr>';}).join('');
   document.getElementById('hm').innerHTML=
     '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
+  // VIX 月份熱力圖
+  drawVixMonthly();
+}
+
+function drawVixMonthly() {
+  var card = document.getElementById('vix-monthly-card');
+  if (!D.monthly_returns || !D.monthly_returns['VIX'] || !D.monthly_avg || !D.monthly_avg['VIX']) {
+    card.style.display = 'none'; return;
+  }
+  card.style.display = '';
+  var vixAvg = D.monthly_avg['VIX'];
+  var vixYrs = Object.keys(D.monthly_returns['VIX'])
+    .filter(function(y){ return Object.keys(D.monthly_returns['VIX'][y]).length>0; }).sort();
+
+  // avg row — VIX 用絕對水位（月平均 VIX 值），顏色: 高=紅, 低=綠
+  var avgRow = '<tr class="ar"><td class="yl">平均水位</td>'+
+    Array.from({length:12}, function(_,m){
+      var v = vixAvg[String(m+1)];
+      if (v===undefined) return '<td style="color:var(--bd)">—</td>';
+      return '<td style="background:'+hcVix(v)+';color:#fff">'+v.toFixed(1)+'</td>';
+    }).join('')+'</tr>';
+
+  // year rows — 顯示各年月平均 VIX
+  var rows = vixYrs.map(function(y){
+    return '<tr><td class="yl">'+y+'</td>'+
+      Array.from({length:12}, function(_,m){
+        var v = D.monthly_returns['VIX'][y][String(m+1)];
+        if (v===undefined) return '<td style="color:var(--bd)">—</td>';
+        return '<td style="background:'+hcVixRet(v)+';color:'+(Math.abs(v)>15?'#fff':'var(--tx)')+'">'+
+          (v>0?'+':'')+v.toFixed(1)+'</td>';
+      }).join('')+'</tr>';
+  }).join('');
+
+  document.getElementById('vix-hm').innerHTML =
+    '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+
+    avgRow+rows;
+}
+
+// VIX 絕對水位熱力圖（15=平靜, 40=恐慌）
+function hcVix(v) {
+  var t = Math.min(Math.max((v-12)/35, 0), 1);
+  return 'rgba('+Math.round(63+t*170)+','+Math.round(185-t*140)+','+Math.round(80-t*60)+','+(0.4+t*0.5)+')';
+}
+// VIX 月報酬熱力圖（VIX漲=恐慌，用紅；VIX跌=平靜，用綠）
+function hcVixRet(v) {
+  if (!v) return 'transparent';
+  var t = Math.min(Math.abs(v)/30, 1);
+  return v>0
+    ? 'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')'
+    : 'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')';
 }
 
 function hc(v){
