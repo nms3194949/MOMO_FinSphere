@@ -59,6 +59,9 @@ main{padding:18px 24px}
 .wr-lbl{font-size:9px;color:var(--bd);margin-top:1px}
 .wr-tab{padding:3px 9px;border:1px solid var(--bd);border-radius:20px;cursor:pointer;font-size:11px;background:var(--surf2);color:var(--mu);transition:.12s;white-space:nowrap}
 .wr-tab.on{font-weight:600;color:#000;border-color:transparent}
+.iwin-cell{width:26px;height:22px;text-align:center;cursor:pointer;font-size:9px;font-weight:500;border-radius:2px;transition:filter .1s;vertical-align:middle}
+.iwin-cell:hover{filter:brightness(1.4);outline:1px solid rgba(255,255,255,.5)}
+.iwin-head{padding:2px 3px;font-size:9px;color:var(--mu);text-align:center;white-space:nowrap;font-weight:600}
 /* loader */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100}
 .spin{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}
@@ -164,6 +167,21 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         </div>
         <div id="wr-bar" style="display:flex;gap:2px;align-items:flex-end"></div>
         <div id="wr-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
+      <!-- 區間勝率矩陣 -->
+      <div style="margin-top:16px">
+        <div style="font-size:12px;font-weight:600;color:var(--mu);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <span>區間勝率矩陣 <span style="font-weight:400;font-size:11px">（Y軸＝進場日，X軸＝出場日）</span></span>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px">
+            <span style="display:inline-block;width:50px;height:8px;border-radius:3px;background:linear-gradient(to right,#f85149,#555,#1a7f37)"></span>
+            <span style="color:var(--rd)">低勝率</span><span style="color:var(--mu)">50%</span><span style="color:var(--gr)">高勝率</span>
+          </div>
+        </div>
+        <div id="iwin-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
+        <div style="overflow-x:auto">
+          <table id="iwin-tbl" style="border-collapse:collapse;font-size:10px"></table>
+        </div>
+        <div id="iwin-detail" style="margin-top:8px;font-size:12px;color:var(--mu);min-height:20px"></div>
+      </div>
       </div>
     </div>
     <!-- VIX 月內走勢 -->
@@ -814,6 +832,7 @@ function drawIntra(){
   document.getElementById('s3').textContent=ld?'D'+ld:'—';
   drawVixIntra(k);
   drawWinrateBar(k);
+  drawIwinMatrix(k);
 }
 
 // ── 勝率熱力條 ───────────────────────────────────────────────
@@ -880,32 +899,116 @@ function renderWrCells(k) {
   var wins = D.intramonth_win[wrIdxKey] && D.intramonth_win[wrIdxKey][k];
   if (!wins || !wins.length) { bar.innerHTML=''; return; }
 
-  var s = SR.find(function(s){ return s.k===wrIdxKey; });
   var maxH = 40;
   bar.innerHTML='';
   wins.forEach(function(wr, i) {
     var cell=document.createElement('div');
     cell.className='wr-cell';
     cell.title='D'+(i+1)+' | 勝率 '+wr+'%';
-
     var color = wr>=70?'#1a7f37': wr>=60?'#3fb950': wr>=50?'#7d8590': wr>=40?'#f0883e':'#f85149';
     var h=Math.max(4, Math.round((wr/100)*maxH));
-
     var blk=document.createElement('div');
     blk.style.cssText='width:100%;height:'+h+'px;background:'+color+';border-radius:3px 3px 0 0';
-
     var num=document.createElement('div');
-    num.className='wr-num';
-    num.textContent=wr+'%';
-    num.style.color=color;
-
+    num.className='wr-num'; num.textContent=wr+'%'; num.style.color=color;
     var lbl=document.createElement('div');
-    lbl.className='wr-lbl';
-    lbl.textContent='D'+(i+1);
-
+    lbl.className='wr-lbl'; lbl.textContent='D'+(i+1);
     cell.appendChild(blk); cell.appendChild(num); cell.appendChild(lbl);
     bar.appendChild(cell);
   });
+}
+
+// ── 區間勝率矩陣 ─────────────────────────────────────────────
+var iwinIdxKey = null;
+
+function drawIwinMatrix(k) {
+  var tabWrap = document.getElementById('iwin-idx-tabs');
+  var tbl     = document.getElementById('iwin-tbl');
+  var detail  = document.getElementById('iwin-detail');
+  if (!tabWrap || !tbl) return;
+
+  var iwKeys = SR.filter(function(s){
+    return D.intramonth_iwin && D.intramonth_iwin[s.k] && D.intramonth_iwin[s.k][k];
+  });
+  if (!iwKeys.length) { tbl.innerHTML=''; tabWrap.innerHTML=''; return; }
+
+  if (!iwinIdxKey || !D.intramonth_iwin[iwinIdxKey] || !D.intramonth_iwin[iwinIdxKey][k]) {
+    var bk = getBaseKey();
+    iwinIdxKey = (bk && D.intramonth_iwin[bk] && D.intramonth_iwin[bk][k]) ? bk : iwKeys[0].k;
+  }
+
+  // 建立 tabs
+  tabWrap.innerHTML='';
+  iwKeys.forEach(function(s) {
+    var btn=document.createElement('button');
+    btn.className='wr-tab'+(s.k===iwinIdxKey?' on':'');
+    btn.textContent=s.lb;
+    btn.style.background=s.k===iwinIdxKey?s.c:'';
+    btn.onclick=(function(sk){ return function(){
+      iwinIdxKey=sk;
+      tabWrap.querySelectorAll('.wr-tab').forEach(function(b,bi){
+        b.classList.toggle('on', iwKeys[bi].k===sk);
+        b.style.background=iwKeys[bi].k===sk?iwKeys[bi].c:'';
+      });
+      renderIwinTable(k);
+    };})(s.k);
+    tabWrap.appendChild(btn);
+  });
+  renderIwinTable(k);
+}
+
+function iwinColor(wr) {
+  if (wr===null) return 'transparent';
+  if (wr >= 75) return 'rgba(26,127,55,.9)';
+  if (wr >= 65) return 'rgba(63,185,80,.7)';
+  if (wr >= 55) return 'rgba(63,185,80,.35)';
+  if (wr >= 45) return 'rgba(125,133,144,.25)';
+  if (wr >= 35) return 'rgba(240,136,62,.5)';
+  return 'rgba(248,81,73,.7)';
+}
+
+function renderIwinTable(k) {
+  var tbl    = document.getElementById('iwin-tbl');
+  var detail = document.getElementById('iwin-detail');
+  var iwin   = D.intramonth_iwin[iwinIdxKey] && D.intramonth_iwin[iwinIdxKey][k];
+  if (!iwin || !iwin.length) { tbl.innerHTML=''; return; }
+  var n = iwin.length;
+
+  var html = '<tr><th class="iwin-head" style="color:var(--mu)">進場↓ 出場→</th>';
+  for (var eo=1; eo<n; eo++) html += '<th class="iwin-head">D'+(eo+1)+'</th>';
+  html += '</tr>';
+
+  for (var ei=0; ei<n-1; ei++) {
+    html += '<tr><th class="iwin-head">D'+(ei+1)+'</th>';
+    for (var eo2=1; eo2<n; eo2++) {
+      if (eo2 <= ei) {
+        html += '<td style="background:transparent"></td>';
+      } else {
+        var wr = iwin[ei][eo2];
+        var bg = iwinColor(wr);
+        var txt = wr!==null ? wr+'%' : '';
+        var txtColor = wr>=55||wr<45 ? '#fff' : 'var(--tx)';
+        html += '<td class="iwin-cell" style="background:'+bg+';color:'+txtColor+'"'+
+          ' title="D'+(ei+1)+'進 → D'+(eo2+1)+'出：勝率 '+wr+'%"'+
+          ' onclick="showIwinDetail('+(ei+1)+','+(eo2+1)+','+wr+')">' + txt + '</td>';
+      }
+    }
+    html += '</tr>';
+  }
+  tbl.innerHTML = html;
+  if (detail) detail.textContent = '點擊格子查看詳情';
+}
+
+function showIwinDetail(ei, eo, wr) {
+  var detail = document.getElementById('iwin-detail');
+  if (!detail) return;
+  var s = SR.find(function(s){ return s.k===iwinIdxKey; });
+  var label = s ? s.lb : iwinIdxKey;
+  var strength = wr>=70?'強勢 ✓✓': wr>=60?'偏強 ✓': wr>=50?'中性 ～': wr>=40?'偏弱 ✗':'弱勢 ✗✗';
+  detail.innerHTML =
+    '<span style="color:'+iwinColor(wr)+';font-weight:600">'+wr+'%</span>' +
+    '　【'+label+'】D'+ei+' 進場 → D'+eo+' 出場　' + strength +
+    '　<span style="color:var(--mu);font-size:11px">（歷史上有 '+wr+'% 的年份這段區間是正報酬）</span>';
 }
 
 function drawVixIntra(k) {
