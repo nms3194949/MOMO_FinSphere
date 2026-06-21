@@ -53,6 +53,12 @@ main{padding:18px 24px}
 .sig-exit{background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);color:#f85149}
 .sig-watch{background:rgba(125,133,144,.12);border:1px solid rgba(125,133,144,.3);color:var(--mu)}
 .sig-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.wr-cell{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;cursor:default;border-radius:3px 3px 0 0;transition:filter .15s}
+.wr-cell:hover{filter:brightness(1.3)}
+.wr-num{font-size:9px;color:var(--mu);margin-top:3px;white-space:nowrap}
+.wr-lbl{font-size:9px;color:var(--bd);margin-top:1px}
+.wr-tab{padding:3px 9px;border:1px solid var(--bd);border-radius:20px;cursor:pointer;font-size:11px;background:var(--surf2);color:var(--mu);transition:.12s;white-space:nowrap}
+.wr-tab.on{font-weight:600;color:#000;border-color:transparent}
 /* loader */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100}
 .spin{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}
@@ -139,6 +145,18 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
       </div>
       <div class="cb"><canvas id="lc" role="img" aria-label="月內走勢圖"></canvas></div>
+      <!-- 勝率熱力條 -->
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:5px;display:flex;justify-content:space-between">
+          <span>各交易日勝率（持有至該日正報酬的歷史比例）</span>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px">
+            <span style="display:inline-block;width:30px;height:8px;border-radius:3px;background:linear-gradient(to right,#f85149,#7d8590,#3fb950)"></span>
+            <span style="color:var(--rd)">低</span><span style="color:var(--mu)">50%</span><span style="color:var(--gr)">高</span>
+          </div>
+        </div>
+        <div id="wr-bar" style="display:flex;gap:2px;align-items:flex-end"></div>
+        <div id="wr-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
+      </div>
     </div>
     <!-- VIX 月內走勢 -->
     <div class="cc" id="vix-intra-card" style="display:none">
@@ -727,31 +745,12 @@ function drawIntra(){
   SR.forEach(function(s,i){
     if(hid[i]) return;
     var avg=(D.intramonth[s.k]&&D.intramonth[s.k][k])||[];
-    var std=(D.intramonth_std&&D.intramonth_std[s.k]&&D.intramonth_std[s.k][k])||[];
-
-    // ±1 標準差陰影帶（上界）
-    if(std.length){
-      datasets.push({
-        label:s.lb+'__upper',
-        data:avg.map(function(v,j){return v+(std[j]||0);}),
-        borderColor:'transparent',backgroundColor:s.c+'28',
-        borderWidth:0,pointRadius:0,tension:0.3,fill:'+1',yAxisID:'y'
-      });
-      // 下界
-      datasets.push({
-        label:s.lb+'__lower',
-        data:avg.map(function(v,j){return v-(std[j]||0);}),
-        borderColor:'transparent',backgroundColor:s.c+'28',
-        borderWidth:0,pointRadius:0,tension:0.3,fill:false,yAxisID:'y'
-      });
-    }
-    // 主折線
     datasets.push({
-      label:s.lb,data:avg,
-      borderColor:s.c,backgroundColor:'transparent',
-      borderWidth:2,borderDash:s.ds,
-      pointRadius:3,pointHoverRadius:5,
-      tension:0.3,fill:false,yAxisID:'y'
+      label:s.lb, data:avg,
+      borderColor:s.c, backgroundColor:'transparent',
+      borderWidth:2, borderDash:s.ds,
+      pointRadius:3, pointHoverRadius:5,
+      tension:0.3, fill:false, yAxisID:'y'
     });
   });
 
@@ -770,7 +769,6 @@ function drawIntra(){
   // tooltip 加入勝率
   lChart.options.plugins.tooltip.callbacks.label=function(c){
     if(c.dataset.yAxisID==='yv') return ' VIX: '+c.parsed.y.toFixed(2);
-    if(c.dataset.label.indexOf('__')!==-1) return null;
     var lb=c.dataset.label;
     var val=(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';
     var sr=SR.find(function(s){return s.lb===lb;});
@@ -805,9 +803,82 @@ function drawIntra(){
   document.getElementById('s2').textContent=hd?'D'+hd:'—';
   document.getElementById('s3').textContent=ld?'D'+ld:'—';
   drawVixIntra(k);
+  drawWinrateBar(k);
 }
 
-function drawVixIntra(k) {
+// ── 勝率熱力條 ───────────────────────────────────────────────
+var wrIdxKey = null;
+
+function drawWinrateBar(k) {
+  var tabWrap = document.getElementById('wr-idx-tabs');
+  var wrKeys = SR.filter(function(s){
+    return D.intramonth_win && D.intramonth_win[s.k] && D.intramonth_win[s.k][k];
+  });
+  if (!wrKeys.length) {
+    document.getElementById('wr-bar').innerHTML='';
+    if(tabWrap) tabWrap.innerHTML='';
+    return;
+  }
+  // 預設 S&P 500 或第一個
+  if (!wrIdxKey || !D.intramonth_win[wrIdxKey] || !D.intramonth_win[wrIdxKey][k]) {
+    var bk = getBaseKey();
+    wrIdxKey = (bk && D.intramonth_win[bk] && D.intramonth_win[bk][k]) ? bk : wrKeys[0].k;
+  }
+  // 建立 tabs
+  if (tabWrap) {
+    tabWrap.innerHTML='';
+    wrKeys.forEach(function(s) {
+      var btn=document.createElement('button');
+      btn.className='wr-tab'+(s.k===wrIdxKey?' on':'');
+      btn.textContent=s.lb;
+      btn.style.background=s.k===wrIdxKey?s.c:'';
+      btn.onclick=(function(sk,sc){return function(){
+        wrIdxKey=sk;
+        tabWrap.querySelectorAll('.wr-tab').forEach(function(b,bi){
+          b.classList.toggle('on',wrKeys[bi].k===sk);
+          b.style.background=wrKeys[bi].k===sk?wrKeys[bi].c:'';
+        });
+        renderWrCells(k);
+      };})(s.k,s.c);
+      tabWrap.appendChild(btn);
+    });
+  }
+  renderWrCells(k);
+}
+
+function renderWrCells(k) {
+  var bar  = document.getElementById('wr-bar');
+  if (!bar) return;
+  var wins = D.intramonth_win[wrIdxKey] && D.intramonth_win[wrIdxKey][k];
+  if (!wins || !wins.length) { bar.innerHTML=''; return; }
+
+  var s = SR.find(function(s){ return s.k===wrIdxKey; });
+  var maxH = 40;
+  bar.innerHTML='';
+  wins.forEach(function(wr, i) {
+    var cell=document.createElement('div');
+    cell.className='wr-cell';
+    cell.title='D'+(i+1)+' | 勝率 '+wr+'%';
+
+    var color = wr>=70?'#1a7f37': wr>=60?'#3fb950': wr>=50?'#7d8590': wr>=40?'#f0883e':'#f85149';
+    var h=Math.max(4, Math.round((wr/100)*maxH));
+
+    var blk=document.createElement('div');
+    blk.style.cssText='width:100%;height:'+h+'px;background:'+color+';border-radius:3px 3px 0 0';
+
+    var num=document.createElement('div');
+    num.className='wr-num';
+    num.textContent=wr+'%';
+    num.style.color=color;
+
+    var lbl=document.createElement('div');
+    lbl.className='wr-lbl';
+    lbl.textContent='D'+(i+1);
+
+    cell.appendChild(blk); cell.appendChild(num); cell.appendChild(lbl);
+    bar.appendChild(cell);
+  });
+}
   var card = document.getElementById('vix-intra-card');
   if (!D.intramonth || !D.intramonth['VIX'] || !D.intramonth['VIX'][k] || !D.intramonth['VIX'][k].length) {
     card.style.display = 'none'; return;
