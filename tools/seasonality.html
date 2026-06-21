@@ -710,17 +710,40 @@ function drawIntra(){
   }));
   lChart.data.labels=Array.from({length:maxL},function(_,i){return'D'+(i+1);});
 
-  var datasets=SR.map(function(s,i){return{
-    label:s.lb,
-    data:(D.intramonth[s.k]&&D.intramonth[s.k][k])||[],
-    borderColor:s.c,backgroundColor:s.c+'18',
-    borderWidth:2,borderDash:s.ds,
-    pointRadius:3,pointHoverRadius:5,
-    tension:0.3,fill:false,hidden:hid[i],yAxisID:'y'
-  };});
+  var datasets=[];
+  SR.forEach(function(s,i){
+    if(hid[i]) return;
+    var avg=(D.intramonth[s.k]&&D.intramonth[s.k][k])||[];
+    var std=(D.intramonth_std&&D.intramonth_std[s.k]&&D.intramonth_std[s.k][k])||[];
+
+    // ±1 標準差陰影帶（上界）
+    if(std.length){
+      datasets.push({
+        label:s.lb+'__upper',
+        data:avg.map(function(v,j){return v+(std[j]||0);}),
+        borderColor:'transparent',backgroundColor:s.c+'28',
+        borderWidth:0,pointRadius:0,tension:0.3,fill:'+1',yAxisID:'y'
+      });
+      // 下界
+      datasets.push({
+        label:s.lb+'__lower',
+        data:avg.map(function(v,j){return v-(std[j]||0);}),
+        borderColor:'transparent',backgroundColor:s.c+'28',
+        borderWidth:0,pointRadius:0,tension:0.3,fill:false,yAxisID:'y'
+      });
+    }
+    // 主折線
+    datasets.push({
+      label:s.lb,data:avg,
+      borderColor:s.c,backgroundColor:'transparent',
+      borderWidth:2,borderDash:s.ds,
+      pointRadius:3,pointHoverRadius:5,
+      tension:0.3,fill:false,yAxisID:'y'
+    });
+  });
 
   // VIX 右軸折線
-  if (D.intramonth&&D.intramonth['VIX']&&D.intramonth['VIX'][k]&&D.intramonth['VIX'][k].length) {
+  if(D.intramonth&&D.intramonth['VIX']&&D.intramonth['VIX'][k]&&D.intramonth['VIX'][k].length){
     datasets.push({
       label:'VIX',data:D.intramonth['VIX'][k],
       borderColor:'#f85149',backgroundColor:'rgba(248,81,73,0.08)',
@@ -730,24 +753,37 @@ function drawIntra(){
     });
   }
   lChart.data.datasets=datasets;
-  // update 在 drawSignals 之後呼叫，讓 signalBands plugin 一起渲染
+
+  // tooltip 加入勝率
+  lChart.options.plugins.tooltip.callbacks.label=function(c){
+    if(c.dataset.yAxisID==='yv') return ' VIX: '+c.parsed.y.toFixed(2);
+    if(c.dataset.label.indexOf('__')!==-1) return null;
+    var lb=c.dataset.label;
+    var val=(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';
+    var sr=SR.find(function(s){return s.lb===lb;});
+    if(sr&&D.intramonth_win&&D.intramonth_win[sr.k]&&D.intramonth_win[sr.k][k]){
+      var wr=D.intramonth_win[sr.k][k][c.dataIndex];
+      if(wr!==undefined) return ' '+lb+': '+val+'  ✓勝率 '+wr+'%';
+    }
+    return ' '+lb+': '+val;
+  };
+
   document.getElementById('ct').textContent=MN[cm]+' 月內各交易日歷史平均累積報酬';
   document.getElementById('ins').textContent=INS[cm];
 
-  // 交易訊號
-  var sigResult = calcSignals(cm);
-  if (sigResult) {
-    drawSignalBands(lChart.data.labels, sigResult.zones);
-  } else {
-    lChart._signalBands = [];
-  }
+  // 交易訊號色塊
+  var sigResult=calcSignals(cm);
+  if(sigResult){ drawSignalBands(lChart.data.labels,sigResult.zones); }
+  else { lChart._signalBands=[]; }
   lChart.update();
   drawSignals(cm);
+
+  // stats cards
   var ai=actIdx();
-  var ends=ai.map(function(i){var a=D.intramonth[SR[i].k][k]||[];return a[a.length-1]||0;});
+  var ends=ai.map(function(i){var a=(D.intramonth[SR[i].k]&&D.intramonth[SR[i].k][k])||[];return a[a.length-1]||0;});
   var avg=ends.length?ends.reduce(function(a,b){return a+b;},0)/ends.length:0;
   var hi=-Infinity,lo=Infinity,hd=0,ld=0;
-  ai.forEach(function(i){(D.intramonth[SR[i].k][k]||[]).forEach(function(v,d){
+  ai.forEach(function(i){((D.intramonth[SR[i].k]&&D.intramonth[SR[i].k][k])||[]).forEach(function(v,d){
     if(v>hi){hi=v;hd=d+1;}if(v<lo){lo=v;ld=d+1;}});});
   var e=document.getElementById('s0');
   e.textContent=(avg>=0?'+':'')+avg.toFixed(2)+'%';
@@ -755,7 +791,6 @@ function drawIntra(){
   document.getElementById('s1').textContent=hi===-Infinity?'—':'+'+hi.toFixed(2)+'%';
   document.getElementById('s2').textContent=hd?'D'+hd:'—';
   document.getElementById('s3').textContent=ld?'D'+ld:'—';
-  // VIX 月內走勢
   drawVixIntra(k);
 }
 
