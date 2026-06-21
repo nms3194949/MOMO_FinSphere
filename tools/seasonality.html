@@ -148,10 +148,10 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
           <button id="vix-toggle" onclick="toggleVix()" style="
-            padding:3px 11px;border-radius:20px;border:1px solid #f85149;
-            background:rgba(248,81,73,0.15);color:#f85149;
+            padding:3px 11px;border-radius:20px;border:1px solid var(--bd);
+            background:transparent;color:var(--mu);
             font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap">
-            VIX ON
+            VIX OFF
           </button>
         </div>
       </div>
@@ -167,21 +167,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         </div>
         <div id="wr-bar" style="display:flex;gap:2px;align-items:flex-end"></div>
         <div id="wr-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
-      <!-- 區間勝率矩陣 -->
-      <div style="margin-top:16px">
-        <div style="font-size:12px;font-weight:600;color:var(--mu);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-          <span>區間勝率矩陣 <span style="font-weight:400;font-size:11px">（Y軸＝進場日，X軸＝出場日）</span></span>
-          <div style="display:flex;align-items:center;gap:6px;font-size:10px">
-            <span style="display:inline-block;width:50px;height:8px;border-radius:3px;background:linear-gradient(to right,#f85149,#555,#1a7f37)"></span>
-            <span style="color:var(--rd)">低勝率</span><span style="color:var(--mu)">50%</span><span style="color:var(--gr)">高勝率</span>
-          </div>
-        </div>
-        <div id="iwin-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
-        <div style="overflow-x:auto">
-          <table id="iwin-tbl" style="border-collapse:collapse;font-size:10px"></table>
-        </div>
-        <div id="iwin-detail" style="margin-top:8px;font-size:12px;color:var(--mu);min-height:20px"></div>
-      </div>
+    </div>
       </div>
     </div>
     <!-- VIX 月內走勢 -->
@@ -191,6 +177,32 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <span class="cc-s">VIX 歷史平均，Y軸＝月初至今變化幅度（%）｜上升＝恐慌加劇</span>
       </div>
       <div class="cb" style="height:200px"><canvas id="vix-lc" role="img" aria-label="VIX月內走勢圖"></canvas></div>
+    </div>
+    <!-- 區間勝率矩陣 -->
+    <div class="cc">
+      <div class="cc-h">
+        <div>
+          <span class="cc-t">區間勝率矩陣</span>
+          <span class="cc-s" style="margin-left:8px">Y軸＝進場日，X軸＝出場日 ｜ 點擊格子查看詳情</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px;font-size:10px">
+            <span style="display:inline-block;width:40px;height:7px;border-radius:3px;background:linear-gradient(to right,rgba(248,81,73,.7),rgba(125,133,144,.25),rgba(26,127,55,.9))"></span>
+            <span style="color:var(--rd)">低</span><span style="color:var(--mu)">50%</span><span style="color:var(--gr)">高</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;color:var(--mu)">縮放：</span>
+            <button onclick="iwinZoom(-1)" style="padding:2px 8px;border:1px solid var(--bd);background:var(--surf2);color:var(--mu);border-radius:4px;cursor:pointer;font-size:13px">－</button>
+            <span id="iwin-zoom-lbl" style="font-size:11px;color:var(--mu);min-width:28px;text-align:center">1×</span>
+            <button onclick="iwinZoom(1)"  style="padding:2px 8px;border:1px solid var(--bd);background:var(--surf2);color:var(--mu);border-radius:4px;cursor:pointer;font-size:13px">＋</button>
+          </div>
+        </div>
+      </div>
+      <div id="iwin-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
+      <div style="overflow-x:auto;overflow-y:auto;max-height:520px">
+        <table id="iwin-tbl" style="border-collapse:collapse"></table>
+      </div>
+      <div id="iwin-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
     </div>
   </div>
   <div id="v-monthly" style="display:none">
@@ -837,7 +849,7 @@ function drawIntra(){
 
 // ── 勝率熱力條 ───────────────────────────────────────────────
 var wrIdxKey = null;
-var vixOn = true;
+var vixOn = false;
 
 function toggleVix() {
   vixOn = !vixOn;
@@ -920,6 +932,18 @@ function renderWrCells(k) {
 
 // ── 區間勝率矩陣 ─────────────────────────────────────────────
 var iwinIdxKey = null;
+var iwinScale  = 1; // 縮放等級 0.7 / 1 / 1.3 / 1.6
+
+function iwinZoom(dir) {
+  var scales = [0.7, 1, 1.3, 1.6];
+  var idx = scales.indexOf(iwinScale) + dir;
+  idx = Math.max(0, Math.min(scales.length-1, idx));
+  iwinScale = scales[idx];
+  document.getElementById('iwin-zoom-lbl').textContent =
+    iwinScale===1?'1×': iwinScale<1?'小':'大';
+  var k = String(cm+1);
+  renderIwinTable(k);
+}
 
 function drawIwinMatrix(k) {
   var tabWrap = document.getElementById('iwin-idx-tabs');
@@ -970,33 +994,36 @@ function iwinColor(wr) {
 function renderIwinTable(k) {
   var tbl    = document.getElementById('iwin-tbl');
   var detail = document.getElementById('iwin-detail');
-  var iwin   = D.intramonth_iwin[iwinIdxKey] && D.intramonth_iwin[iwinIdxKey][k];
+  var iwin   = D.intramonth_iwin && D.intramonth_iwin[iwinIdxKey] && D.intramonth_iwin[iwinIdxKey][k];
+  if (!tbl) return;
   if (!iwin || !iwin.length) { tbl.innerHTML=''; return; }
-  var n = iwin.length;
+  var n  = iwin.length;
+  var cw = Math.round(26*iwinScale), ch = Math.round(22*iwinScale), fs = Math.round(9*iwinScale);
 
-  var html = '<tr><th class="iwin-head" style="color:var(--mu)">進場↓ 出場→</th>';
-  for (var eo=1; eo<n; eo++) html += '<th class="iwin-head">D'+(eo+1)+'</th>';
-  html += '</tr>';
+  var html = '<tr><th class="iwin-head" style="font-size:'+fs+'px">進↓ 出→</th>';
+  for (var eo=1; eo<n; eo++) html+='<th class="iwin-head" style="font-size:'+fs+'px;width:'+cw+'px">D'+(eo+1)+'</th>';
+  html+='</tr>';
 
   for (var ei=0; ei<n-1; ei++) {
-    html += '<tr><th class="iwin-head">D'+(ei+1)+'</th>';
+    html+='<tr><th class="iwin-head" style="font-size:'+fs+'px">D'+(ei+1)+'</th>';
     for (var eo2=1; eo2<n; eo2++) {
-      if (eo2 <= ei) {
-        html += '<td style="background:transparent"></td>';
+      if (eo2<=ei) {
+        html+='<td style="width:'+cw+'px;height:'+ch+'px"></td>';
       } else {
-        var wr = iwin[ei][eo2];
+        var wr = (iwin[ei] && iwin[ei][eo2]!==undefined) ? iwin[ei][eo2] : null;
         var bg = iwinColor(wr);
         var txt = wr!==null ? wr+'%' : '';
-        var txtColor = wr>=55||wr<45 ? '#fff' : 'var(--tx)';
-        html += '<td class="iwin-cell" style="background:'+bg+';color:'+txtColor+'"'+
-          ' title="D'+(ei+1)+'進 → D'+(eo2+1)+'出：勝率 '+wr+'%"'+
-          ' onclick="showIwinDetail('+(ei+1)+','+(eo2+1)+','+wr+')">' + txt + '</td>';
+        var tc  = (wr!==null&&(wr>=60||wr<40)) ? '#fff' : 'var(--tx)';
+        html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+
+          ';width:'+cw+'px;height:'+ch+'px;font-size:'+fs+'px"'+
+          ' title="D'+(ei+1)+'進→D'+(eo2+1)+'出 勝率'+(wr!==null?wr+'%':'—')+'"'+
+          ' onclick="showIwinDetail('+(ei+1)+','+(eo2+1)+','+(wr!==null?wr:'null')+')">'+txt+'</td>';
       }
     }
-    html += '</tr>';
+    html+='</tr>';
   }
-  tbl.innerHTML = html;
-  if (detail) detail.textContent = '點擊格子查看詳情';
+  tbl.innerHTML=html;
+  if(detail){ detail.style.display='none'; }
 }
 
 function showIwinDetail(ei, eo, wr) {
@@ -1004,11 +1031,14 @@ function showIwinDetail(ei, eo, wr) {
   if (!detail) return;
   var s = SR.find(function(s){ return s.k===iwinIdxKey; });
   var label = s ? s.lb : iwinIdxKey;
-  var strength = wr>=70?'強勢 ✓✓': wr>=60?'偏強 ✓': wr>=50?'中性 ～': wr>=40?'偏弱 ✗':'弱勢 ✗✗';
+  if (wr===null) { detail.style.display='none'; return; }
+  var strength = wr>=75?'強勢 ✓✓': wr>=65?'偏強 ✓': wr>=55?'中性偏強 ～': wr>=45?'中性 ～': wr>=35?'偏弱 ✗':'弱勢 ✗✗';
+  var color = iwinColor(wr);
+  detail.style.display='block';
   detail.innerHTML =
-    '<span style="color:'+iwinColor(wr)+';font-weight:600">'+wr+'%</span>' +
-    '　【'+label+'】D'+ei+' 進場 → D'+eo+' 出場　' + strength +
-    '　<span style="color:var(--mu);font-size:11px">（歷史上有 '+wr+'% 的年份這段區間是正報酬）</span>';
+    '<b style="color:'+color+';font-size:16px">'+wr+'%</b>　' +
+    '【'+label+'】D'+ei+' 進場 → D'+eo+' 出場　<b>'+strength+'</b>' +
+    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史上 '+wr+'% 的年份此區間為正報酬</span>';
 }
 
 function drawVixIntra(k) {
