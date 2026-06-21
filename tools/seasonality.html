@@ -142,7 +142,15 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <div class="cc">
       <div class="cc-h">
         <span class="cc-t" id="ct"></span>
-        <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
+          <button id="vix-toggle" onclick="toggleVix()" style="
+            padding:3px 11px;border-radius:20px;border:1px solid #f85149;
+            background:rgba(248,81,73,0.15);color:#f85149;
+            font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap">
+            VIX ON
+          </button>
+        </div>
       </div>
       <div class="cb"><canvas id="lc" role="img" aria-label="月內走勢圖"></canvas></div>
       <!-- 勝率熱力條 -->
@@ -755,7 +763,7 @@ function drawIntra(){
   });
 
   // VIX 右軸折線
-  if(D.intramonth&&D.intramonth['VIX']&&D.intramonth['VIX'][k]&&D.intramonth['VIX'][k].length){
+  if(vixOn && D.intramonth&&D.intramonth['VIX']&&D.intramonth['VIX'][k]&&D.intramonth['VIX'][k].length){
     datasets.push({
       label:'VIX',data:D.intramonth['VIX'][k],
       borderColor:'#f85149',backgroundColor:'rgba(248,81,73,0.08)',
@@ -765,6 +773,8 @@ function drawIntra(){
     });
   }
   lChart.data.datasets=datasets;
+  // 控制右軸顯示
+  lChart.options.scales.yv.display = vixOn ? 'auto' : false;
 
   // tooltip 加入勝率
   lChart.options.plugins.tooltip.callbacks.label=function(c){
@@ -808,6 +818,24 @@ function drawIntra(){
 
 // ── 勝率熱力條 ───────────────────────────────────────────────
 var wrIdxKey = null;
+var vixOn = true;
+
+function toggleVix() {
+  vixOn = !vixOn;
+  var btn = document.getElementById('vix-toggle');
+  if (vixOn) {
+    btn.textContent = 'VIX ON';
+    btn.style.background = 'rgba(248,81,73,0.15)';
+    btn.style.color = '#f85149';
+    btn.style.borderColor = '#f85149';
+  } else {
+    btn.textContent = 'VIX OFF';
+    btn.style.background = 'transparent';
+    btn.style.color = 'var(--mu)';
+    btn.style.borderColor = 'var(--bd)';
+  }
+  draw();
+}
 
 function drawWinrateBar(k) {
   var tabWrap = document.getElementById('wr-idx-tabs');
