@@ -48,6 +48,11 @@ main{padding:18px 24px}
 .hm-tab{padding:3px 10px;border:1px solid var(--bd);border-radius:20px;cursor:pointer;font-size:11px;background:var(--surf2);color:var(--mu);transition:.12s;white-space:nowrap}
 .hm-tab.on{color:#000;border-color:transparent;font-weight:600}
 .hm-tab:hover:not(.on){color:var(--tx);border-color:var(--mu)}
+.sig-zone{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap}
+.sig-entry{background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.4);color:#3fb950}
+.sig-exit{background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);color:#f85149}
+.sig-watch{background:rgba(125,133,144,.12);border:1px solid rgba(125,133,144,.3);color:var(--mu)}
+.sig-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 /* loader */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100}
 .spin{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}
@@ -118,6 +123,14 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       <div class="sc"><div class="sc-l">月內最高點</div><div class="sc-v pos" id="s1">—</div></div>
       <div class="sc"><div class="sc-l">最高在第幾日</div><div class="sc-v" style="color:var(--bl)" id="s2">—</div></div>
       <div class="sc"><div class="sc-l">最低在第幾日</div><div class="sc-v" style="color:var(--or)" id="s3">—</div></div>
+    </div>
+    <!-- 交易建議區 -->
+    <div id="signal-card" style="display:none;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--mu);margin-bottom:8px;letter-spacing:.5px">
+        交易區間建議 <span style="font-weight:400;color:var(--bd)">｜ 基準：S&amp;P 500 × VIX 輔助</span>
+      </div>
+      <div id="signal-zones" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+      <div id="signal-summary" style="font-size:12px;color:var(--mu);line-height:1.8;padding:10px 14px;background:var(--surf);border:1px solid var(--bd);border-radius:8px"></div>
     </div>
     <div class="ins" id="ins"></div>
     <div class="cc">
@@ -491,7 +504,162 @@ function initUI() {
   });
 } // end initUI
 
-function selM(m){cm=m;document.querySelectorAll('.mb').forEach(function(b,i){b.classList.toggle('on',i===m);});draw();}
+// ── 交易訊號計算 ─────────────────────────────────────────────
+var SIGNAL_BASE = 'S&P 500'; // 基準指數 label 對應
+
+function getBaseKey() {
+  // 找 label 為 S&P 500 的 key
+  if (!D || !D.meta) return null;
+  var found = null;
+  Object.keys(D.meta).forEach(function(k) {
+    if (D.meta[k].label === 'S&P 500' || k === 'SP500' || k === 'S&P 500') found = k;
+  });
+  return found;
+}
+
+function calcSignals(month) {
+  var k = String(month + 1);
+  var baseKey = getBaseKey();
+  if (!baseKey || !D.intramonth[baseKey] || !D.intramonth[baseKey][k]) return null;
+
+  var spData  = D.intramonth[baseKey][k];
+  var vixData = (D.intramonth['VIX'] && D.intramonth['VIX'][k]) || [];
+  var n = spData.length;
+  if (n < 3) return null;
+
+  // 每個交易日的訊號：1=進場, -1=離場, 0=觀望
+  var signals = [];
+  for (var i = 1; i < n; i++) {
+    var spDiff  = spData[i]  - spData[i-1];   // S&P 當日變化
+    var vixDiff = vixData.length > i ? vixData[i] - vixData[i-1] : 0;
+    var hasVix  = vixData.length > i;
+
+    var sig;
+    if (spDiff > 0 && (!hasVix || vixDiff <= 0)) {
+      sig = 1;   // 進場：S&P 漲 + VIX 跌或無VIX
+    } else if (spDiff < 0 && (!hasVix || vixDiff >= 0)) {
+      sig = -1;  // 離場：S&P 跌 + VIX 漲或無VIX
+    } else {
+      sig = 0;   // 觀望：訊號矛盾
+    }
+    signals.push(sig);
+  }
+
+  // 把連續相同訊號合併成區間
+  var zones = [];
+  var cur = {sig: signals[0], start: 1, end: 1};
+  for (var j = 1; j < signals.length; j++) {
+    if (signals[j] === cur.sig) {
+      cur.end = j + 1;
+    } else {
+      zones.push({sig:cur.sig, start:cur.start, end:cur.end});
+      cur = {sig:signals[j], start:j+1, end:j+1};
+    }
+  }
+  zones.push({sig:cur.sig, start:cur.start, end:cur.end});
+
+  // 找最佳進場區（S&P最低點前後）和最佳離場區（S&P最高點前後）
+  var minVal = Infinity, minDay = 0, maxVal = -Infinity, maxDay = 0;
+  spData.forEach(function(v, i) {
+    if (v < minVal) { minVal = v; minDay = i; }
+    if (v > maxVal) { maxVal = v; maxDay = i; }
+  });
+
+  return { zones: zones, minDay: minDay, maxDay: maxDay, spData: spData, vixData: vixData, n: n };
+}
+
+function drawSignals(month) {
+  var result = calcSignals(month);
+  var card = document.getElementById('signal-card');
+  if (!result) { card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  var zones    = result.zones;
+  var minDay   = result.minDay;
+  var maxDay   = result.maxDay;
+
+  // 文字區間摘要
+  var entryZones = [], exitZones = [], watchZones = [];
+  zones.forEach(function(z) {
+    var label = 'D' + (z.start+1) + (z.end > z.start ? '–D'+(z.end+1) : '');
+    if (z.sig === 1)  entryZones.push(label);
+    if (z.sig === -1) exitZones.push(label);
+    if (z.sig === 0)  watchZones.push(label);
+  });
+
+  // 渲染 zone chips
+  var zonesEl = document.getElementById('signal-zones');
+  zonesEl.innerHTML = '';
+  if (entryZones.length) {
+    var chip = document.createElement('span');
+    chip.className = 'sig-zone sig-entry';
+    chip.innerHTML = '<span class="sig-dot" style="background:#3fb950"></span>進場區：' + entryZones.join('、');
+    zonesEl.appendChild(chip);
+  }
+  if (exitZones.length) {
+    var chip2 = document.createElement('span');
+    chip2.className = 'sig-zone sig-exit';
+    chip2.innerHTML = '<span class="sig-dot" style="background:#f85149"></span>離場區：' + exitZones.join('、');
+    zonesEl.appendChild(chip2);
+  }
+  if (watchZones.length) {
+    var chip3 = document.createElement('span');
+    chip3.className = 'sig-zone sig-watch';
+    chip3.innerHTML = '<span class="sig-dot" style="background:var(--mu)"></span>觀望區：' + watchZones.join('、');
+    zonesEl.appendChild(chip3);
+  }
+
+  // 文字摘要
+  var spEnd = result.spData[result.n-1];
+  document.getElementById('signal-summary').innerHTML =
+    '📍 歷史低點在 <b>D'+(minDay+1)+'</b>（均值 '+result.spData[minDay].toFixed(2)+'%），' +
+    '高點在 <b>D'+(maxDay+1)+'</b>（均值 '+result.spData[maxDay].toFixed(2)+'%）。' +
+    '月末平均報酬 <b style="color:'+(spEnd>=0?'var(--gr)':'var(--rd)')+'">'+
+    (spEnd>=0?'+':'')+spEnd.toFixed(2)+'%</b>。' +
+    (result.vixData.length > 0
+      ? '　VIX 輔助訊號已啟用。'
+      : '　<span style="color:var(--or)">尚無 VIX 資料，僅依 S&P 500 判斷。</span>');
+}
+
+function drawSignalBands(labels, zones) {
+  // 在折線圖上繪製半透明色塊
+  // 用 Chart.js plugin 的 beforeDraw 實現
+  if (!lChart._signalPlugin) {
+    lChart._signalPlugin = true;
+    Chart.register({
+      id: 'signalBands',
+      beforeDraw: function(chart) {
+        var bands = chart._signalBands;
+        if (!bands || !bands.length) return;
+        var ctx2 = chart.ctx;
+        var xAxis = chart.scales.x;
+        var yAxis = chart.scales.y;
+        if (!xAxis || !yAxis) return;
+        ctx2.save();
+        bands.forEach(function(b) {
+          var x1 = xAxis.getPixelForValue(b.start);
+          var x2 = xAxis.getPixelForValue(b.end);
+          var y1 = yAxis.top;
+          var y2 = yAxis.bottom;
+          ctx2.fillStyle = b.color;
+          ctx2.fillRect(x1, y1, x2-x1, y2-y1);
+        });
+        ctx2.restore();
+      }
+    });
+  }
+  // 轉換 zone 到像素座標
+  var bands = zones.map(function(z) {
+    return {
+      start: z.start,
+      end:   Math.min(z.end + 1, labels.length - 1),
+      color: z.sig === 1  ? 'rgba(63,185,80,0.10)'  :
+             z.sig === -1 ? 'rgba(248,81,73,0.10)'  :
+                            'rgba(125,133,144,0.05)'
+    };
+  });
+  lChart._signalBands = bands;
+}
 function actIdx(){return SR.map(function(_,i){return i;}).filter(function(i){return !hid[i];});}
 function draw(){if(!D)return;cv==='intra'?drawIntra():drawMonthly();}
 
@@ -522,9 +690,19 @@ function drawIntra(){
     });
   }
   lChart.data.datasets=datasets;
-  lChart.update();
+  // update 在 drawSignals 之後呼叫，讓 signalBands plugin 一起渲染
   document.getElementById('ct').textContent=MN[cm]+' 月內各交易日歷史平均累積報酬';
   document.getElementById('ins').textContent=INS[cm];
+
+  // 交易訊號
+  var sigResult = calcSignals(cm);
+  if (sigResult) {
+    drawSignalBands(lChart.data.labels, sigResult.zones);
+  } else {
+    lChart._signalBands = [];
+  }
+  lChart.update();
+  drawSignals(cm);
   var ai=actIdx();
   var ends=ai.map(function(i){var a=D.intramonth[SR[i].k][k]||[];return a[a.length-1]||0;});
   var avg=ends.length?ends.reduce(function(a,b){return a+b;},0)/ends.length:0;
