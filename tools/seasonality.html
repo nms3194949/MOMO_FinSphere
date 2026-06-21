@@ -188,7 +188,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
 // 不需要 GAS 執行，穩定度最高
 var CSV_URL = 'https://docs.google.com/spreadsheets/d/1o0CxoDf7QGJV5Dr2YCvUfu1OL6CdGi1Cb4XVWt9IFI4/export?format=csv&gid=534897987';
 
-var D = null, cm = 5, cv = 'intra', hid = {}, curHmIdx = 0;
+var D = null, cm = new Date().getMonth(), cv = 'intra', hid = {}, curHmIdx = 0;
 var lChart = null, bChart = null, vixLineChart = null, _timer = null;
 var SR = []; // 從 GAS meta 動態建立
 
