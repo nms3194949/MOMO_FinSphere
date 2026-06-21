@@ -177,29 +177,45 @@ var CSV_URL = 'https://docs.google.com/spreadsheets/d/1o0CxoDf7QGJV5Dr2YCvUfu1OL
 
 var D = null, cm = 5, cv = 'intra', hid = {}, curHmIdx = 0;
 var lChart = null, bChart = null, vixLineChart = null, _timer = null;
+var SR = []; // 從 GAS meta 動態建立
 
-var SR = [
-  {k:'DJI',        lb:'DJI',          c:'#d4a843', ds:[]},
-  {k:'NASDAQ',     lb:'NASDAQ',       c:'#58a6ff', ds:[6,3]},
-  {k:'NASDAQ100',  lb:'NDQ 100',      c:'#bc8cff', ds:[3,3]},
-  {k:'Russell2000',lb:'Russell 2000', c:'#39d353', ds:[8,2,2,2]},
-  {k:'TWII',       lb:'台股加權',     c:'#f0883e', ds:[4,2]},
-];
-SR.forEach(function(_,i){ hid[i]=false; });
+// 顏色和虛線樣式循環池（VIX 固定紅色，其餘依序套用）
+var COLOR_POOL = ['#d4a843','#58a6ff','#bc8cff','#39d353','#f0883e','#61afef','#e06c75','#98c379','#56b6c2','#c678dd'];
+var DASH_POOL  = [[],[6,3],[3,3],[8,2,2,2],[4,2],[6,2],[2,2],[8,4],[4,4],[6,2,2,2]];
+
+function buildSR() {
+  if (!D || !D.meta) return;
+  SR = [];
+  hid = {};
+  var ci = 0;
+  Object.keys(D.meta).forEach(function(k) {
+    if (k === 'VIX') return; // VIX 單獨處理，不進 SR
+    var m = D.meta[k];
+    SR.push({
+      k:  k,
+      lb: m.label || k,
+      c:  COLOR_POOL[ci % COLOR_POOL.length],
+      ds: DASH_POOL[ci % DASH_POOL.length]
+    });
+    hid[SR.length-1] = false;
+    ci++;
+  });
+}
+
 var MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 var INS=[
-  '月初至第12日穩步上升，NASDAQ系列月底強力拉升。Russell 2000月末趨弱。DJI表現保守穩健。',
-  '整體偏弱，NASDAQ下行明顯。台股2月因農曆年效應異常強勢（+2.9%），與美股完全背離。',
-  'NASDAQ100/DJI受賣壓偏弱，Russell 2000月末跌幅最大（約-1%）。台股3月橫盤偏弱。',
-  '全年最強月份之一。NASDAQ100月末平均+2.4%，DJI+1.8%。台股4月月末可達+1.6%。',
-  '五窮月，整體先跌後漲。NASDAQ100月末仍有+1.5%，DJI僅+0.2%。',
-  '六絕月，前3日有假反彈，第7日後持續下行。台股6月相對抗跌（+1.0%）。',
-  '7月反轉月！月初先蹲，第8日起強力反彈。NASDAQ100月末+2.1%最強，DJI+1.5%。',
-  'DJI/NASDAQ100月末勉強轉正。台股8月最慘（-0.8%）。整體月份表現分歧大。',
-  '九月效應顯著，全年最弱月。DJI/Russell 2000月末約-0.9%，台股-0.8%。建議降低持倉。',
-  '第四季資金入場，全月強勢。NASDAQ100月末+2.8%，DJI+1.3%。台股10月月末波動大需注意。',
-  '全年最強月份！Russell 2000月末+3.2%，NASDAQ100+2.6%，DJI+2.6%。感恩節行情明顯。',
-  '聖誕行情，月末效果顯著。Russell 2000+1.6%，DJI+0.8%。台股12月月末強拉至+1.1%。',
+  '月初至第12日穩步上升，科技股月底強力拉升。DJI表現保守穩健。',
+  '整體偏弱，科技股下行明顯。台股2月因農曆年效應異常強勢，與美股完全背離。',
+  '科技股受賣壓偏弱，Russell 2000月末跌幅最大。台股3月橫盤偏弱。',
+  '全年最強月份之一。科技股月末平均+2%以上，台股月末可達+1.6%。',
+  '五窮月，整體先跌後漲。科技股月末仍有+1.5%，DJI僅+0.2%。',
+  '六絕月，前3日有假反彈，第7日後持續下行。台股6月相對抗跌。',
+  '7月反轉月！月初先蹲，第8日起強力反彈。科技股月末表現最強。',
+  '科技股月末勉強轉正。台股8月表現最差。整體月份表現分歧大。',
+  '九月效應顯著，全年最弱月。各指數月末約-0.9%，建議降低持倉。',
+  '第四季資金入場，全月強勢。科技股月末+2.8%，DJI+1.3%。台股10月月末波動大需注意。',
+  '全年最強月份！Russell 2000月末+3.2%，感恩節行情明顯。',
+  '聖誕行情，月末效果顯著。Russell 2000+1.6%，DJI+0.8%。台股12月月末強拉。',
 ];
 
 // ── progress helpers ────────────────────────────────────────
@@ -338,7 +354,7 @@ function fetchData() {
       setTimeout(function(){
         document.getElementById('loader').style.display = 'none';
         setStatus('ok','✓ 已從 Google Sheets 載入　計算時間：'+ts+'　耗時 '+elapsed+'s');
-        initUI(); selM(cm); drawMonthly();
+        buildSR(); initUI(); selM(cm); drawMonthly();
       }, 400);
     })
     .catch(function(e) {
@@ -351,13 +367,18 @@ function fetchData() {
 
 // ── init UI ─────────────────────────────────────────────────
 function initUI() {
+  // 月份按鈕（只建一次）
   var mr = document.getElementById('mRow');
-  if (mr.children.length) return;
-  MN.forEach(function(m,i){
-    var b=document.createElement('button'); b.className='mb'; b.textContent=m;
-    b.onclick=function(){selM(i);}; mr.appendChild(b);
-  });
+  if (!mr.children.length) {
+    MN.forEach(function(m,i){
+      var b=document.createElement('button'); b.className='mb'; b.textContent=m;
+      b.onclick=function(){selM(i);}; mr.appendChild(b);
+    });
+  }
+
+  // 指數 pills（每次重建，因為 SR 可能變動）
   var pw = document.getElementById('pills');
+  pw.innerHTML = '';
   SR.forEach(function(s,i){
     var p=document.createElement('span'); p.className='pill';
     p.style.borderColor=s.c; p.style.color=s.c;
@@ -365,30 +386,52 @@ function initUI() {
     p.onclick=function(){hid[i]=!hid[i];p.classList.toggle('off',hid[i]);draw();};
     pw.appendChild(p);
   });
-  document.querySelectorAll('.nb').forEach(function(b){
-    b.onclick=function(){
-      cv=b.dataset.v;
-      document.querySelectorAll('.nb').forEach(function(x){x.classList.remove('on');});
-      b.classList.add('on');
-      document.getElementById('v-intra').style.display=cv==='intra'?'':'none';
-      document.getElementById('v-monthly').style.display=cv==='monthly'?'':'none';
-      draw();
-    };
-  });
+
+  // nav tabs（只綁一次）
+  if (!document.querySelector('.nb').onclick) {
+    document.querySelectorAll('.nb').forEach(function(b){
+      b.onclick=function(){
+        cv=b.dataset.v;
+        document.querySelectorAll('.nb').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        document.getElementById('v-intra').style.display=cv==='intra'?'':'none';
+        document.getElementById('v-monthly').style.display=cv==='monthly'?'':'none';
+        draw();
+      };
+    });
+  }
+
+  // 銷毀舊 chart 再重建（SR 變動時需要）
+  if (lChart) { lChart.destroy(); lChart=null; }
+  if (bChart) { bChart.destroy(); bChart=null; }
+  if (vixLineChart) { vixLineChart.destroy(); vixLineChart=null; }
+
+  // 月內走勢折線圖（含 VIX 右軸）
   lChart=new Chart(document.getElementById('lc').getContext('2d'),{
     type:'line',data:{labels:[],datasets:[]},
     options:{responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
-        callbacks:{title:function(i){return '第'+(i[0].dataIndex+1)+'交易日';},
-                   label:function(c){return ' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+'%';}}}},
+        callbacks:{
+          title:function(i){return '第'+(i[0].dataIndex+1)+'交易日';},
+          label:function(c){
+            if(c.dataset.yAxisID==='yv') return ' VIX: '+c.parsed.y.toFixed(2);
+            return ' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+'%';
+          }
+        }}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},autoSkip:false,maxRotation:0}},
         y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
-           title:{display:true,text:'累積報酬（%）',color:'#7d8590',font:{size:11}}}
+           title:{display:true,text:'累積報酬（%）',color:'#7d8590',font:{size:11}},position:'left'},
+        yv:{position:'right',grid:{drawOnChartArea:false},
+            ticks:{color:'#f85149',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
+            title:{display:true,text:'VIX 變化',color:'#f85149',font:{size:11}},
+            display:'auto'}
       }
     }
   });
+
+  // 月份長條圖（含 VIX 右軸）
   bChart=new Chart(document.getElementById('bc').getContext('2d'),{
     type:'bar',data:{labels:MN,datasets:[]},
     options:{responsive:true,maintainAspectRatio:false,
@@ -400,8 +443,7 @@ function initUI() {
         }}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11}}},
-        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
-           position:'left'},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},position:'left'},
         y2:{position:'right',grid:{drawOnChartArea:false},
             ticks:{color:'#f85149',font:{size:11},callback:function(v){return v.toFixed(0);}},
             title:{display:true,text:'VIX',color:'#f85149',font:{size:11}}}
@@ -409,7 +451,8 @@ function initUI() {
       onClick:function(_,els){if(!els.length)return;selM(els[0].index);document.querySelector('.nb[data-v="intra"]').click();}
     }
   });
-  // VIX 月內走勢折線圖
+
+  // VIX 月內走勢（獨立小圖，保留但預設隱藏）
   vixLineChart = new Chart(document.getElementById('vix-lc').getContext('2d'),{
     type:'line', data:{labels:[],datasets:[]},
     options:{responsive:true,maintainAspectRatio:false,
@@ -433,11 +476,31 @@ function draw(){if(!D)return;cv==='intra'?drawIntra():drawMonthly();}
 
 function drawIntra(){
   var k=String(cm+1);
-  var maxL=Math.max.apply(null,SR.map(function(s){return(D.intramonth[s.k][k]||[]).length;}));
+  var maxL=Math.max.apply(null,SR.map(function(s){
+    return (D.intramonth[s.k]&&D.intramonth[s.k][k]) ? D.intramonth[s.k][k].length : 0;
+  }));
   lChart.data.labels=Array.from({length:maxL},function(_,i){return'D'+(i+1);});
-  lChart.data.datasets=SR.map(function(s,i){return{label:s.lb,data:D.intramonth[s.k][k]||[],
-    borderColor:s.c,backgroundColor:s.c+'18',borderWidth:2,borderDash:s.ds,
-    pointRadius:3,pointHoverRadius:5,tension:0.3,fill:false,hidden:hid[i]};});
+
+  var datasets=SR.map(function(s,i){return{
+    label:s.lb,
+    data:(D.intramonth[s.k]&&D.intramonth[s.k][k])||[],
+    borderColor:s.c,backgroundColor:s.c+'18',
+    borderWidth:2,borderDash:s.ds,
+    pointRadius:3,pointHoverRadius:5,
+    tension:0.3,fill:false,hidden:hid[i],yAxisID:'y'
+  };});
+
+  // VIX 右軸折線
+  if (D.intramonth&&D.intramonth['VIX']&&D.intramonth['VIX'][k]&&D.intramonth['VIX'][k].length) {
+    datasets.push({
+      label:'VIX',data:D.intramonth['VIX'][k],
+      borderColor:'#f85149',backgroundColor:'rgba(248,81,73,0.08)',
+      borderWidth:1.5,borderDash:[4,3],
+      pointRadius:2,pointHoverRadius:4,
+      tension:0.3,fill:false,yAxisID:'yv',order:0
+    });
+  }
+  lChart.data.datasets=datasets;
   lChart.update();
   document.getElementById('ct').textContent=MN[cm]+' 月內各交易日歷史平均累積報酬';
   document.getElementById('ins').textContent=INS[cm];
