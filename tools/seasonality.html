@@ -203,6 +203,46 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       </div>
       <div id="iwin-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
     </div>
+    <!-- 跨月區間勝率查詢 -->
+    <div class="cc">
+      <div class="cc-h">
+        <div>
+          <span class="cc-t">跨月區間勝率查詢</span>
+          <span class="cc-s" style="margin-left:8px">指定進出場月份與交易日，查歷史勝率</span>
+        </div>
+      </div>
+      <!-- 查詢列 -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">指數</div>
+          <select id="cm-idx" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">進場月份</div>
+          <select id="cm-em" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">進場交易日</div>
+          <select id="cm-ed" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
+        </div>
+        <div style="font-size:18px;color:var(--mu);padding-bottom:6px">→</div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">出場月份</div>
+          <select id="cm-xm" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">出場交易日</div>
+          <select id="cm-xd" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
+        </div>
+        <button onclick="queryCrossMonth()" style="padding:7px 20px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">查詢</button>
+      </div>
+      <!-- 結果區 -->
+      <div id="cm-result" style="display:none">
+        <div id="cm-summary" style="padding:14px 16px;border-radius:8px;margin-bottom:12px;font-size:14px;line-height:1.8"></div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px">各年度實際報酬：</div>
+        <div id="cm-bars" style="display:flex;flex-wrap:wrap;gap:4px;align-items:flex-end"></div>
+      </div>
+    </div>
   </div>
   <div id="v-monthly" style="display:none">
     <div class="cc">
@@ -227,6 +267,42 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <span class="cc-s">顏色越深紅＝平均恐慌越高，越深綠＝市場越平靜</span>
       </div>
       <div class="hm-wrap"><table class="hm" id="vix-hm"></table></div>
+    </div>
+    <!-- 跨月勝率熱力圖 -->
+    <div class="cc">
+      <div class="cc-h">
+        <div>
+          <span class="cc-t">跨月進場勝率熱力圖</span>
+          <span class="cc-s" style="margin-left:8px">固定出場點，看所有進場月日的歷史勝率</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px;font-size:10px">
+            <span style="display:inline-block;width:40px;height:7px;border-radius:3px;background:linear-gradient(to right,rgba(248,81,73,.8),rgba(125,133,144,.3),rgba(26,127,55,.9))"></span>
+            <span style="color:var(--rd)">低</span><span style="color:var(--mu)">50%</span><span style="color:var(--gr)">高</span>
+          </div>
+        </div>
+      </div>
+      <!-- 出場設定 -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px">
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">指數</div>
+          <select id="cm2-idx" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer"></select>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">固定出場月</div>
+          <select id="cm2-xm" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer"></select>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">固定出場交易日</div>
+          <select id="cm2-xd" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer"></select>
+        </div>
+        <button onclick="drawCrossMonthHeatmap()" style="padding:6px 16px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">更新熱力圖</button>
+      </div>
+      <!-- 熱力圖 -->
+      <div style="overflow-x:auto">
+        <table id="cm2-tbl" style="border-collapse:collapse;font-size:10px"></table>
+      </div>
+      <div id="cm2-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
     </div>
   </div>
 </main>
@@ -445,7 +521,7 @@ function fetchData() {
       setTimeout(function(){
         document.getElementById('loader').style.display = 'none';
         setStatus('ok','✓ 已從 Google Sheets 載入　計算時間：'+ts+'　耗時 '+elapsed+'s');
-        buildSR(); initUI(); selM(cm); drawMonthly();
+        buildSR(); initUI(); initCrossMonthUI(); selM(cm); drawMonthly();
       }, 400);
     })
     .catch(function(e) {
@@ -1029,7 +1105,297 @@ function renderIwinTable(k) {
   if(detail){ detail.style.display='none'; }
 }
 
-function showIwinDetail(ei, eo, wr) {
+// ── 跨月勝率熱力圖 ───────────────────────────────────────────
+function initCrossMonthHeatmap() {
+  var MN_SHORT=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var idxSel=document.getElementById('cm2-idx');
+  var xmSel =document.getElementById('cm2-xm');
+  var xdSel =document.getElementById('cm2-xd');
+  if(!idxSel) return;
+
+  idxSel.innerHTML='';
+  SR.forEach(function(s){
+    var o=document.createElement('option');
+    o.value=s.k; o.textContent=s.lb; idxSel.appendChild(o);
+  });
+  var bk=getBaseKey(); if(bk) idxSel.value=bk;
+
+  xmSel.innerHTML='';
+  MN_SHORT.forEach(function(m,i){
+    var o=document.createElement('option');
+    o.value=i+1; o.textContent=m; xmSel.appendChild(o);
+  });
+  xmSel.value=9; // 預設9月出場
+
+  // 出場日下拉
+  xmSel.onchange=function(){ updateCm2Days(); };
+  updateCm2Days();
+  drawCrossMonthHeatmap();
+}
+
+function updateCm2Days() {
+  var xmSel=document.getElementById('cm2-xm');
+  var xdSel=document.getElementById('cm2-xd');
+  if(!xmSel||!xdSel) return;
+  var m=parseInt(xmSel.value);
+  var bk=getBaseKey()||(SR[0]&&SR[0].k);
+  var maxD=23;
+  if(D&&D.intramonth&&bk&&D.intramonth[bk]&&D.intramonth[bk][String(m)]){
+    maxD=D.intramonth[bk][String(m)].length;
+  }
+  var cur=parseInt(xdSel.value)||maxD;
+  xdSel.innerHTML='';
+  for(var d=1;d<=maxD;d++){
+    var o=document.createElement('option'); o.value=d; o.textContent='D'+d; xdSel.appendChild(o);
+  }
+  xdSel.value=Math.min(cur,maxD);
+}
+
+function drawCrossMonthHeatmap() {
+  var idxKey=document.getElementById('cm2-idx').value;
+  var xm    =parseInt(document.getElementById('cm2-xm').value);
+  var xd    =parseInt(document.getElementById('cm2-xd').value)-1; // 0-based
+  var tbl   =document.getElementById('cm2-tbl');
+  var detail=document.getElementById('cm2-detail');
+  if(!tbl) return;
+
+  if(!D||!D.cross_month_win||!D.cross_month_win[idxKey]){
+    tbl.innerHTML='<tr><td style="color:var(--or);padding:12px">請重新執行 GAS「重新計算所有指數」後重新整理。</td></tr>';
+    return;
+  }
+
+  var mat=D.cross_month_win[idxKey][String(xm)];
+  if(!mat||!mat[String(xd)]){ tbl.innerHTML=''; return; }
+  var row=mat[String(xd)]; // row[entryMonth][entryDay]
+
+  var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var s=SR.find(function(s){return s.k===idxKey;})||{lb:idxKey};
+
+  // header
+  var html='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px">進場↓</th>';
+  // 出場日最多幾天
+  var maxED=0;
+  for(var em2=1;em2<=12;em2++){
+    if(row[String(em2)]){
+      var keys=Object.keys(row[String(em2)]).map(Number);
+      if(keys.length) maxED=Math.max(maxED,Math.max.apply(null,keys)+1);
+    }
+  }
+  for(var d2=0;d2<maxED;d2++) html+='<th class="iwin-head">D'+(d2+1)+'</th>';
+  html+='</tr>';
+
+  for(var em=1;em<=12;em++){
+    html+='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px">'+MN_S[em-1]+'</th>';
+    for(var ed=0;ed<maxED;ed++){
+      var wr=(row[String(em)]&&row[String(em)][String(ed)]!==undefined)?row[String(em)][String(ed)]:null;
+      // 同月同日或無效跳過
+      var skip=(xm===em&&xd===ed);
+      if(skip||wr===null){
+        html+='<td style="width:26px;height:22px"></td>';
+      } else {
+        var bg=iwinColor(wr);
+        var tc=(wr>=60||wr<40)?'#fff':'var(--tx)';
+        html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+';width:26px;height:22px;font-size:9px"'+
+          ' title="'+MN_S[em-1]+' D'+(ed+1)+' 進 → '+MN_S[xm-1]+' D'+(xd+1)+' 出：'+wr+'%"'+
+          ' onclick="showCm2Detail('+em+','+(ed+1)+','+xm+','+(xd+1)+','+wr+',\''+s.lb+'\')">'+wr+'%</td>';
+      }
+    }
+    html+='</tr>';
+  }
+  tbl.innerHTML=html;
+  if(detail) detail.style.display='none';
+}
+
+function showCm2Detail(em,ed,xm,xd,wr,label) {
+  var detail=document.getElementById('cm2-detail');
+  if(!detail) return;
+  var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var color=iwinColor(wr);
+  var strength=wr>=75?'強勢 ✓✓':wr>=65?'偏強 ✓':wr>=55?'中性偏強':wr>=45?'中性':wr>=35?'偏弱 ✗':'弱勢 ✗✗';
+  detail.style.display='block';
+  detail.innerHTML=
+    '<b style="color:'+color+';font-size:16px">'+wr+'%</b>　'+
+    '【'+label+'】'+MN_S[em-1]+' D'+ed+' 進場 → '+MN_S[xm-1]+' D'+xd+' 出場　<b>'+strength+'</b>'+
+    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史 '+wr+'% 的年份為正報酬</span>';
+}
+function initCrossMonthUI() {
+  var MN_SHORT=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  // 指數下拉
+  var idxSel = document.getElementById('cm-idx');
+  if (!idxSel) return;
+  idxSel.innerHTML='';
+  SR.forEach(function(s){
+    var opt=document.createElement('option');
+    opt.value=s.k; opt.textContent=s.lb;
+    idxSel.appendChild(opt);
+  });
+  // 預設 S&P 500
+  var bk=getBaseKey();
+  if(bk) idxSel.value=bk;
+
+  // 月份下拉（進出場各一）
+  ['cm-em','cm-xm'].forEach(function(id,i){
+    var sel=document.getElementById(id);
+    sel.innerHTML='';
+    MN_SHORT.forEach(function(m,mi){
+      var opt=document.createElement('option');
+      opt.value=mi+1; opt.textContent=m;
+      sel.appendChild(opt);
+    });
+    sel.value = i===0 ? 6 : 9; // 預設進場6月、出場9月
+    sel.onchange=function(){ updateDayOptions(); };
+  });
+
+  updateDayOptions();
+}
+
+function updateDayOptions() {
+  ['em','xm'].forEach(function(prefix){
+    var mSel=document.getElementById('cm-'+prefix);
+    var dSel=document.getElementById('cm-'+prefix.replace('m','d'));
+    if(!mSel||!dSel) return;
+    var m=parseInt(mSel.value);
+    var curVal=parseInt(dSel.value)||1;
+    dSel.innerHTML='';
+    // 從資料判斷該月最多幾個交易日
+    var maxD=23;
+    var bk=getBaseKey()||(SR[0]&&SR[0].k);
+    if(D&&D.intramonth&&bk&&D.intramonth[bk]&&D.intramonth[bk][String(m)]){
+      maxD=D.intramonth[bk][String(m)].length;
+    }
+    for(var d=1;d<=maxD;d++){
+      var opt=document.createElement('option');
+      opt.value=d; opt.textContent='D'+d;
+      dSel.appendChild(opt);
+    }
+    dSel.value=Math.min(curVal,maxD);
+  });
+}
+
+function queryCrossMonth() {
+  var idxKey = document.getElementById('cm-idx').value;
+  var eMonth = parseInt(document.getElementById('cm-em').value);
+  var eDay   = parseInt(document.getElementById('cm-ed').value) - 1; // 0-based
+  var xMonth = parseInt(document.getElementById('cm-xm').value);
+  var xDay   = parseInt(document.getElementById('cm-xd').value) - 1; // 0-based
+
+  if(!D||!D.yearly_intra||!D.yearly_intra[idxKey]){
+    alert('請先重新計算（需要 yearly_intra 資料）'); return;
+  }
+
+  var s = SR.find(function(s){return s.k===idxKey;});
+  var label = s?s.lb:idxKey;
+  var MN_SHORT=['1','2','3','4','5','6','7','8','9','10','11','12'];
+
+  var results = []; // [{year, ret}]
+  var yearly  = D.yearly_intra[idxKey];
+
+  // 判斷是否跨年（進場月 > 出場月）
+  var crossYear = eMonth > xMonth || (eMonth===xMonth && eDay > xDay);
+
+  Object.keys(yearly).sort().forEach(function(yr){
+    var y = parseInt(yr);
+    var entryYr = yearly[yr];
+    // 出場在下一年？
+    var exitYr  = crossYear ? yearly[String(y+1)] : yearly[yr];
+
+    if(!entryYr||!entryYr[eMonth]||!entryYr[eMonth][eDay]) return;
+    if(!exitYr||!exitYr[xMonth]||exitYr[xMonth][xDay]===undefined) return;
+
+    // 進場價基準：entryYr[eMonth][0] 是月初，eDay是第幾天的累積報酬
+    // 需要換算成真實價格再比較
+    // entry_price / month_open = 1 + entryYr[eMonth][eDay]/100
+    // exit_price  / month_open = 1 + exitYr[xMonth][xDay]/100
+    // 但兩個月的 month_open 不同，需要用 monthly_returns 串接
+
+    // 計算進場月月初到出場月月末的累積路徑
+    var entryRet = entryYr[eMonth][eDay] / 100; // 相對於進場月月初
+
+    // 計算從進場月月初到出場月月初的累積報酬
+    var bridgeRet = 0;
+    if(eMonth !== xMonth || crossYear) {
+      var startM = eMonth, startY = y;
+      var endM   = xMonth, endY   = crossYear ? y+1 : y;
+      var cur = 1.0;
+      // 逐月串接
+      var m2 = startM, y2 = startY;
+      var safety = 0;
+      while(!(y2===endY && m2===endM) && safety<25) {
+        var mr = D.monthly_returns[idxKey];
+        if(mr && mr[String(y2)] && mr[String(y2)][String(m2)] !== undefined) {
+          cur *= (1 + mr[String(y2)][String(m2)]/100);
+        }
+        m2++; if(m2>12){m2=1;y2++;}
+        safety++;
+      }
+      bridgeRet = cur - 1; // 進場月月初 → 出場月月初
+    }
+
+    // 出場月月初 + xDay 的累積報酬
+    var exitDayRet = exitYr[xMonth][xDay] / 100;
+
+    // 總報酬 = (1 + bridgeRet) * (1 + exitDayRet) / (1 + entryRet) - 1
+    var totalRet = (1 + bridgeRet) * (1 + exitDayRet) / (1 + entryRet) - 1;
+    results.push({year: crossYear ? y+'/'+String(y+1).slice(2) : String(y), ret: Math.round(totalRet*10000)/100});
+  });
+
+  if(!results.length){
+    document.getElementById('cm-result').style.display='none';
+    alert('找不到足夠資料，請確認已重新計算並包含 yearly_intra。');
+    return;
+  }
+
+  var wins   = results.filter(function(r){return r.ret>0;}).length;
+  var total  = results.length;
+  var avgRet = results.reduce(function(s,r){return s+r.ret;},0)/total;
+  var wr     = Math.round(wins/total*1000)/10;
+  var entryLabel = MN_SHORT[eMonth-1]+'月 D'+(eDay+1);
+  var exitLabel  = MN_SHORT[xMonth-1]+'月 D'+(xDay+1);
+  var color = wr>=65?'var(--gr)':wr>=50?'var(--mu)':'var(--rd)';
+
+  var resultEl = document.getElementById('cm-result');
+  resultEl.style.display='';
+
+  document.getElementById('cm-summary').style.background = 'var(--surf)';
+  document.getElementById('cm-summary').style.border = '1px solid var(--bd)';
+  document.getElementById('cm-summary').innerHTML =
+    '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">'+
+    '<div><div style="font-size:11px;color:var(--mu)">勝率</div>'+
+      '<div style="font-size:28px;font-weight:700;color:'+color+'">'+wr+'%</div></div>'+
+    '<div><div style="font-size:11px;color:var(--mu)">平均報酬</div>'+
+      '<div style="font-size:22px;font-weight:600;color:'+(avgRet>=0?'var(--gr)':'var(--rd)')+'">'+
+        (avgRet>=0?'+':'')+avgRet.toFixed(2)+'%</div></div>'+
+    '<div style="font-size:13px;color:var(--mu);line-height:1.8">'+
+      '<b style="color:var(--tx)">'+label+'</b>　'+
+      entryLabel+' 進場 → '+exitLabel+' 出場<br>'+
+      '共 '+total+' 年樣本，'+wins+' 年正報酬</div>'+
+    '</div>';
+
+  // 各年長條圖
+  var barsEl = document.getElementById('cm-bars');
+  barsEl.innerHTML='';
+  var maxAbs = Math.max.apply(null, results.map(function(r){return Math.abs(r.ret);}));
+  results.forEach(function(r){
+    var h = Math.max(4, Math.round(Math.abs(r.ret)/maxAbs*60));
+    var color2 = r.ret>=0?'#3fb950':'#f85149';
+    var wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;min-width:28px;cursor:default';
+    wrap.title=r.year+'年：'+(r.ret>=0?'+':'')+r.ret+'%';
+    var bar=document.createElement('div');
+    bar.style.cssText='width:20px;height:'+h+'px;background:'+color2+';border-radius:2px 2px 0 0;margin-bottom:2px;transition:filter .1s';
+    bar.onmouseover=function(){this.style.filter='brightness(1.3)';};
+    bar.onmouseout=function(){this.style.filter='';};
+    var pct=document.createElement('div');
+    pct.style.cssText='font-size:9px;color:'+color2+';transform:rotate(-60deg);transform-origin:top left;margin-top:4px;white-space:nowrap;margin-left:8px';
+    pct.textContent=(r.ret>=0?'+':'')+r.ret+'%';
+    var yr=document.createElement('div');
+    yr.style.cssText='font-size:9px;color:var(--mu);margin-top:20px;white-space:nowrap';
+    yr.textContent=r.year;
+    wrap.appendChild(bar);wrap.appendChild(pct);wrap.appendChild(yr);
+    barsEl.appendChild(wrap);
+  });
+}
   var detail = document.getElementById('iwin-detail');
   if (!detail) return;
   var s = SR.find(function(s){ return s.k===iwinIdxKey; });
@@ -1135,6 +1501,7 @@ function renderHeatmap() {
     '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
   // VIX 月份熱力圖
   drawVixMonthly();
+  initCrossMonthHeatmap();
 }
 
 function drawVixMonthly() {
