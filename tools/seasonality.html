@@ -879,6 +879,8 @@ function renderWrCells(k) {
     bar.appendChild(cell);
   });
 }
+
+function drawVixIntra(k) {
   var card = document.getElementById('vix-intra-card');
   if (!D.intramonth || !D.intramonth['VIX'] || !D.intramonth['VIX'][k] || !D.intramonth['VIX'][k].length) {
     card.style.display = 'none'; return;
