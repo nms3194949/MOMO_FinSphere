@@ -661,6 +661,7 @@ function drawSignalBands(labels, zones) {
   lChart._signalBands = bands;
 }
 function actIdx(){return SR.map(function(_,i){return i;}).filter(function(i){return !hid[i];});}
+function selM(m){cm=m;document.querySelectorAll('.mb').forEach(function(b,i){b.classList.toggle('on',i===m);});draw();}
 function draw(){if(!D)return;cv==='intra'?drawIntra():drawMonthly();}
 
 function drawIntra(){
