@@ -45,6 +45,9 @@ main{padding:18px 24px}
 .hm td:hover{filter:brightness(1.35)}
 .yl{color:var(--mu);font-weight:600;text-align:left!important;padding-left:10px!important}
 .ar td{border-top:1px solid var(--bd);font-weight:700}
+.hm-tab{padding:3px 10px;border:1px solid var(--bd);border-radius:20px;cursor:pointer;font-size:11px;background:var(--surf2);color:var(--mu);transition:.12s;white-space:nowrap}
+.hm-tab.on{color:#000;border-color:transparent;font-weight:600}
+.hm-tab:hover:not(.on){color:var(--tx);border-color:var(--mu)}
 /* loader */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100}
 .spin{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}
@@ -144,8 +147,9 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <div class="cc">
       <div class="cc-h">
         <span class="cc-t" id="hmt">熱力圖</span>
-        <span class="cc-s">綠＝正報酬 紅＝負報酬 ｜ 點擊指數圓點切換</span>
+        <div id="hm-tabs" style="display:flex;flex-wrap:wrap;gap:5px"></div>
       </div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">綠＝正報酬 紅＝負報酬</div>
       <div class="hm-wrap"><table class="hm" id="hm"></table></div>
     </div>
     <!-- VIX 月份熱力圖 -->
@@ -171,7 +175,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
 // 不需要 GAS 執行，穩定度最高
 var CSV_URL = 'https://docs.google.com/spreadsheets/d/1o0CxoDf7QGJV5Dr2YCvUfu1OL6CdGi1Cb4XVWt9IFI4/export?format=csv&gid=534897987';
 
-var D = null, cm = 5, cv = 'intra', hid = {};
+var D = null, cm = 5, cv = 'intra', hid = {}, curHmIdx = 0;
 var lChart = null, bChart = null, vixLineChart = null, _timer = null;
 
 var SR = [
@@ -390,10 +394,17 @@ function initUI() {
     options:{responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
-        callbacks:{label:function(c){return ' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+'%';}}}},
+        callbacks:{label:function(c){
+          if(c.dataset.yAxisID==='y2') return ' VIX 平均水位: '+c.parsed.y.toFixed(1);
+          return ' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+'%';
+        }}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11}}},
-        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}}}
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
+           position:'left'},
+        y2:{position:'right',grid:{drawOnChartArea:false},
+            ticks:{color:'#f85149',font:{size:11},callback:function(v){return v.toFixed(0);}},
+            title:{display:true,text:'VIX',color:'#f85149',font:{size:11}}}
       },
       onClick:function(_,els){if(!els.length)return;selM(els[0].index);document.querySelector('.nb[data-v="intra"]').click();}
     }
@@ -472,29 +483,68 @@ function drawVixIntra(k) {
 
 function drawMonthly(){
   var ai=actIdx();
-  bChart.data.datasets=ai.map(function(i){
+  var datasets = ai.map(function(i){
     var s=SR[i];
     var vals=Array.from({length:12},function(_,m){return D.monthly_avg[s.k][String(m+1)]||0;});
-    return{label:s.lb,data:vals,
+    return{type:'bar',label:s.lb,data:vals,yAxisID:'y',
       backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
       borderColor:s.c,borderWidth:1,borderRadius:4};
   });
+  // VIX 折線（右軸）
+  if (D.monthly_avg && D.monthly_avg['VIX']) {
+    var vixVals = Array.from({length:12}, function(_,m){ return D.monthly_avg['VIX'][String(m+1)]||null; });
+    datasets.push({
+      type:'line', label:'VIX', data:vixVals, yAxisID:'y2',
+      borderColor:'#f85149', backgroundColor:'rgba(248,81,73,0.08)',
+      borderWidth:2, pointRadius:4, pointHoverRadius:6,
+      pointBackgroundColor:'#f85149', tension:0.3, fill:false,
+      order:0  // 折線畫在長條上方
+    });
+  }
+  bChart.data.datasets = datasets;
   bChart.update();
-  if(!ai.length)return;
-  var s=SR[ai[0]];
-  document.getElementById('hmt').textContent=s.lb+' — 各年各月報酬（%）';
-  var yrs=Object.keys(D.monthly_returns[s.k]).filter(function(y){
-    return Object.keys(D.monthly_returns[s.k][y]).length>0;}).sort();
-  var avgRow='<tr class="ar"><td class="yl">平均</td>'+
-    Array.from({length:12},function(_,m){var v=D.monthly_avg[s.k][String(m+1)]||0;
+
+  // 建立熱力圖切換按鈕（只建一次）
+  var tabWrap = document.getElementById('hm-tabs');
+  if (!tabWrap.children.length) {
+    SR.forEach(function(s, i) {
+      var btn = document.createElement('button');
+      btn.className = 'hm-tab';
+      btn.textContent = s.lb;
+      btn.style.setProperty('--tc', s.c);
+      btn.dataset.i = i;
+      btn.onclick = function() {
+        curHmIdx = parseInt(this.dataset.i);
+        renderHeatmap();
+      };
+      tabWrap.appendChild(btn);
+    });
+  }
+  renderHeatmap();
+}
+
+function renderHeatmap() {
+  // 確保 curHmIdx 指向有資料的指數
+  var s = SR[curHmIdx];
+  // 更新 tab 樣式
+  document.querySelectorAll('.hm-tab').forEach(function(btn, i) {
+    btn.classList.toggle('on', i === curHmIdx);
+    btn.style.background = (i === curHmIdx) ? SR[i].c : '';
+  });
+  document.getElementById('hmt').textContent = s.lb + ' — 各年各月報酬（%）';
+  if (!D.monthly_returns || !D.monthly_returns[s.k]) return;
+  var yrs = Object.keys(D.monthly_returns[s.k])
+    .filter(function(y){ return Object.keys(D.monthly_returns[s.k][y]).length>0; }).sort();
+  var avgRow = '<tr class="ar"><td class="yl">平均</td>'+
+    Array.from({length:12}, function(_,m){ var v=D.monthly_avg[s.k][String(m+1)]||0;
       return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>3?'#fff':'var(--tx)')+'">'+
         (v>0?'+':'')+v.toFixed(1)+'%</td>';}).join('')+'</tr>';
-  var rows=yrs.map(function(y){return'<tr><td class="yl">'+y+'</td>'+
-    Array.from({length:12},function(_,m){var v=D.monthly_returns[s.k][y][String(m+1)];
+  var rows = yrs.map(function(y){ return'<tr><td class="yl">'+y+'</td>'+
+    Array.from({length:12}, function(_,m){ var v=D.monthly_returns[s.k][y][String(m+1)];
       if(v===undefined)return'<td style="color:var(--bd)">—</td>';
       return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>8?'#fff':'var(--tx)')+'">'+
         (v>0?'+':'')+v.toFixed(1)+'</td>';}).join('')+'</tr>';}).join('');
-  document.getElementById('hm').innerHTML=
+  document.getElementById('hm').innerHTML =
     '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
   // VIX 月份熱力圖
   drawVixMonthly();
