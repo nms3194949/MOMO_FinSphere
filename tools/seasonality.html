@@ -504,11 +504,10 @@ function initUI() {
   });
 } // end initUI
 
-// ── 交易訊號計算 ─────────────────────────────────────────────
-var SIGNAL_BASE = 'S&P 500'; // 基準指數 label 對應
+// ── 交易訊號計算（趨勢轉折邏輯）────────────────────────────
+var SIGNAL_BASE = 'S&P 500';
 
 function getBaseKey() {
-  // 找 label 為 S&P 500 的 key
   if (!D || !D.meta) return null;
   var found = null;
   Object.keys(D.meta).forEach(function(k) {
@@ -517,55 +516,106 @@ function getBaseKey() {
   return found;
 }
 
+function smooth(arr, win) {
+  // 簡單移動平均，用於平滑雜訊
+  return arr.map(function(_, i) {
+    var start = Math.max(0, i - Math.floor(win/2));
+    var end   = Math.min(arr.length, i + Math.floor(win/2) + 1);
+    var slice = arr.slice(start, end);
+    return slice.reduce(function(s,v){return s+v;},0) / slice.length;
+  });
+}
+
 function calcSignals(month) {
   var k = String(month + 1);
   var baseKey = getBaseKey();
   if (!baseKey || !D.intramonth[baseKey] || !D.intramonth[baseKey][k]) return null;
 
-  var spData  = D.intramonth[baseKey][k];
-  var vixData = (D.intramonth['VIX'] && D.intramonth['VIX'][k]) || [];
-  var n = spData.length;
-  if (n < 3) return null;
+  var spRaw  = D.intramonth[baseKey][k];
+  var vixRaw = (D.intramonth['VIX'] && D.intramonth['VIX'][k]) || [];
+  var n = spRaw.length;
+  if (n < 5) return null;
 
-  // 每個交易日的訊號：1=進場, -1=離場, 0=觀望
-  var signals = [];
-  for (var i = 1; i < n; i++) {
-    var spDiff  = spData[i]  - spData[i-1];   // S&P 當日變化
-    var vixDiff = vixData.length > i ? vixData[i] - vixData[i-1] : 0;
-    var hasVix  = vixData.length > i;
+  // 平滑處理（3日移動平均），減少雜訊
+  var sp  = smooth(spRaw, 3);
+  var vix = vixRaw.length >= n ? smooth(vixRaw, 3) : [];
 
-    var sig;
-    if (spDiff > 0 && (!hasVix || vixDiff <= 0)) {
-      sig = 1;   // 進場：S&P 漲 + VIX 跌或無VIX
-    } else if (spDiff < 0 && (!hasVix || vixDiff >= 0)) {
-      sig = -1;  // 離場：S&P 跌 + VIX 漲或無VIX
-    } else {
-      sig = 0;   // 觀望：訊號矛盾
-    }
-    signals.push(sig);
+  // ── 計算每日趨勢斜率（用前後2日）────────────────────────
+  function slope(arr, i) {
+    var prev = Math.max(0, i-2), next = Math.min(arr.length-1, i+2);
+    return (arr[next] - arr[prev]) / (next - prev);
   }
 
-  // 把連續相同訊號合併成區間
-  var zones = [];
-  var cur = {sig: signals[0], start: 1, end: 1};
-  for (var j = 1; j < signals.length; j++) {
-    if (signals[j] === cur.sig) {
-      cur.end = j + 1;
-    } else {
-      zones.push({sig:cur.sig, start:cur.start, end:cur.end});
-      cur = {sig:signals[j], start:j+1, end:j+1};
+  // ── 找局部高點和低點 ─────────────────────────────────────
+  function findPeaks(arr, minDist) {
+    var peaks = [], troughs = [];
+    for (var i = 1; i < arr.length - 1; i++) {
+      var isPeak   = arr[i] > arr[i-1] && arr[i] > arr[i+1];
+      var isTrough = arr[i] < arr[i-1] && arr[i] < arr[i+1];
+      if (isPeak)   peaks.push(i);
+      if (isTrough) troughs.push(i);
     }
+    return {peaks: peaks, troughs: troughs};
   }
-  zones.push({sig:cur.sig, start:cur.start, end:cur.end});
 
-  // 找最佳進場區（S&P最低點前後）和最佳離場區（S&P最高點前後）
-  var minVal = Infinity, minDay = 0, maxVal = -Infinity, maxDay = 0;
-  spData.forEach(function(v, i) {
-    if (v < minVal) { minVal = v; minDay = i; }
-    if (v > maxVal) { maxVal = v; maxDay = i; }
+  var found = findPeaks(sp, 2);
+  var peaks   = found.peaks;
+  var troughs = found.troughs;
+
+  // ── 為每個交易日標記訊號 ─────────────────────────────────
+  // 策略：
+  // 離場區 = 接近峰值前後（高點附近，S&P斜率由正轉負）
+  // 進場區 = 接近谷值前後（低點附近，S&P斜率由負轉正）
+  // VIX 確認：進場時 VIX 偏高且開始下降更佳；離場時 VIX 偏低且開始上升需謹慎
+
+  var WINDOW = 2; // 峰谷前後幾天算作「區間」
+  var zones  = new Array(n).fill(0); // 0=觀望, 1=進場, -1=離場
+
+  // 標記離場區（峰值附近）
+  peaks.forEach(function(p) {
+    for (var i = Math.max(0, p-WINDOW); i <= Math.min(n-1, p+WINDOW); i++) {
+      // 若 VIX 同時上升，離場訊號更強；若 VIX 下降，降低強度
+      var vixConfirm = vix.length > i ? slope(vix, i) >= 0 : true;
+      zones[i] = vixConfirm ? -1 : 0; // VIX上升確認離場，否則觀望
+    }
   });
 
-  return { zones: zones, minDay: minDay, maxDay: maxDay, spData: spData, vixData: vixData, n: n };
+  // 標記進場區（谷值附近）
+  troughs.forEach(function(t) {
+    for (var i = Math.max(0, t-WINDOW); i <= Math.min(n-1, t+WINDOW); i++) {
+      if (zones[i] === -1) continue; // 不覆蓋離場訊號
+      // 若 VIX 同時下降，進場訊號更強；若 VIX 上升，降低強度
+      var vixConfirm = vix.length > i ? slope(vix, i) <= 0 : true;
+      zones[i] = vixConfirm ? 1 : 0;
+    }
+  });
+
+  // ── 合併連續相同訊號成區間 ───────────────────────────────
+  var merged = [];
+  var cur = {sig: zones[0], start: 0, end: 0};
+  for (var j = 1; j < n; j++) {
+    if (zones[j] === cur.sig) {
+      cur.end = j;
+    } else {
+      merged.push({sig:cur.sig, start:cur.start, end:cur.end});
+      cur = {sig:zones[j], start:j, end:j};
+    }
+  }
+  merged.push({sig:cur.sig, start:cur.start, end:cur.end});
+
+  // 找最佳進場日（最低谷）和最佳離場日（最高峰）
+  var minVal=Infinity, minDay=0, maxVal=-Infinity, maxDay=0;
+  spRaw.forEach(function(v,i){ if(v<minVal){minVal=v;minDay=i;} if(v>maxVal){maxVal=v;maxDay=i;} });
+
+  return {
+    zones:   merged,
+    zoneArr: zones,
+    minDay:  minDay, maxDay: maxDay,
+    minVal:  minVal, maxVal: maxVal,
+    spData:  spRaw,
+    vixData: vixRaw,
+    n:       n
+  };
 }
 
 function drawSignals(month) {
@@ -574,51 +624,40 @@ function drawSignals(month) {
   if (!result) { card.style.display = 'none'; return; }
   card.style.display = '';
 
-  var zones    = result.zones;
-  var minDay   = result.minDay;
-  var maxDay   = result.maxDay;
+  var zones = result.zones;
 
   // 文字區間摘要
   var entryZones = [], exitZones = [], watchZones = [];
   zones.forEach(function(z) {
-    var label = 'D' + (z.start+1) + (z.end > z.start ? '–D'+(z.end+1) : '');
+    if (z.end - z.start < 1) return; // 過濾單日雜訊
+    var label = 'D'+(z.start+1) + (z.end > z.start ? '–D'+(z.end+1) : '');
     if (z.sig === 1)  entryZones.push(label);
     if (z.sig === -1) exitZones.push(label);
-    if (z.sig === 0)  watchZones.push(label);
   });
 
-  // 渲染 zone chips
   var zonesEl = document.getElementById('signal-zones');
   zonesEl.innerHTML = '';
   if (entryZones.length) {
-    var chip = document.createElement('span');
-    chip.className = 'sig-zone sig-entry';
-    chip.innerHTML = '<span class="sig-dot" style="background:#3fb950"></span>進場區：' + entryZones.join('、');
-    zonesEl.appendChild(chip);
+    var c1 = document.createElement('span');
+    c1.className = 'sig-zone sig-entry';
+    c1.innerHTML = '<span class="sig-dot" style="background:#3fb950"></span>建議進場：' + entryZones.join('、');
+    zonesEl.appendChild(c1);
   }
   if (exitZones.length) {
-    var chip2 = document.createElement('span');
-    chip2.className = 'sig-zone sig-exit';
-    chip2.innerHTML = '<span class="sig-dot" style="background:#f85149"></span>離場區：' + exitZones.join('、');
-    zonesEl.appendChild(chip2);
-  }
-  if (watchZones.length) {
-    var chip3 = document.createElement('span');
-    chip3.className = 'sig-zone sig-watch';
-    chip3.innerHTML = '<span class="sig-dot" style="background:var(--mu)"></span>觀望區：' + watchZones.join('、');
-    zonesEl.appendChild(chip3);
+    var c2 = document.createElement('span');
+    c2.className = 'sig-zone sig-exit';
+    c2.innerHTML = '<span class="sig-dot" style="background:#f85149"></span>建議離場：' + exitZones.join('、');
+    zonesEl.appendChild(c2);
   }
 
-  // 文字摘要
   var spEnd = result.spData[result.n-1];
+  var hasVix = result.vixData.length >= result.n;
   document.getElementById('signal-summary').innerHTML =
-    '📍 歷史低點在 <b>D'+(minDay+1)+'</b>（均值 '+result.spData[minDay].toFixed(2)+'%），' +
-    '高點在 <b>D'+(maxDay+1)+'</b>（均值 '+result.spData[maxDay].toFixed(2)+'%）。' +
-    '月末平均報酬 <b style="color:'+(spEnd>=0?'var(--gr)':'var(--rd)')+'">'+
-    (spEnd>=0?'+':'')+spEnd.toFixed(2)+'%</b>。' +
-    (result.vixData.length > 0
-      ? '　VIX 輔助訊號已啟用。'
-      : '　<span style="color:var(--or)">尚無 VIX 資料，僅依 S&P 500 判斷。</span>');
+    '📍 歷史低點在 <b>D'+(result.minDay+1)+'</b>（均值 <span style="color:var(--rd)">'+result.minVal.toFixed(2)+'%</span>），' +
+    '高點在 <b>D'+(result.maxDay+1)+'</b>（均值 <span style="color:var(--gr)">+'+result.maxVal.toFixed(2)+'%</span>）。' +
+    '月末平均報酬 <b style="color:'+(spEnd>=0?'var(--gr)':'var(--rd)')+'">'+(spEnd>=0?'+':'')+spEnd.toFixed(2)+'%</b>。' +
+    (hasVix ? '　VIX 輔助訊號已啟用。' : '　<span style="color:var(--or)">尚無 VIX 資料，僅依 S&P 500 判斷。</span>') +
+    '<br><span style="font-size:11px;color:var(--bd)">⚠ 以上為歷史統計規律，不構成投資建議。</span>';
 }
 
 function drawSignalBands(labels, zones) {
