@@ -1154,7 +1154,7 @@ function updateCm2Days() {
 function drawCrossMonthHeatmap() {
   var idxKey=document.getElementById('cm2-idx').value;
   var xm    =parseInt(document.getElementById('cm2-xm').value);
-  var xd    =parseInt(document.getElementById('cm2-xd').value)-1; // 0-based
+  var xd    =parseInt(document.getElementById('cm2-xd').value)-1;
   var tbl   =document.getElementById('cm2-tbl');
   var detail=document.getElementById('cm2-detail');
   if(!tbl) return;
@@ -1166,14 +1166,27 @@ function drawCrossMonthHeatmap() {
 
   var mat=D.cross_month_win[idxKey][String(xm)];
   if(!mat||!mat[String(xd)]){ tbl.innerHTML=''; return; }
-  var row=mat[String(xd)]; // row[entryMonth][entryDay]
+  var row=mat[String(xd)];
 
   var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   var s=SR.find(function(s){return s.k===idxKey;})||{lb:idxKey};
 
+  // ── 計算今天約是哪個月第幾個交易日 ──────────────────────────
+  var today    = new Date();
+  var todayM   = today.getMonth()+1;  // 1-12
+  var todayDay = today.getDate();
+  // 估算：每月約有 22 個交易日，月曆日 ÷ (30/22) ≈ 第幾個交易日
+  // 更精確：假設每月 1 號是 D1，跳過週末
+  var d = new Date(today.getFullYear(), todayM-1, 1);
+  var tradingDay = 0;
+  while(d <= today) {
+    var dow = d.getDay();
+    if(dow!==0 && dow!==6) tradingDay++;
+    d.setDate(d.getDate()+1);
+  }
+  tradingDay = Math.max(1, tradingDay) - 1; // 0-based
+
   // header
-  var html='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px">進場↓</th>';
-  // 出場日最多幾天
   var maxED=0;
   for(var em2=1;em2<=12;em2++){
     if(row[String(em2)]){
@@ -1181,29 +1194,44 @@ function drawCrossMonthHeatmap() {
       if(keys.length) maxED=Math.max(maxED,Math.max.apply(null,keys)+1);
     }
   }
-  for(var d2=0;d2<maxED;d2++) html+='<th class="iwin-head">D'+(d2+1)+'</th>';
+  var html='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px">進場↓</th>';
+  for(var d2=0;d2<maxED;d2++){
+    var isToday=(d2===tradingDay);
+    html+='<th class="iwin-head" style="'+(isToday?'color:var(--rd);font-weight:700':'')+'">D'+(d2+1)+
+      (isToday?'<div style="font-size:7px;color:var(--rd)">今</div>':'')+'</th>';
+  }
   html+='</tr>';
 
   for(var em=1;em<=12;em++){
-    html+='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px">'+MN_S[em-1]+'</th>';
+    var isNowRow=(em===todayM);
+    html+='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px;'+(isNowRow?'color:var(--rd);font-weight:700':'')+'">'+
+      MN_S[em-1]+'</th>';
     for(var ed=0;ed<maxED;ed++){
       var wr=(row[String(em)]&&row[String(em)][String(ed)]!==undefined)?row[String(em)][String(ed)]:null;
-      // 同月同日或無效跳過
       var skip=(xm===em&&xd===ed);
+      var isNow=(em===todayM && ed===tradingDay);
+      var nowStyle=isNow?';outline:2px solid #f85149;outline-offset:-1px;z-index:1;position:relative':'';
       if(skip||wr===null){
-        html+='<td style="width:26px;height:22px"></td>';
+        html+='<td style="width:26px;height:22px'+nowStyle+'">'+(isNow?'<span style="font-size:8px;color:var(--rd);font-weight:700">今</span>':'')+'</td>';
       } else {
         var bg=iwinColor(wr);
         var tc=(wr>=60||wr<40)?'#fff':'var(--tx)';
-        html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+';width:26px;height:22px;font-size:9px"'+
-          ' title="'+MN_S[em-1]+' D'+(ed+1)+' 進 → '+MN_S[xm-1]+' D'+(xd+1)+' 出：'+wr+'%"'+
-          ' onclick="showCm2Detail('+em+','+(ed+1)+','+xm+','+(xd+1)+','+wr+',\''+s.lb+'\')">'+wr+'%</td>';
+        html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+';width:26px;height:22px;font-size:9px'+nowStyle+'"'+
+          ' title="'+MN_S[em-1]+' D'+(ed+1)+' 進 → '+MN_S[xm-1]+' D'+(xd+1)+' 出：'+wr+'%'+(isNow?' ◀ 今天約在此':'')+'"'+
+          ' onclick="showCm2Detail('+em+','+(ed+1)+','+xm+','+(xd+1)+','+wr+',\''+s.lb+'\')">'+
+          (isNow?'<b>'+wr+'%</b>':wr+'%')+'</td>';
       }
     }
     html+='</tr>';
   }
   tbl.innerHTML=html;
-  if(detail) detail.style.display='none';
+  // 顯示今天位置說明
+  var todayLabel = MN_S[todayM-1]+' 第 '+(tradingDay+1)+' 個交易日（D'+(tradingDay+1)+'）';
+  var cm2detail = document.getElementById('cm2-detail');
+  if(cm2detail){
+    cm2detail.style.display='block';
+    cm2detail.innerHTML='<span style="color:var(--rd)">▣</span> 今天約為 <b style="color:var(--rd)">'+todayLabel+'</b>，對應熱力圖中紅框位置。點擊格子查看詳細勝率說明。';
+  }
 }
 
 function showCm2Detail(em,ed,xm,xd,wr,label) {
