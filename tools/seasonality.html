@@ -414,6 +414,7 @@ function initUI() {
       }
     }
   });
+} // end initUI
 
 function selM(m){cm=m;document.querySelectorAll('.mb').forEach(function(b,i){b.classList.toggle('on',i===m);});draw();}
 function actIdx(){return SR.map(function(_,i){return i;}).filter(function(i){return !hid[i];});}
