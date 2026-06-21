@@ -346,18 +346,31 @@ function fetchData() {
       clearTimeout(_timeout);
       if (r.status === 401 || r.status === 403) throw {code:'share'};
       if (!r.ok) throw {code:'network', msg:'HTTP '+r.status};
-      document.getElementById('load-msg').textContent = '正在解析 CSV...';
+      document.getElementById('load-msg').textContent = '正在解析資料...';
       setFill(70);
       return r.text();
     })
     .then(function(csv) {
-      // CSV 的 A1 就是整個 JSON 字串
-      // Google export 會把內容用雙引號包住，需要 unescape
-      var raw = csv.trim();
-      // 去除 Google CSV 包的外層引號與跳脫
-      if (raw.charAt(0)==='"') {
-        raw = raw.slice(1, raw.charAt(raw.length-1)==='"' ? raw.length-1 : raw.length);
-        raw = raw.replace(/""/g, '"');
+      // 解析 CSV：第一列是 chunk 數量，後續列是各 chunk
+      var lines = csv.trim().split(/\r?\n/);
+      var raw;
+      var firstVal = lines[0].replace(/^"|"$/g,'').trim();
+      var chunkCount = parseInt(firstVal);
+      if (!isNaN(chunkCount) && chunkCount > 1) {
+        // 多 chunk 模式：從第二列開始合併
+        var parts = [];
+        for (var i = 1; i <= chunkCount && i < lines.length; i++) {
+          var cell = lines[i].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
+          parts.push(cell);
+        }
+        raw = parts.join('');
+      } else {
+        // 單 chunk 舊格式
+        raw = firstVal;
+        if (raw.charAt(0)==='"') {
+          raw = raw.slice(1, raw.charAt(raw.length-1)==='"' ? raw.length-1 : raw.length);
+          raw = raw.replace(/""/g,'"');
+        }
       }
       if (!raw || raw.length < 10) throw {code:'empty'};
       document.getElementById('load-msg').textContent = '還原 JSON 資料...';
