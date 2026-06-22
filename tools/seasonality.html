@@ -198,52 +198,32 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         </div>
       </div>
       <div id="iwin-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
-      <!-- 左右排版：矩陣 + 統計面板 -->
-      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
-        <!-- 矩陣 -->
-        <div style="overflow-x:auto;overflow-y:auto;max-height:520px;flex:1;min-width:0">
-          <table id="iwin-tbl" style="border-collapse:collapse"></table>
+      <!-- 統計卡片 + 矩陣左對齊容器 -->
+      <div style="display:inline-block;min-width:0;width:100%">
+      <!-- 統計卡片列 -->
+      <div id="iwin-stats-row" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:160px">
+          <div style="font-size:10px;color:var(--mu);margin-bottom:4px">所有區間平均勝率</div>
+          <div id="iwin-avg-wr" style="font-size:22px;font-weight:700">—</div>
         </div>
-        <!-- 右側統計面板 -->
-        <div id="iwin-stats" style="width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:10px">
-          <!-- 整體統計 -->
-          <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:12px">
-            <div style="font-size:11px;color:var(--mu);margin-bottom:10px;font-weight:600;letter-spacing:.5px">整體統計</div>
-            <div id="iwin-avg-wr" style="margin-bottom:8px">
-              <div style="font-size:10px;color:var(--mu)">所有區間平均勝率</div>
-              <div style="font-size:22px;font-weight:700;color:var(--tx)">—</div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div style="background:var(--surf);border-radius:6px;padding:8px">
-                <div style="font-size:10px;color:var(--mu);margin-bottom:3px">高勝率區間</div>
-                <div id="iwin-hi-cnt" style="font-size:15px;font-weight:600;color:var(--gr)">—</div>
-                <div style="font-size:9px;color:var(--mu)">&gt;65% 的組合數</div>
-              </div>
-              <div style="background:var(--surf);border-radius:6px;padding:8px">
-                <div style="font-size:10px;color:var(--mu);margin-bottom:3px">低勝率區間</div>
-                <div id="iwin-lo-cnt" style="font-size:15px;font-weight:600;color:var(--rd)">—</div>
-                <div style="font-size:9px;color:var(--mu)">&lt;40% 的組合數</div>
-              </div>
-            </div>
-          </div>
-          <!-- 最佳組合 -->
-          <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);border-radius:8px;padding:12px">
-            <div style="font-size:11px;color:var(--gr);margin-bottom:8px;font-weight:600">🏆 最佳進出場組合</div>
-            <div id="iwin-best" style="font-size:12px;color:var(--tx);line-height:1.8">—</div>
-          </div>
-          <!-- 最差組合 -->
-          <div style="background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:12px">
-            <div style="font-size:11px;color:var(--rd);margin-bottom:8px;font-weight:600">⚠ 最差進出場組合</div>
-            <div id="iwin-worst" style="font-size:12px;color:var(--tx);line-height:1.8">—</div>
-          </div>
-          <!-- 本月最佳進場排行 -->
-          <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:12px">
-            <div style="font-size:11px;color:var(--mu);margin-bottom:8px;font-weight:600">📅 本月最佳進場日</div>
-            <div style="font-size:9px;color:var(--mu);margin-bottom:8px">出場固定為本月末（D最後）</div>
-            <div id="iwin-rank" style="display:flex;flex-direction:column;gap:5px"></div>
-          </div>
+        <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);border-radius:8px;padding:10px 12px;min-width:160px">
+          <div style="font-size:10px;color:var(--gr);margin-bottom:4px">🏆 最佳進出場</div>
+          <div id="iwin-best" style="font-size:13px;color:var(--tx);line-height:1.7">—</div>
+        </div>
+        <div style="background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 12px;min-width:160px">
+          <div style="font-size:10px;color:var(--rd);margin-bottom:4px">⚠ 最差進出場</div>
+          <div id="iwin-worst" style="font-size:13px;color:var(--tx);line-height:1.7">—</div>
+        </div>
+        <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:200px">
+          <div style="font-size:10px;color:var(--mu);margin-bottom:6px">📅 本月最佳進場（出場=末日）</div>
+          <div id="iwin-rank" style="display:flex;flex-direction:column;gap:4px"></div>
         </div>
       </div>
+      <!-- 矩陣 -->
+      <div style="overflow-x:auto;overflow-y:auto;max-height:520px">
+        <table id="iwin-tbl" style="border-collapse:collapse"></table>
+      </div>
+      </div><!-- end wrapper -->
       <div id="iwin-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
     </div>
   </div>
@@ -1251,9 +1231,6 @@ function showCm2Detail(em,ed,xm,xd,wr,label) {
     '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史 '+wr+'% 的年份為正報酬</span>';
 }
 function updateIwinStats(k, iwin, n) {
-  var s = SR.find(function(s){ return s.k===iwinIdxKey; });
-
-  // 收集所有有效格子
   var all=[], best=null, worst=null;
   for(var ei=0;ei<n-1;ei++){
     for(var eo=ei+1;eo<n;eo++){
@@ -1270,58 +1247,56 @@ function updateIwinStats(k, iwin, n) {
   var hiCnt=all.filter(function(v){return v.wr>=65;}).length;
   var loCnt=all.filter(function(v){return v.wr<40;}).length;
 
-  // 整體統計
+  // 平均勝率卡
   var avgEl=document.getElementById('iwin-avg-wr');
   if(avgEl){
-    var color=avg>=60?'var(--gr)':avg>=50?'var(--tx)':'var(--rd)';
-    avgEl.querySelector('div:last-child').textContent=avg+'%';
-    avgEl.querySelector('div:last-child').style.color=color;
+    var ac=avg>=60?'var(--gr)':avg>=50?'var(--tx)':'var(--rd)';
+    avgEl.style.color=ac;
+    avgEl.innerHTML='<span style="font-size:22px;font-weight:700">'+avg+'%</span>'+
+      '<div style="font-size:10px;color:var(--mu);margin-top:4px">'+
+        '<span style="color:var(--gr)">▲'+hiCnt+'個</span> &gt;65%　'+
+        '<span style="color:var(--rd)">▼'+loCnt+'個</span> &lt;40%</div>';
   }
-  var hiEl=document.getElementById('iwin-hi-cnt');
-  var loEl=document.getElementById('iwin-lo-cnt');
-  if(hiEl) hiEl.textContent=hiCnt+'個';
-  if(loEl) loEl.textContent=loCnt+'個';
 
   // 最佳組合
   var bestEl=document.getElementById('iwin-best');
   if(bestEl&&best){
     bestEl.innerHTML=
-      '<div style="font-size:20px;font-weight:700;color:var(--gr)">'+best.wr+'%</div>'+
-      '<div style="color:var(--mu)">D'+(best.ei+1)+' 進場 → D'+(best.eo+1)+' 出場</div>';
+      '<span style="font-size:20px;font-weight:700;color:var(--gr)">'+best.wr+'%</span>'+
+      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(best.ei+1)+'→D'+(best.eo+1)+'</span>';
   }
 
   // 最差組合
   var worstEl=document.getElementById('iwin-worst');
   if(worstEl&&worst){
     worstEl.innerHTML=
-      '<div style="font-size:20px;font-weight:700;color:var(--rd)">'+worst.wr+'%</div>'+
-      '<div style="color:var(--mu)">D'+(worst.ei+1)+' 進場 → D'+(worst.eo+1)+' 出場</div>';
+      '<span style="font-size:20px;font-weight:700;color:var(--rd)">'+worst.wr+'%</span>'+
+      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(worst.ei+1)+'→D'+(worst.eo+1)+'</span>';
   }
 
-  // 本月最佳進場排行（固定出場為本月最後一天）
+  // 本月最佳進場排行（出場=本月末）
   var rankEl=document.getElementById('iwin-rank');
   if(rankEl){
-    var lastDay=n-1; // 本月最後一個交易日 index
+    var lastDay=n-1;
     var exits=[];
     for(var ei2=0;ei2<lastDay;ei2++){
       var wr2=iwin[ei2]&&iwin[ei2][lastDay]!==undefined?iwin[ei2][lastDay]:null;
       if(wr2!==null) exits.push({ei:ei2,wr:wr2});
     }
     exits.sort(function(a,b){return b.wr-a.wr;});
-    var top5=exits.slice(0,5);
     rankEl.innerHTML='';
-    top5.forEach(function(item,i){
+    exits.slice(0,5).forEach(function(item,i){
       var c=item.wr>=65?'var(--gr)':item.wr>=50?'var(--tx)':'var(--or)';
-      var pct=Math.round(item.wr/top5[0].wr*100);
+      var pct=Math.round(item.wr/exits[0].wr*100);
       var row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:6px;cursor:pointer';
-      row.title='D'+(item.ei+1)+' 進場 → D'+n+' 出場';
-      row.onclick=(function(ei,eo,wr){ return function(){showIwinDetail(ei+1,eo+1,wr);}; })(item.ei,lastDay,item.wr);
+      row.style.cssText='display:flex;align-items:center;gap:5px;cursor:pointer';
+      row.title='D'+(item.ei+1)+'進→D'+n+'出 勝率'+item.wr+'%';
+      row.onclick=(function(ei,eo,wr){return function(){showIwinDetail(ei+1,eo+1,wr);};})(item.ei,lastDay,item.wr);
       row.innerHTML=
-        '<span style="font-size:10px;color:var(--mu);min-width:14px">'+(i+1)+'.</span>'+
-        '<span style="font-size:11px;color:var(--tx);min-width:32px">D'+(item.ei+1)+'</span>'+
-        '<div style="flex:1;height:6px;background:var(--surf);border-radius:3px;overflow:hidden">'+
-          '<div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:3px"></div></div>'+
+        '<span style="font-size:10px;color:var(--mu);min-width:12px">'+(i+1)+'.</span>'+
+        '<span style="font-size:11px;min-width:26px;color:var(--tx)">D'+(item.ei+1)+'</span>'+
+        '<div style="flex:1;height:5px;background:var(--surf);border-radius:2px;overflow:hidden">'+
+          '<div style="height:100%;width:'+pct+'%;background:'+c+'"></div></div>'+
         '<span style="font-size:11px;font-weight:600;color:'+c+';min-width:36px;text-align:right">'+item.wr+'%</span>';
       rankEl.appendChild(row);
     });
