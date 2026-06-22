@@ -51,6 +51,7 @@ main{padding:18px 24px}
 .sig-zone{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap}
 .sig-entry{background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.4);color:#3fb950}
 .sig-exit{background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);color:#f85149}
+.sig-best{background:rgba(88,166,255,.15);border:1px solid rgba(88,166,255,.4);color:#58a6ff}
 .sig-watch{background:rgba(125,133,144,.12);border:1px solid rgba(125,133,144,.3);color:var(--mu)}
 .sig-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .wr-cell{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;cursor:default;border-radius:3px 3px 0 0;transition:filter .15s}
@@ -102,9 +103,9 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <div id="prog-meta"><span id="prog-step">—</span><span id="prog-pct">0%</span></div>
   </div>
   <div id="step-list">
-    <div class="step" id="st0"><span class="step-icon">○</span>連線 Google Sheets</div>
-    <div class="step" id="st1"><span class="step-icon">○</span>下載 SeasonalityJSON 工作表</div>
-    <div class="step" id="st2"><span class="step-icon">○</span>解析 CSV 內容</div>
+    <div class="step" id="st0"><span class="step-icon">○</span>連線資料來源</div>
+    <div class="step" id="st1"><span class="step-icon">○</span>下載 SeasonalityJSON</div>
+    <div class="step" id="st2"><span class="step-icon">○</span>解析內容</div>
     <div class="step" id="st3"><span class="step-icon">○</span>還原 JSON 資料結構</div>
     <div class="step" id="st4"><span class="step-icon">○</span>渲染圖表</div>
   </div>
@@ -136,7 +137,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <!-- 交易建議區 -->
     <div id="signal-card" style="display:none;margin-bottom:14px">
       <div style="font-size:12px;font-weight:600;color:var(--mu);margin-bottom:8px;letter-spacing:.5px">
-        交易區間建議 <span style="font-weight:400;color:var(--bd)">｜ 基準：S&amp;P 500 × VIX 輔助</span>
+        交易區間建議 <span style="font-weight:400;color:var(--bd)">｜ 由區間勝率矩陣推導（基準：S&amp;P 500）</span>
       </div>
       <div id="signal-zones" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
       <div id="signal-summary" style="font-size:12px;color:var(--mu);line-height:1.8;padding:10px 14px;background:var(--surf);border:1px solid var(--bd);border-radius:8px"></div>
@@ -295,12 +296,15 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
   <span id="gs-txt">—</span>
   <button onclick="fetchData()" style="margin-left:auto;padding:3px 10px;border:1px solid var(--bd);background:none;color:var(--mu);border-radius:5px;cursor:pointer;font-size:11px">重新整理</button>
 </div>
-<footer>資料來源：Investing.com 歷史收盤價。DJI/NASDAQ100/Russell2000：2001–2026；NASDAQ：2001–2019；台股加權：2011–2026。僅供參考，不構成投資建議。</footer>
+<footer id="ftr">資料來源：Investing.com 歷史收盤價。僅供參考，不構成投資建議。</footer>
 
 <script>
-// ── 資料來源：直接讀取 Google Sheets CSV（SeasonalityJSON 工作表）──
-// 不需要 GAS 執行，穩定度最高
+// ── 資料來源 ──────────────────────────────────────────────────
+// 主來源：GAS JSON 端點（單一 chunk 重組邏輯、伺服器端 6h 快取）
+// 後備：直連 Google Sheets CSV（GAS 故障時仍可運作）
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbyj2fX5_kTIJOJSnIKIyqdwpAtjJhEeHQIdDsGUbafKDI21y51F-uQqiskTWj1Z6JTmDg/exec';
 var CSV_URL = 'https://docs.google.com/spreadsheets/d/1o0CxoDf7QGJV5Dr2YCvUfu1OL6CdGi1Cb4XVWt9IFI4/export?format=csv&gid=534897987';
+var SCHEMA_EXPECT = 2;
 
 var D = null, cm = new Date().getMonth(), cv = 'intra', hid = {}, curHmIdx = 0;
 var lChart = null, bChart = null, vixLineChart = null, _timer = null;
@@ -308,16 +312,15 @@ var SR = []; // 從 GAS meta 動態建立
 
 // 固定顏色對照表（避免不同指數撞色）
 var COLOR_MAP = {
-  'DJI':         '#d4a843',  // 金黃
-  'S&P 500':     '#00bfff',  // 天藍（深）
-  'SP500':       '#00bfff',  // 天藍（深）
-  'NASDAQ':      '#bc8cff',  // 紫
-  'NASDAQ100':   '#3fb950',  // 綠
-  'Russell2000': '#f0883e',  // 橘
-  'TWII':        '#ff6eb4',  // 粉紅
-  'VIX':         '#f85149',  // 紅（固定）
+  'DJI':         '#d4a843',
+  'S&P 500':     '#00bfff',
+  'SP500':       '#00bfff',
+  'NASDAQ':      '#bc8cff',
+  'NASDAQ100':   '#3fb950',
+  'Russell2000': '#f0883e',
+  'TWII':        '#ff6eb4',
+  'VIX':         '#f85149',
 };
-// 備用顏色池（未在 COLOR_MAP 的指數依序套用）
 var COLOR_POOL = ['#40e0d0','#ffd700','#61afef','#98c379','#56b6c2','#c678dd','#e06c75'];
 var DASH_POOL  = [[],[6,3],[3,3],[8,2,2,2],[4,2],[6,2],[2,2],[8,4],[4,4],[6,2,2,2]];
 
@@ -340,26 +343,49 @@ function buildSR() {
 }
 
 var MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-var INS=[
-  '月初至第12日穩步上升，科技股月底強力拉升。DJI表現保守穩健。',
-  '整體偏弱，科技股下行明顯。台股2月因農曆年效應異常強勢，與美股完全背離。',
-  '科技股受賣壓偏弱，Russell 2000月末跌幅最大。台股3月橫盤偏弱。',
-  '全年最強月份之一。科技股月末平均+2%以上，台股月末可達+1.6%。',
-  '五窮月，整體先跌後漲。科技股月末仍有+1.5%，DJI僅+0.2%。',
-  '六絕月，前3日有假反彈，第7日後持續下行。台股6月相對抗跌。',
-  '7月反轉月！月初先蹲，第8日起強力反彈。科技股月末表現最強。',
-  '科技股月末勉強轉正。台股8月表現最差。整體月份表現分歧大。',
-  '九月效應顯著，全年最弱月。各指數月末約-0.9%，建議降低持倉。',
-  '第四季資金入場，全月強勢。科技股月末+2.8%，DJI+1.3%。台股10月月末波動大需注意。',
-  '全年最強月份！Russell 2000月末+3.2%，感恩節行情明顯。',
-  '聖誕行情，月末效果顯著。Russell 2000+1.6%，DJI+0.8%。台股12月月末強拉。',
-];
+
+// ── 動態洞察（取代寫死的 INS 陣列，永遠與實際資料一致）────────
+function genInsight(m) {
+  if (!D) return '';
+  var k = String(m+1);
+  var rows = [];
+  SR.forEach(function(s,i){
+    if (hid[i]) return;
+    var a = (D.intramonth[s.k] && D.intramonth[s.k][k]) || [];
+    if (a.length) rows.push({lb:s.lb, end:a[a.length-1]});
+  });
+  if (!rows.length) return MN[m] + ' 尚無足夠資料。';
+  rows.sort(function(a,b){ return b.end - a.end; });
+  var best = rows[0], worst = rows[rows.length-1];
+  var avg = rows.reduce(function(s,r){ return s+r.end; },0) / rows.length;
+  function sg(v){ return (v>=0?'+':'') + v.toFixed(2) + '%'; }
+  var txt = MN[m] + ' 已選 ' + rows.length + ' 個指數，月末平均累積報酬 ' + sg(avg);
+  if (rows.length > 1) {
+    txt += '；最強 ' + best.lb + ' ' + sg(best.end) + '，最弱 ' + worst.lb + ' ' + sg(worst.end);
+  }
+  txt += '。';
+  if (D.monthly_avg && D.monthly_avg['VIX'] && D.monthly_avg['VIX'][k] != null) {
+    txt += ' VIX 本月平均水位約 ' + D.monthly_avg['VIX'][k].toFixed(1) + '。';
+  }
+  return txt;
+}
+
+// ── 動態 footer（依各指數實際涵蓋年份）────────────────────────
+function updateFooter() {
+  var ftr = document.getElementById('ftr');
+  if (!ftr || !D || !D.meta) return;
+  var parts = Object.keys(D.meta).map(function(k){
+    return (D.meta[k].label||k)+'：'+(D.meta[k].years||'—');
+  });
+  ftr.textContent = '資料來源：Investing.com 歷史收盤價。涵蓋區間 — ' +
+    parts.join('；') + '。僅供參考，不構成投資建議。';
+}
 
 // ── progress helpers ────────────────────────────────────────
 var STEPS = [
-  {id:'st0', pct:15,  label:'連線 Google Sheets'},
-  {id:'st1', pct:40,  label:'下載 SeasonalityJSON 工作表'},
-  {id:'st2', pct:65,  label:'解析 CSV 內容'},
+  {id:'st0', pct:15,  label:'連線資料來源'},
+  {id:'st1', pct:40,  label:'下載 SeasonalityJSON'},
+  {id:'st2', pct:65,  label:'解析內容'},
   {id:'st3', pct:82,  label:'還原 JSON 資料結構'},
   {id:'st4', pct:92,  label:'渲染圖表'},
 ];
@@ -411,23 +437,23 @@ function showError(code, extra) {
   var title, body, hint;
   if (code==='timeout') {
     title='請求逾時（>30秒）';
-    body='Google Sheets 未在時限內回應。';
+    body='資料來源未在時限內回應。';
     hint='• 確認 Sheets 已設定「共用給所有人」或「發佈至網路」<br>• 檢查 SeasonalityJSON 工作表有資料<br>• 稍後重試';
   } else if (code==='empty') {
     title='工作表內容為空';
-    body='SeasonalityJSON 工作表的 A1 儲存格沒有資料。';
+    body='SeasonalityJSON 工作表沒有資料。';
     hint='請在 Google Sheets 執行「季節性分析 → 重新計算所有指數」後重試。';
   } else if (code==='json') {
     title='JSON 解析失敗';
-    body='工作表內容不是有效的 JSON 格式。';
-    hint='請確認 SeasonalityJSON 的 A1 儲存格內容以 { 開頭，並重新執行 calcAllSeasonality()。';
+    body='資料來源回傳的內容不是有效的 JSON 格式。';
+    hint='請確認已重新執行 calcAllSeasonality()，且 GAS 已重新部署。';
   } else if (code==='share') {
     title='試算表未公開分享';
     body='無法存取此 Google Sheets，可能未設定公開。';
     hint='請在 Google Sheets 點「共用」→「知道連結的所有人」→「檢視者」，或「檔案 → 發佈至網路」。';
   } else if (code==='network' || (extra||'').indexOf('fetch')!==-1) {
     title='網路連線失敗';
-    body='無法連線至 Google Sheets。';
+    body='無法連線至資料來源（GAS 與 CSV 皆失敗）。';
     hint='① 此頁面必須用 https:// 開啟（不可用 file://）<br>② 確認網路正常<br>③ 本機測試請用：python -m http.server 8080';
   } else {
     title='未知錯誤';
@@ -441,37 +467,36 @@ function showError(code, extra) {
   setStatus('err','載入失敗：'+title);
 }
 
-// ── fetch CSV from Sheets ────────────────────────────────────
-function fetchData() {
-  document.getElementById('loader').style.display    = 'flex';
-  document.getElementById('spin-icon').style.display = 'block';
-  document.getElementById('load-msg').style.display  = 'block';
-  setStatus('loading','連線中...');
-  startProgress();
-  var t0 = Date.now();
-
-  var _timeout = setTimeout(function(){
-    showError('timeout', null);
-  }, 30000);
-
-  // 加 timestamp 避免瀏覽器 cache 造成讀不到最新資料
-  fetch(CSV_URL + '&t=' + Date.now())
-    .then(function(r) {
-      clearTimeout(_timeout);
-      if (r.status === 401 || r.status === 403) throw {code:'share'};
-      if (!r.ok) throw {code:'network', msg:'HTTP '+r.status};
-      document.getElementById('load-msg').textContent = '正在解析資料...';
-      setFill(70);
+// ── 載入：GAS 優先 → CSV 後備 ───────────────────────────────
+function loadFromGas() {
+  return fetch(GAS_URL + '?action=data&t=' + Date.now())
+    .then(function(r){
+      if (!r.ok) throw {code:'network', msg:'GAS HTTP '+r.status};
       return r.text();
     })
-    .then(function(csv) {
-      // 解析 CSV：第一列是 chunk 數量，後續列是各 chunk
+    .then(function(text){
+      var json;
+      try { json = JSON.parse(text); } catch(e){ throw {code:'json'}; }
+      if (!json || !json.intramonth) throw {code:'empty'};
+      json._source = 'GAS';
+      return json;
+    });
+}
+
+function loadFromCsv() {
+  document.getElementById('load-msg').textContent = '改用 CSV 直連...';
+  return fetch(CSV_URL + '&t=' + Date.now())
+    .then(function(r){
+      if (r.status === 401 || r.status === 403) throw {code:'share'};
+      if (!r.ok) throw {code:'network', msg:'HTTP '+r.status};
+      return r.text();
+    })
+    .then(function(csv){
       var lines = csv.trim().split(/\r?\n/);
       var raw;
       var firstVal = lines[0].replace(/^"|"$/g,'').trim();
       var chunkCount = parseInt(firstVal);
       if (!isNaN(chunkCount) && chunkCount > 1) {
-        // 多 chunk 模式：從第二列開始合併
         var parts = [];
         for (var i = 1; i <= chunkCount && i < lines.length; i++) {
           var cell = lines[i].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
@@ -479,7 +504,6 @@ function fetchData() {
         }
         raw = parts.join('');
       } else {
-        // 單 chunk 舊格式
         raw = firstVal;
         if (raw.charAt(0)==='"') {
           raw = raw.slice(1, raw.charAt(raw.length-1)==='"' ? raw.length-1 : raw.length);
@@ -487,27 +511,30 @@ function fetchData() {
         }
       }
       if (!raw || raw.length < 10) throw {code:'empty'};
-      document.getElementById('load-msg').textContent = '還原 JSON 資料...';
-      setFill(85);
       var json;
-      try { json = JSON.parse(raw); } catch(e) { throw {code:'json'}; }
+      try { json = JSON.parse(raw); } catch(e){ throw {code:'json'}; }
       if (!json.intramonth) throw {code:'json'};
-      clearInterval(_timer);
-      STEPS.forEach(function(s){ setStep(s.id,'done'); });
-      setFill(100);
-      document.getElementById('load-msg').textContent = '載入完成！';
-      document.getElementById('spin-icon').style.display = 'none';
-      D = json;
-      var elapsed = ((Date.now()-t0)/1000).toFixed(1);
-      var ts = json.generated_at
-        ? new Date(json.generated_at).toLocaleString('zh-TW') : '—';
-      setTimeout(function(){
-        document.getElementById('loader').style.display = 'none';
-        setStatus('ok','✓ 已從 Google Sheets 載入　計算時間：'+ts+'　耗時 '+elapsed+'s');
-        buildSR(); initUI(); selM(cm); drawMonthly();
-      }, 400);
+      json._source = 'CSV';
+      return json;
+    });
+}
+
+function fetchData() {
+  document.getElementById('loader').style.display    = 'flex';
+  document.getElementById('spin-icon').style.display = 'block';
+  document.getElementById('load-msg').style.display  = 'block';
+  setStatus('loading','連線中...');
+  startProgress();
+  var t0 = Date.now();
+  var _timeout = setTimeout(function(){ showError('timeout', null); }, 30000);
+
+  loadFromGas()
+    .catch(function(){ return loadFromCsv(); })   // GAS 失敗 → 退回 CSV
+    .then(function(json){
+      clearTimeout(_timeout);
+      finishLoad(json, t0);
     })
-    .catch(function(e) {
+    .catch(function(e){
       clearTimeout(_timeout);
       clearInterval(_timer);
       if (e && e.code) showError(e.code, e.msg||null);
@@ -515,9 +542,30 @@ function fetchData() {
     });
 }
 
+function finishLoad(json, t0) {
+  clearInterval(_timer);
+  STEPS.forEach(function(s){ setStep(s.id,'done'); });
+  setFill(100);
+  document.getElementById('load-msg').textContent = '載入完成！';
+  document.getElementById('spin-icon').style.display = 'none';
+  D = json;
+
+  var schemaNote = '';
+  if (D.schema_version && D.schema_version !== SCHEMA_EXPECT) {
+    schemaNote = '　⚠ 資料結構 v'+D.schema_version+'（前端預期 v'+SCHEMA_EXPECT+'，請重新部署）';
+  }
+  var elapsed = ((Date.now()-t0)/1000).toFixed(1);
+  var ts = json.generated_at ? new Date(json.generated_at).toLocaleString('zh-TW') : '—';
+  var src = json._source === 'CSV' ? 'CSV 直連' : 'GAS 端點';
+  setTimeout(function(){
+    document.getElementById('loader').style.display = 'none';
+    setStatus('ok','✓ 已載入（'+src+'）　計算時間：'+ts+'　耗時 '+elapsed+'s'+schemaNote);
+    buildSR(); updateFooter(); initUI(); selM(cm); drawMonthly();
+  }, 400);
+}
+
 // ── init UI ─────────────────────────────────────────────────
 function initUI() {
-  // 月份按鈕（只建一次）
   var mr = document.getElementById('mRow');
   if (!mr.children.length) {
     MN.forEach(function(m,i){
@@ -526,7 +574,6 @@ function initUI() {
     });
   }
 
-  // 指數 pills（每次重建，因為 SR 可能變動）
   var pw = document.getElementById('pills');
   pw.innerHTML = '';
   SR.forEach(function(s,i){
@@ -537,7 +584,6 @@ function initUI() {
     pw.appendChild(p);
   });
 
-  // nav tabs（只綁一次）
   if (!document.querySelector('.nb').onclick) {
     document.querySelectorAll('.nb').forEach(function(b){
       b.onclick=function(){
@@ -546,7 +592,6 @@ function initUI() {
         b.classList.add('on');
         document.getElementById('v-intra').style.display=cv==='intra'?'':'none';
         document.getElementById('v-monthly').style.display=cv==='monthly'?'':'none';
-        // 切到月份總覽時隱藏月內專屬卡片
         if(cv==='monthly'){
           document.getElementById('vix-intra-card').style.display='none';
         }
@@ -555,12 +600,10 @@ function initUI() {
     });
   }
 
-  // 銷毀舊 chart 再重建（SR 變動時需要）
   if (lChart) { lChart.destroy(); lChart=null; }
   if (bChart) { bChart.destroy(); bChart=null; }
   if (vixLineChart) { vixLineChart.destroy(); vixLineChart=null; }
 
-  // 月內走勢折線圖（含 VIX 右軸）
   lChart=new Chart(document.getElementById('lc').getContext('2d'),{
     type:'line',data:{labels:[],datasets:[]},
     options:{responsive:true,maintainAspectRatio:false,
@@ -576,15 +619,9 @@ function initUI() {
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},autoSkip:false,maxRotation:0}},
         y:{grid:{
-             color:function(ctx){
-               return ctx.tick.value===0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.05)';
-             },
-             lineWidth:function(ctx){
-               return ctx.tick.value===0 ? 1.5 : 1;
-             },
-             borderDash:function(ctx){
-               return ctx.tick.value===0 ? [5,4] : [];
-             }
+             color:function(ctx){ return ctx.tick.value===0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.05)'; },
+             lineWidth:function(ctx){ return ctx.tick.value===0 ? 1.5 : 1; },
+             borderDash:function(ctx){ return ctx.tick.value===0 ? [5,4] : []; }
            },
            ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
            title:{display:true,text:'累積報酬（%）',color:'#7d8590',font:{size:11}},position:'left'},
@@ -596,7 +633,6 @@ function initUI() {
     }
   });
 
-  // 月份長條圖（含 VIX 右軸）
   bChart=new Chart(document.getElementById('bc').getContext('2d'),{
     type:'bar',data:{labels:MN,datasets:[]},
     options:{responsive:true,maintainAspectRatio:false,
@@ -617,7 +653,6 @@ function initUI() {
     }
   });
 
-  // VIX 月內走勢（獨立小圖，保留但預設隱藏）
   vixLineChart = new Chart(document.getElementById('vix-lc').getContext('2d'),{
     type:'line', data:{labels:[],datasets:[]},
     options:{responsive:true,maintainAspectRatio:false,
@@ -635,9 +670,7 @@ function initUI() {
   });
 } // end initUI
 
-// ── 交易訊號計算（趨勢轉折邏輯）────────────────────────────
-var SIGNAL_BASE = 'S&P 500';
-
+// ── 交易訊號（改由區間勝率矩陣 iwin 推導，與儀表板其他區塊一致）─
 function getBaseKey() {
   if (!D || !D.meta) return null;
   var found = null;
@@ -647,189 +680,112 @@ function getBaseKey() {
   return found;
 }
 
-function smooth(arr, win) {
-  // 簡單移動平均，用於平滑雜訊
-  return arr.map(function(_, i) {
-    var start = Math.max(0, i - Math.floor(win/2));
-    var end   = Math.min(arr.length, i + Math.floor(win/2) + 1);
-    var slice = arr.slice(start, end);
-    return slice.reduce(function(s,v){return s+v;},0) / slice.length;
-  });
-}
-
 function calcSignals(month) {
-  var k = String(month + 1);
-  var baseKey = getBaseKey();
-  if (!baseKey || !D.intramonth[baseKey] || !D.intramonth[baseKey][k]) return null;
+  var k = String(month+1);
+  var bk = getBaseKey();
+  if (!bk) return null;
+  var iwin = D.intramonth_iwin && D.intramonth_iwin[bk] && D.intramonth_iwin[bk][k];
+  var avg  = D.intramonth && D.intramonth[bk] && D.intramonth[bk][k];
+  if (!iwin || !iwin.length || !avg || avg.length < 5) return null;
+  var nd = iwin.length, lastDay = nd - 1;
 
-  var spRaw  = D.intramonth[baseKey][k];
-  var vixRaw = (D.intramonth['VIX'] && D.intramonth['VIX'][k]) || [];
-  var n = spRaw.length;
-  if (n < 5) return null;
-
-  // 平滑處理（3日移動平均），減少雜訊
-  var sp  = smooth(spRaw, 3);
-  var vix = vixRaw.length >= n ? smooth(vixRaw, 3) : [];
-
-  // ── 計算每日趨勢斜率（用前後2日）────────────────────────
-  function slope(arr, i) {
-    var prev = Math.max(0, i-2), next = Math.min(arr.length-1, i+2);
-    return (arr[next] - arr[prev]) / (next - prev);
-  }
-
-  // ── 找局部高點和低點 ─────────────────────────────────────
-  function findPeaks(arr, minDist) {
-    var peaks = [], troughs = [];
-    for (var i = 1; i < arr.length - 1; i++) {
-      var isPeak   = arr[i] > arr[i-1] && arr[i] > arr[i+1];
-      var isTrough = arr[i] < arr[i-1] && arr[i] < arr[i+1];
-      if (isPeak)   peaks.push(i);
-      if (isTrough) troughs.push(i);
-    }
-    return {peaks: peaks, troughs: troughs};
-  }
-
-  var found = findPeaks(sp, 2);
-  var peaks   = found.peaks;
-  var troughs = found.troughs;
-
-  // ── 為每個交易日標記訊號 ─────────────────────────────────
-  // 策略：
-  // 離場區 = 接近峰值前後（高點附近，S&P斜率由正轉負）
-  // 進場區 = 接近谷值前後（低點附近，S&P斜率由負轉正）
-  // VIX 確認：進場時 VIX 偏高且開始下降更佳；離場時 VIX 偏低且開始上升需謹慎
-
-  var WINDOW = 2; // 峰谷前後幾天算作「區間」
-  var zones  = new Array(n).fill(0); // 0=觀望, 1=進場, -1=離場
-
-  // 標記離場區（峰值附近）
-  peaks.forEach(function(p) {
-    for (var i = Math.max(0, p-WINDOW); i <= Math.min(n-1, p+WINDOW); i++) {
-      // 若 VIX 同時上升，離場訊號更強；若 VIX 下降，降低強度
-      var vixConfirm = vix.length > i ? slope(vix, i) >= 0 : true;
-      zones[i] = vixConfirm ? -1 : 0; // VIX上升確認離場，否則觀望
-    }
-  });
-
-  // 標記進場區（谷值附近）
-  troughs.forEach(function(t) {
-    for (var i = Math.max(0, t-WINDOW); i <= Math.min(n-1, t+WINDOW); i++) {
-      if (zones[i] === -1) continue; // 不覆蓋離場訊號
-      // 若 VIX 同時下降，進場訊號更強；若 VIX 上升，降低強度
-      var vixConfirm = vix.length > i ? slope(vix, i) <= 0 : true;
-      zones[i] = vixConfirm ? 1 : 0;
-    }
-  });
-
-  // ── 合併連續相同訊號成區間 ───────────────────────────────
-  var merged = [];
-  var cur = {sig: zones[0], start: 0, end: 0};
-  for (var j = 1; j < n; j++) {
-    if (zones[j] === cur.sig) {
-      cur.end = j;
-    } else {
-      merged.push({sig:cur.sig, start:cur.start, end:cur.end});
-      cur = {sig:zones[j], start:j, end:j};
+  var best=null, worst=null;
+  for (var ei=0; ei<nd; ei++) {
+    if (!iwin[ei]) continue;
+    for (var eo=ei+1; eo<nd; eo++) {
+      var w = iwin[ei][eo];
+      if (w == null) continue;
+      if (!best  || w > best.w)  best  = {ei:ei, eo:eo, w:w};
+      if (!worst || w < worst.w) worst = {ei:ei, eo:eo, w:w};
     }
   }
-  merged.push({sig:cur.sig, start:cur.start, end:cur.end});
 
-  // 找最佳進場日（最低谷）和最佳離場日（最高峰）
-  var minVal=Infinity, minDay=0, maxVal=-Infinity, maxDay=0;
-  spRaw.forEach(function(v,i){ if(v<minVal){minVal=v;minDay=i;} if(v>maxVal){maxVal=v;maxDay=i;} });
+  var entryRank = [];
+  for (var ei2=0; ei2<lastDay; ei2++) {
+    var w2 = iwin[ei2] && iwin[ei2][lastDay];
+    if (w2 != null) entryRank.push({ei:ei2, w:w2});
+  }
+  entryRank.sort(function(a,b){ return b.w - a.w; });
+
+  var hi=-Infinity, lo=Infinity, hd=0, ld=0;
+  avg.forEach(function(v,i){ if(v>hi){hi=v;hd=i;} if(v<lo){lo=v;ld=i;} });
 
   return {
-    zones:   merged,
-    zoneArr: zones,
-    minDay:  minDay, maxDay: maxDay,
-    minVal:  minVal, maxVal: maxVal,
-    spData:  spRaw,
-    vixData: vixRaw,
-    n:       n
+    best:best, worst:worst, entryRank:entryRank,
+    monthEnd:avg[avg.length-1], hi:hi, lo:lo, hd:hd, ld:ld,
+    nd:nd, lastDay:lastDay, baseLabel:(D.meta[bk].label||bk)
   };
 }
 
 function drawSignals(month) {
-  var result = calcSignals(month);
+  var r = calcSignals(month);
   var card = document.getElementById('signal-card');
-  if (!result) { card.style.display = 'none'; return; }
+  if (!r) { card.style.display = 'none'; return; }
   card.style.display = '';
-
-  var zones = result.zones;
-
-  // 文字區間摘要
-  var entryZones = [], exitZones = [], watchZones = [];
-  zones.forEach(function(z) {
-    if (z.end - z.start < 1) return; // 過濾單日雜訊
-    var label = 'D'+(z.start+1) + (z.end > z.start ? '–D'+(z.end+1) : '');
-    if (z.sig === 1)  entryZones.push(label);
-    if (z.sig === -1) exitZones.push(label);
-  });
 
   var zonesEl = document.getElementById('signal-zones');
   zonesEl.innerHTML = '';
-  if (entryZones.length) {
+
+  if (r.entryRank.length) {
+    var top = r.entryRank[0];
     var c1 = document.createElement('span');
     c1.className = 'sig-zone sig-entry';
-    c1.innerHTML = '<span class="sig-dot" style="background:#3fb950"></span>建議進場：' + entryZones.join('、');
+    c1.innerHTML = '<span class="sig-dot" style="background:#3fb950"></span>最佳進場：D'+(top.ei+1)+
+      '（持有至月末勝率 '+top.w+'%）';
     zonesEl.appendChild(c1);
   }
-  if (exitZones.length) {
+  if (r.best) {
     var c2 = document.createElement('span');
-    c2.className = 'sig-zone sig-exit';
-    c2.innerHTML = '<span class="sig-dot" style="background:#f85149"></span>建議離場：' + exitZones.join('、');
+    c2.className = 'sig-zone sig-best';
+    c2.innerHTML = '<span class="sig-dot" style="background:#58a6ff"></span>最強區間：D'+(r.best.ei+1)+
+      ' 進 → D'+(r.best.eo+1)+' 出（'+r.best.w+'%）';
     zonesEl.appendChild(c2);
   }
+  if (r.worst) {
+    var c3 = document.createElement('span');
+    c3.className = 'sig-zone sig-exit';
+    c3.innerHTML = '<span class="sig-dot" style="background:#f85149"></span>最弱區間：D'+(r.worst.ei+1)+
+      ' 進 → D'+(r.worst.eo+1)+' 出（'+r.worst.w+'%）';
+    zonesEl.appendChild(c3);
+  }
 
-  var spEnd = result.spData[result.n-1];
-  var hasVix = result.vixData.length >= result.n;
   document.getElementById('signal-summary').innerHTML =
-    '📍 歷史低點在 <b>D'+(result.minDay+1)+'</b>（均值 <span style="color:var(--rd)">'+result.minVal.toFixed(2)+'%</span>），' +
-    '高點在 <b>D'+(result.maxDay+1)+'</b>（均值 <span style="color:var(--gr)">+'+result.maxVal.toFixed(2)+'%</span>）。' +
-    '月末平均報酬 <b style="color:'+(spEnd>=0?'var(--gr)':'var(--rd)')+'">'+(spEnd>=0?'+':'')+spEnd.toFixed(2)+'%</b>。' +
-    (hasVix ? '　VIX 輔助訊號已啟用。' : '　<span style="color:var(--or)">尚無 VIX 資料，僅依 S&P 500 判斷。</span>') +
-    '<br><span style="font-size:11px;color:var(--bd)">⚠ 以上為歷史統計規律，不構成投資建議。</span>';
+    '📍 平均曲線高點在 <b>D'+(r.hd+1)+'</b>（+'+r.hi.toFixed(2)+'%），低點在 <b>D'+(r.ld+1)+'</b>（'+r.lo.toFixed(2)+'%）。'+
+    '月末平均報酬 <b style="color:'+(r.monthEnd>=0?'var(--gr)':'var(--rd)')+'">'+(r.monthEnd>=0?'+':'')+r.monthEnd.toFixed(2)+'%</b>。'+
+    '<br><span style="font-size:11px;color:var(--bd)">進出場勝率＝歷史上該區間為正報酬的年份比例（基準：'+r.baseLabel+'）。為歷史統計規律，不構成投資建議。</span>';
 }
 
-function drawSignalBands(labels, zones) {
-  // 在折線圖上繪製半透明色塊
-  // 用 Chart.js plugin 的 beforeDraw 實現
+function drawSignalBands(labels, bands) {
   if (!lChart._signalPlugin) {
     lChart._signalPlugin = true;
     Chart.register({
       id: 'signalBands',
       beforeDraw: function(chart) {
-        var bands = chart._signalBands;
-        if (!bands || !bands.length) return;
-        var ctx2 = chart.ctx;
-        var xAxis = chart.scales.x;
-        var yAxis = chart.scales.y;
+        var bb = chart._signalBands;
+        if (!bb || !bb.length) return;
+        var ctx2 = chart.ctx, xAxis = chart.scales.x, yAxis = chart.scales.y;
         if (!xAxis || !yAxis) return;
         ctx2.save();
-        bands.forEach(function(b) {
+        bb.forEach(function(b) {
           var x1 = xAxis.getPixelForValue(b.start);
           var x2 = xAxis.getPixelForValue(b.end);
-          var y1 = yAxis.top;
-          var y2 = yAxis.bottom;
           ctx2.fillStyle = b.color;
-          ctx2.fillRect(x1, y1, x2-x1, y2-y1);
+          ctx2.fillRect(x1, yAxis.top, x2-x1, yAxis.bottom-yAxis.top);
         });
         ctx2.restore();
       }
     });
   }
-  // 轉換 zone 到像素座標
-  var bands = zones.map(function(z) {
+  lChart._signalBands = (bands||[]).map(function(b){
     return {
-      start: z.start,
-      end:   Math.min(z.end + 1, labels.length - 1),
-      color: z.sig === 1  ? 'rgba(63,185,80,0.10)'  :
-             z.sig === -1 ? 'rgba(248,81,73,0.10)'  :
-                            'rgba(125,133,144,0.05)'
+      start: b.start,
+      end:   Math.min(b.end, labels.length-1),
+      color: b.sig === 1 ? 'rgba(63,185,80,0.10)' :
+             b.sig === -1 ? 'rgba(248,81,73,0.10)' : 'rgba(125,133,144,0.05)'
     };
   });
-  lChart._signalBands = bands;
 }
+
 function actIdx(){return SR.map(function(_,i){return i;}).filter(function(i){return !hid[i];});}
 function selM(m){cm=m;document.querySelectorAll('.mb').forEach(function(b,i){b.classList.toggle('on',i===m);});draw();}
 function draw(){if(!D)return;cv==='intra'?drawIntra():drawMonthly();}
@@ -854,7 +810,6 @@ function drawIntra(){
     });
   });
 
-  // VIX 右軸折線
   if(vixOn && D.intramonth&&D.intramonth['VIX']&&D.intramonth['VIX'][k]&&D.intramonth['VIX'][k].length){
     datasets.push({
       label:'VIX',data:D.intramonth['VIX'][k],
@@ -865,10 +820,8 @@ function drawIntra(){
     });
   }
   lChart.data.datasets=datasets;
-  // 控制右軸顯示
   lChart.options.scales.yv.display = vixOn ? 'auto' : false;
 
-  // tooltip 加入勝率
   lChart.options.plugins.tooltip.callbacks.label=function(c){
     if(c.dataset.yAxisID==='yv') return ' VIX: '+c.parsed.y.toFixed(2);
     var lb=c.dataset.label;
@@ -882,16 +835,15 @@ function drawIntra(){
   };
 
   document.getElementById('ct').textContent=MN[cm]+' 月內各交易日歷史平均累積報酬';
-  document.getElementById('ins').textContent=INS[cm];
+  document.getElementById('ins').textContent=genInsight(cm);
 
-  // 交易訊號色塊
   var sigResult=calcSignals(cm);
-  if(sigResult){ drawSignalBands(lChart.data.labels,sigResult.zones); }
-  else { lChart._signalBands=[]; }
+  if(sigResult && sigResult.best){
+    drawSignalBands(lChart.data.labels, [{start:sigResult.best.ei, end:sigResult.best.eo, sig:1}]);
+  } else { lChart._signalBands=[]; }
   lChart.update();
   drawSignals(cm);
 
-  // stats cards
   var ai=actIdx();
   var ends=ai.map(function(i){var a=(D.intramonth[SR[i].k]&&D.intramonth[SR[i].k][k])||[];return a[a.length-1]||0;});
   var avg=ends.length?ends.reduce(function(a,b){return a+b;},0)/ends.length:0;
@@ -940,12 +892,10 @@ function drawWinrateBar(k) {
     if(tabWrap) tabWrap.innerHTML='';
     return;
   }
-  // 預設 S&P 500 或第一個
   if (!wrIdxKey || !D.intramonth_win[wrIdxKey] || !D.intramonth_win[wrIdxKey][k]) {
     var bk = getBaseKey();
     wrIdxKey = (bk && D.intramonth_win[bk] && D.intramonth_win[bk][k]) ? bk : wrKeys[0].k;
   }
-  // 建立 tabs
   if (tabWrap) {
     tabWrap.innerHTML='';
     wrKeys.forEach(function(s) {
@@ -972,7 +922,6 @@ function renderWrCells(k) {
   if (!bar) return;
   var wins = D.intramonth_win[wrIdxKey] && D.intramonth_win[wrIdxKey][k];
   if (!wins || !wins.length) { bar.innerHTML=''; return; }
-
   var maxH = 40;
   bar.innerHTML='';
   wins.forEach(function(wr, i) {
@@ -994,7 +943,7 @@ function renderWrCells(k) {
 
 // ── 區間勝率矩陣 ─────────────────────────────────────────────
 var iwinIdxKey = null;
-var iwinScale  = 1; // 縮放等級 0.7 / 1 / 1.3 / 1.6
+var iwinScale  = 1;
 
 function iwinZoom(dir) {
   var scales = [0.7, 1, 1.3, 1.6];
@@ -1010,7 +959,6 @@ function iwinZoom(dir) {
 function drawIwinMatrix(k) {
   var tabWrap = document.getElementById('iwin-idx-tabs');
   var tbl     = document.getElementById('iwin-tbl');
-  var detail  = document.getElementById('iwin-detail');
   if (!tabWrap || !tbl) return;
 
   var iwKeys = SR.filter(function(s){
@@ -1023,7 +971,6 @@ function drawIwinMatrix(k) {
     iwinIdxKey = (bk && D.intramonth_iwin[bk] && D.intramonth_iwin[bk][k]) ? bk : iwKeys[0].k;
   }
 
-  // 建立 tabs
   tabWrap.innerHTML='';
   iwKeys.forEach(function(s) {
     var btn=document.createElement('button');
@@ -1062,11 +1009,10 @@ function renderIwinTable(k) {
   var n  = iwin.length;
   var cw = Math.round(26*iwinScale), ch = Math.round(22*iwinScale), fs = Math.round(9*iwinScale);
 
-  // 計算今天是當月第幾個交易日（0-based），且只在當前月份才標記
   var today = new Date();
   var todayM = today.getMonth() + 1;
   var curM   = parseInt(k);
-  var tradingDay = -1; // -1 表示不是本月
+  var tradingDay = -1;
   if (todayM === curM) {
     var d = new Date(today.getFullYear(), todayM-1, 1);
     var td = 0;
@@ -1074,10 +1020,9 @@ function renderIwinTable(k) {
       if (d.getDay()!==0 && d.getDay()!==6) td++;
       d.setDate(d.getDate()+1);
     }
-    tradingDay = Math.max(1, td) - 1; // 0-based
+    tradingDay = Math.max(1, td) - 1;
   }
 
-  // header：出場日，今天欄位標紅
   var html = '<tr><th class="iwin-head" style="font-size:'+fs+'px">進↓ 出→</th>';
   for (var eo=1; eo<n; eo++) {
     var isTodayCol = (tradingDay === eo);
@@ -1100,7 +1045,6 @@ function renderIwinTable(k) {
         var bg = iwinColor(wr);
         var txt = wr!==null ? wr+'%' : '';
         var tc  = (wr!==null&&(wr>=60||wr<40)) ? '#fff' : 'var(--tx)';
-        // 今天在進場行 或 今天在出場列
         var isNowEntry = (tradingDay === ei);
         var isNowExit  = (tradingDay === eo2);
         var nowBorder  = (isNowEntry || isNowExit)
@@ -1117,7 +1061,6 @@ function renderIwinTable(k) {
   }
   tbl.innerHTML=html;
   if(detail){ detail.style.display='none'; }
-  // 在矩陣下方顯示今天位置說明
   if(tradingDay>=0){
     var detailEl=document.getElementById('iwin-detail');
     if(detailEl){
@@ -1149,9 +1092,8 @@ function initCrossMonthHeatmap() {
     var o=document.createElement('option');
     o.value=i+1; o.textContent=m; xmSel.appendChild(o);
   });
-  xmSel.value=9; // 預設9月出場
+  xmSel.value=9;
 
-  // 出場日下拉
   xmSel.onchange=function(){ updateCm2Days(); };
   updateCm2Days();
   drawCrossMonthHeatmap();
@@ -1180,7 +1122,6 @@ function drawCrossMonthHeatmap() {
   var xm    =parseInt(document.getElementById('cm2-xm').value);
   var xd    =parseInt(document.getElementById('cm2-xd').value)-1;
   var tbl   =document.getElementById('cm2-tbl');
-  var detail=document.getElementById('cm2-detail');
   if(!tbl) return;
 
   if(!D||!D.cross_month_win||!D.cross_month_win[idxKey]){
@@ -1195,12 +1136,8 @@ function drawCrossMonthHeatmap() {
   var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   var s=SR.find(function(s){return s.k===idxKey;})||{lb:idxKey};
 
-  // ── 計算今天約是哪個月第幾個交易日 ──────────────────────────
   var today    = new Date();
-  var todayM   = today.getMonth()+1;  // 1-12
-  var todayDay = today.getDate();
-  // 估算：每月約有 22 個交易日，月曆日 ÷ (30/22) ≈ 第幾個交易日
-  // 更精確：假設每月 1 號是 D1，跳過週末
+  var todayM   = today.getMonth()+1;
   var d = new Date(today.getFullYear(), todayM-1, 1);
   var tradingDay = 0;
   while(d <= today) {
@@ -1208,9 +1145,8 @@ function drawCrossMonthHeatmap() {
     if(dow!==0 && dow!==6) tradingDay++;
     d.setDate(d.getDate()+1);
   }
-  tradingDay = Math.max(1, tradingDay) - 1; // 0-based
+  tradingDay = Math.max(1, tradingDay) - 1;
 
-  // header
   var maxED=0;
   for(var em2=1;em2<=12;em2++){
     if(row[String(em2)]){
@@ -1249,7 +1185,6 @@ function drawCrossMonthHeatmap() {
     html+='</tr>';
   }
   tbl.innerHTML=html;
-  // 顯示今天位置說明
   var todayLabel = MN_S[todayM-1]+' 第 '+(tradingDay+1)+' 個交易日（D'+(tradingDay+1)+'）';
   var cm2detail = document.getElementById('cm2-detail');
   if(cm2detail){
@@ -1270,6 +1205,7 @@ function showCm2Detail(em,ed,xm,xd,wr,label) {
     '【'+label+'】'+MN_S[em-1]+' D'+ed+' 進場 → '+MN_S[xm-1]+' D'+xd+' 出場　<b>'+strength+'</b>'+
     '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史 '+wr+'% 的年份為正報酬</span>';
 }
+
 function updateIwinStats(k, iwin, n) {
   var all=[], best=null, worst=null;
   for(var ei=0;ei<n-1;ei++){
@@ -1287,7 +1223,6 @@ function updateIwinStats(k, iwin, n) {
   var hiCnt=all.filter(function(v){return v.wr>=65;}).length;
   var loCnt=all.filter(function(v){return v.wr<40;}).length;
 
-  // 平均勝率卡
   var avgEl=document.getElementById('iwin-avg-wr');
   if(avgEl){
     var ac=avg>=60?'var(--gr)':avg>=50?'var(--tx)':'var(--rd)';
@@ -1298,7 +1233,6 @@ function updateIwinStats(k, iwin, n) {
         '<span style="color:var(--rd)">▼'+loCnt+'個</span> &lt;40%</div>';
   }
 
-  // 最佳組合
   var bestEl=document.getElementById('iwin-best');
   if(bestEl&&best){
     bestEl.innerHTML=
@@ -1306,7 +1240,6 @@ function updateIwinStats(k, iwin, n) {
       '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(best.ei+1)+'→D'+(best.eo+1)+'</span>';
   }
 
-  // 最差組合
   var worstEl=document.getElementById('iwin-worst');
   if(worstEl&&worst){
     worstEl.innerHTML=
@@ -1314,7 +1247,6 @@ function updateIwinStats(k, iwin, n) {
       '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(worst.ei+1)+'→D'+(worst.eo+1)+'</span>';
   }
 
-  // 本月最佳進場排行（出場=本月末）
   var rankEl=document.getElementById('iwin-rank');
   if(rankEl){
     var lastDay=n-1;
@@ -1391,7 +1323,6 @@ function drawMonthly(){
       backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
       borderColor:s.c,borderWidth:1,borderRadius:4};
   });
-  // VIX 折線（右軸）
   if (D.monthly_avg && D.monthly_avg['VIX']) {
     var vixVals = Array.from({length:12}, function(_,m){ return D.monthly_avg['VIX'][String(m+1)]||null; });
     datasets.push({
@@ -1399,13 +1330,12 @@ function drawMonthly(){
       borderColor:'#f85149', backgroundColor:'rgba(248,81,73,0.08)',
       borderWidth:2, pointRadius:4, pointHoverRadius:6,
       pointBackgroundColor:'#f85149', tension:0.3, fill:false,
-      order:0  // 折線畫在長條上方
+      order:0
     });
   }
   bChart.data.datasets = datasets;
   bChart.update();
 
-  // 建立熱力圖切換按鈕（只建一次）
   var tabWrap = document.getElementById('hm-tabs');
   if (!tabWrap.children.length) {
     SR.forEach(function(s, i) {
@@ -1425,9 +1355,8 @@ function drawMonthly(){
 }
 
 function renderHeatmap() {
-  // 確保 curHmIdx 指向有資料的指數
+  if (curHmIdx >= SR.length) curHmIdx = 0;
   var s = SR[curHmIdx];
-  // 更新 tab 樣式
   document.querySelectorAll('.hm-tab').forEach(function(btn, i) {
     btn.classList.toggle('on', i === curHmIdx);
     btn.style.background = (i === curHmIdx) ? SR[i].c : '';
@@ -1447,7 +1376,6 @@ function renderHeatmap() {
         (v>0?'+':'')+v.toFixed(1)+'</td>';}).join('')+'</tr>';}).join('');
   document.getElementById('hm').innerHTML =
     '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
-  // VIX 月份熱力圖
   drawVixMonthly();
   initCrossMonthHeatmap();
 }
@@ -1462,7 +1390,6 @@ function drawVixMonthly() {
   var vixYrs = Object.keys(D.monthly_returns['VIX'])
     .filter(function(y){ return Object.keys(D.monthly_returns['VIX'][y]).length>0; }).sort();
 
-  // avg row — VIX 用絕對水位（月平均 VIX 值），顏色: 高=紅, 低=綠
   var avgRow = '<tr class="ar"><td class="yl">平均水位</td>'+
     Array.from({length:12}, function(_,m){
       var v = vixAvg[String(m+1)];
@@ -1470,7 +1397,6 @@ function drawVixMonthly() {
       return '<td style="background:'+hcVix(v)+';color:#fff">'+v.toFixed(1)+'</td>';
     }).join('')+'</tr>';
 
-  // year rows — 顯示各年月平均 VIX
   var rows = vixYrs.map(function(y){
     return '<tr><td class="yl">'+y+'</td>'+
       Array.from({length:12}, function(_,m){
@@ -1486,12 +1412,10 @@ function drawVixMonthly() {
     avgRow+rows;
 }
 
-// VIX 絕對水位熱力圖（15=平靜, 40=恐慌）
 function hcVix(v) {
   var t = Math.min(Math.max((v-12)/35, 0), 1);
   return 'rgba('+Math.round(63+t*170)+','+Math.round(185-t*140)+','+Math.round(80-t*60)+','+(0.4+t*0.5)+')';
 }
-// VIX 月報酬熱力圖（VIX漲=恐慌，用紅；VIX跌=平靜，用綠）
 function hcVixRet(v) {
   if (!v) return 'transparent';
   var t = Math.min(Math.abs(v)/30, 1);
@@ -1499,7 +1423,6 @@ function hcVixRet(v) {
     ? 'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')'
     : 'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')';
 }
-
 function hc(v){
   if(!v)return'transparent';
   var t=Math.min(Math.abs(v)/12,1);
