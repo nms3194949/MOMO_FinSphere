@@ -198,50 +198,53 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         </div>
       </div>
       <div id="iwin-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
-      <div style="overflow-x:auto;overflow-y:auto;max-height:520px">
-        <table id="iwin-tbl" style="border-collapse:collapse"></table>
+      <!-- 左右排版：矩陣 + 統計面板 -->
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+        <!-- 矩陣 -->
+        <div style="overflow-x:auto;overflow-y:auto;max-height:520px;flex:1;min-width:0">
+          <table id="iwin-tbl" style="border-collapse:collapse"></table>
+        </div>
+        <!-- 右側統計面板 -->
+        <div id="iwin-stats" style="width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:10px">
+          <!-- 整體統計 -->
+          <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:12px">
+            <div style="font-size:11px;color:var(--mu);margin-bottom:10px;font-weight:600;letter-spacing:.5px">整體統計</div>
+            <div id="iwin-avg-wr" style="margin-bottom:8px">
+              <div style="font-size:10px;color:var(--mu)">所有區間平均勝率</div>
+              <div style="font-size:22px;font-weight:700;color:var(--tx)">—</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="background:var(--surf);border-radius:6px;padding:8px">
+                <div style="font-size:10px;color:var(--mu);margin-bottom:3px">高勝率區間</div>
+                <div id="iwin-hi-cnt" style="font-size:15px;font-weight:600;color:var(--gr)">—</div>
+                <div style="font-size:9px;color:var(--mu)">&gt;65% 的組合數</div>
+              </div>
+              <div style="background:var(--surf);border-radius:6px;padding:8px">
+                <div style="font-size:10px;color:var(--mu);margin-bottom:3px">低勝率區間</div>
+                <div id="iwin-lo-cnt" style="font-size:15px;font-weight:600;color:var(--rd)">—</div>
+                <div style="font-size:9px;color:var(--mu)">&lt;40% 的組合數</div>
+              </div>
+            </div>
+          </div>
+          <!-- 最佳組合 -->
+          <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);border-radius:8px;padding:12px">
+            <div style="font-size:11px;color:var(--gr);margin-bottom:8px;font-weight:600">🏆 最佳進出場組合</div>
+            <div id="iwin-best" style="font-size:12px;color:var(--tx);line-height:1.8">—</div>
+          </div>
+          <!-- 最差組合 -->
+          <div style="background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:12px">
+            <div style="font-size:11px;color:var(--rd);margin-bottom:8px;font-weight:600">⚠ 最差進出場組合</div>
+            <div id="iwin-worst" style="font-size:12px;color:var(--tx);line-height:1.8">—</div>
+          </div>
+          <!-- 本月最佳進場排行 -->
+          <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:12px">
+            <div style="font-size:11px;color:var(--mu);margin-bottom:8px;font-weight:600">📅 本月最佳進場日</div>
+            <div style="font-size:9px;color:var(--mu);margin-bottom:8px">出場固定為本月末（D最後）</div>
+            <div id="iwin-rank" style="display:flex;flex-direction:column;gap:5px"></div>
+          </div>
+        </div>
       </div>
       <div id="iwin-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
-    </div>
-    <!-- 跨月區間勝率查詢 -->
-    <div class="cc">
-      <div class="cc-h">
-        <div>
-          <span class="cc-t">跨月區間勝率查詢</span>
-          <span class="cc-s" style="margin-left:8px">指定進出場月份與交易日，查歷史勝率</span>
-        </div>
-      </div>
-      <!-- 查詢列 -->
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px">
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">指數</div>
-          <select id="cm-idx" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">進場月份</div>
-          <select id="cm-em" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">進場交易日</div>
-          <select id="cm-ed" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
-        </div>
-        <div style="font-size:18px;color:var(--mu);padding-bottom:6px">→</div>
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">出場月份</div>
-          <select id="cm-xm" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">出場交易日</div>
-          <select id="cm-xd" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer"></select>
-        </div>
-        <button onclick="queryCrossMonth()" style="padding:7px 20px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">查詢</button>
-      </div>
-      <!-- 結果區 -->
-      <div id="cm-result" style="display:none">
-        <div id="cm-summary" style="padding:14px 16px;border-radius:8px;margin-bottom:12px;font-size:14px;line-height:1.8"></div>
-        <div style="font-size:11px;color:var(--mu);margin-bottom:6px">各年度實際報酬：</div>
-        <div id="cm-bars" style="display:flex;flex-wrap:wrap;gap:4px;align-items:flex-end"></div>
-      </div>
     </div>
   </div>
   <div id="v-monthly" style="display:none">
@@ -521,7 +524,7 @@ function fetchData() {
       setTimeout(function(){
         document.getElementById('loader').style.display = 'none';
         setStatus('ok','✓ 已從 Google Sheets 載入　計算時間：'+ts+'　耗時 '+elapsed+'s');
-        buildSR(); initUI(); initCrossMonthUI(); selM(cm); drawMonthly();
+        buildSR(); initUI(); selM(cm); drawMonthly();
       }, 400);
     })
     .catch(function(e) {
@@ -1103,6 +1106,7 @@ function renderIwinTable(k) {
   }
   tbl.innerHTML=html;
   if(detail){ detail.style.display='none'; }
+  updateIwinStats(k, iwin, n);
 }
 
 // ── 跨月勝率熱力圖 ───────────────────────────────────────────
@@ -1246,186 +1250,83 @@ function showCm2Detail(em,ed,xm,xd,wr,label) {
     '【'+label+'】'+MN_S[em-1]+' D'+ed+' 進場 → '+MN_S[xm-1]+' D'+xd+' 出場　<b>'+strength+'</b>'+
     '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史 '+wr+'% 的年份為正報酬</span>';
 }
-function initCrossMonthUI() {
-  var MN_SHORT=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+function updateIwinStats(k, iwin, n) {
+  var s = SR.find(function(s){ return s.k===iwinIdxKey; });
 
-  // 指數下拉
-  var idxSel = document.getElementById('cm-idx');
-  if (!idxSel) return;
-  idxSel.innerHTML='';
-  SR.forEach(function(s){
-    var opt=document.createElement('option');
-    opt.value=s.k; opt.textContent=s.lb;
-    idxSel.appendChild(opt);
-  });
-  // 預設 S&P 500
-  var bk=getBaseKey();
-  if(bk) idxSel.value=bk;
+  // 收集所有有效格子
+  var all=[], best=null, worst=null;
+  for(var ei=0;ei<n-1;ei++){
+    for(var eo=ei+1;eo<n;eo++){
+      var wr=iwin[ei]&&iwin[ei][eo]!==undefined?iwin[ei][eo]:null;
+      if(wr===null) continue;
+      all.push({ei:ei,eo:eo,wr:wr});
+      if(!best||wr>best.wr) best={ei:ei,eo:eo,wr:wr};
+      if(!worst||wr<worst.wr) worst={ei:ei,eo:eo,wr:wr};
+    }
+  }
+  if(!all.length) return;
 
-  // 月份下拉（進出場各一）
-  ['cm-em','cm-xm'].forEach(function(id,i){
-    var sel=document.getElementById(id);
-    sel.innerHTML='';
-    MN_SHORT.forEach(function(m,mi){
-      var opt=document.createElement('option');
-      opt.value=mi+1; opt.textContent=m;
-      sel.appendChild(opt);
+  var avg=Math.round(all.reduce(function(s,v){return s+v.wr;},0)/all.length*10)/10;
+  var hiCnt=all.filter(function(v){return v.wr>=65;}).length;
+  var loCnt=all.filter(function(v){return v.wr<40;}).length;
+
+  // 整體統計
+  var avgEl=document.getElementById('iwin-avg-wr');
+  if(avgEl){
+    var color=avg>=60?'var(--gr)':avg>=50?'var(--tx)':'var(--rd)';
+    avgEl.querySelector('div:last-child').textContent=avg+'%';
+    avgEl.querySelector('div:last-child').style.color=color;
+  }
+  var hiEl=document.getElementById('iwin-hi-cnt');
+  var loEl=document.getElementById('iwin-lo-cnt');
+  if(hiEl) hiEl.textContent=hiCnt+'個';
+  if(loEl) loEl.textContent=loCnt+'個';
+
+  // 最佳組合
+  var bestEl=document.getElementById('iwin-best');
+  if(bestEl&&best){
+    bestEl.innerHTML=
+      '<div style="font-size:20px;font-weight:700;color:var(--gr)">'+best.wr+'%</div>'+
+      '<div style="color:var(--mu)">D'+(best.ei+1)+' 進場 → D'+(best.eo+1)+' 出場</div>';
+  }
+
+  // 最差組合
+  var worstEl=document.getElementById('iwin-worst');
+  if(worstEl&&worst){
+    worstEl.innerHTML=
+      '<div style="font-size:20px;font-weight:700;color:var(--rd)">'+worst.wr+'%</div>'+
+      '<div style="color:var(--mu)">D'+(worst.ei+1)+' 進場 → D'+(worst.eo+1)+' 出場</div>';
+  }
+
+  // 本月最佳進場排行（固定出場為本月最後一天）
+  var rankEl=document.getElementById('iwin-rank');
+  if(rankEl){
+    var lastDay=n-1; // 本月最後一個交易日 index
+    var exits=[];
+    for(var ei2=0;ei2<lastDay;ei2++){
+      var wr2=iwin[ei2]&&iwin[ei2][lastDay]!==undefined?iwin[ei2][lastDay]:null;
+      if(wr2!==null) exits.push({ei:ei2,wr:wr2});
+    }
+    exits.sort(function(a,b){return b.wr-a.wr;});
+    var top5=exits.slice(0,5);
+    rankEl.innerHTML='';
+    top5.forEach(function(item,i){
+      var c=item.wr>=65?'var(--gr)':item.wr>=50?'var(--tx)':'var(--or)';
+      var pct=Math.round(item.wr/top5[0].wr*100);
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:6px;cursor:pointer';
+      row.title='D'+(item.ei+1)+' 進場 → D'+n+' 出場';
+      row.onclick=(function(ei,eo,wr){ return function(){showIwinDetail(ei+1,eo+1,wr);}; })(item.ei,lastDay,item.wr);
+      row.innerHTML=
+        '<span style="font-size:10px;color:var(--mu);min-width:14px">'+(i+1)+'.</span>'+
+        '<span style="font-size:11px;color:var(--tx);min-width:32px">D'+(item.ei+1)+'</span>'+
+        '<div style="flex:1;height:6px;background:var(--surf);border-radius:3px;overflow:hidden">'+
+          '<div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:3px"></div></div>'+
+        '<span style="font-size:11px;font-weight:600;color:'+c+';min-width:36px;text-align:right">'+item.wr+'%</span>';
+      rankEl.appendChild(row);
     });
-    sel.value = i===0 ? 6 : 9; // 預設進場6月、出場9月
-    sel.onchange=function(){ updateDayOptions(); };
-  });
-
-  updateDayOptions();
-}
-
-function updateDayOptions() {
-  ['em','xm'].forEach(function(prefix){
-    var mSel=document.getElementById('cm-'+prefix);
-    var dSel=document.getElementById('cm-'+prefix.replace('m','d'));
-    if(!mSel||!dSel) return;
-    var m=parseInt(mSel.value);
-    var curVal=parseInt(dSel.value)||1;
-    dSel.innerHTML='';
-    // 從資料判斷該月最多幾個交易日
-    var maxD=23;
-    var bk=getBaseKey()||(SR[0]&&SR[0].k);
-    if(D&&D.intramonth&&bk&&D.intramonth[bk]&&D.intramonth[bk][String(m)]){
-      maxD=D.intramonth[bk][String(m)].length;
-    }
-    for(var d=1;d<=maxD;d++){
-      var opt=document.createElement('option');
-      opt.value=d; opt.textContent='D'+d;
-      dSel.appendChild(opt);
-    }
-    dSel.value=Math.min(curVal,maxD);
-  });
-}
-
-function queryCrossMonth() {
-  var idxKey = document.getElementById('cm-idx').value;
-  var eMonth = parseInt(document.getElementById('cm-em').value);
-  var eDay   = parseInt(document.getElementById('cm-ed').value) - 1; // 0-based
-  var xMonth = parseInt(document.getElementById('cm-xm').value);
-  var xDay   = parseInt(document.getElementById('cm-xd').value) - 1; // 0-based
-
-  if(!D||!D.yearly_intra||!D.yearly_intra[idxKey]){
-    alert('請先重新計算（需要 yearly_intra 資料）'); return;
   }
-
-  var s = SR.find(function(s){return s.k===idxKey;});
-  var label = s?s.lb:idxKey;
-  var MN_SHORT=['1','2','3','4','5','6','7','8','9','10','11','12'];
-
-  var results = []; // [{year, ret}]
-  var yearly  = D.yearly_intra[idxKey];
-
-  // 判斷是否跨年（進場月 > 出場月）
-  var crossYear = eMonth > xMonth || (eMonth===xMonth && eDay > xDay);
-
-  Object.keys(yearly).sort().forEach(function(yr){
-    var y = parseInt(yr);
-    var entryYr = yearly[yr];
-    // 出場在下一年？
-    var exitYr  = crossYear ? yearly[String(y+1)] : yearly[yr];
-
-    if(!entryYr||!entryYr[eMonth]||!entryYr[eMonth][eDay]) return;
-    if(!exitYr||!exitYr[xMonth]||exitYr[xMonth][xDay]===undefined) return;
-
-    // 進場價基準：entryYr[eMonth][0] 是月初，eDay是第幾天的累積報酬
-    // 需要換算成真實價格再比較
-    // entry_price / month_open = 1 + entryYr[eMonth][eDay]/100
-    // exit_price  / month_open = 1 + exitYr[xMonth][xDay]/100
-    // 但兩個月的 month_open 不同，需要用 monthly_returns 串接
-
-    // 計算進場月月初到出場月月末的累積路徑
-    var entryRet = entryYr[eMonth][eDay] / 100; // 相對於進場月月初
-
-    // 計算從進場月月初到出場月月初的累積報酬
-    var bridgeRet = 0;
-    if(eMonth !== xMonth || crossYear) {
-      var startM = eMonth, startY = y;
-      var endM   = xMonth, endY   = crossYear ? y+1 : y;
-      var cur = 1.0;
-      // 逐月串接
-      var m2 = startM, y2 = startY;
-      var safety = 0;
-      while(!(y2===endY && m2===endM) && safety<25) {
-        var mr = D.monthly_returns[idxKey];
-        if(mr && mr[String(y2)] && mr[String(y2)][String(m2)] !== undefined) {
-          cur *= (1 + mr[String(y2)][String(m2)]/100);
-        }
-        m2++; if(m2>12){m2=1;y2++;}
-        safety++;
-      }
-      bridgeRet = cur - 1; // 進場月月初 → 出場月月初
-    }
-
-    // 出場月月初 + xDay 的累積報酬
-    var exitDayRet = exitYr[xMonth][xDay] / 100;
-
-    // 總報酬 = (1 + bridgeRet) * (1 + exitDayRet) / (1 + entryRet) - 1
-    var totalRet = (1 + bridgeRet) * (1 + exitDayRet) / (1 + entryRet) - 1;
-    results.push({year: crossYear ? y+'/'+String(y+1).slice(2) : String(y), ret: Math.round(totalRet*10000)/100});
-  });
-
-  if(!results.length){
-    document.getElementById('cm-result').style.display='none';
-    alert('找不到足夠資料，請確認已重新計算並包含 yearly_intra。');
-    return;
-  }
-
-  var wins   = results.filter(function(r){return r.ret>0;}).length;
-  var total  = results.length;
-  var avgRet = results.reduce(function(s,r){return s+r.ret;},0)/total;
-  var wr     = Math.round(wins/total*1000)/10;
-  var entryLabel = MN_SHORT[eMonth-1]+'月 D'+(eDay+1);
-  var exitLabel  = MN_SHORT[xMonth-1]+'月 D'+(xDay+1);
-  var color = wr>=65?'var(--gr)':wr>=50?'var(--mu)':'var(--rd)';
-
-  var resultEl = document.getElementById('cm-result');
-  resultEl.style.display='';
-
-  document.getElementById('cm-summary').style.background = 'var(--surf)';
-  document.getElementById('cm-summary').style.border = '1px solid var(--bd)';
-  document.getElementById('cm-summary').innerHTML =
-    '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">'+
-    '<div><div style="font-size:11px;color:var(--mu)">勝率</div>'+
-      '<div style="font-size:28px;font-weight:700;color:'+color+'">'+wr+'%</div></div>'+
-    '<div><div style="font-size:11px;color:var(--mu)">平均報酬</div>'+
-      '<div style="font-size:22px;font-weight:600;color:'+(avgRet>=0?'var(--gr)':'var(--rd)')+'">'+
-        (avgRet>=0?'+':'')+avgRet.toFixed(2)+'%</div></div>'+
-    '<div style="font-size:13px;color:var(--mu);line-height:1.8">'+
-      '<b style="color:var(--tx)">'+label+'</b>　'+
-      entryLabel+' 進場 → '+exitLabel+' 出場<br>'+
-      '共 '+total+' 年樣本，'+wins+' 年正報酬</div>'+
-    '</div>';
-
-  // 各年長條圖
-  var barsEl = document.getElementById('cm-bars');
-  barsEl.innerHTML='';
-  var maxAbs = Math.max.apply(null, results.map(function(r){return Math.abs(r.ret);}));
-  results.forEach(function(r){
-    var h = Math.max(4, Math.round(Math.abs(r.ret)/maxAbs*60));
-    var color2 = r.ret>=0?'#3fb950':'#f85149';
-    var wrap=document.createElement('div');
-    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;min-width:28px;cursor:default';
-    wrap.title=r.year+'年：'+(r.ret>=0?'+':'')+r.ret+'%';
-    var bar=document.createElement('div');
-    bar.style.cssText='width:20px;height:'+h+'px;background:'+color2+';border-radius:2px 2px 0 0;margin-bottom:2px;transition:filter .1s';
-    bar.onmouseover=function(){this.style.filter='brightness(1.3)';};
-    bar.onmouseout=function(){this.style.filter='';};
-    var pct=document.createElement('div');
-    pct.style.cssText='font-size:9px;color:'+color2+';transform:rotate(-60deg);transform-origin:top left;margin-top:4px;white-space:nowrap;margin-left:8px';
-    pct.textContent=(r.ret>=0?'+':'')+r.ret+'%';
-    var yr=document.createElement('div');
-    yr.style.cssText='font-size:9px;color:var(--mu);margin-top:20px;white-space:nowrap';
-    yr.textContent=r.year;
-    wrap.appendChild(bar);wrap.appendChild(pct);wrap.appendChild(yr);
-    barsEl.appendChild(wrap);
-  });
 }
-
-function showIwinDetail(ei, eo, wr) {
   var detail = document.getElementById('iwin-detail');
   if (!detail) return;
   var s = SR.find(function(s){ return s.k===iwinIdxKey; });
