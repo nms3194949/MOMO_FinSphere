@@ -1062,12 +1062,36 @@ function renderIwinTable(k) {
   var n  = iwin.length;
   var cw = Math.round(26*iwinScale), ch = Math.round(22*iwinScale), fs = Math.round(9*iwinScale);
 
+  // 計算今天是當月第幾個交易日（0-based），且只在當前月份才標記
+  var today = new Date();
+  var todayM = today.getMonth() + 1;
+  var curM   = parseInt(k);
+  var tradingDay = -1; // -1 表示不是本月
+  if (todayM === curM) {
+    var d = new Date(today.getFullYear(), todayM-1, 1);
+    var td = 0;
+    while (d <= today) {
+      if (d.getDay()!==0 && d.getDay()!==6) td++;
+      d.setDate(d.getDate()+1);
+    }
+    tradingDay = Math.max(1, td) - 1; // 0-based
+  }
+
+  // header：出場日，今天欄位標紅
   var html = '<tr><th class="iwin-head" style="font-size:'+fs+'px">進↓ 出→</th>';
-  for (var eo=1; eo<n; eo++) html+='<th class="iwin-head" style="font-size:'+fs+'px;width:'+cw+'px">D'+(eo+1)+'</th>';
-  html+='</tr>';
+  for (var eo=1; eo<n; eo++) {
+    var isTodayCol = (tradingDay === eo);
+    html += '<th class="iwin-head" style="font-size:'+fs+'px;width:'+cw+'px;'+
+      (isTodayCol?'color:var(--rd);font-weight:700':'')+'">D'+(eo+1)+
+      (isTodayCol?'<div style="font-size:7px;color:var(--rd)">今</div>':'')+'</th>';
+  }
+  html += '</tr>';
 
   for (var ei=0; ei<n-1; ei++) {
-    html+='<tr><th class="iwin-head" style="font-size:'+fs+'px">D'+(ei+1)+'</th>';
+    var isTodayRow = (tradingDay === ei);
+    html += '<tr><th class="iwin-head" style="font-size:'+fs+'px;'+
+      (isTodayRow?'color:var(--rd);font-weight:700':'')+'">D'+(ei+1)+
+      (isTodayRow?'<div style="font-size:7px;color:var(--rd)">今</div>':'')+'</th>';
     for (var eo2=1; eo2<n; eo2++) {
       if (eo2<=ei) {
         html+='<td style="width:'+cw+'px;height:'+ch+'px"></td>';
@@ -1076,16 +1100,32 @@ function renderIwinTable(k) {
         var bg = iwinColor(wr);
         var txt = wr!==null ? wr+'%' : '';
         var tc  = (wr!==null&&(wr>=60||wr<40)) ? '#fff' : 'var(--tx)';
+        // 今天在進場行 或 今天在出場列
+        var isNowEntry = (tradingDay === ei);
+        var isNowExit  = (tradingDay === eo2);
+        var nowBorder  = (isNowEntry || isNowExit)
+          ? ';outline:2px solid #f85149;outline-offset:-1px;position:relative;z-index:1' : '';
+        var titleExtra = isNowEntry ? ' ← 今天約在此（進場）' : isNowExit ? ' ← 今天約在此（出場）' : '';
         html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+
-          ';width:'+cw+'px;height:'+ch+'px;font-size:'+fs+'px"'+
-          ' title="D'+(ei+1)+'進→D'+(eo2+1)+'出 勝率'+(wr!==null?wr+'%':'—')+'"'+
-          ' onclick="showIwinDetail('+(ei+1)+','+(eo2+1)+','+(wr!==null?wr:'null')+')">'+txt+'</td>';
+          ';width:'+cw+'px;height:'+ch+'px;font-size:'+fs+'px'+nowBorder+'"'+
+          ' title="D'+(ei+1)+'進→D'+(eo2+1)+'出 勝率'+(wr!==null?wr+'%':'—')+titleExtra+'"'+
+          ' onclick="showIwinDetail('+(ei+1)+','+(eo2+1)+','+(wr!==null?wr:'null')+')">'+
+          (wr!==null?(isNowEntry||isNowExit?'<b>'+txt+'</b>':txt):'')+'</td>';
       }
     }
     html+='</tr>';
   }
   tbl.innerHTML=html;
   if(detail){ detail.style.display='none'; }
+  // 在矩陣下方顯示今天位置說明
+  if(tradingDay>=0){
+    var detailEl=document.getElementById('iwin-detail');
+    if(detailEl){
+      detailEl.style.display='block';
+      detailEl.innerHTML='<span style="color:var(--rd)">▣</span> 今天約為 <b style="color:var(--rd)">'+
+        MN[curM-1]+' D'+(tradingDay+1)+'</b>，紅框為今天對應的進場列和出場欄。';
+    }
+  }
   updateIwinStats(k, iwin, n);
 }
 
