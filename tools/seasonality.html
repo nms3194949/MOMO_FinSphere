@@ -1327,6 +1327,8 @@ function updateIwinStats(k, iwin, n) {
     });
   }
 }
+
+function showIwinDetail(ei, eo, wr) {
   var detail = document.getElementById('iwin-detail');
   if (!detail) return;
   var s = SR.find(function(s){ return s.k===iwinIdxKey; });
