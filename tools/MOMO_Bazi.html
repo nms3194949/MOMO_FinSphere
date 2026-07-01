@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>八字批次推算</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* fonts loaded externally if available */
+:root{
+  --ink:#1a1008;--paper:#f5f0e8;--paper-dark:#ede6d6;
+  --gold:#b8860b;--jade:#2e6b4f;--stone:#6b6256;--mist:#d4cfc6;--divider:#c8bfaf;
+  --wood:#2e7d32;--fire:#c62828;--earth:#8b6914;--metal:#d4650a;--water:#1565c0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;}
+header{background:var(--ink);padding:1.75rem 2rem;text-align:center;border-bottom:3px solid var(--gold);}
+header h1{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:1.9rem;font-weight:900;color:var(--gold);letter-spacing:.3em;}
+header p{color:var(--mist);font-size:.82rem;margin-top:.35rem;letter-spacing:.1em;}
+.container{max-width:1100px;margin:0 auto;padding:1.5rem;}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--divider);margin-bottom:1.25rem;}
+.tab{padding:.55rem 1.4rem;font-size:.88rem;cursor:pointer;border:1px solid transparent;border-bottom:none;color:var(--stone);letter-spacing:.05em;transition:all .15s;}
+.tab.active{background:white;border-color:var(--divider);border-bottom:2px solid white;margin-bottom:-2px;color:var(--ink);font-weight:500;}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.panel{background:white;border:1px solid var(--divider);border-radius:2px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.upload-zone{border:2px dashed var(--divider);border-radius:2px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--paper);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--gold);}
+.upload-zone p{color:var(--stone);font-size:.88rem;line-height:1.9;}
+.upload-zone strong{color:var(--ink);}
+#fileInput{display:none;}
+.format-hint{background:#fdf9f0;border-left:3px solid var(--gold);padding:.65rem .9rem;font-size:.8rem;color:var(--stone);margin-bottom:.85rem;line-height:1.7;}
+.format-hint code{background:var(--paper-dark);padding:.1em .35em;border-radius:2px;font-family:monospace;font-size:.88em;}
+textarea{width:100%;height:160px;border:1px solid var(--divider);border-radius:2px;padding:.7rem;font-family:monospace;font-size:.88rem;resize:vertical;background:var(--paper);color:var(--ink);line-height:1.6;}
+textarea:focus{outline:none;border-color:var(--gold);}
+.btn-row{display:flex;gap:.65rem;margin-top:.9rem;flex-wrap:wrap;}
+button{padding:.55rem 1.3rem;border:none;border-radius:2px;font-family:'Noto Sans TC','Microsoft JhengHei','微軟正黑體',sans-serif;font-size:.88rem;cursor:pointer;letter-spacing:.05em;transition:opacity .15s;}
+button:hover{opacity:.85;}
+.btn-primary{background:var(--ink);color:var(--gold);font-weight:500;}
+.btn-secondary{background:var(--paper-dark);color:var(--stone);border:1px solid var(--divider);}
+.btn-export{background:var(--jade);color:white;}
+.results-section{display:flex;flex-direction:column;gap:1.25rem;}
+.person-card{background:white;border:1px solid var(--divider);border-radius:2px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.person-header{display:flex;align-items:baseline;gap:.9rem;padding:.85rem 1.15rem;background:var(--ink);}
+.person-name{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:.1em;}
+.person-dob{font-size:.8rem;color:var(--mist);}
+.bazi-grid{display:grid;grid-template-columns:3.5rem repeat(4,1fr);}
+.bc{padding:.4rem .6rem;border-right:1px solid var(--divider);border-bottom:1px solid var(--divider);font-size:.85rem;display:flex;align-items:center;justify-content:center;min-height:4.5rem;}
+.bc:last-child{border-right:none;}
+.bc.lbl{background:var(--paper-dark);color:var(--stone);font-size:.75rem;font-weight:500;letter-spacing:.1em;justify-content:flex-start;padding-left:.8rem;}
+.bc.hdr{background:#2a2218;color:var(--mist);font-size:.75rem;letter-spacing:.15em;border-bottom-color:var(--gold);}
+.tg-ch{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:1.5rem;font-weight:900;line-height:1;}
+.dz-ch{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:1.65rem;font-weight:900;line-height:1;}
+.zg-wrap{display:flex;flex-direction:column;gap:.18rem;align-items:center;padding:.35rem;}
+.zg-item{font-size:.8rem;display:flex;gap:.12rem;align-items:center;}
+.zg-wx{font-size:.65rem;color:#999;}
+.no-hour{font-size:.72rem;color:var(--stone);font-style:italic;}
+.w-木{color:var(--wood);}.w-火{color:var(--fire);}.w-土{color:var(--earth);}.w-金{color:var(--metal);}.w-水{color:var(--water);}
+.wx-bar{display:flex;border-top:1px solid var(--divider);}
+.wx-item{flex:1;padding:.55rem .4rem;text-align:center;border-right:1px solid var(--divider);}
+.wx-item:last-child{border-right:none;}
+.wx-lbl{font-size:.7rem;color:var(--stone);letter-spacing:.1em;}
+.wx-cnt{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:1.05rem;font-weight:700;margin:.15rem 0;}
+.wx-chs{font-size:.72rem;opacity:.85;}
+.error-card{background:#fff5f5;border:1px solid #ffcccc;border-radius:2px;padding:.7rem 1rem;font-size:.83rem;color:#c0392b;}
+.empty-state{text-align:center;padding:2.5rem;color:var(--stone);font-size:.88rem;}
+.export-bar{display:flex;align-items:center;gap:1rem;padding:.6rem 0 0;border-top:1px solid var(--divider);margin-top:.5rem;}
+.result-count{font-size:.8rem;color:var(--stone);}
+.tmpl-link{font-size:.78rem;color:var(--stone);margin-top:.6rem;}
+/* cloud panel */
+.cloud-panel{background:#f0f7f0;border:1px solid #b8d8b8;border-radius:2px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.cloud-panel h3{font-size:.85rem;color:var(--jade);font-weight:600;margin-bottom:.7rem;letter-spacing:.1em;}
+.input-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.5rem;}
+.input-row label{font-size:.78rem;color:var(--stone);white-space:nowrap;}
+.cfg-input{border:1px solid var(--divider);border-radius:2px;padding:.4rem .6rem;font-size:.82rem;background:white;color:var(--ink);}
+.cfg-input:focus{outline:none;border-color:var(--jade);}
+.cfg-input.url{width:100%;margin-bottom:.5rem;}
+.search-bar{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap;}
+.cloud-status{font-size:.78rem;margin-top:.5rem;min-height:1.2rem;}
+.cloud-status.ok{color:var(--jade);}
+.cloud-status.err{color:#c0392b;}
+.cloud-results{margin-top:.8rem;}
+.cloud-result-row{display:flex;align-items:center;gap:.75rem;padding:.45rem .6rem;border-bottom:1px solid var(--divider);font-size:.82rem;}
+.cloud-result-row:hover{background:#f5fff5;cursor:pointer;}
+.cr-name{font-weight:600;min-width:5rem;}
+.cr-dob{color:var(--stone);}
+.cr-pillars{font-family:'DFKai-SB','標楷體',serif;letter-spacing:.05em;}
+.cr-del{margin-left:auto;color:#c0392b;cursor:pointer;font-size:.75rem;padding:.2rem .4rem;border:1px solid #ffcccc;border-radius:2px;background:white;}
+.cr-del:hover{background:#fff0f0;}
+.view-toggle{display:flex;gap:0;border:1px solid var(--divider);border-radius:2px;overflow:hidden;}
+.view-btn{padding:.35rem .9rem;font-size:.8rem;cursor:pointer;border:none;background:var(--paper-dark);color:var(--stone);letter-spacing:.05em;transition:all .15s;}
+.view-btn.active{background:var(--ink);color:var(--gold);}
+/* summary table */
+.summary-table-wrap{overflow-x:auto;}
+table.summary{width:100%;border-collapse:collapse;font-size:.83rem;background:white;}
+table.summary th{background:#2a2218;color:var(--mist);padding:.5rem .7rem;text-align:center;font-weight:500;letter-spacing:.1em;border-right:1px solid #3a3020;white-space:nowrap;}
+table.summary th:first-child{text-align:left;}
+table.summary td{padding:.48rem .7rem;border-bottom:1px solid var(--divider);border-right:1px solid var(--divider);text-align:center;vertical-align:middle;}
+table.summary td:first-child{text-align:left;font-weight:500;}
+table.summary tr:hover td{background:#fdf9f0;}
+table.summary .pillar-cell{white-space:nowrap;vertical-align:middle;}
+table.summary .wx-cell{font-size:.8rem;}
+table.summary .zg-cell{font-size:.75rem;color:var(--stone);}
+.tmpl-link a{color:var(--gold);cursor:pointer;text-decoration:underline;}
+#uploadStatus{margin-top:.6rem;font-size:.82rem;color:var(--stone);}
+@media(max-width:600px){.tg-ch{font-size:1.1rem;}.dz-ch{font-size:1.2rem;}.bc{padding:.35rem .25rem;font-size:.75rem;}header h1{font-size:1.3rem;}}
+
+/* ── 登入遮罩 ── */
+#loginOverlay{
+  position:fixed;inset:0;background:var(--ink);
+  display:flex;align-items:center;justify-content:center;z-index:9999;
+}
+#loginBox{
+  background:var(--paper);border:2px solid var(--gold);border-radius:4px;
+  padding:2.5rem 2rem;text-align:center;width:320px;max-width:90vw;
+}
+#loginBox h2{
+  font-family:'DFKai-SB','標楷體',serif;font-size:1.5rem;color:var(--gold);
+  letter-spacing:.3em;margin-bottom:.3rem;
+}
+#loginBox p{font-size:.8rem;color:var(--stone);margin-bottom:1.5rem;}
+#loginPw{
+  width:100%;padding:.65rem .8rem;font-size:1rem;border:1px solid var(--divider);
+  border-radius:2px;background:white;color:var(--ink);text-align:center;
+  letter-spacing:.2em;margin-bottom:.9rem;
+}
+#loginPw:focus{outline:none;border-color:var(--gold);}
+#loginBtn{
+  width:100%;padding:.65rem;background:var(--ink);color:var(--gold);
+  border:none;border-radius:2px;font-size:.95rem;font-weight:500;
+  letter-spacing:.15em;cursor:pointer;
+}
+#loginBtn:hover{opacity:.85;}
+#loginErr{font-size:.8rem;color:#c0392b;margin-top:.6rem;min-height:1.2rem;}
+#mainBody{display:none;}
+</style>
+</head>
+<body>
+<header>
+  <h1>八字批次推算</h1>
+  <p>支援手動輸入・Excel 上傳・結果匯出 Excel</p>
+</header>
+<!-- 登入遮罩 -->
+<div id="loginOverlay">
+  <div id="loginBox">
+    <h2>八字推算</h2>
+    <p>請輸入密碼進入系統</p>
+    <input id="loginPw" type="password" placeholder="••••••" 
+           onkeydown="if(event.key==='Enter')doLogin()">
+    <button id="loginBtn" onclick="doLogin()">進 入</button>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
+<!-- 主介面 -->
+<div id="mainBody">
+<div class="container">
+  <div class="panel" style="padding-bottom:.5rem;">
+    <div class="tabs" id="tabBar">
+      <div class="tab active" data-tab="manual" onclick="switchTab('manual')">✏️ 手動輸入</div>
+      <div class="tab" data-tab="excel" onclick="switchTab('excel')">📊 上傳 Excel</div>
+    </div>
+    <div id="tab-manual" class="tab-panel active">
+      <div class="format-hint">
+        每行一人：<code>姓名,年/月/日,時:分</code>　（時間可省略）<br>
+        例：<code>王小明,1989/09/15,20:30</code>　或　<code>李大華,1995/01/27</code>
+      </div>
+      <textarea id="inputData" placeholder="王小明,1989/09/15,20:30&#10;李大華,1995/01/27,15:00&#10;陳美玲,1990/12/26"></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="calculateManual()">▶ 推算八字</button>
+        <button class="btn-secondary" onclick="loadSample()">載入範例</button>
+        <button class="btn-secondary" onclick="document.getElementById('inputData').value=''">清除</button>
+      </div>
+    </div>
+    <div id="tab-excel" class="tab-panel">
+      <div class="upload-zone" id="dropZone"
+        onclick="document.getElementById('fileInput').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <p>📂 <strong>點擊選擇</strong> 或拖曳 Excel 檔案至此<br>支援 .xlsx / .xls 格式</p>
+      </div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFile(event)">
+      <div class="tmpl-link"><a onclick="downloadTemplate()">⬇ 下載輸入範本 Excel</a>　（A欄=姓名，B欄=日期，C欄=時間）</div>
+      <div id="uploadStatus"></div>
+
+      <!-- 雲端功能 -->
+      <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--divider);">
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+          <span style="font-size:.8rem;color:var(--stone);">☁️ 雲端</span>
+<button class="btn-secondary" onclick="testConn()" style="padding:.38rem .9rem;font-size:.8rem;">測試連線</button>
+          <button class="btn-secondary" onclick="cloudSearchAll()" style="padding:.38rem .9rem;font-size:.8rem;">📋 讀取全部</button>
+          <div style="display:flex;gap:.4rem;align-items:center;">
+            <input class="cfg-input" id="searchKw" style="width:9rem;" placeholder="姓名搜尋">
+            <button class="btn-secondary" onclick="cloudSearch()" style="padding:.38rem .9rem;font-size:.8rem;">搜尋</button>
+          </div>
+        </div>
+        <div class="cloud-status" id="connStatus" style="margin-top:.35rem;"></div>
+        <div class="cloud-status" id="searchStatus" style="margin-top:.2rem;"></div>
+        <div id="cloudResults" style="margin-top:.6rem;"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="export-bar" id="exportBar" style="display:none">
+    <span class="result-count" id="resultCount"></span>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btnCard" onclick="setView('card')">📋 卡片</button>
+      <button class="view-btn" id="btnTable" onclick="setView('table')">📊 表格</button>
+    </div>
+    <button class="btn-export" onclick="exportExcel()">⬇ 匯出 Excel</button>
+    <button class="btn-export" style="background:#2e6b4f;" onclick="saveToCloud()" id="btnSaveCloud">☁️ 儲存到雲端</button>
+    <button class="btn-secondary" onclick="clearResults()">清除結果</button>
+  </div>
+  <div id="saveCloudStatus" style="font-size:.78rem;padding:.3rem 0;min-height:1.2rem;color:var(--jade);"></div>
+  <div id="results" class="results-section">
+    <div class="empty-state">輸入資料後按「推算八字」，或上傳 Excel 檔案</div>
+  </div>
+</div>
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbzL8kzvA7s-4t4uG-Da-_Ihw5dJdsxdjtLD1VApFcCmbX9Q3rODb1d0qWz05ymHKKcs/exec';
+const TG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const DZ=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const TG_WX={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+const DZ_WX={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+const ZANGGAN={子:['癸'],丑:['己','癸','辛'],寅:['甲','丙','戊'],卯:['乙'],辰:['戊','乙','癸'],巳:['丙','庚','戊'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']};
+const JQ={
+  1980:[[2,5],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1981:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1982:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1983:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1984:[[2,5],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1985:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1986:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1987:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1988:[[2,5],[3,6],[4,5],[5,5],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1989:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1990:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1991:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1992:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1993:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1994:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1995:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1996:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1997:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1998:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1999:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2000:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  2001:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2002:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2003:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2004:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,7],[9,7],[10,8],[11,8],[12,7],[1,6]],
+  2005:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2006:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2007:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2008:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,7],[9,7],[10,8],[11,8],[12,7],[1,6]],
+  2009:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2010:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2011:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2012:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,7],[9,7],[10,8],[11,8],[12,7],[1,6]],
+  2013:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2014:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2015:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2016:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,7],[9,7],[10,8],[11,8],[12,7],[1,6]],
+  2017:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2018:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2019:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2020:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,7],[9,7],[10,8],[11,8],[12,7],[1,6]],
+  2021:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2022:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2023:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  2024:[[2,5],[3,5],[4,5],[5,5],[6,6],[7,7],[8,7],[9,7],[10,8],[11,8],[12,7],[1,6]],
+  2025:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]]
+};
+
+function getYearPillar(y){return{tg:TG[(y-4+400)%10],dz:DZ[(y-4+480)%12]};}
+
+function getMonthPillar(y,m,d){
+  let dzIdx,baziY=y;
+  const data=JQ[y];
+  if(m===1){
+    baziY=y-1;
+    const prev=JQ[y-1];
+    const jd=prev?prev[11][1]:6;
+    dzIdx=d>=jd?11:10;
+  } else {
+    const idx=m-2;
+    const jd=data?data[idx][1]:5;
+    if(d>=jd){dzIdx=idx;}
+    else{dzIdx=idx-1;if(dzIdx<0){dzIdx=11;baziY=y-1;}}
+    if(m===2&&dzIdx===11)baziY=y-1;
+  }
+  const yti=(baziY-4+400)%10;
+  const startTG=[2,4,6,8,0,2,4,6,8,0];
+  const tgi=(startTG[yti]+dzIdx)%10;
+  const dzOrder=[2,3,4,5,6,7,8,9,10,11,0,1];
+  return{tg:TG[tgi],dz:DZ[dzOrder[dzIdx]]};
+}
+
+const BASE=new Date(2000,0,1);
+function getDayPillar(y,m,d){
+  const diff=Math.round((new Date(y,m-1,d)-BASE)/86400000);
+  return{tg:TG[((4+diff)%10+10)%10],dz:DZ[((6+diff)%12+12)%12]};
+}
+
+function getHourPillar(h,dayTG){
+  const zm=[0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,0];
+  const zi=zm[h];
+  const di=TG.indexOf(dayTG);
+  const st=[0,2,4,6,8,0,2,4,6,8];
+  return{tg:TG[(st[di]+zi)%10],dz:DZ[zi]};
+}
+
+function calcPerson(name,y,m,d,hour,minute){
+  const yp=getYearPillar(y);
+  const mp=getMonthPillar(y,m,d);
+  const dp=getDayPillar(y,m,d);
+  const hasHour=hour!==null&&hour!==undefined;
+  const hp=hasHour?getHourPillar(hour,dp.tg):null;
+  return{name,year:y,month:m,day:d,hour,minute:minute||0,hasHour,yp,mp,dp,hp};
+}
+
+function wuxingCount(r){
+  const c={木:[],火:[],土:[],金:[],水:[]};
+  [r.yp,r.mp,r.dp,r.hp].filter(Boolean).forEach(p=>{
+    if(TG_WX[p.tg])c[TG_WX[p.tg]].push(p.tg);
+    if(DZ_WX[p.dz])c[DZ_WX[p.dz]].push(p.dz);
+  });
+  return c;
+}
+
+function wxcls(ch){return'w-'+(TG_WX[ch]||DZ_WX[ch]||'');}
+
+const TG_ELE=['木','木','火','火','土','土','金','金','水','水'];
+const TG_YIN=[0,1,0,1,0,1,0,1,0,1];
+const WX_SHENG={木:'火',火:'土',土:'金',金:'水',水:'木'};
+const WX_KE={木:'土',火:'金',土:'水',金:'木',水:'火'};
+
+function shishen(dayTG,tgtTG,isDay){
+  if(isDay)return'元';
+  const di=TG.indexOf(dayTG),ti=TG.indexOf(tgtTG);
+  const dw=TG_ELE[di],tw=TG_ELE[ti];
+  const same=(TG_YIN[di]===TG_YIN[ti]);
+  if(dw===tw)return same?'比肩':'劫財';
+  if(WX_SHENG[dw]===tw)return same?'食神':'傷官';
+  if(WX_KE[dw]===tw)return same?'偏財':'正財';
+  if(WX_KE[tw]===dw)return same?'七殺':'正官';
+  if(WX_SHENG[tw]===dw)return same?'偏印':'正印';
+  return'';
+}
+
+function renderPerson(r){
+  const dob=r.year+'/'+String(r.month).padStart(2,'0')+'/'+String(r.day).padStart(2,'0')+
+    (r.hasHour?' '+String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0'):'（未提供時辰）');
+  function bc(ct,cl=''){return'<div class="bc '+cl+'">'+ct+'</div>';}
+  function tgspan(p){return p?'<span class="tg-ch '+wxcls(p.tg)+'">'+p.tg+'</span>':'';}
+  function dzspan(p){return p?'<span class="dz-ch '+wxcls(p.dz)+'">'+p.dz+'</span>':'';}
+  function zg(p){
+    if(!p)return'';
+    return'<div class="zg-wrap">'+(ZANGGAN[p.dz]||[]).map(c=>'<span class="zg-item"><span class="'+wxcls(c)+'">'+c+'</span><span class="zg-wx">'+TG_WX[c]+'</span></span>').join('')+'</div>';
+  }
+  const nh='<span class="no-hour">未提供</span>';
+  let g='';
+  function ps(p,noHour,dayTG,isDay){
+    if(!p)return noHour?'<span class="no-hour">未提供</span>':'';
+    const ss=dayTG?shishen(dayTG,p.tg,isDay):'';
+    return '<div class="pillar-stack">'
+      +(ss?'<span class="pillar-ss">'+ss+'</span>':'')
+      +'<span class="tg-ch '+wxcls(p.tg)+'">'+p.tg+'</span>'
+      +'<span class="dz-ch '+wxcls(p.dz)+'">'+p.dz+'</span>'
+      +'</div>';
+  }
+  g+=bc('','hdr lbl')+bc('時柱','hdr')+bc('日柱','hdr')+bc('月柱','hdr')+bc('年柱','hdr');
+  g+=bc('干支','lbl')+bc(ps(r.hp,r.hasHour?false:true,r.dp.tg,false))+bc(ps(r.dp,false,r.dp.tg,true))+bc(ps(r.mp,false,r.dp.tg,false))+bc(ps(r.yp,false,r.dp.tg,false));
+  g+=bc('藏干','lbl')+bc(r.hasHour?zg(r.hp):'')+bc(zg(r.dp))+bc(zg(r.mp))+bc(zg(r.yp));
+  const wx=wuxingCount(r);
+  const WXO=['木','火','土','金','水'],WXC=['w-木','w-火','w-土','w-金','w-水'];
+  const wxbar=WXO.map((w,i)=>'<div class="wx-item"><div class="wx-lbl">'+w+'</div><div class="wx-cnt '+WXC[i]+'">'+wx[w].length+'</div><div class="wx-chs '+WXC[i]+'">'+wx[w].join(' ')+'</div></div>').join('');
+  return'<div class="person-card"><div class="person-header"><span class="person-name">'+r.name+'</span><span class="person-dob">'+dob+'</span></div><div class="bazi-grid">'+g+'</div><div class="wx-bar">'+wxbar+'</div></div>';
+}
+
+let allResults=[];
+
+let currentView='card';
+
+function setView(v){
+  currentView=v;
+  document.getElementById('btnCard').classList.toggle('active',v==='card');
+  document.getElementById('btnTable').classList.toggle('active',v==='table');
+  renderView();
+}
+
+function renderView(){
+  if(currentView==='card') renderCardView();
+  else renderTableView();
+}
+
+function showResults(results){
+  allResults=results;
+  const container=document.getElementById('results');
+  if(!results.length){container.innerHTML='<div class="empty-state">無有效資料</div>';return;}
+  const ok=results.filter(r=>!r.error).length;
+  document.getElementById('exportBar').style.display='flex';
+  document.getElementById('resultCount').textContent='共 '+ok+' 筆結果';
+  renderView();
+}
+
+function renderCardView(){
+  const container=document.getElementById('results');
+  let html='';
+  allResults.forEach(r=>{
+    if(r.error)html+='<div class="error-card">&#10060; '+r.name+'：'+r.error+'</div>';
+    else html+=renderPerson(r);
+  });
+  container.innerHTML=html;
+}
+
+function renderTableView(){
+  const container=document.getElementById('results');
+  const valid=allResults.filter(r=>!r.error);
+  const errors=allResults.filter(r=>r.error);
+  let errHtml=errors.map(r=>'<div class="error-card">&#10060; '+r.name+'：'+r.error+'</div>').join('');
+
+  function pc(p,fallback='',dayTG,isDay){
+    if(!p)return fallback;
+    const ss=dayTG?shishen(dayTG,p.tg,isDay):'';
+    return'<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;gap:0.05rem;">'
+      +(ss?'<span style="font-size:.7rem;color:var(--stone);letter-spacing:.05em;">'+ss+'</span>':'')
+      +'<span class="'+wxcls(p.tg)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1rem;font-weight:900;">'+p.tg+'</span>'
+      +'<span class="'+wxcls(p.dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;">'+p.dz+'</span>'
+      +'</div>';
+  }
+  function zgc(p){
+    if(!p)return'';
+    return(ZANGGAN[p.dz]||[]).map(c=>'<span class="'+wxcls(c)+'">'+c+'</span>').join(' ');
+  }
+
+  let rows=valid.map(r=>{
+    const wx=wuxingCount(r);
+    const dob=r.year+'/'+String(r.month).padStart(2,'0')+'/'+String(r.day).padStart(2,'0');
+    const tod=r.hasHour?String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0'):'—';
+    return'<tr>'+
+      '<td>'+r.name+'</td>'+
+      '<td>'+dob+'</td>'+
+      '<td>'+tod+'</td>'+
+      '<td class="pillar-cell">'+(r.hasHour?pc(r.hp,'—',r.dp.tg,false):'—')+'</td>'+
+      '<td class="pillar-cell">'+pc(r.dp,'',r.dp.tg,true)+'</td>'+
+      '<td class="pillar-cell">'+pc(r.mp,'',r.dp.tg,false)+'</td>'+
+      '<td class="pillar-cell">'+pc(r.yp,'',r.dp.tg,false)+'</td>'+
+      '<td class="wx-cell"><span class="w-木">'+wx['木'].length+'</span></td>'+
+      '<td class="wx-cell"><span class="w-火">'+wx['火'].length+'</span></td>'+
+      '<td class="wx-cell"><span class="w-土">'+wx['土'].length+'</span></td>'+
+      '<td class="wx-cell"><span class="w-金">'+wx['金'].length+'</span></td>'+
+      '<td class="wx-cell"><span class="w-水">'+wx['水'].length+'</span></td>'+
+      '<td class="zg-cell">'+(r.hasHour?zgc(r.hp):'—')+'</td>'+
+      '<td class="zg-cell">'+zgc(r.dp)+'</td>'+
+      '<td class="zg-cell">'+zgc(r.mp)+'</td>'+
+      '<td class="zg-cell">'+zgc(r.yp)+'</td>'+
+      '</tr>';
+  }).join('');
+
+  const table='<div class="summary-table-wrap">'+
+    '<table class="summary">'+
+    '<thead><tr>'+
+    '<th>姓名</th><th>出生日期</th><th>時間</th>'+
+    '<th>時柱</th><th>日柱</th><th>月柱</th><th>年柱</th>'+
+    '<th>木</th><th>火</th><th>土</th><th>金</th><th>水</th>'+
+    '<th>時藏干</th><th>日藏干</th><th>月藏干</th><th>年藏干</th>'+
+    '</tr></thead>'+
+    '<tbody>'+rows+'</tbody>'+
+    '</table></div>';
+
+  container.innerHTML=errHtml+table;
+}
+
+function clearResults(){
+  allResults=[];
+  document.getElementById('results').innerHTML='<div class="empty-state">輸入資料後按「推算八字」，或上傳 Excel 檔案</div>';
+  document.getElementById('exportBar').style.display='none';
+}
+
+function parseLine(line){
+  const parts=line.split(',').map(s=>s.trim());
+  if(parts.length<2)return{name:line,error:'格式錯誤'};
+  const name=parts[0];
+  const dm=parts[1].match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
+  if(!dm)return{name,error:'日期格式錯誤（'+parts[1]+'）'};
+  const y=+dm[1],m=+dm[2],d=+dm[3];
+  let hour=null,minute=0;
+  if(parts[2]){const tm=parts[2].match(/^(\d{1,2}):(\d{2})$/);if(tm){hour=+tm[1];minute=+tm[2];}}
+  try{return calcPerson(name,y,m,d,hour,minute);}catch(e){return{name,error:e.message};}
+}
+
+function calculateManual(){
+  const raw=document.getElementById('inputData').value.trim();
+  if(!raw)return;
+  showResults(raw.split('\n').map(l=>l.trim()).filter(Boolean).map(parseLine));
+}
+
+function loadSample(){
+  document.getElementById('inputData').value='王小明,1989/09/15,20:30\n李大華,1995/01/27,15:00\n陳美玲,1990/12/26,14:00\n張志偉,1988/12/27,09:00';
+  calculateManual();
+}
+
+function switchTab(id){
+  document.querySelectorAll('#tabBar .tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.tab===id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>{
+    p.style.display = (p.id==='tab-'+id) ? 'block' : 'none';
+  });
+}
+
+window.addEventListener('load', ()=>{
+  document.querySelectorAll('.tab-panel').forEach(p=>{
+    p.style.display = p.id==='tab-manual' ? 'block' : 'none';
+  });
+  // Auto-login if session pw saved
+  const savedPw = sessionStorage.getItem('bazi_pw');
+  if(savedPw){
+    document.getElementById('loginPw').value = savedPw;
+    doLogin();
+  } else {
+    document.getElementById('loginPw').focus();
+  }
+});
+
+function handleFile(e){processFile(e.target.files[0]);}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag');
+  processFile(e.dataTransfer.files[0]);
+}
+
+function processFile(file){
+  if(!file)return;
+  const st=document.getElementById('uploadStatus');
+  st.textContent='讀取中：'+file.name;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      let start=0;
+      if(rows[0]){
+        const isHdr=rows[0].some(c=>['姓名','name','出生','日期','時間'].some(k=>String(c).toLowerCase().includes(k)));
+        if(isHdr)start=1;
+      }
+      const results=[];
+      for(let i=start;i<rows.length;i++){
+        const row=rows[i];
+        if(!row||!row[0])continue;
+        const name=String(row[0]).trim();
+        if(!name)continue;
+        let y,m,d;
+        const dc=row[1];
+        const ds=String(dc).trim().replace(/-/g,'/');
+        // 純數字8碼: 19890915
+        const dm8=ds.match(/^(\d{4})(\d{2})(\d{2})$/);
+        // 斜線/連字號分隔: 1989/09/15 or 1989-09-15
+        const dm2=ds.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
+        if(dm8){y=+dm8[1];m=+dm8[2];d=+dm8[3];}
+        else if(dm2){y=+dm2[1];m=+dm2[2];d=+dm2[3];}
+        else if(typeof dc==='number'&&dc>10000){
+          // Excel date serial (large number)
+          const pd=XLSX.SSF.parse_date_code(dc);
+          if(pd){y=pd.y;m=pd.m;d=pd.d;}
+          else{results.push({name,error:'日期格式錯誤（'+dc+'）'});continue;}
+        }else{results.push({name,error:'日期格式錯誤（'+ds+'）'});continue;}
+        let hour=null,minute=0;
+        const tc=row[2];
+        if(tc!==undefined&&tc!==''){
+          if(typeof tc==='number'){
+            const tot=Math.round(tc*1440);hour=Math.floor(tot/60)%24;minute=tot%60;
+          }else{
+            const ts=String(tc).trim();
+            const tm2=ts.match(/^(\d{1,2}):(\d{2})/);
+            if(tm2){hour=+tm2[1];minute=+tm2[2];}
+          }
+        }
+        try{results.push(calcPerson(name,y,m,d,hour,minute));}
+        catch(err){results.push({name,error:err.message});}
+      }
+      st.textContent='✅ 已讀取 '+results.length+' 筆（'+file.name+'）';
+      showResults(results);
+    }catch(err){st.textContent='❌ 讀取失敗：'+err.message;}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function exportExcel(){
+  const valid=allResults.filter(r=>!r.error);
+  if(!valid.length){alert('沒有可匯出的資料');return;}
+  const header=['姓名','出生日期','出生時間','年柱天干','年柱地支','年柱','月柱天干','月柱地支','月柱','日柱天干','日柱地支','日柱','時柱天干','時柱地支','時柱','木','火','土','金','水','年柱藏干','月柱藏干','日柱藏干','時柱藏干'];
+  const rows=valid.map(r=>{
+    const wx=wuxingCount(r);
+    const dob=r.year+'/'+String(r.month).padStart(2,'0')+'/'+String(r.day).padStart(2,'0');
+    const tod=r.hasHour?String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0'):'';
+    const zg=p=>p?(ZANGGAN[p.dz]||[]).join(' '):'';
+    return[r.name,dob,tod,r.yp.tg,r.yp.dz,r.yp.tg+r.yp.dz,r.mp.tg,r.mp.dz,r.mp.tg+r.mp.dz,r.dp.tg,r.dp.dz,r.dp.tg+r.dp.dz,r.hp?r.hp.tg:'',r.hp?r.hp.dz:'',r.hp?r.hp.tg+r.hp.dz:'',wx['木'].length,wx['火'].length,wx['土'].length,wx['金'].length,wx['水'].length,zg(r.yp),zg(r.mp),zg(r.dp),zg(r.hp)];
+  });
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
+  ws['!cols']=[{wch:10},{wch:12},{wch:10},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:4},{wch:4},{wch:4},{wch:4},{wch:4},{wch:12},{wch:12},{wch:12},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws,'八字推算結果');
+  const t=new Date();
+  XLSX.writeFile(wb,'八字推算_'+t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0')+'.xlsx');
+}
+
+// ── 雲端功能 ──────────────────────────────────
+let SESSION_PW = '';
+
+function getConfig(){
+  return { url: GAS_URL, pw: SESSION_PW };
+}
+
+function saveConfig(){}
+function loadConfig(){}
+
+async function gasPost(payload){
+  const {url, pw} = getConfig();
+  if(!url) throw new Error('請先填入 GAS URL');
+  const resp = await fetch(url, {
+    method:'POST',
+    body: JSON.stringify({password: pw, ...payload})
+  });
+  const json = await resp.json();
+  if(!json.ok) throw new Error(json.error || '請求失敗');
+  return json;
+}
+
+async function testConn(){
+  const st = document.getElementById('connStatus');
+  st.textContent = '連線中...'; st.className='cloud-status';
+  try {
+    await gasPost({action:'list'});
+    st.textContent = '✅ 連線成功'; st.className='cloud-status ok';
+  } catch(e) {
+    st.textContent = '❌ '+e.message; st.className='cloud-status err';
+  }
+}
+
+async function saveToCloud(){
+  const valid = allResults.filter(r=>!r.error);
+  if(!valid.length){ alert('沒有可儲存的資料'); return; }
+  const st = document.getElementById('saveCloudStatus');
+  st.textContent = '儲存中...';
+
+  const records = valid.map(r=>{
+    const wx = wuxingCount(r);
+    const zg = p => p?(ZANGGAN[p.dz]||[]).join(' '):'';
+    return {
+      name:         r.name,
+      dob:          r.year+'/'+String(r.month).padStart(2,'0')+'/'+String(r.day).padStart(2,'0'),
+      time:         r.hasHour ? String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0') : '',
+      year_pillar:  r.yp.tg+r.yp.dz,
+      month_pillar: r.mp.tg+r.mp.dz,
+      day_pillar:   r.dp.tg+r.dp.dz,
+      hour_pillar:  r.hp ? r.hp.tg+r.hp.dz : '',
+      wx_wood:  wx['木'].length, wx_fire:  wx['火'].length,
+      wx_earth: wx['土'].length, wx_metal: wx['金'].length, wx_water: wx['水'].length,
+      zg_year:  zg(r.yp), zg_month: zg(r.mp), zg_day: zg(r.dp), zg_hour: zg(r.hp)
+    };
+  });
+
+  try {
+    const res = await gasPost({action:'save', records});
+    st.textContent = '✅ 已儲存 '+res.saved+' 筆到雲端';
+    setTimeout(()=>st.textContent='', 4000);
+  } catch(e) {
+    st.textContent = '❌ '+e.message;
+  }
+}
+
+async function cloudSearchAll(){
+  document.getElementById('searchKw').value='';
+  await cloudSearch();
+}
+
+async function cloudSearch(){
+  const kw  = document.getElementById('searchKw').value.trim();
+  const st  = document.getElementById('searchStatus');
+  const box = document.getElementById('cloudResults');
+  st.textContent='讀取中...'; st.className='cloud-status';
+  box.innerHTML='';
+  try {
+    const res = await gasPost({action:'search', keyword:kw});
+    const rows = res.results;
+    const total = res.totalRows !== undefined ? '（Sheets共'+res.totalRows+'列）' : '';
+    st.textContent = (kw?'搜尋到':'共')+' '+rows.length+' 筆 '+total;
+    st.className='cloud-status ok';
+    if(!rows.length){
+      box.innerHTML='<div style="font-size:.82rem;color:var(--stone);padding:.5rem 0;">無資料</div>';
+      return;
+    }
+    // render as table same as renderTableView
+    function wxspan(n, cls){ return '<span class="'+cls+'">'+n+'</span>'; }
+    function pillarCell(tgdz, dayTgdz, isDay){
+      if(!tgdz) return '—';
+      const tg=tgdz[0], dz=tgdz[1];
+      const dayTG = dayTgdz ? dayTgdz[0] : null;
+      const ss = dayTG ? shishen(dayTG, tg, isDay) : '';
+      return '<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;gap:.05rem;">'
+        +(ss?'<span style="font-size:.7rem;color:var(--stone);">'+ss+'</span>':'')
+        +'<span class="'+wxcls(tg)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1rem;font-weight:900;">'+tg+'</span>'
+        +'<span class="'+wxcls(dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;">'+dz+'</span>'
+        +'</div>';
+    }
+    function zgCell(zg){
+      if(!zg) return '';
+      return zg.split(' ').map(c=>'<span class="'+wxcls(c)+'">'+c+'</span>').join(' ');
+    }
+
+    const tableRows = rows.map(r=>{
+      const yp=r.year_pillar||'', mp=r.month_pillar||'', dp=r.day_pillar||'', hp=r.hour_pillar||'';
+      const nameEsc = r.name.replace(/'/g,"\'");
+      return '<tr>'
+        +'<td style="text-align:left;font-weight:500;">'+r.name+'</td>'
+        +'<td>'+r.dob+'</td>'
+        +'<td>'+(r.time||'—')+'</td>'
+        +'<td class="pillar-cell">'+pillarCell(hp,dp,false)+'</td>'
+        +'<td class="pillar-cell">'+pillarCell(dp,dp,true)+'</td>'
+        +'<td class="pillar-cell">'+pillarCell(mp,dp,false)+'</td>'
+        +'<td class="pillar-cell">'+pillarCell(yp,dp,false)+'</td>'
+        +'<td class="wx-cell"><span class="w-木">'+r.wx_wood+'</span></td>'
+        +'<td class="wx-cell"><span class="w-火">'+r.wx_fire+'</span></td>'
+        +'<td class="wx-cell"><span class="w-土">'+r.wx_earth+'</span></td>'
+        +'<td class="wx-cell"><span class="w-金">'+r.wx_metal+'</span></td>'
+        +'<td class="wx-cell"><span class="w-水">'+r.wx_water+'</span></td>'
+        +'<td class="zg-cell">'+zgCell(r.zg_year)+'</td>'
+        +'<td class="zg-cell">'+zgCell(r.zg_month)+'</td>'
+        +'<td class="zg-cell">'+zgCell(r.zg_day)+'</td>'
+        +'<td class="zg-cell">'+zgCell(r.zg_hour)+'</td>'
+        +'<td><span class="cr-del" onclick="cloudDelete(this.dataset.name)" data-name="'+r.name.replace(/"/g,'&quot;')+'">刪除</span></td>'
+        +'</tr>';
+    }).join('');
+
+    box.innerHTML='<div class="summary-table-wrap"><table class="summary">'
+      +'<thead><tr>'
+      +'<th style="text-align:left;">姓名</th><th>出生日期</th><th>時間</th>'
+      +'<th>時柱</th><th>日柱</th><th>月柱</th><th>年柱</th>'
+      +'<th>木</th><th>火</th><th>土</th><th>金</th><th>水</th>'
+      +'<th>時藏干</th><th>日藏干</th><th>月藏干</th><th>年藏干</th>'
+      +'<th></th>'
+      +'</tr></thead>'
+      +'<tbody>'+tableRows+'</tbody>'
+      +'</table></div>';
+  } catch(e) {
+    st.textContent='❌ '+e.message; st.className='cloud-status err';
+  }
+}
+
+function loadCloudRecord(jsonStr){
+  const r = JSON.parse(jsonStr);
+  // Fill manual input and calculate
+  const time = r.time ? ','+r.time : '';
+  document.getElementById('inputData').value = r.name+','+r.dob+time;
+  switchTab('manual');
+  calculateManual();
+}
+
+async function cloudDelete(name){
+  if(!confirm('確定刪除「'+name+'」？')) return;
+  try {
+    await gasPost({action:'delete', name});
+    cloudSearch();
+  } catch(e) {
+    alert('❌ '+e.message);
+  }
+}
+
+// ── 登入 ──────────────────────────────────────
+async function doLogin(){
+  const pw = document.getElementById('loginPw').value.trim();
+  const err = document.getElementById('loginErr');
+  if(!pw){ err.textContent='請輸入密碼'; return; }
+  
+  const btn = document.getElementById('loginBtn');
+  btn.textContent='驗證中...'; btn.disabled=true;
+  err.textContent='';
+
+  try {
+    const resp = await fetch(GAS_URL, {
+      method:'POST',
+      body: JSON.stringify({password: pw, action:'list'})
+    });
+    const json = await resp.json();
+    if(json.ok){
+      SESSION_PW = pw;
+      // Save to sessionStorage (cleared when tab closes)
+      sessionStorage.setItem('bazi_pw', pw);
+      document.getElementById('loginOverlay').style.display='none';
+      document.getElementById('mainBody').style.display='block';
+    } else {
+      err.textContent='❌ 密碼錯誤';
+      document.getElementById('loginPw').value='';
+      document.getElementById('loginPw').focus();
+    }
+  } catch(e) {
+    err.textContent='❌ 連線失敗：'+e.message;
+  }
+  btn.textContent='進 入'; btn.disabled=false;
+}
+
+function downloadTemplate(){
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([['姓名','出生日期','出生時間（可空白）'],['王小明','1989/09/15','20:30'],['李大華','1995/01/27','15:00'],['陳美玲','1990/12/26','']]);
+  ws['!cols']=[{wch:12},{wch:14},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,ws,'輸入資料');
+  XLSX.writeFile(wb,'八字推算_範本.xlsx');
+}
+</script>
+</div><!-- /mainBody -->
+</body>
+</html>
