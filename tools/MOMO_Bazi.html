@@ -273,6 +273,19 @@ const JQ={
 };
 
 function getYearPillar(y){return{tg:TG[(y-4+400)%10],dz:DZ[(y-4+480)%12]};}
+function getYearPillarFromBaziYear(baziY){return{tg:TG[(baziY-4+400)%10],dz:DZ[(baziY-4+480)%12]};}
+
+function getBaziYear(y,m,d){
+  const data=JQ[y];
+  let baziY=y;
+  if(m===1){
+    baziY=y-1;
+  } else if(m===2){
+    const jd=data?data[0][1]:4; // 立春日
+    if(d<jd) baziY=y-1;
+  }
+  return {baziY};
+}
 
 function getMonthPillar(y,m,d){
   let dzIdx,baziY=y;
@@ -311,8 +324,10 @@ function getHourPillar(h,dayTG){
 }
 
 function calcPerson(name,y,m,d,hour,minute){
-  const yp=getYearPillar(y);
   const mp=getMonthPillar(y,m,d);
+  // Year pillar uses baziYear (立春換年), extracted from month pillar logic
+  const {baziY} = getBaziYear(y,m,d);
+  const yp=getYearPillarFromBaziYear(baziY);
   const dp=getDayPillar(y,m,d);
   const hasHour=hour!==null&&hour!==undefined;
   const hp=hasHour?getHourPillar(hour,dp.tg):null;
