@@ -132,6 +132,33 @@ table.summary .zg-cell{font-size:.75rem;color:var(--stone);}
 #loginBtn:hover{opacity:.85;}
 #loginErr{font-size:.8rem;color:#c0392b;margin-top:.6rem;min-height:1.2rem;}
 #mainBody{display:none;}
+
+/* ── 地支關係高亮 ── */
+.dz-ch{cursor:pointer;border-radius:4px;padding:2px 4px;transition:all .2s;}
+.dz-ch:hover{opacity:.8;}
+.dz-hl-liuhe  {background:#ffd60033;box-shadow:0 0 0 2px #ffd600;}
+.dz-hl-sanhe  {background:#2e7d3233;box-shadow:0 0 0 2px #2e7d32;}
+.dz-hl-liuchong{background:#c6282833;box-shadow:0 0 0 2px #c62828;}
+.dz-hl-liuhai {background:#6d400033;box-shadow:0 0 0 2px #6d4000;}
+.dz-hl-sanxing{background:#6a1b9a33;box-shadow:0 0 0 2px #6a1b9a;}
+.dz-hl-self   {background:#1565c033;box-shadow:0 0 0 2px #1565c0;border-radius:4px;}
+
+/* 關係圖例 tooltip */
+#dzLegend{
+  position:fixed;bottom:1.2rem;right:1.2rem;
+  background:var(--ink);border:1px solid var(--gold);border-radius:4px;
+  padding:.7rem .9rem;font-size:.75rem;z-index:1000;
+  display:none;min-width:130px;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+#dzLegend.show{display:block;}
+#dzLegend h4{color:var(--gold);font-size:.8rem;letter-spacing:.1em;margin-bottom:.5rem;}
+.dz-leg-item{display:flex;align-items:center;gap:.5rem;margin:.25rem 0;color:var(--mist);}
+.dz-leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+#dzLegend .close-btn{
+  position:absolute;top:.3rem;right:.5rem;color:var(--stone);
+  cursor:pointer;font-size:.85rem;line-height:1;
+}
 </style>
 </head>
 <body>
@@ -181,7 +208,10 @@ table.summary .zg-cell{font-size:.75rem;color:var(--stone);}
       </div>
       <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFile(event)">
       <div class="tmpl-link"><a onclick="downloadTemplate()">⬇ 下載輸入範本 Excel</a>　（A欄=姓名，B欄=日期，C欄=時間）</div>
-      <div id="uploadStatus"></div>
+      <div style="display:flex;align-items:center;gap:.6rem;margin-top:.5rem;">
+        <div id="uploadStatus" style="flex:1;font-size:.82rem;color:var(--stone);"></div>
+        <button class="btn-secondary" id="btnClearUpload" onclick="clearUpload()" style="display:none;padding:.35rem .8rem;font-size:.8rem;">✕ 清除資料</button>
+      </div>
 
       <!-- 雲端功能 -->
       <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--divider);">
@@ -368,10 +398,13 @@ function renderPerson(r){
     (r.hasHour?' '+String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0'):'（未提供時辰）');
   function bc(ct,cl=''){return'<div class="bc '+cl+'">'+ct+'</div>';}
   function tgspan(p){return p?'<span class="tg-ch '+wxcls(p.tg)+'">'+p.tg+'</span>':'';}
-  function dzspan(p){return p?'<span class="dz-ch '+wxcls(p.dz)+'">'+p.dz+'</span>':'';}
-  function zg(p){
+  function dzspan(p){return p?'<span class="dz-ch '+wxcls(p.dz)+'" data-dz="'+p.dz+'"">'+p.dz+'</span>':'';}
+  function zg(p,dayTG){
     if(!p)return'';
-    return'<div class="zg-wrap">'+(ZANGGAN[p.dz]||[]).map(c=>'<span class="zg-item"><span class="'+wxcls(c)+'">'+c+'</span><span class="zg-wx">'+TG_WX[c]+'</span></span>').join('')+'</div>';
+    return'<div class="zg-wrap">'+(ZANGGAN[p.dz]||[]).map(c=>{
+      const ss=dayTG?shishen(dayTG,c,false):'';
+      return ss?'<span class="zg-item"><span class="zg-wx">'+ss+'</span></span>':'';
+    }).join('')+'</div>';
   }
   const nh='<span class="no-hour">未提供</span>';
   let g='';
@@ -381,12 +414,12 @@ function renderPerson(r){
     return '<div class="pillar-stack">'
       +(ss?'<span class="pillar-ss">'+ss+'</span>':'')
       +'<span class="tg-ch '+wxcls(p.tg)+'">'+p.tg+'</span>'
-      +'<span class="dz-ch '+wxcls(p.dz)+'">'+p.dz+'</span>'
+      +'<span class="dz-ch '+wxcls(p.dz)+'" data-dz="'+p.dz+'"">'+p.dz+'</span>'
       +'</div>';
   }
   g+=bc('','hdr lbl')+bc('時柱','hdr')+bc('日柱','hdr')+bc('月柱','hdr')+bc('年柱','hdr');
   g+=bc('干支','lbl')+bc(ps(r.hp,r.hasHour?false:true,r.dp.tg,false))+bc(ps(r.dp,false,r.dp.tg,true))+bc(ps(r.mp,false,r.dp.tg,false))+bc(ps(r.yp,false,r.dp.tg,false));
-  g+=bc('藏干','lbl')+bc(r.hasHour?zg(r.hp):'')+bc(zg(r.dp))+bc(zg(r.mp))+bc(zg(r.yp));
+  g+=bc('副星','lbl')+bc(r.hasHour?zg(r.hp,r.dp.tg):'')+bc(zg(r.dp,r.dp.tg))+bc(zg(r.mp,r.dp.tg))+bc(zg(r.yp,r.dp.tg));
   const wx=wuxingCount(r);
   const WXO=['木','火','土','金','水'],WXC=['w-木','w-火','w-土','w-金','w-水'];
   const wxbar=WXO.map((w,i)=>'<div class="wx-item"><div class="wx-lbl">'+w+'</div><div class="wx-cnt '+WXC[i]+'">'+wx[w].length+'</div><div class="wx-chs '+WXC[i]+'">'+wx[w].join(' ')+'</div></div>').join('');
@@ -441,16 +474,18 @@ function renderTableView(){
     return'<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;gap:0.05rem;">'
       +(ss?'<span style="font-size:.7rem;color:var(--stone);letter-spacing:.05em;">'+ss+'</span>':'')
       +'<span class="'+wxcls(p.tg)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1rem;font-weight:900;">'+p.tg+'</span>'
-      +'<span class="'+wxcls(p.dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;">'+p.dz+'</span>'
+      +'<span class="dz-ch '+wxcls(p.dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;" data-dz="'+p.dz+'"">'+p.dz+'</span>'
       +'</div>';
   }
-  function zgc(p){
+  function zgc(p,dayTG){
     if(!p)return'';
-    return(ZANGGAN[p.dz]||[]).map(c=>'<span class="'+wxcls(c)+'">'+c+'</span>').join(' ');
+    return(ZANGGAN[p.dz]||[]).map(c=>{
+      const ss=dayTG?shishen(dayTG,c,false):'';
+      return ss?'<span style="font-size:.8rem;">'+ss+'</span>':'';
+    }).filter(Boolean).join(' ');
   }
 
   let rows=valid.map(r=>{
-    const wx=wuxingCount(r);
     const dob=r.year+'/'+String(r.month).padStart(2,'0')+'/'+String(r.day).padStart(2,'0');
     const tod=r.hasHour?String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0'):'—';
     return'<tr>'+
@@ -461,15 +496,11 @@ function renderTableView(){
       '<td class="pillar-cell">'+pc(r.dp,'',r.dp.tg,true)+'</td>'+
       '<td class="pillar-cell">'+pc(r.mp,'',r.dp.tg,false)+'</td>'+
       '<td class="pillar-cell">'+pc(r.yp,'',r.dp.tg,false)+'</td>'+
-      '<td class="wx-cell"><span class="w-木">'+wx['木'].length+'</span></td>'+
-      '<td class="wx-cell"><span class="w-火">'+wx['火'].length+'</span></td>'+
-      '<td class="wx-cell"><span class="w-土">'+wx['土'].length+'</span></td>'+
-      '<td class="wx-cell"><span class="w-金">'+wx['金'].length+'</span></td>'+
-      '<td class="wx-cell"><span class="w-水">'+wx['水'].length+'</span></td>'+
-      '<td class="zg-cell">'+(r.hasHour?zgc(r.hp):'—')+'</td>'+
-      '<td class="zg-cell">'+zgc(r.dp)+'</td>'+
-      '<td class="zg-cell">'+zgc(r.mp)+'</td>'+
-      '<td class="zg-cell">'+zgc(r.yp)+'</td>'+
+
+      '<td class="zg-cell">'+(r.hasHour?zgc(r.hp,r.dp.tg):'—')+'</td>'+
+      '<td class="zg-cell">'+zgc(r.dp,r.dp.tg)+'</td>'+
+      '<td class="zg-cell">'+zgc(r.mp,r.dp.tg)+'</td>'+
+      '<td class="zg-cell">'+zgc(r.yp,r.dp.tg)+'</td>'+
       '</tr>';
   }).join('');
 
@@ -478,8 +509,8 @@ function renderTableView(){
     '<thead><tr>'+
     '<th>姓名</th><th>出生日期</th><th>時間</th>'+
     '<th>時柱</th><th>日柱</th><th>月柱</th><th>年柱</th>'+
-    '<th>木</th><th>火</th><th>土</th><th>金</th><th>水</th>'+
-    '<th>時藏干</th><th>日藏干</th><th>月藏干</th><th>年藏干</th>'+
+    ''+
+    '<th>時副星</th><th>日副星</th><th>月副星</th><th>年副星</th>'+
     '</tr></thead>'+
     '<tbody>'+rows+'</tbody>'+
     '</table></div>';
@@ -529,14 +560,7 @@ window.addEventListener('load', ()=>{
   document.querySelectorAll('.tab-panel').forEach(p=>{
     p.style.display = p.id==='tab-manual' ? 'block' : 'none';
   });
-  // Auto-login if session pw saved
-  const savedPw = sessionStorage.getItem('bazi_pw');
-  if(savedPw){
-    document.getElementById('loginPw').value = savedPw;
-    doLogin();
-  } else {
-    document.getElementById('loginPw').focus();
-  }
+  document.getElementById('loginPw').focus();
 });
 
 function handleFile(e){processFile(e.target.files[0]);}
@@ -606,17 +630,16 @@ function processFile(file){
 function exportExcel(){
   const valid=allResults.filter(r=>!r.error);
   if(!valid.length){alert('沒有可匯出的資料');return;}
-  const header=['姓名','出生日期','出生時間','年柱天干','年柱地支','年柱','月柱天干','月柱地支','月柱','日柱天干','日柱地支','日柱','時柱天干','時柱地支','時柱','木','火','土','金','水','年柱藏干','月柱藏干','日柱藏干','時柱藏干'];
+  const header=['姓名','出生日期','出生時間','年柱天干','年柱地支','年柱','月柱天干','月柱地支','月柱','日柱天干','日柱地支','日柱','時柱天干','時柱地支','時柱','年柱藏干','月柱藏干','日柱藏干','時柱藏干'];
   const rows=valid.map(r=>{
-    const wx=wuxingCount(r);
     const dob=r.year+'/'+String(r.month).padStart(2,'0')+'/'+String(r.day).padStart(2,'0');
     const tod=r.hasHour?String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0'):'';
     const zg=p=>p?(ZANGGAN[p.dz]||[]).join(' '):'';
-    return[r.name,dob,tod,r.yp.tg,r.yp.dz,r.yp.tg+r.yp.dz,r.mp.tg,r.mp.dz,r.mp.tg+r.mp.dz,r.dp.tg,r.dp.dz,r.dp.tg+r.dp.dz,r.hp?r.hp.tg:'',r.hp?r.hp.dz:'',r.hp?r.hp.tg+r.hp.dz:'',wx['木'].length,wx['火'].length,wx['土'].length,wx['金'].length,wx['水'].length,zg(r.yp),zg(r.mp),zg(r.dp),zg(r.hp)];
+    return[r.name,dob,tod,r.yp.tg,r.yp.dz,r.yp.tg+r.yp.dz,r.mp.tg,r.mp.dz,r.mp.tg+r.mp.dz,r.dp.tg,r.dp.dz,r.dp.tg+r.dp.dz,r.hp?r.hp.tg:'',r.hp?r.hp.dz:'',r.hp?r.hp.tg+r.hp.dz:'',zg(r.yp),zg(r.mp),zg(r.dp),zg(r.hp)];
   });
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
-  ws['!cols']=[{wch:10},{wch:12},{wch:10},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:4},{wch:4},{wch:4},{wch:4},{wch:4},{wch:12},{wch:12},{wch:12},{wch:12}];
+  ws['!cols']=[{wch:10},{wch:12},{wch:10},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:6},{wch:6},{wch:7},{wch:12},{wch:12},{wch:12},{wch:12}];
   XLSX.utils.book_append_sheet(wb,ws,'八字推算結果');
   const t=new Date();
   XLSX.writeFile(wb,'八字推算_'+t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0')+'.xlsx');
@@ -662,8 +685,11 @@ async function saveToCloud(){
   st.textContent = '儲存中...';
 
   const records = valid.map(r=>{
-    const wx = wuxingCount(r);
-    const zg = p => p?(ZANGGAN[p.dz]||[]).join(' '):'';
+    // 副星：藏干天干對日主推十神
+    const ss = (p) => {
+      if(!p) return '';
+      return (ZANGGAN[p.dz]||[]).map(c=>shishen(r.dp.tg,c,false)).filter(Boolean).join(' ');
+    };
     return {
       name:         r.name,
       dob:          r.year+'/'+String(r.month).padStart(2,'0')+'/'+String(r.day).padStart(2,'0'),
@@ -672,9 +698,7 @@ async function saveToCloud(){
       month_pillar: r.mp.tg+r.mp.dz,
       day_pillar:   r.dp.tg+r.dp.dz,
       hour_pillar:  r.hp ? r.hp.tg+r.hp.dz : '',
-      wx_wood:  wx['木'].length, wx_fire:  wx['火'].length,
-      wx_earth: wx['土'].length, wx_metal: wx['金'].length, wx_water: wx['水'].length,
-      zg_year:  zg(r.yp), zg_month: zg(r.mp), zg_day: zg(r.dp), zg_hour: zg(r.hp)
+      zg_year:  ss(r.yp), zg_month: ss(r.mp), zg_day: ss(r.dp), zg_hour: ss(r.hp)
     };
   });
 
@@ -718,16 +742,20 @@ async function cloudSearch(){
       return '<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;gap:.05rem;">'
         +(ss?'<span style="font-size:.7rem;color:var(--stone);">'+ss+'</span>':'')
         +'<span class="'+wxcls(tg)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1rem;font-weight:900;">'+tg+'</span>'
-        +'<span class="'+wxcls(dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;">'+dz+'</span>'
+        +'<span class="dz-ch '+wxcls(dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;" data-dz="'+dz+'"">'+dz+'</span>'
         +'</div>';
     }
     function zgCell(zg){
       if(!zg) return '';
-      return zg.split(' ').map(c=>'<span class="'+wxcls(c)+'">'+c+'</span>').join(' ');
+      // GAS already stores 十神 names, just display them
+      return zg.split(' ').filter(Boolean).map(s=>{
+        return '<span style="font-size:.8rem;">'+s+'</span>';
+      }).join(' ');
     }
 
     const tableRows = rows.map(r=>{
       const yp=r.year_pillar||'', mp=r.month_pillar||'', dp=r.day_pillar||'', hp=r.hour_pillar||'';
+      const dayTGcloud = dp.length>=1 ? dp[0] : null;
       const nameEsc = r.name.replace(/'/g,"\'");
       return '<tr>'
         +'<td style="text-align:left;font-weight:500;">'+r.name+'</td>'
@@ -737,15 +765,10 @@ async function cloudSearch(){
         +'<td class="pillar-cell">'+pillarCell(dp,dp,true)+'</td>'
         +'<td class="pillar-cell">'+pillarCell(mp,dp,false)+'</td>'
         +'<td class="pillar-cell">'+pillarCell(yp,dp,false)+'</td>'
-        +'<td class="wx-cell"><span class="w-木">'+r.wx_wood+'</span></td>'
-        +'<td class="wx-cell"><span class="w-火">'+r.wx_fire+'</span></td>'
-        +'<td class="wx-cell"><span class="w-土">'+r.wx_earth+'</span></td>'
-        +'<td class="wx-cell"><span class="w-金">'+r.wx_metal+'</span></td>'
-        +'<td class="wx-cell"><span class="w-水">'+r.wx_water+'</span></td>'
-        +'<td class="zg-cell">'+zgCell(r.zg_year)+'</td>'
-        +'<td class="zg-cell">'+zgCell(r.zg_month)+'</td>'
-        +'<td class="zg-cell">'+zgCell(r.zg_day)+'</td>'
         +'<td class="zg-cell">'+zgCell(r.zg_hour)+'</td>'
+        +'<td class="zg-cell">'+zgCell(r.zg_day)+'</td>'
+        +'<td class="zg-cell">'+zgCell(r.zg_month)+'</td>'
+        +'<td class="zg-cell">'+zgCell(r.zg_year)+'</td>'
         +'<td><span class="cr-del" onclick="cloudDelete(this.dataset.name)" data-name="'+r.name.replace(/"/g,'&quot;')+'">刪除</span></td>'
         +'</tr>';
     }).join('');
@@ -754,8 +777,8 @@ async function cloudSearch(){
       +'<thead><tr>'
       +'<th style="text-align:left;">姓名</th><th>出生日期</th><th>時間</th>'
       +'<th>時柱</th><th>日柱</th><th>月柱</th><th>年柱</th>'
-      +'<th>木</th><th>火</th><th>土</th><th>金</th><th>水</th>'
-      +'<th>時藏干</th><th>日藏干</th><th>月藏干</th><th>年藏干</th>'
+      +''
+      +'<th>時副星</th><th>日副星</th><th>月副星</th><th>年副星</th>'
       +'<th></th>'
       +'</tr></thead>'
       +'<tbody>'+tableRows+'</tbody>'
@@ -784,6 +807,65 @@ async function cloudDelete(name){
   }
 }
 
+// ── 地支關係資料 ─────────────────────────────
+const DZ_LIUHE = {子:'丑',丑:'子',寅:'亥',卯:'戌',辰:'酉',巳:'申',午:'未',未:'午',申:'巳',酉:'辰',戌:'卯',亥:'寅'};
+const DZ_SANHE = {子:['申','辰'],丑:['巳','酉'],寅:['午','戌'],卯:['亥','未'],辰:['子','申'],巳:['丑','酉'],午:['寅','戌'],未:['卯','亥'],申:['子','辰'],酉:['丑','巳'],戌:['寅','午'],亥:['卯','未']};
+const DZ_LIUCHONG = {子:'午',丑:'未',寅:'申',卯:'酉',辰:'戌',巳:'亥',午:'子',未:'丑',申:'寅',酉:'卯',戌:'辰',亥:'巳'};
+const DZ_LIUHAI = {子:'未',丑:'午',寅:'巳',卯:'辰',辰:'卯',巳:'寅',午:'丑',未:'子',申:'亥',酉:'戌',戌:'酉',亥:'申'};
+const DZ_SANXING = {寅:['巳','申'],巳:['寅','申'],申:['寅','巳'],丑:['戌','未'],戌:['丑','未'],未:['丑','戌'],子:['卯'],卯:['子']};
+
+let activeDz = null;
+
+
+function applyDzHL(dz){
+  // Remove all existing highlights
+  document.querySelectorAll('.dz-ch').forEach(el=>{
+    el.classList.remove('dz-hl-liuhe','dz-hl-sanhe','dz-hl-liuchong','dz-hl-liuhai','dz-hl-sanxing','dz-hl-self');
+  });
+  const liuhe   = DZ_LIUHE[dz] ? [DZ_LIUHE[dz]] : [];
+  const sanhe   = DZ_SANHE[dz] || [];
+  const liuchong= DZ_LIUCHONG[dz] ? [DZ_LIUCHONG[dz]] : [];
+  const liuhai  = DZ_LIUHAI[dz] ? [DZ_LIUHAI[dz]] : [];
+  const sanxing = DZ_SANXING[dz] || [];
+
+  document.querySelectorAll('.dz-ch').forEach(el=>{
+    const v = el.dataset.dz;
+    if(!v) return;
+    if(v === dz)           el.classList.add('dz-hl-self');
+    else if(liuhe.includes(v))    el.classList.add('dz-hl-liuhe');
+    else if(sanhe.includes(v))    el.classList.add('dz-hl-sanhe');
+    else if(liuchong.includes(v)) el.classList.add('dz-hl-liuchong');
+    else if(liuhai.includes(v))   el.classList.add('dz-hl-liuhai');
+    else if(sanxing.includes(v))  el.classList.add('dz-hl-sanxing');
+  });
+}
+
+function clearDzHL(){
+  activeDz = null;
+  document.querySelectorAll('.dz-ch').forEach(el=>{
+    el.classList.remove('dz-hl-liuhe','dz-hl-sanhe','dz-hl-liuchong','dz-hl-liuhai','dz-hl-sanxing','dz-hl-self');
+  });
+  document.getElementById('dzLegend').classList.remove('show');
+}
+
+// Event delegation for all dz-ch clicks
+document.addEventListener('click', e=>{
+  const el = e.target.closest('.dz-ch');
+  if(el && el.dataset.dz){
+    const dz = el.dataset.dz;
+    e.stopPropagation();
+    if(activeDz === dz){ clearDzHL(); }
+    else {
+      activeDz = dz;
+      applyDzHL(dz);
+      document.getElementById('dzLegendTitle').textContent = dz + ' 的關係';
+      document.getElementById('dzLegend').classList.add('show');
+    }
+  } else {
+    if(activeDz) clearDzHL();
+  }
+});
+
 // ── 登入 ──────────────────────────────────────
 async function doLogin(){
   const pw = document.getElementById('loginPw').value.trim();
@@ -802,8 +884,6 @@ async function doLogin(){
     const json = await resp.json();
     if(json.ok){
       SESSION_PW = pw;
-      // Save to sessionStorage (cleared when tab closes)
-      sessionStorage.setItem('bazi_pw', pw);
       document.getElementById('loginOverlay').style.display='none';
       document.getElementById('mainBody').style.display='block';
     } else {
@@ -817,6 +897,13 @@ async function doLogin(){
   btn.textContent='進 入'; btn.disabled=false;
 }
 
+function clearUpload(){
+  document.getElementById('fileInput').value='';
+  document.getElementById('uploadStatus').textContent='';
+  document.getElementById('btnClearUpload').style.display='none';
+  clearResults();
+}
+
 function downloadTemplate(){
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([['姓名','出生日期','出生時間（可空白）'],['王小明','1989/09/15','20:30'],['李大華','1995/01/27','15:00'],['陳美玲','1990/12/26','']]);
@@ -825,6 +912,17 @@ function downloadTemplate(){
   XLSX.writeFile(wb,'八字推算_範本.xlsx');
 }
 </script>
+
+<!-- 地支關係圖例 -->
+<div id="dzLegend">
+  <span class="close-btn" onclick="clearDzHL()">✕</span>
+  <h4 id="dzLegendTitle">地支關係</h4>
+  <div class="dz-leg-item"><div class="dz-leg-dot" style="background:#ffd600"></div>六合（最合）</div>
+  <div class="dz-leg-item"><div class="dz-leg-dot" style="background:#2e7d32"></div>三合（同盟）</div>
+  <div class="dz-leg-item"><div class="dz-leg-dot" style="background:#c62828"></div>六沖（對立）</div>
+  <div class="dz-leg-item"><div class="dz-leg-dot" style="background:#6d4000"></div>六害（暗害）</div>
+  <div class="dz-leg-item"><div class="dz-leg-dot" style="background:#6a1b9a"></div>三刑（摩擦）</div>
+</div>
 </div><!-- /mainBody -->
 </body>
 </html>
