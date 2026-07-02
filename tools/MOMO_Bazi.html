@@ -188,10 +188,10 @@ table.summary .zg-cell{font-size:.75rem;color:var(--stone);}
     </div>
     <div id="tab-manual" class="tab-panel active">
       <div class="format-hint">
-        每行一人：<code>姓名,年/月/日,時:分</code>　（時間可省略）<br>
-        例：<code>王小明,1900/06/06,00:00</code>　或　<code>李大華,1900/01/01</code>
+        每行一人，姓名 + 日期（時間可省略），分隔符不限<br>
+        <code>王小明,1989/09/15,20:30</code>　<code>李大華 1989/09/15</code>　<code>陳美玲 19890915</code>
       </div>
-      <textarea id="inputData" placeholder="王小明,1900/01/01,00:00&#10;李大華,1900/01/01,00:00&#10;陳美玲,1900/02/02"></textarea>
+      <textarea id="inputData" placeholder="王小明,1989/09/15,20:30&#10;李大華,1995/01/27,15:00&#10;陳美玲,1990/12/26"></textarea>
       <div class="btn-row">
         <button class="btn-primary" onclick="calculateManual()">▶ 推算八字</button>
         <button class="btn-secondary" onclick="loadSample()">載入範例</button>
@@ -525,15 +525,37 @@ function clearResults(){
 }
 
 function parseLine(line){
-  const parts=line.split(',').map(s=>s.trim());
-  if(parts.length<2)return{name:line,error:'格式錯誤'};
-  const name=parts[0];
-  const dm=parts[1].match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
-  if(!dm)return{name,error:'日期格式錯誤（'+parts[1]+'）'};
-  const y=+dm[1],m=+dm[2],d=+dm[3];
-  let hour=null,minute=0;
-  if(parts[2]){const tm=parts[2].match(/^(\d{1,2}):(\d{2})$/);if(tm){hour=+tm[1];minute=+tm[2];}}
-  try{return calcPerson(name,y,m,d,hour,minute);}catch(e){return{name,error:e.message};}
+  // 統一分隔符：逗號、空格、tab 都接受
+  // 先把連續空白壓成一個，再嘗試各種切法
+  const raw = line.trim();
+  if(!raw) return null;
+
+  // 抽取日期：支援 1989/09/15、1989-09-15、19890915
+  const dateRe = /(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})|(\d{8})/;
+  const dateM = raw.match(dateRe);
+  if(!dateM) return {name: raw, error: '找不到日期'};
+
+  let y,m,d;
+  if(dateM[4]){ // YYYYMMDD
+    y=+dateM[4].slice(0,4); m=+dateM[4].slice(4,6); d=+dateM[4].slice(6,8);
+  } else {
+    y=+dateM[1]; m=+dateM[2]; d=+dateM[3];
+  }
+
+  // 抽取時間：HH:MM 或 HH MM（空白）
+  const timeRe = /(\d{1,2}):(\d{2})/;
+  const timeM = raw.match(timeRe);
+  let hour=null, minute=0;
+  if(timeM){ hour=+timeM[1]; minute=+timeM[2]; }
+
+  // 姓名：日期之前的文字，去除分隔符
+  const dateStr = dateM[0];
+  const dateIdx = raw.indexOf(dateStr);
+  const namePart = raw.slice(0, dateIdx).replace(/[,，\s]+$/,'').trim();
+  const name = namePart || '未命名';
+
+  try{ return calcPerson(name,y,m,d,hour,minute); }
+  catch(e){ return{name, error:e.message}; }
 }
 
 function calculateManual(){
