@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>配息許願 × 配息強化｜MOMO財商智庫</title>
+<meta name="description" content="配息許願：輸入本金與配息率試算三年後資產樣貌。配息強化試算：加入融資部位，掌握每月淨現金流與利息成本。MOMO財商智庫雙贏策略互動工具。">
+<meta property="og:title" content="配息許願 × 配息強化｜MOMO財商智庫">
+<meta property="og:description" content="輸入本金與配息率，即時試算每月配息、三年後資產樣貌與槓桿現金流。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/tools/dividend-wish-calculator.html">
+<meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/tools/calc-og-cover.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="calc-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#211f14;
+  --bg-2:#282618;
+  --surface:#2b2919;
+  --surface-2:#35331f;
+  --ink:#F5F1E4;
+  --ink-dim:#DDD7C4;
+  --muted:#a8a290;
+  --hair:rgba(216,182,120,.32);
+  --hair-soft:rgba(245,241,228,.11);
+  --brass:#D4AC69;
+  --brass-soft:#EBD49E;
+  --brass-dim:#a9885a;
+  --risk-low:#8fa47c;
+  --risk-mid:#D4AC69;
+  --risk-high:#b06b56;
+  --radius:18px;
+  --radius-sm:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(212,172,105,.10), transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans TC",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+.serif{font-family:"Noto Serif TC",serif}
+::selection{background:rgba(191,154,95,.35)}
+
+.wrap{max-width:520px;margin:0 auto;padding:0 18px 140px}
+
+/* header */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 0 14px;
+}
+.brandmark{display:flex;align-items:center;gap:10px}
+.mono{
+  width:26px;height:26px;position:relative;flex:0 0 auto;
+}
+.mono::before,.mono::after{
+  content:"";position:absolute;inset:0;margin:auto;
+  border:1px solid var(--brass);
+}
+.mono::before{width:26px;height:26px;transform:rotate(45deg)}
+.mono::after{width:10px;height:10px;transform:rotate(45deg);background:var(--brass);opacity:.5}
+.brand-name{font-size:13px;letter-spacing:.14em;color:var(--ink-dim);font-weight:600}
+.back{font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:8px 14px}
+.back:active{border-color:var(--brass)}
+
+/* intro */
+.intro{padding:6px 2px 22px}
+.eyebrow{
+  font-size:11px;letter-spacing:.22em;color:var(--brass-soft);
+  text-transform:uppercase;font-weight:600;margin:0 0 10px;
+}
+.intro h1{
+  margin:0 0 10px;font-size:26px;line-height:1.3;font-weight:600;
+}
+.intro p{margin:0;font-size:13.5px;line-height:1.75;color:var(--muted)}
+
+/* segmented control */
+.segmented{
+  display:flex;border:1px solid var(--hair);border-radius:999px;
+  padding:4px;gap:4px;background:var(--surface);margin-bottom:22px;
+}
+.seg-btn{
+  flex:1;text-align:center;padding:12px 4px;border-radius:999px;
+  font-size:14px;font-weight:600;color:var(--muted);background:transparent;
+  border:none;cursor:pointer;transition:color .25s ease,background .25s ease;
+  min-height:44px;
+}
+.seg-btn.is-active{
+  background:linear-gradient(180deg,rgba(191,154,95,.16),rgba(191,154,95,.05));
+  color:var(--ink);border:1px solid var(--hair);
+}
+
+/* fields */
+.field{margin-bottom:22px}
+.field-label{
+  display:flex;align-items:baseline;justify-content:space-between;
+  font-size:12px;letter-spacing:.08em;color:var(--ink-dim);font-weight:600;margin-bottom:10px;
+}
+.field-label .val-pill{
+  font-size:13px;font-weight:700;color:var(--brass-soft);
+  font-variant-numeric:tabular-nums;
+}
+.amt-input-wrap{
+  position:relative;border-bottom:1px solid var(--hair);padding-bottom:8px;
+}
+.amt-input-wrap::before{content:"NT$";position:absolute;left:0;bottom:10px;font-size:14px;color:var(--muted)}
+.amt-input-wrap input{
+  width:100%;background:transparent;border:none;color:var(--ink);
+  font-family:"Noto Serif TC",serif;font-size:28px;font-weight:600;
+  padding:6px 0 6px 46px;outline:none;font-variant-numeric:tabular-nums;
+  -webkit-appearance:none;appearance:none;
+}
+.amt-input-wrap input::-webkit-outer-spin-button,
+.amt-input-wrap input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.amt-input-wrap input[type="number"]{-moz-appearance:textfield}
+
+input[type="range"]{
+  -webkit-appearance:none;width:100%;background:transparent;height:28px;margin:6px 0;
+}
+input[type="range"]::-webkit-slider-runnable-track{
+  height:2px;background:var(--hair);border-radius:2px;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;margin-top:-13px;
+  width:28px;height:28px;border-radius:50%;
+  background:radial-gradient(circle at 32% 32%, var(--brass-soft), var(--brass) 60%, var(--brass-dim) 100%);
+  box-shadow:0 3px 8px rgba(0,0,0,.45);
+  border:1px solid rgba(0,0,0,.2);
+}
+input[type="range"]::-moz-range-track{height:2px;background:var(--hair);border-radius:2px}
+input[type="range"]::-moz-range-thumb{
+  width:28px;height:28px;border-radius:50%;border:none;
+  background:radial-gradient(circle at 32% 32%, var(--brass-soft), var(--brass) 60%, var(--brass-dim) 100%);
+  box-shadow:0 3px 8px rgba(0,0,0,.45);
+}
+.chip-row{display:flex;gap:8px;margin-top:12px}
+.chip{
+  flex:1;text-align:center;padding:9px 0;border-radius:999px;
+  border:1px solid var(--hair);color:var(--muted);font-size:12.5px;font-weight:600;
+  background:transparent;cursor:pointer;min-height:38px;
+}
+.chip:active{border-color:var(--brass);color:var(--brass-soft)}
+
+/* strategy info */
+.info-box{
+  border-top:1px solid var(--hair-soft);padding-top:16px;margin-bottom:26px;
+}
+.info-desc{
+  margin:0 0 14px;font-size:13px;line-height:1.75;color:var(--ink-dim);min-height:44px;transition:opacity .2s;
+}
+.tag-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;margin-bottom:8px}
+.tag-row:last-child{margin-bottom:0}
+.tag-label{color:var(--muted)}
+.tag-val{color:var(--ink);font-weight:600}
+.tag-bar-bg{width:96px;height:4px;background:var(--hair-soft);border-radius:2px;overflow:hidden}
+.tag-bar-fill{height:100%;border-radius:2px;transition:width .5s ease,background-color .5s ease}
+
+/* statement card - signature element */
+.statement{
+  position:relative;
+  background:linear-gradient(180deg,var(--surface), var(--surface-2));
+  border:1px solid var(--hair);border-radius:var(--radius);
+  padding:24px 22px 20px;overflow:hidden;margin-bottom:18px;
+}
+.statement::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent, var(--brass), transparent);
+}
+.statement-corner{
+  position:absolute;top:14px;right:16px;font-size:10px;letter-spacing:.16em;
+  color:var(--brass-dim);text-transform:uppercase;font-weight:600;
+}
+.headline-row{margin-bottom:18px}
+.headline-label{font-size:11px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.headline-num{
+  font-family:"Noto Serif TC",serif;font-size:38px;font-weight:600;color:var(--ink);
+  font-variant-numeric:tabular-nums;line-height:1.15;
+}
+.hair-divider{height:1px;background:var(--hair-soft);margin:16px 0}
+
+.locked-row{
+  position:relative;border-radius:var(--radius-sm);
+  border:1px solid var(--hair);background:rgba(191,154,95,.05);
+  padding:14px 16px;overflow:hidden;margin-bottom:16px;
+}
+.locked-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.locked-label{font-size:12px;color:var(--brass-soft);font-weight:700;letter-spacing:.04em}
+.locked-tag{
+  font-size:9.5px;letter-spacing:.14em;color:var(--brass-dim);border:1px solid var(--hair);
+  padding:2px 8px;border-radius:999px;text-transform:uppercase;
+}
+.locked-desc{
+  margin:6px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink-dim);
+}
+.locked-desc b{color:var(--brass-soft);font-weight:700}
+.assump-line{margin:0 0 10px;font-size:12px;line-height:1.75;color:var(--ink-dim)}
+.assump-line:last-child{margin-bottom:0}
+.assump-line b{color:var(--brass-soft);font-weight:700}
+.unlock-overlay{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(18,19,9,.35);z-index:10;
+}
+.unlock-pill{
+  background:var(--brass);color:#171406;padding:7px 14px;border-radius:999px;
+  font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;
+  box-shadow:0 6px 14px rgba(0,0,0,.4);
+}
+.locked-cta{
+  display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+  background:var(--brass);color:#171406;padding:9px 16px;border-radius:999px;
+  font-size:12.5px;font-weight:700;
+}
+
+.life-row{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);
+  background:var(--hair-soft);margin-bottom:18px;
+}
+.life-icon{font-size:20px}
+.life-copy .life-eyebrow{font-size:10.5px;color:var(--muted);letter-spacing:.06em}
+.life-copy .life-text{font-size:13.5px;font-weight:600;color:var(--brass-soft)}
+
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.metric{
+  border:1px solid var(--hair-soft);border-radius:var(--radius-sm);padding:12px 14px;
+}
+.metric .k{font-size:11px;color:var(--muted);margin-bottom:6px}
+.metric .v{font-family:"Noto Serif TC",serif;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.total-row{
+  display:flex;align-items:center;justify-content:space-between;
+  border:1px solid var(--hair);border-radius:var(--radius-sm);
+  padding:16px;margin-top:10px;
+  background:linear-gradient(90deg, rgba(191,154,95,.08), transparent);
+}
+.total-row .k{font-size:12px;color:var(--ink-dim);font-weight:600}
+.total-row .v{
+  font-family:"Noto Serif TC",serif;font-size:20px;font-weight:700;
+  background:linear-gradient(90deg,var(--brass-soft),var(--brass),var(--brass-soft));
+  background-size:220% auto;-webkit-background-clip:text;color:transparent;
+  animation:shimmer 4.5s linear infinite;font-variant-numeric:tabular-nums;
+}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+@media (prefers-reduced-motion:reduce){.total-row .v{animation:none}}
+.flash{animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.4}100%{opacity:1}}
+
+.rate-line{text-align:right;font-size:12px;color:var(--muted);margin-top:6px}
+.rate-line b{color:var(--brass-soft);font-weight:700}
+
+/* utility row */
+.util-row{display:flex;gap:10px;margin:22px 0 4px}
+.util-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid var(--hair);border-radius:999px;padding:11px;
+  font-size:12.5px;color:var(--ink-dim);background:transparent;cursor:pointer;min-height:42px;
+}
+.util-btn:active{border-color:var(--brass)}
+
+/* sticky CTA */
+.cta-spacer{height:12px}
+.cta-inline{display:none}
+.cta-fixed{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:linear-gradient(180deg, rgba(18,19,9,0), rgba(18,19,9,.94) 30%);
+  padding:24px 18px calc(16px + env(safe-area-inset-bottom));
+}
+.cta-fixed .inner{max-width:520px;margin:0 auto}
+.cta-note{font-size:12px;color:var(--ink-dim);text-align:center;margin:0 0 10px}
+.btn-primary{
+  display:block;text-align:center;padding:15px;border-radius:999px;
+  background:linear-gradient(180deg,var(--brass-soft),var(--brass));
+  color:#171406;font-weight:700;font-size:14.5px;letter-spacing:.02em;
+  box-shadow:0 10px 24px rgba(0,0,0,.4);
+}
+
+.footer{
+  margin-top:26px;color:var(--muted);font-size:11.5px;line-height:1.7;text-align:center;
+  border-top:1px solid var(--hair-soft);padding-top:16px;
+}
+
+@media (min-width:640px){
+  .wrap{padding-bottom:110px}
+  .cta-fixed{display:none}
+  .cta-inline{display:block;margin-top:20px}
+}
+
+/* page tabs (top-level) */
+.page-tabs{margin-bottom:20px}
+.page{display:none}
+.page.active{display:block}
+
+/* select control */
+.lux-select{
+  width:100%;appearance:none;-webkit-appearance:none;
+  background:var(--surface-2);color:var(--ink);
+  border:1px solid var(--hair);border-radius:var(--radius-sm);
+  padding:12px 14px;font-size:15px;font-family:"Noto Sans TC",sans-serif;
+  min-height:44px;
+}
+.lux-select:focus{outline:none;border-color:var(--brass)}
+
+/* collapsible details */
+.lux-details{
+  border:1px solid var(--hair-soft);border-radius:var(--radius-sm);
+  background:rgba(245,241,228,.02);margin-bottom:22px;overflow:hidden;
+}
+.lux-details summary{
+  list-style:none;cursor:pointer;padding:13px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:13px;font-weight:600;color:var(--ink-dim);
+}
+.lux-details summary::-webkit-details-marker{display:none}
+.lux-details summary::after{content:"›";transform:rotate(90deg);color:var(--brass-soft);font-size:16px;transition:transform .2s}
+.lux-details[open] summary::after{transform:rotate(-90deg)}
+.lux-details .lux-body{padding:2px 14px 16px}
+.lux-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.lux-row:last-child{margin-bottom:0}
+.lux-mini-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
+.lux-mini-field input{
+  width:100%;background:var(--surface-2);border:1px solid var(--hair);
+  color:var(--ink);border-radius:10px;padding:10px 12px;font-size:15px;
+  font-variant-numeric:tabular-nums;
+}
+.lux-toggle-row{display:flex;align-items:center;gap:10px;padding:0 14px 12px}
+.lux-toggle-row input{width:18px;height:18px;accent-color:var(--brass)}
+.lux-toggle-row label{font-size:12.5px;color:var(--ink-dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <div class="brandmark">
+      <div class="mono"></div>
+      <span class="brand-name serif">MOMO 財商智庫</span>
+    </div>
+    <a class="back" href="https://nms3194949.github.io/MOMO_FinSphere/">回首頁</a>
+  </header>
+
+  <div class="segmented page-tabs" role="tablist" aria-label="頁面切換">
+    <button type="button" class="seg-btn is-active" data-page="wish" role="tab" aria-selected="true">配息許願</button>
+    <button type="button" class="seg-btn" data-page="leverage" role="tab" aria-selected="false">配息強化試算</button>
+  </div>
+
+  <div class="page active" id="page-wish">
+
+  <section class="intro">
+    <p class="eyebrow">雙贏策略 · 互動試算</p>
+    <h1 class="serif">配息許願</h1>
+    <p>選擇一種配置節奏，輸入本金並調整配息率，立即看見每月現金流與三年後的資產樣貌。</p>
+  </section>
+
+
+  <div class="segmented" role="tablist" aria-label="策略選擇">
+    <button type="button" class="seg-btn" data-strategy="conservative" role="tab" aria-selected="false">保守</button>
+    <button type="button" class="seg-btn is-active" data-strategy="balanced" role="tab" aria-selected="true">穩健</button>
+    <button type="button" class="seg-btn" data-strategy="aggressive" role="tab" aria-selected="false">積極</button>
+  </div>
+
+  <div class="field">
+    <div class="field-label"><span>投入本金</span></div>
+    <div class="amt-input-wrap">
+      <input id="amt" type="number" inputmode="numeric" min="0" step="1000" value="1000000" aria-label="投入本金">
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">
+      <span>配息率</span>
+      <span class="val-pill" id="distNow">8%</span>
+    </div>
+    <input id="distRange" type="range" min="0" max="17" step="1" value="8" aria-label="配息率" />
+    <div class="chip-row">
+      <button type="button" class="chip" id="dist5">5%</button>
+      <button type="button" class="chip" id="dist10">10%</button>
+      <button type="button" class="chip" id="dist15">15%</button>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <p class="info-desc" id="info-desc">股債平衡配置，在控制波動的同時，透過複利效應穩健累積資產。</p>
+    <div class="tag-row">
+      <span class="tag-label">風險屬性</span>
+      <div class="tag-bar-bg"><div class="tag-bar-fill" id="bar-risk" style="width:55%;background:var(--risk-mid)"></div></div>
+    </div>
+    <div class="tag-row">
+      <span class="tag-label">適合週期</span>
+      <span class="tag-val" id="text-term">中期累積（1–3 年）</span>
+    </div>
+  </div>
+
+  <div class="statement" id="calc-statement">
+    <span class="statement-corner">雙贏對帳單</span>
+    <div class="headline-row">
+      <div class="headline-label">預估月配息</div>
+      <div class="headline-num" id="out-monthly">—</div>
+    </div>
+
+    <div class="locked-row">
+      <div class="locked-top">
+        <span class="locked-label">還有更適合你的配置方式</span>
+        <span class="locked-tag">限定</span>
+      </div>
+      <p class="locked-desc">依你目前輸入的本金與配息率，還有 <b>3 種進階配置方式</b>尚未試算，包含更高效率的資產配置建議。</p>
+      <a class="locked-cta" id="unlock-link" href="https://lin.ee/52RKwM5?utm_source=wish_unlock&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">加入 LINE 解鎖 →</a>
+    </div>
+
+    <div class="life-row">
+      <div class="life-icon" id="life-icon">☕</div>
+      <div class="life-copy">
+        <div class="life-eyebrow">相當於生活品質</div>
+        <div class="life-text" id="life-text">每天一杯拿鐵</div>
+      </div>
+    </div>
+
+    <div class="hair-divider"></div>
+
+    <div class="metric-grid">
+      <div class="metric"><div class="k">每年本金成長率</div><div class="v" id="out-grow">—</div></div>
+      <div class="metric"><div class="k">三年後本金</div><div class="v" id="out-3y">—</div></div>
+      <div class="metric"><div class="k">三年總領配息</div><div class="v" id="out-3y-div">—</div></div>
+      <div class="metric"><div class="k">三年累積報酬率</div><div class="v" id="out-total-rate">—</div></div>
+    </div>
+
+    <div class="total-row">
+      <span class="k">三年總報酬（本金+配息）</span>
+      <span class="v" id="out-total">—</span>
+    </div>
+  </div>
+
+  <details class="lux-details">
+    <summary>ⓘ 試算假設說明</summary>
+    <div class="lux-body">
+      <p class="assump-line">本試算採用 <b>2.5 倍槓桿</b>部位（本金以外另計入融資部位），三年後數字為稅前試算，不含手續費、稅負與匯率影響。</p>
+      <p class="assump-line">各策略假設年化資產成長率：保守 3%／穩健 6%／積極 9%（目前選擇：<span id="assump-current-strategy">穩健 6%</span>）。</p>
+      <p class="assump-line">配息率為使用者自行輸入，與假設成長率彼此獨立試算；過去績效不代表未來表現，實際淨值與配息可能不同。</p>
+    </div>
+  </details>
+
+  <div class="util-row">
+    <button type="button" class="util-btn" id="btn-share-link">🔗 複製連結</button>
+    <button type="button" class="util-btn" id="btn-native-share">📤 分享</button>
+  </div>
+
+  <div class="cta-inline">
+    <p class="cta-note">想知道如何實際配置出這樣的現金流？</p>
+    <a class="btn-primary" href="https://lin.ee/52RKwM5?utm_source=wish_cta&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
+  </div>
+
+  <footer class="footer">
+    本工具僅供試算參考，不構成招募、要約或投資建議。投資有風險，商品價值可能因市場波動而變化，過去績效不代表未來表現，請依自身風險承受度謹慎評估後再行決定。
+  </footer>
+
+  <div class="cta-spacer"></div>
+
+  </div><!-- /page-wish -->
+
+  <div class="page" id="page-leverage">
+
+    <section class="intro">
+      <p class="eyebrow">雙贏策略 · 配息強化</p>
+      <h1 class="serif">配息強化試算</h1>
+      <p>本金加上融資部位放大月配息，同步掌握利息成本，看見真正落袋的淨現金流。</p>
+    </section>
+
+    <div class="field">
+      <div class="field-label"><span>投入本金</span></div>
+      <div class="amt-input-wrap">
+        <input id="lev-principal" type="number" inputmode="numeric" min="0" step="1000" value="1000000" aria-label="投入本金">
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        <span>融資成數</span>
+        <span class="val-pill" id="lev-loan-display">融資 ＄1,500,000</span>
+      </div>
+      <select id="lev-ratio" class="lux-select" aria-label="融資成數">
+        <option value="0|0">0 成</option>
+        <option value="1|0.1111111111">1 成</option>
+        <option value="2|0.25">2 成</option>
+        <option value="3|0.4285714286">3 成</option>
+        <option value="4|0.6666666667">4 成</option>
+        <option value="5|1.0">5 成</option>
+        <option value="6|1.5" selected>6 成</option>
+        <option value="custom|custom">自訂融資金額</option>
+      </select>
+      <div class="field" id="lev-custom-wrap" style="display:none;margin-top:12px">
+        <div class="amt-input-wrap">
+          <input id="lev-loan-custom" type="number" inputmode="numeric" min="0" step="1000" value="1500000" aria-label="自訂融資金額">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        <span>年化配息率</span>
+        <span class="val-pill" id="lev-rate-now">8%</span>
+      </div>
+      <input id="lev-rate" type="range" min="0" max="20" step="0.5" value="8" aria-label="年化配息率" />
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        <span>融資年利率</span>
+        <span class="val-pill" id="lev-loanrate-now">4%</span>
+      </div>
+      <input id="lev-loanrate" type="range" min="0" max="10" step="0.1" value="4" aria-label="融資年利率" />
+    </div>
+
+    <details class="lux-details" id="lev-loan2-box">
+      <summary>加入分期貸款（選填）</summary>
+      <div class="lux-toggle-row">
+        <input type="checkbox" id="lev-loan2-enabled" />
+        <label for="lev-loan2-enabled">啟用貸款試算（等額本息）</label>
+      </div>
+      <div class="lux-body">
+        <div class="lux-row">
+          <div class="lux-mini-field"><label>貸款金額</label><input id="lev-loan2-amount" type="number" value="500000" step="1000" disabled></div>
+          <div class="lux-mini-field"><label>年限（年）</label><input id="lev-loan2-years" type="number" value="5" step="1" min="1" disabled></div>
+        </div>
+        <div class="lux-row">
+          <div class="lux-mini-field"><label>年利率（%）</label><input id="lev-loan2-rate" type="number" value="3.5" step="0.1" disabled></div>
+          <div class="lux-mini-field"><label>每月本息</label><input id="lev-loan2-monthly" value="—" disabled></div>
+        </div>
+      </div>
+    </details>
+
+    <div class="statement" id="lev-statement">
+      <span class="statement-corner">配息強化對帳單</span>
+      <div class="headline-row">
+        <div class="headline-label">每月淨現金流</div>
+        <div class="headline-num" id="lev-net">—</div>
+      </div>
+
+      <div class="hair-divider"></div>
+
+      <div class="metric-grid">
+        <div class="metric"><div class="k">總投入（本金＋融資）</div><div class="v" id="lev-total">—</div></div>
+        <div class="metric"><div class="k">每月配息（毛）</div><div class="v" id="lev-gross">—</div></div>
+        <div class="metric"><div class="k">每月融資利息</div><div class="v" id="lev-interest">—</div></div>
+        <div class="metric"><div class="k">預估年化報酬率</div><div class="v" id="lev-return">—</div></div>
+        <div class="metric" id="lev-loan2-metric" style="display:none;grid-column:1/-1"><div class="k">每月貸款本息</div><div class="v" id="lev-loan2-out">—</div></div>
+      </div>
+    </div>
+
+    <details class="lux-details">
+      <summary>ⓘ 試算假設說明</summary>
+      <div class="lux-body">
+        <p class="assump-line">本試算為融資部位之現金流試算：配息率與融資年利率皆為使用者自行輸入之假設值，並假設試算期間維持不變。</p>
+        <p class="assump-line">本試算不包含基金淨值波動與虧損風險；融資將放大波動與損失，請審慎評估自身風險承受度。</p>
+      </div>
+    </details>
+
+    <div class="util-row">
+      <button type="button" class="util-btn" id="lev-btn-share">🔗 複製連結</button>
+      <button type="button" class="util-btn" id="lev-btn-native-share">📤 分享</button>
+    </div>
+
+    <div class="cta-inline">
+      <p class="cta-note">想知道如何配置出這樣的配息強化現金流？</p>
+      <a class="btn-primary" href="https://lin.ee/52RKwM5?utm_source=leverage_cta&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
+    </div>
+
+    <footer class="footer">
+      本工具僅供試算參考，不構成招募、要約或投資建議。槓桿與融資將放大波動與損失風險，配息不代表保證收益，請審慎評估自身風險承受度。
+    </footer>
+
+    <div class="cta-spacer"></div>
+
+  </div><!-- /page-leverage -->
+
+</div>
+
+<div class="cta-fixed" id="cta-fixed" style="display:none">
+  <div class="inner">
+    <p class="cta-note" id="cta-fixed-note">想知道如何實際配置出這樣的現金流？</p>
+    <a class="btn-primary" id="cta-fixed-link" href="https://lin.ee/52RKwM5?utm_source=wish_cta&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
+  </div>
+</div>
+
+
+<script>
+const $ = (id)=>document.getElementById(id);
+const nfTW = new Intl.NumberFormat('zh-TW');
+const clamp = (v,min,max)=>Math.min(max,Math.max(min,v));
+const money = (x)=>'＄'+nfTW.format(Math.round(x));
+const pct = (x)=>(Math.round(x*100)/100).toFixed(2)+'%';
+const passiveOpt = {passive:true};
+
+function getPageBaseUrl(){
+  if(location.protocol === 'http:' || location.protocol === 'https:'){
+    return `${location.origin}${location.pathname}`;
+  }
+  return null; // e.g. opened directly as a local file:// — no meaningful shareable link
+}
+
+async function nativeShare({title, text, url, btn}){
+  const shareData = url ? { title, text, url } : { title, text };
+  if(navigator.share){
+    try{
+      await navigator.share(shareData);
+    }catch(err){
+      if(err && err.name !== 'AbortError'){ console.error('share failed:', err); }
+    }
+    return;
+  }
+  const clipboardText = url ? `${text}\n${url}` : text;
+  try{
+    await navigator.clipboard.writeText(clipboardText);
+    if(btn){
+      const original = btn.textContent;
+      btn.textContent = '已複製 ✓';
+      setTimeout(()=>{ btn.textContent = original; }, 2000);
+    }
+    alert(url ? '此裝置不支援原生分享，已複製文字與連結，可直接貼到 LINE 或訊息。' : '此裝置不支援原生分享，已複製文字內容（本機開啟時無法附上連結）。');
+  }catch(_){ alert('分享失敗，請手動複製內容：' + clipboardText); }
+}
+
+const STRATEGY = { conservative:3, balanced:6, aggressive:9 };
+const state = { baseCAGR: STRATEGY.balanced, principal: 1_000_000, dist: 8 };
+
+function safeNum(v,def=0){ v=+v; return Number.isFinite(v)?v:def; }
+
+function compute({principal, dist, baseCAGR}){
+  const leverage = 2.5;
+  const totalAsset = principal * leverage;
+  const financing = totalAsset - principal;
+  const monthly = totalAsset * (dist/100) / 12;
+  const div3y = totalAsset * (dist/100) * 3;
+  const assetAfter3y = totalAsset * Math.pow(1 + baseCAGR/100, 3);
+  const after3y = assetAfter3y - financing;
+  const grow = principal > 0 ? (Math.pow(after3y/principal, 1/3) - 1) * 100 : 0;
+  const total = after3y + div3y;
+  const totalRate = principal > 0 ? (total/principal - 1) * 100 : 0;
+  return { monthly, grow, after3y, div3y, total, totalRate };
+}
+
+const STRATEGY_INFO = {
+  conservative: { desc:"以高評級債券與防禦型部位為主，優先守住本金，追求平穩且持續的現金流。", risk:25, riskColor:"var(--risk-low)", term:"長期持有（3 年以上）", label:"保守 3%" },
+  balanced:     { desc:"股債平衡配置，在控制波動的同時，透過複利效應穩健累積資產。", risk:55, riskColor:"var(--risk-mid)", term:"中期累積（1–3 年）", label:"穩健 6%" },
+  aggressive:   { desc:"聚焦高成長股與加密資產機會，波動較大，但具備最高的潛在報酬空間。", risk:85, riskColor:"var(--risk-high)", term:"波段操作（靈活進出）", label:"積極 9%" }
+};
+
+function updateStrategyInfo(key){
+  const data = STRATEGY_INFO[key] || STRATEGY_INFO['balanced'];
+  const descEl = $('info-desc');
+  descEl.style.opacity = 0;
+  setTimeout(()=>{ descEl.textContent = data.desc; descEl.style.opacity = 1; }, 180);
+  $('text-term').textContent = data.term;
+  const bar = $('bar-risk');
+  bar.style.width = data.risk + '%';
+  bar.style.background = data.riskColor;
+  const assumpEl = $('assump-current-strategy');
+  if(assumpEl) assumpEl.textContent = data.label;
+}
+
+function renderOutputs(o){
+  $('out-monthly').textContent = money(o.monthly);
+  $('out-grow').textContent = pct(o.grow);
+  $('out-3y').textContent = money(o.after3y);
+  $('out-3y-div').textContent = money(o.div3y);
+  const totalEl = $('out-total');
+  const newTotal = money(o.total);
+  if(totalEl.textContent !== newTotal){
+    totalEl.textContent = newTotal;
+    totalEl.classList.remove('flash');
+    void totalEl.offsetWidth;
+    totalEl.classList.add('flash');
+  }
+  $('out-total-rate').textContent = pct(o.totalRate);
+
+  const m = o.monthly;
+  const iconEl = $('life-icon');
+  const textEl = $('life-text');
+  let icon='🌱', text='累積種子期';
+  if(m>150 && m<=3000){ icon='☕'; text='每天一杯拿鐵'; }
+  else if(m>3000 && m<=10000){ icon='🍱'; text='每月加菜金 + 水電費全免'; }
+  else if(m>10000 && m<=25000){ icon='🚗'; text='支付國產車貸 + 停車費'; }
+  else if(m>25000 && m<=50000){ icon='✈️'; text='每季出國旅遊基金'; }
+  else if(m>50000 && m<=100000){ icon='🏠'; text='支付房貸，邁向財富自由'; }
+  else if(m>100000){ icon='👑'; text='雙贏巔峰，被動收入大於支出'; }
+  iconEl.textContent = icon; textEl.textContent = text;
+}
+
+/* ===== page switching ===== */
+let currentPage = 'wish';
+function updateCtaVisibility(){
+  const fixedCta = $('cta-fixed');
+  if(!fixedCta) return;
+  let show = false;
+  if(currentPage === 'wish'){
+    show = compute(state).monthly > 10000;
+  }else if(currentPage === 'leverage'){
+    show = levCompute().net > 10000;
+  }
+  fixedCta.style.display = (show && window.innerWidth < 640) ? 'block' : 'none';
+}
+function setPage(page){
+  document.querySelectorAll('.page').forEach(el=>{ el.classList.toggle('active', el.id === 'page-'+page); });
+  document.querySelectorAll('[data-page]').forEach(btn=>{
+    const active = btn.dataset.page === page;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', active ? 'true':'false');
+  });
+  currentPage = page;
+  const ctaLink = $('cta-fixed-link');
+  if(ctaLink){
+    const source = page === 'leverage' ? 'leverage_cta_fixed' : 'wish_cta_fixed';
+    ctaLink.href = `https://lin.ee/52RKwM5?utm_source=${source}&utm_medium=calculator&utm_campaign=momo_finsphere`;
+  }
+  try{ localStorage.setItem('momo-page', page); }catch(_){}
+  updateCtaVisibility();
+}
+
+/* ===== leverage / monthly dividend tool ===== */
+const levState = {
+  principal:1_000_000, ratioKey:'6', mult:1.5, customLoan:1_500_000,
+  rate:8, loanRate:4,
+  loan2Enabled:false, loan2Amount:500_000, loan2Years:5, loan2Rate:3.5
+};
+function levLoanAmount(){ return levState.ratioKey==='custom' ? Math.max(0, levState.customLoan) : levState.principal * (levState.mult||0); }
+function levLoan2Monthly(){
+  if(!levState.loan2Enabled) return 0;
+  const A = Math.max(0, levState.loan2Amount);
+  const years = Math.max(1, levState.loan2Years);
+  const r = Math.max(0, levState.loan2Rate)/100/12;
+  const n = years*12;
+  if(r===0) return A/n;
+  const pow = Math.pow(1+r, -n);
+  return A*(r/(1-pow));
+}
+function levCompute(){
+  const P = levState.principal;
+  const L = levLoanAmount();
+  const annualDiv = (P+L) * levState.rate/100;
+  const annualInt = L * levState.loanRate/100;
+  const mDivGross = annualDiv/12;
+  const mInt = annualInt/12;
+  const mLoan2 = levLoan2Monthly();
+  const net = mDivGross - mInt - mLoan2;
+  const estReturn = P>0 ? (annualDiv-annualInt)/P*100 : NaN;
+  return { P, L, total:P+L, mDivGross, mInt, mLoan2, net, estReturn };
+}
+function levApplyStateToUI(){
+  $('lev-principal').value = levState.principal;
+  $('lev-rate').value = levState.rate;
+  $('lev-rate-now').textContent = levState.rate + '%';
+  $('lev-loanrate').value = levState.loanRate;
+  $('lev-loanrate-now').textContent = levState.loanRate + '%';
+
+  const sel = $('lev-ratio');
+  const wantValue = levState.ratioKey==='custom' ? 'custom|custom' : (levState.ratioKey + '|' + levState.mult);
+  sel.value = wantValue;
+  if(sel.value !== wantValue){ sel.value = '6|1.5'; levState.ratioKey='6'; levState.mult=1.5; }
+  $('lev-custom-wrap').style.display = (levState.ratioKey==='custom') ? 'block' : 'none';
+  $('lev-loan-custom').value = levState.customLoan;
+
+  $('lev-loan2-enabled').checked = levState.loan2Enabled;
+  ['lev-loan2-amount','lev-loan2-years','lev-loan2-rate'].forEach(id=>{ $(id).disabled = !levState.loan2Enabled; });
+  $('lev-loan2-amount').value = levState.loan2Amount;
+  $('lev-loan2-years').value = levState.loan2Years;
+  $('lev-loan2-rate').value = levState.loan2Rate;
+}
+function levPersist(){ try{ localStorage.setItem('momo-leverage-v1', JSON.stringify(levState)); }catch(_){} }
+function levRestore(){
+  try{
+    const s = JSON.parse(localStorage.getItem('momo-leverage-v1'));
+    if(s && typeof s==='object') Object.assign(levState, s);
+  }catch(_){}
+}
+function levFromURL(){
+  const p = new URLSearchParams(location.search);
+  if(p.has('lp')) levState.principal = clamp(safeNum(p.get('lp'), levState.principal), 0, 1e9);
+  if(p.has('lratio')){
+    const parts = p.get('lratio').split('|');
+    levState.ratioKey = parts[0];
+    levState.mult = parts[1]==='custom' ? null : parseFloat(parts[1]);
+  }
+  if(p.has('lloan')) levState.customLoan = clamp(safeNum(p.get('lloan'), levState.customLoan), 0, 1e9);
+  if(p.has('lrate')) levState.rate = clamp(safeNum(p.get('lrate'), levState.rate), 0, 100);
+  if(p.has('llrate')) levState.loanRate = clamp(safeNum(p.get('llrate'), levState.loanRate), 0, 100);
+}
+function levRender(){
+  const o = levCompute();
+  $('lev-total').textContent = money(o.total);
+  $('lev-gross').textContent = money(o.mDivGross);
+  $('lev-interest').textContent = money(o.mInt);
+  $('lev-return').textContent = isFinite(o.estReturn) ? pct(o.estReturn) : '—';
+  $('lev-net').textContent = money(o.net);
+  $('lev-loan-display').textContent = '融資 ' + money(o.L);
+  $('lev-loan2-monthly').value = levState.loan2Enabled ? money(o.mLoan2) : '—';
+
+  const loan2Metric = $('lev-loan2-metric');
+  if(levState.loan2Enabled && o.mLoan2 > 0){
+    loan2Metric.style.display = '';
+    $('lev-loan2-out').textContent = money(o.mLoan2);
+  }else{
+    loan2Metric.style.display = 'none';
+  }
+  updateCtaVisibility();
+}
+function levUpdate(){ levApplyStateToUI(); levRender(); levPersist(); }
+function bindLevEvents(){
+  const p = $('lev-principal');
+  const setPrincipal = ()=>{ levState.principal = clamp(safeNum(p.value,0), 0, 1_000_000_000); levUpdate(); };
+  p.addEventListener('input', setPrincipal, passiveOpt);
+  p.addEventListener('change', setPrincipal, passiveOpt);
+
+  const sel = $('lev-ratio');
+  sel.addEventListener('change', ()=>{
+    const parts = sel.value.split('|');
+    levState.ratioKey = parts[0];
+    levState.mult = parts[1]==='custom' ? null : parseFloat(parts[1]);
+    levUpdate();
+  }, passiveOpt);
+
+  const loanCustom = $('lev-loan-custom');
+  loanCustom.addEventListener('input', ()=>{ levState.customLoan = clamp(safeNum(loanCustom.value,0), 0, 1_000_000_000); levUpdate(); }, passiveOpt);
+
+  const rate = $('lev-rate');
+  rate.addEventListener('input', ()=>{ levState.rate = safeNum(rate.value,0); levUpdate(); }, passiveOpt);
+
+  const loanRate = $('lev-loanrate');
+  loanRate.addEventListener('input', ()=>{ levState.loanRate = safeNum(loanRate.value,0); levUpdate(); }, passiveOpt);
+
+  const l2ck = $('lev-loan2-enabled');
+  l2ck.addEventListener('change', ()=>{ levState.loan2Enabled = l2ck.checked; levUpdate(); }, passiveOpt);
+  ['lev-loan2-amount','lev-loan2-years','lev-loan2-rate'].forEach(id=>{
+    $(id).addEventListener('input', ()=>{
+      levState.loan2Amount = safeNum($('lev-loan2-amount').value, levState.loan2Amount);
+      levState.loan2Years = Math.max(1, safeNum($('lev-loan2-years').value, levState.loan2Years));
+      levState.loan2Rate = safeNum($('lev-loan2-rate').value, levState.loan2Rate);
+      levRender(); levPersist();
+    }, passiveOpt);
+  });
+
+  function buildLevShareUrl(){
+    const base = getPageBaseUrl();
+    if(!base) return null;
+    const params = new URLSearchParams();
+    params.set('page','leverage');
+    params.set('lp', levState.principal);
+    params.set('lratio', levState.ratioKey + '|' + (levState.ratioKey==='custom' ? 'custom' : levState.mult));
+    if(levState.ratioKey==='custom') params.set('lloan', levState.customLoan);
+    params.set('lrate', levState.rate);
+    params.set('llrate', levState.loanRate);
+    return `${base}?${params.toString()}`;
+  }
+
+  const btnLevNativeShare = $('lev-btn-native-share');
+  if(btnLevNativeShare){
+    btnLevNativeShare.addEventListener('click', ()=>{
+      const o = levCompute();
+      const text = `本金 ${money(levState.principal)} ＋ 融資 ${money(o.L)}\n年化配息率 ${levState.rate}%\n預估每月淨現金流 ${money(o.net)}`;
+      nativeShare({ title:'MOMO 配息強化試算', text, url: buildLevShareUrl(), btn: btnLevNativeShare });
+    }, passiveOpt);
+  }
+
+  const btnShare = $('lev-btn-share');
+  if(btnShare){
+    btnShare.addEventListener('click', async ()=>{
+      const shareUrl = buildLevShareUrl();
+      if(!shareUrl){ alert('此連結需要將頁面部署到網站後才能使用，目前是在本機開啟檔案。'); return; }
+      try{
+        await navigator.clipboard.writeText(shareUrl);
+        const original = btnShare.textContent;
+        btnShare.textContent = "已複製 ✓";
+        setTimeout(()=>{ btnShare.textContent = original; }, 2000);
+      }catch(err){ alert('複製失敗，請手動複製網址'); }
+    }, passiveOpt);
+  }
+
+  window.addEventListener('resize', ()=>{ if(currentPage==='leverage') levRender(); }, passiveOpt);
+}
+
+function persist(){ try{ localStorage.setItem('momo-calc-v2', JSON.stringify(state)); }catch(_){} }
+function restore(){
+  try{
+    const s = JSON.parse(localStorage.getItem('momo-calc-v2'));
+    if(s && typeof s==='object'){
+      if(typeof s.baseCAGR==='number') state.baseCAGR=s.baseCAGR;
+      if(typeof s.principal==='number') state.principal=s.principal;
+      if(typeof s.dist==='number') state.dist=s.dist;
+    }
+  }catch(_){}
+}
+
+function fromURL(){
+  const p = new URLSearchParams(location.search);
+  if(p.has('principal')) state.principal = clamp(safeNum(p.get('principal'), state.principal), 0, 1e9);
+  if(p.has('dist')) state.dist = clamp(safeNum(p.get('dist'), state.dist), 0, 100);
+  const st = p.get('strategy');
+  if(st && STRATEGY[st] != null){
+    state.baseCAGR = STRATEGY[st];
+    setActiveSeg(st);
+  }
+}
+
+function setActiveSeg(key){
+  document.querySelectorAll('[data-strategy]').forEach(b=>{
+    const active = b.dataset.strategy === key;
+    b.classList.toggle('is-active', active);
+    b.setAttribute('aria-selected', active?'true':'false');
+  });
+}
+
+function update(){
+  const badge = $('distNow'); if(badge) badge.textContent = (state.dist||0)+'%';
+  const amt = $('amt'), range = $('distRange');
+  if(amt) amt.value = safeNum(state.principal,0);
+  if(range) range.value = safeNum(state.dist,0);
+  renderOutputs(compute(state));
+  updateCtaVisibility();
+  persist();
+}
+
+function bindEvents(){
+  const r = $('distRange');
+  r.addEventListener('input', ()=>{ state.dist = safeNum(r.value,0); update(); }, passiveOpt);
+
+  [['dist5',5],['dist10',10],['dist15',15]].forEach(([id,v])=>{
+    $(id)?.addEventListener('click', ()=>{ state.dist=v; r.value=v; update(); }, passiveOpt);
+  });
+
+  const a = $('amt');
+  a.addEventListener('input', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); update(); }, passiveOpt);
+  a.addEventListener('change', ()=>{ const raw=safeNum(a.value,0); state.principal=clamp(raw,0,1_000_000_000); a.value=state.principal; update(); }, passiveOpt);
+
+  document.querySelectorAll('[data-strategy]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.getAttribute('data-strategy');
+      state.baseCAGR = STRATEGY[key] ?? state.baseCAGR;
+      setActiveSeg(key);
+      updateStrategyInfo(key);
+      update();
+    }, passiveOpt);
+  });
+
+  function buildWishShareUrl(){
+    const base = getPageBaseUrl();
+    if(!base) return null;
+    const params = new URLSearchParams();
+    params.set('page','wish');
+    params.set('principal', state.principal);
+    params.set('dist', state.dist);
+    const activeBtn = document.querySelector('[data-strategy].is-active');
+    if(activeBtn) params.set('strategy', activeBtn.dataset.strategy);
+    return `${base}?${params.toString()}`;
+  }
+
+  const btnNativeShare = $('btn-native-share');
+  if(btnNativeShare){
+    btnNativeShare.addEventListener('click', ()=>{
+      const o = compute(state);
+      const text = `本金 ${money(state.principal)}，配息率 ${state.dist}%\n預估月配息 ${money(o.monthly)}\n三年總報酬約 ${money(o.total)}（${pct(o.totalRate)}）`;
+      nativeShare({ title:'MOMO 配息許願試算', text, url: buildWishShareUrl(), btn: btnNativeShare });
+    }, passiveOpt);
+  }
+
+  const btnShare = $('btn-share-link');
+  if(btnShare){
+    btnShare.addEventListener('click', async ()=>{
+      const shareUrl = buildWishShareUrl();
+      if(!shareUrl){ alert('此連結需要將頁面部署到網站後才能使用，目前是在本機開啟檔案。'); return; }
+      try{
+        await navigator.clipboard.writeText(shareUrl);
+        const original = btnShare.textContent;
+        btnShare.textContent = "已複製 ✓";
+        setTimeout(()=>{ btnShare.textContent = original; }, 2000);
+      }catch(err){ alert('複製失敗，請手動複製網址'); }
+    }, passiveOpt);
+  }
+
+  window.addEventListener('resize', ()=>{ renderOutputs(compute(state)); }, passiveOpt);
+}
+
+function boot(){
+  restore(); fromURL(); bindEvents(); update();
+  const activeStrategyBtn = document.querySelector('[data-strategy].is-active');
+  updateStrategyInfo(activeStrategyBtn ? activeStrategyBtn.dataset.strategy : 'balanced');
+
+  levRestore(); levFromURL(); bindLevEvents(); levApplyStateToUI(); levRender();
+
+  document.querySelectorAll('[data-page]').forEach(btn=>{
+    btn.addEventListener('click', ()=> setPage(btn.dataset.page), passiveOpt);
+  });
+
+  const urlPage = new URLSearchParams(location.search).get('page');
+  let initialPage = 'wish';
+  if(urlPage === 'leverage' || urlPage === 'wish'){
+    initialPage = urlPage;
+  }else{
+    try{ const saved = localStorage.getItem('momo-page'); if(saved) initialPage = saved; }catch(_){}
+  }
+  setPage(initialPage);
+}
+document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
+
+</script>
+</body>
+</html>
