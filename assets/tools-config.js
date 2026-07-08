@@ -43,7 +43,6 @@ window.MOMO_TOOLS_CONFIG = [
     showOnHome: false
   },
   {
-    // [修正 2] 統一 ID 命名風格 (原本是 Macro-Compas) 並修正拼字
     id: "macro-compass",
     category: "fund",
     title: "MOMO景氣羅盤",
@@ -62,13 +61,12 @@ window.MOMO_TOOLS_CONFIG = [
     showOnHome: true
   },
   {
-    // [修正 3] 統一 ID 命名風格 (原本是 fund_radar)
     id: "fund-radar",
     category: "fund",
     title: "基金監控雷達",
     desc: "監控基金變化，找到甜蜜買點。",
     href: "/MOMO_FinSphere/tools/fund_radar.html",
-    external: true,
+    external: false,
     showOnHome: true
   },
    {
@@ -77,6 +75,15 @@ window.MOMO_TOOLS_CONFIG = [
     title: "長周期交易平均",
     desc: "監控交易變化，找到甜蜜進出點。",
     href: "/MOMO_FinSphere/tools/seasonality.html",
+    external: true,
+    showOnHome: true
+  },
+     {
+    id: "dividend-simulator",
+    category: "dividend-simulator",
+    title: "配息計算機",
+    desc: "配息計算機",
+    href: "/MOMO_FinSphere/tools/dividend-simulator.html",
     external: true,
     showOnHome: true
   },
@@ -91,7 +98,6 @@ window.MOMO_TOOLS_CONFIG = [
   },
   {
     id: "etf-dashboard",
-    // [修正 4] 統一 Category 大小寫 (依據你的偏好，這裡保持 ETF 或改為 etf 皆可，建議統一)
     category: "ETF",
     title: "台股ETF監控",
     desc: "監控ETF報酬，找出最佳投資點。",
