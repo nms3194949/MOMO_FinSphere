@@ -657,11 +657,11 @@ function isETF(name){return ETF_PATTERNS.some(p=>p.test(name));}
 function calcCP(r){
   if(r.eff_delta==null||r.move5pct==null||r.iv==null||r.spread==null||r.days_left==null) return null;
   // 各指標分數（標準化後加權）
-  const deltaScore  = Math.min(r.eff_delta, 1) * 40;          // 有效Delta，最高40分
-  const move5Score  = Math.min(Math.max(r.move5pct,0),50)/50 * 20; // 漲5%報酬，最高20分
-  const ivScore     = Math.max(0, (100 - r.iv)) / 100 * 20;   // 隱波越低越好，最高20分
-  const spreadScore = Math.max(0, (15 - r.spread)) / 15 * 10; // 價差越低越好，最高10分
-  const dayScore    = Math.min(r.days_left, 365) / 365 * 10;  // 天數越長越好，最高10分
+  const deltaScore  = Math.min(r.eff_delta, 1) * 50;               // 有效Delta，最重要，最高50分
+  const move5Score  = Math.min(Math.max(r.move5pct,0),50)/50 * 25; // 漲5%報酬，最高25分
+  const ivScore     = Math.max(0, (100 - r.iv)) / 100 * 15;        // 隱波越低越好，最高15分
+  const spreadScore = Math.max(0, (15 - r.spread)) / 15 * 8;       // 價差越低越好，最高8分
+  const dayScore    = Math.min(r.days_left, 365) / 365 * 2;        // 天數越長越好，最高2分（不主導排名）
   return deltaScore + move5Score + ivScore + spreadScore + dayScore;
 }
 
