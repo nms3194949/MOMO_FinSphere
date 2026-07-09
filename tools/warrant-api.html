@@ -806,15 +806,19 @@ function filterSort(){
     if(!isNaN(minMove5)&&(x.move5pct==null||x.move5pct<minMove5))return false;
     return true;
   }).sort((a,b)=>{const va=a[sortKey]??Infinity,vb=b[sortKey]??Infinity;return(va-vb)*sortDir;});
-  // CP排名：搜尋特定標的時（有搜尋字且結果集中在同一標的）計算前三名
+  // CP排名：搜尋特定標的時計算前三名並置頂
   if(q.length>0&&rows.length>1){
-    // 計算每筆的 CP 分數
-    rows.forEach(r=>{ r.cp_score=calcCP(r); });
-    // 依 CP 分數排序找前三名
+    rows.forEach(r=>{ r.cp_score=calcCP(r); r.medal=''; });
     const ranked=[...rows].filter(r=>r.cp_score!=null).sort((a,b)=>b.cp_score-a.cp_score);
     const medals=['🥇','🥈','🥉'];
-    rows.forEach(r=>{ r.medal=''; });
-    ranked.slice(0,3).forEach((r,i)=>{ r.medal=medals[i]; });
+    const top3=ranked.slice(0,3);
+    top3.forEach((r,i)=>{ r.medal=medals[i]; });
+    // 前三名置頂，其餘保持原排序
+    const top3set=new Set(top3.map(r=>r.code+r.name));
+    const rest=rows.filter(r=>!top3set.has(r.code+r.name));
+    rows.length=0;
+    top3.forEach(r=>rows.push(r));
+    rest.forEach(r=>rows.push(r));
   } else {
     rows.forEach(r=>{ r.medal=''; r.cp_score=null; });
   }
@@ -949,10 +953,15 @@ function renderMobile(){
   // CP 排名（手機版搜尋時）
   const mobQ=norm($('#nameFilterMob').value).trim();
   if(mobQ.length>0&&rawRows.length>1){
-    rawRows.forEach(r=>{ r.cp_score=calcCP(r); });
+    rawRows.forEach(r=>{ r.cp_score=calcCP(r); r.medal=''; });
     const ranked=[...rawRows].filter(r=>r.cp_score!=null).sort((a,b)=>b.cp_score-a.cp_score);
-    rawRows.forEach(r=>{ r.medal=''; });
-    ranked.slice(0,3).forEach((r,i)=>{ r.medal=['🥇','🥈','🥉'][i]; });
+    const top3=ranked.slice(0,3);
+    top3.forEach((r,i)=>{ r.medal=['🥇','🥈','🥉'][i]; });
+    const top3set=new Set(top3.map(r=>r.code+r.name));
+    const rest=rawRows.filter(r=>!top3set.has(r.code+r.name));
+    rawRows.length=0;
+    top3.forEach(r=>rawRows.push(r));
+    rest.forEach(r=>rawRows.push(r));
   } else {
     rawRows.forEach(r=>{ r.medal=''; });
   }
