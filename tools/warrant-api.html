@@ -194,6 +194,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkIV" checked/>排除無隱波</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkLowIV" checked/>排除隱波&lt;5%</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNeedPrice"/>僅顯示有股價🟢</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNoETF"/>排除ETF權證</label>
       </div>
 
       <!-- 手機版控制列 -->
@@ -235,6 +236,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkIVMob" checked/>排除無隱波</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkLowIVMob" checked/>排除隱波&lt;5%</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNeedPriceMob"/>僅顯示有股價🟢</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNoETFMob"/>排除ETF權證</label>
         </div>
         <button class="btn btn-outline btn-sm" id="btnResetMob">重置</button>
       </div>
@@ -286,6 +288,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <span style="color:var(--purple)">■ 隱波 &gt; 80%（過高）</span>
         <span style="color:var(--muted)">漲5%報酬：以履約價為近似現貨，BS重算之報酬%</span>
         <span style="font-size:11px;color:var(--muted)">🟢 有真實股價　🔴 無股價（用履約價估算，Delta 可能失真）</span>
+        <span style="font-size:11px;color:var(--muted)">🥇🥈🥉 同標的 CP 值排名（搜尋特定標的時顯示，綜合 Delta、報酬、隱波、價差、天數）</span>
       </div>
     </div>
   </div>
@@ -635,6 +638,33 @@ let RAW=[],PROC=[],STOCK_MAP={},STOCK_REV={},STOCK_PRICES={};
 let sortKey='s1',sortDir=1;
 let mobSortDir=-1; // 手機版預設降序（大到小）
 
+
+/* ===== ETF 標的關鍵字 ===== */
+const ETF_PATTERNS = [
+  /^台灣50/,/^T50正/,/^T50反/,/^臺指2X/,/^臺指反/,/^台指反/,/^臺股指/,/^台股指/,
+  /^元金2X/,/^元金反/,/^滬深2X/,/^上証2X/,/^香港2X/,/^元日2X/,/^日本2X/,
+  /^道瓊銀/,/^道瓊銅/,/^道瓊反/,/^道瓊2X/,/^SP黃豆/,/^S&P正/,/^S&P反/,
+  /^SGBR/,/^FBNQ/,/^FB/,/^元黃金/,/^元石油/,/^元油反/,/^元債/,
+  /^美債2X/,/^國債20/,/^國企2X/,/^美費半/,/^美指2X/,/^美指反/,
+  /^A50正/,/^台灣5G/,/^中502/,/^FH/,/^AES/,/^jpp/,/^ITH/,/^IET/,/^AMAX/,
+  /^群臺2X/,/^高息30/,/^領袖50/,/^群高息/,/^高股息/,/^科技息/,/^永續半/,
+  /^電子類/,/^金融類/,/^台股增/,/^群ESG/,/^中高息/,/^國金10/,
+  /^CT債/,/^FANG/,
+];
+function isETF(name){return ETF_PATTERNS.some(p=>p.test(name));}
+
+/* ===== CP值計算（同標的內排名用）===== */
+function calcCP(r){
+  if(r.eff_delta==null||r.move5pct==null||r.iv==null||r.spread==null||r.days_left==null) return null;
+  // 各指標分數（標準化後加權）
+  const deltaScore  = Math.min(r.eff_delta, 1) * 40;          // 有效Delta，最高40分
+  const move5Score  = Math.min(Math.max(r.move5pct,0),50)/50 * 20; // 漲5%報酬，最高20分
+  const ivScore     = Math.max(0, (100 - r.iv)) / 100 * 20;   // 隱波越低越好，最高20分
+  const spreadScore = Math.max(0, (15 - r.spread)) / 15 * 10; // 價差越低越好，最高10分
+  const dayScore    = Math.min(r.days_left, 365) / 365 * 10;  // 天數越長越好，最高10分
+  return deltaScore + move5Score + ivScore + spreadScore + dayScore;
+}
+
 function preprocess(){
   PROC=RAW.map(r=>{
     const name=r["權證名稱"]||r["FLD_WAR_NM"]||"";
@@ -687,6 +717,8 @@ function preprocess(){
       moneyness:r["價內外程度"]||r["FLD_IN_OUT"],
       eff_delta,move5pct,
       has_price:realPrice!=null, // 是否有真實股價
+      is_etf:isETF(name),         // 是否為ETF標的
+      cp_score:null,               // CP分數（後面計算）
     };
   });
 }
@@ -740,7 +772,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 function filterSort(){
   const type=$('#selType').value;
-  const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked,dropLowIV=$('#chkLowIV').checked,needPrice=$('#chkNeedPrice').checked;
+  const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked,dropLowIV=$('#chkLowIV').checked,needPrice=$('#chkNeedPrice').checked,noETF=$('#chkNoETF').checked;
   const rawQ=norm($('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
@@ -764,6 +796,7 @@ function filterSort(){
     if(needIV&&(!x.iv||x.iv===0))return false;
     if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
     if(needPrice&&!x.has_price)return false;
+    if(noETF&&x.is_etf)return false;
     if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
     if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
     if(!isNaN(maxS1)&&x.s1!=null&&x.s1*100>maxS1)return false;
@@ -773,6 +806,18 @@ function filterSort(){
     if(!isNaN(minMove5)&&(x.move5pct==null||x.move5pct<minMove5))return false;
     return true;
   }).sort((a,b)=>{const va=a[sortKey]??Infinity,vb=b[sortKey]??Infinity;return(va-vb)*sortDir;});
+  // CP排名：搜尋特定標的時（有搜尋字且結果集中在同一標的）計算前三名
+  if(q.length>0&&rows.length>1){
+    // 計算每筆的 CP 分數
+    rows.forEach(r=>{ r.cp_score=calcCP(r); });
+    // 依 CP 分數排序找前三名
+    const ranked=[...rows].filter(r=>r.cp_score!=null).sort((a,b)=>b.cp_score-a.cp_score);
+    const medals=['🥇','🥈','🥉'];
+    rows.forEach(r=>{ r.medal=''; });
+    ranked.slice(0,3).forEach((r,i)=>{ r.medal=medals[i]; });
+  } else {
+    rows.forEach(r=>{ r.medal=''; r.cp_score=null; });
+  }
   return{rows,allQ:afterQ.length,allType:all.length,hasQ:q.length>0};
 }
 
@@ -801,7 +846,7 @@ function render(){
 
       tr.innerHTML=`
         <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
-        <td>${r.name}</td>
+        <td>${r.medal?'<span style="margin-right:4px;font-size:14px">'+r.medal+'</span>':''}${r.name}</td>
         <td><span class="tag ${r.cp}">${r.cp}</span></td>
         <td class="${r.spread!=null&&r.spread>15?'eff-bad':''}">${fmt(r.spread,3)}</td>
         <td class="${Math.abs(r.leverage??0)>5?'gold':''}">${fmt(Math.abs(r.leverage),2)}</td>
@@ -834,10 +879,21 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
     const descFirst=['eff_delta','move5pct','leverage'];
     if(sortKey===k){sortDir*=-1;}
     else{sortKey=k;sortDir=descFirst.includes(k)?-1:1;}
+    // 同步更新排序選單
+    const sel=$('#selSortKey');
+    if(sel&&[...sel.options].some(o=>o.value===k)) sel.value=k;
     render();
   });
 });
-['selType','chkZero','selLimit','chkIV','chkLowIV','chkNeedPrice'].forEach(id=>$('#'+id).addEventListener('change',render));
+['selType','chkZero','selLimit','chkIV','chkLowIV','chkNeedPrice','chkNoETF'].forEach(id=>$('#'+id).addEventListener('change',render));
+// 排序選單同步 sortKey
+$('#selSortKey').addEventListener('change',()=>{
+  const k=$('#selSortKey').value;
+  const descFirst=['eff_delta','move5pct','leverage'];
+  sortKey=k;
+  sortDir=descFirst.includes(k)?-1:1;
+  render();
+});
 let dbt;const dbR=()=>{clearTimeout(dbt);dbt=setTimeout(render,280);};
 ['nameFilter','fDays','fS2','fS1','fIV','fLev','fEffDelta','fMove5'].forEach(id=>$('#'+id).addEventListener('input',dbR));
 
@@ -849,6 +905,7 @@ function filterSortMob(){
   const needIV=isMob?$('#chkIVMob').checked:$('#chkIV').checked;
   const dropLowIV=isMob?$('#chkLowIVMob').checked:$('#chkLowIV').checked;
   const needPrice=isMob?$('#chkNeedPriceMob').checked:$('#chkNeedPrice').checked;
+  const noETF=isMob?$('#chkNoETFMob').checked:$('#chkNoETF').checked;
   const rawQ=norm(isMob?$('#nameFilterMob').value:$('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat(isMob?$('#fDaysMob').value:$('#fDays').value);
@@ -872,6 +929,7 @@ function filterSortMob(){
     if(needIV&&(!x.iv||x.iv===0))return false;
     if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
     if(needPrice&&!x.has_price)return false;
+    if(noETF&&x.is_etf)return false;
     if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
     if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
     if(!isNaN(minEffDelta)&&(x.eff_delta==null||x.eff_delta<minEffDelta))return false;
@@ -887,7 +945,18 @@ function filterSortMob(){
 /* ===== renderMobile ===== */
 function renderMobile(){
   if(PROC.length===0)return;
-  const rows=filterSortMob();
+  const rawRows=filterSortMob();
+  // CP 排名（手機版搜尋時）
+  const mobQ=norm($('#nameFilterMob').value).trim();
+  if(mobQ.length>0&&rawRows.length>1){
+    rawRows.forEach(r=>{ r.cp_score=calcCP(r); });
+    const ranked=[...rawRows].filter(r=>r.cp_score!=null).sort((a,b)=>b.cp_score-a.cp_score);
+    rawRows.forEach(r=>{ r.medal=''; });
+    ranked.slice(0,3).forEach((r,i)=>{ r.medal=['🥇','🥈','🥉'][i]; });
+  } else {
+    rawRows.forEach(r=>{ r.medal=''; });
+  }
+  const rows=rawRows;
   const list=$('#wcardList'); list.innerHTML='';
 
   $('#metaBar').textContent='篩選後 '+rows.length+' 筆';
@@ -911,7 +980,7 @@ function renderMobile(){
     div.innerHTML=`
       <div class="wcard-header">
         <span class="wcard-code">${r.code}</span>
-        <span class="wcard-name">${r.name}</span>
+        <span class="wcard-name">${r.medal?'<span style="font-size:14px">"+r.medal+"</span> ':''}${r.name}</span>
         <span style="font-size:11px">${r.has_price?'🟢':'🔴'}</span>
         <span class="tag ${r.cp}">${r.cp}</span>
       </div>
@@ -980,7 +1049,7 @@ let dbtM;const dbRM=()=>{clearTimeout(dbtM);dbtM=setTimeout(renderAll,280);};
 ['nameFilterMob','fDaysMob','fS2Mob','fEffDeltaMob','fMove5Mob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('input',dbRM);
 });
-['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob','chkNeedPriceMob'].forEach(id=>{
+['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob','chkNeedPriceMob','chkNoETFMob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('change',renderAll);
 });
 window.addEventListener('resize',()=>{if(PROC.length>0)renderAll();});
