@@ -120,6 +120,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
   <nav>
     <button class="nb on" data-v="intra">月內走勢</button>
     <button class="nb" data-v="monthly">月份總覽</button>
+    <button class="nb" data-v="sector">板塊輪動</button>
   </nav>
 </header>
 
@@ -315,6 +316,69 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       <div id="corr-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
     </div>
   </div>
+  <!-- 板塊輪動 -->
+  <div id="v-sector" style="display:none">
+    <!-- 板塊設定 -->
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t">板塊設定</span>
+        <span class="cc-s">選擇哪些指數屬於板塊 ETF，設定會自動儲存</span>
+      </div>
+      <div id="sector-cfg" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px"></div>
+    </div>
+    <!-- 月內走勢 -->
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t" id="s-ct"></span>
+        <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
+      </div>
+      <div class="cb"><canvas id="s-lc"></canvas></div>
+    </div>
+    <!-- 各月份報酬長條圖 -->
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t">各月份歷史平均報酬</span>
+        <span class="cc-s">點擊長條可跳至月內走勢</span>
+      </div>
+      <div class="cb" style="height:240px"><canvas id="s-bc"></canvas></div>
+    </div>
+    <!-- 熱力圖 -->
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t" id="s-hmt">板塊熱力圖</span>
+        <div id="s-hm-tabs" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">綠＝正報酬 紅＝負報酬</div>
+      <div class="hm-wrap"><table class="hm" id="s-hm"></table></div>
+    </div>
+    <!-- 相對強弱 -->
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t">板塊相對強弱比較</span>
+        <span class="cc-s">各月份平均報酬相對板塊均值的偏差</span>
+      </div>
+      <div class="cb" style="height:280px"><canvas id="s-rs"></canvas></div>
+    </div>
+    <!-- 相關係數 -->
+    <div class="cc">
+      <div class="cc-h">
+        <div>
+          <span class="cc-t">板塊相關係數矩陣</span>
+          <span class="cc-s" style="margin-left:8px">深綠＝高度正相關 深紅＝負相關</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--mu)">篩選月份：</span>
+          <select id="s-corr-month" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer">
+            <option value="0">全年</option>
+          </select>
+        </div>
+      </div>
+      <div style="overflow-x:auto;margin-top:8px">
+        <table id="s-corr-tbl" style="border-collapse:collapse;font-size:12px"></table>
+      </div>
+      <div id="s-corr-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
+    </div>
+  </div>
 </main>
 
 <div class="gs-bar">
@@ -350,12 +414,14 @@ var DASH_POOL  = [[],[6,3],[3,3],[8,2,2,2],[4,2],[6,2],[2,2],[8,4],[4,4],[6,2,2,
 
 function buildSR() {
   if (!D || !D.meta) return;
+  loadSectorKeys();
   SR = [];
   hid = {};
   var poolIdx = 0;
   Object.keys(D.meta).forEach(function(k) {
     if (k === 'VIX') return;
-    var color = COLOR_MAP[k] || COLOR_POOL[poolIdx++ % COLOR_POOL.length];
+    if (sectorKeys.indexOf(k) !== -1) return; // 板塊排除在主視圖外
+    var color = COLOR_MAP[k] || SECTOR_COLOR_MAP[k] || COLOR_POOL[poolIdx++ % COLOR_POOL.length];
     SR.push({
       k:  k,
       lb: D.meta[k].label || k,
@@ -364,6 +430,21 @@ function buildSR() {
     });
     hid[SR.length-1] = false;
   });
+}
+
+function buildSectorSR() {
+  // 給板塊 Tab 用的 SR，使用板塊顏色
+  if (!D || !D.meta) return [];
+  return Object.keys(D.meta)
+    .filter(function(k){ return k !== 'VIX' && sectorKeys.indexOf(k) !== -1; })
+    .map(function(k){
+      return {
+        k:  k,
+        lb: D.meta[k].label || k,
+        c:  SECTOR_COLOR_MAP[k] || COLOR_POOL[Object.keys(D.meta).indexOf(k) % COLOR_POOL.length],
+        ds: []
+      };
+    });
 }
 
 var MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
@@ -573,10 +654,12 @@ function initUI() {
         b.classList.add('on');
         document.getElementById('v-intra').style.display=cv==='intra'?'':'none';
         document.getElementById('v-monthly').style.display=cv==='monthly'?'':'none';
+        document.getElementById('v-sector').style.display=cv==='sector'?'':'none';
         // 切到月份總覽時隱藏月內專屬卡片
         if(cv==='monthly'){
           document.getElementById('vix-intra-card').style.display='none';
         }
+        if(cv==='sector'){ drawSector(); }
         draw();
       };
     });
@@ -1156,7 +1239,292 @@ function renderIwinTable(k) {
   updateIwinStats(k, iwin, n);
 }
 
-// ── 跨月勝率熱力圖 ───────────────────────────────────────────
+// ── 板塊輪動 ─────────────────────────────────────────────────
+var sectorKeys  = [];   // 目前設定為板塊的 key 陣列
+var sLChart     = null;
+var sBChart     = null;
+var sRsChart    = null;
+var sHmIdx      = null; // 熱力圖目前指數
+
+// SPDR 板塊 ETF 預設清單
+var DEFAULT_SECTOR_KEYS = ['XLK','XLF','XLE','XLV','XLY','XLP','XLI','XLB','XLU','XLRE'];
+
+// 板塊 ETF 固定顏色
+var SECTOR_COLOR_MAP = {
+  'XLK':  '#58a6ff', // 藍  科技
+  'XLF':  '#d4a843', // 金  金融
+  'XLE':  '#f0883e', // 橘  能源
+  'XLV':  '#3fb950', // 綠  醫療
+  'XLY':  '#bc8cff', // 紫  非必需消費
+  'XLP':  '#ff6eb4', // 粉  必需消費
+  'XLI':  '#40e0d0', // 青  工業
+  'XLB':  '#e06c75', // 紅  原材料
+  'XLU':  '#ffd700', // 黃  公用事業
+  'XLRE': '#98c379', // 淺綠 不動產
+};
+
+function loadSectorKeys() {
+  try {
+    var saved = localStorage.getItem('momo_sector_keys');
+    if (saved !== null) {
+      sectorKeys = JSON.parse(saved);
+    } else {
+      // 第一次使用：預設把 XL 系列全部設為板塊
+      sectorKeys = DEFAULT_SECTOR_KEYS.slice();
+      saveSectorKeys();
+    }
+  } catch(e) { sectorKeys = DEFAULT_SECTOR_KEYS.slice(); }
+}
+function saveSectorKeys() {
+  try { localStorage.setItem('momo_sector_keys', JSON.stringify(sectorKeys)); } catch(e){}
+}
+
+function initSectorCfg() {
+  loadSectorKeys();
+  var cfg = document.getElementById('sector-cfg');
+  if (!cfg) return;
+  cfg.innerHTML = '';
+  SR.forEach(function(s) {
+    var on = sectorKeys.indexOf(s.k) !== -1;
+    var btn = document.createElement('button');
+    btn.className = 'idx-chip';
+    btn.style.cursor = 'pointer';
+    btn.style.borderColor = on ? s.c : 'var(--bd)';
+    btn.style.opacity = on ? '1' : '0.45';
+    btn.innerHTML = '<span class="dot" style="background:'+s.c+'"></span>'+s.lb;
+    btn.title = on ? '點擊移除板塊' : '點擊加入板塊';
+    btn.onclick = (function(key, color, b) { return function() {
+      var i = sectorKeys.indexOf(key);
+      if (i === -1) { sectorKeys.push(key); b.style.borderColor=color; b.style.opacity='1'; b.title='點擊移除板塊'; }
+      else          { sectorKeys.splice(i,1); b.style.borderColor='var(--bd)'; b.style.opacity='0.45'; b.title='點擊加入板塊'; }
+      saveSectorKeys();
+      buildSR(); initUI(); // 重建主視圖 pills
+      drawSector();
+    };})(s.k, s.c, btn);
+    cfg.appendChild(btn);
+  });
+
+  // 初始化相關係數月份下拉
+  var mSel = document.getElementById('s-corr-month');
+  if (mSel && mSel.options.length === 1) {
+    MN.forEach(function(m, i) {
+      var o = document.createElement('option');
+      o.value = i+1; o.textContent = m; mSel.appendChild(o);
+    });
+    mSel.onchange = function() { drawSectorCorr(); };
+  }
+}
+
+function getSectorSR() {
+  return buildSectorSR();
+}
+
+function drawSector() {
+  initSectorCfg();
+  var srs = getSectorSR();
+  if (!srs.length) return;
+  drawSectorIntra(srs);
+  drawSectorMonthly(srs);
+  drawSectorHeatmap(srs);
+  drawSectorRS(srs);
+  drawSectorCorr(srs);
+}
+
+// 月內走勢
+function drawSectorIntra(srs) {
+  if (!srs) srs = getSectorSR();
+  var k = String(cm+1);
+  var maxL = Math.max.apply(null, srs.map(function(s){
+    return (D.intramonth[s.k]&&D.intramonth[s.k][k]) ? D.intramonth[s.k][k].length : 0;
+  }));
+  var labels = Array.from({length:maxL}, function(_,i){ return 'D'+(i+1); });
+  var datasets = srs.map(function(s){
+    return {
+      label:s.lb, data:(D.intramonth[s.k]&&D.intramonth[s.k][k])||[],
+      borderColor:s.c, backgroundColor:'transparent',
+      borderWidth:2, borderDash:s.ds,
+      pointRadius:3, pointHoverRadius:5, tension:0.3, fill:false
+    };
+  });
+  var ctx = document.getElementById('s-lc');
+  if (!ctx) return;
+  if (sLChart) { sLChart.destroy(); sLChart=null; }
+  sLChart = new Chart(ctx.getContext('2d'), {
+    type:'line', data:{labels:labels, datasets:datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:16,padding:10}},
+        tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
+          callbacks:{title:function(i){return '第'+(i[0].dataIndex+1)+'交易日';},
+                     label:function(c){return ' '+c.dataset.label+': '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},autoSkip:false,maxRotation:0}},
+        y:{grid:{color:function(c){return c.tick.value===0?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.05)';},
+                 lineWidth:function(c){return c.tick.value===0?1.5:1;},
+                 borderDash:function(c){return c.tick.value===0?[5,4]:[];}},
+           ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}},
+           title:{display:true,text:'累積報酬（%）',color:'#7d8590',font:{size:11}}}
+      }
+    }
+  });
+  var ct = document.getElementById('s-ct');
+  if (ct) ct.textContent = MN[cm]+' 板塊月內各交易日歷史平均累積報酬';
+}
+
+// 月份長條圖
+function drawSectorMonthly(srs) {
+  if (!srs) srs = getSectorSR();
+  var datasets = srs.map(function(s){
+    var vals = Array.from({length:12}, function(_,m){ return D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)]||0; });
+    return {label:s.lb, data:vals,
+      backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
+      borderColor:s.c, borderWidth:1, borderRadius:4};
+  });
+  var ctx = document.getElementById('s-bc');
+  if (!ctx) return;
+  if (sBChart) { sBChart.destroy(); sBChart=null; }
+  sBChart = new Chart(ctx.getContext('2d'), {
+    type:'bar', data:{labels:MN, datasets:datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:16,padding:10}},
+        tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
+          callbacks:{label:function(c){return ' '+c.dataset.label+': '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}}}
+      },
+      onClick:function(_,els){if(!els.length)return; selM(els[0].index); drawSectorIntra();}
+    }
+  });
+}
+
+// 熱力圖
+function drawSectorHeatmap(srs) {
+  if (!srs) srs = getSectorSR();
+  if (!srs.length) return;
+  if (!sHmIdx || srs.findIndex(function(s){return s.k===sHmIdx;})===-1) sHmIdx = srs[0].k;
+  // tabs
+  var tabWrap = document.getElementById('s-hm-tabs');
+  if (tabWrap) {
+    tabWrap.innerHTML='';
+    srs.forEach(function(s){
+      var btn=document.createElement('button');
+      btn.className='hm-tab'+(s.k===sHmIdx?' on':'');
+      btn.textContent=s.lb; btn.style.background=s.k===sHmIdx?s.c:'';
+      btn.onclick=function(){ sHmIdx=s.k; drawSectorHeatmap(); };
+      tabWrap.appendChild(btn);
+    });
+  }
+  var s = srs.find(function(s){return s.k===sHmIdx;})||srs[0];
+  document.getElementById('s-hmt').textContent = s.lb+' — 各年各月報酬（%）';
+  if (!D.monthly_returns||!D.monthly_returns[s.k]) return;
+  var yrs = Object.keys(D.monthly_returns[s.k]).filter(function(y){return Object.keys(D.monthly_returns[s.k][y]).length>0;}).sort();
+  var avgRow='<tr class="ar"><td class="yl">平均</td>'+
+    Array.from({length:12},function(_,m){var v=D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)]||0;
+      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>3?'#fff':'var(--tx)')+'">'+
+        (v>0?'+':'')+v.toFixed(1)+'%</td>';}).join('')+'</tr>';
+  var rows=yrs.map(function(y){return'<tr><td class="yl">'+y+'</td>'+
+    Array.from({length:12},function(_,m){var v=D.monthly_returns[s.k][y][String(m+1)];
+      if(v===undefined)return'<td style="color:var(--bd)">—</td>';
+      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>8?'#fff':'var(--tx)')+'">'+
+        (v>0?'+':'')+v.toFixed(1)+'</td>';}).join('')+'</tr>';}).join('');
+  document.getElementById('s-hm').innerHTML=
+    '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
+}
+
+// 相對強弱
+function drawSectorRS(srs) {
+  if (!srs) srs = getSectorSR();
+  if (!srs.length) return;
+  var datasets = srs.map(function(s){
+    var vals = Array.from({length:12},function(_,m){
+      var v=D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)];
+      return v!==undefined?v:null;
+    });
+    var devs = vals.map(function(v,m){
+      if(v===null) return null;
+      var peers=srs.map(function(s2){var x=D.monthly_avg[s2.k]&&D.monthly_avg[s2.k][String(m+1)];return x!==undefined?x:null;}).filter(function(x){return x!==null;});
+      var mean=peers.reduce(function(a,b){return a+b;},0)/peers.length;
+      return Math.round((v-mean)*100)/100;
+    });
+    return {label:s.lb,data:devs,borderColor:s.c,backgroundColor:s.c+'30',
+      borderWidth:2,borderDash:s.ds,pointRadius:4,pointHoverRadius:6,tension:0.3,fill:false};
+  });
+  var ctx = document.getElementById('s-rs');
+  if (!ctx) return;
+  if (sRsChart) { sRsChart.destroy(); sRsChart=null; }
+  sRsChart = new Chart(ctx.getContext('2d'), {
+    type:'line', data:{labels:MN,datasets:datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:16,padding:10}},
+        tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
+          callbacks:{label:function(c){var v=c.parsed.y;if(v===null)return null;return' '+c.dataset.label+': '+(v>=0?'+':'')+v.toFixed(2)+'%';}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11}}},
+        y:{grid:{color:function(c){return c.tick.value===0?'rgba(255,255,255,0.25)':'rgba(255,255,255,0.05)';},
+                 lineWidth:function(c){return c.tick.value===0?1.5:1;},
+                 borderDash:function(c){return c.tick.value===0?[5,4]:[];}},
+           ticks:{color:'#7d8590',font:{size:11},callback:function(v){return(v>=0?'+':'')+v.toFixed(1)+'%';}},
+           title:{display:true,text:'相對偏差（%）',color:'#7d8590',font:{size:11}}}
+      }
+    }
+  });
+}
+
+// 板塊相關係數
+function drawSectorCorr(srs) {
+  if (!srs) srs = getSectorSR();
+  var tbl    = document.getElementById('s-corr-tbl');
+  var detail = document.getElementById('s-corr-detail');
+  var mSel   = document.getElementById('s-corr-month');
+  if (!tbl||!srs.length) return;
+  var filterM = mSel ? parseInt(mSel.value) : 0;
+  function getSeries(k) {
+    var mr=D.monthly_returns[k]; if(!mr) return [];
+    var arr=[];
+    Object.keys(mr).sort().forEach(function(y){
+      if(filterM===0){Object.keys(mr[y]).forEach(function(m){if(mr[y][m]!==undefined)arr.push(mr[y][m]);});}
+      else{if(mr[y][String(filterM)]!==undefined)arr.push(mr[y][String(filterM)]);}
+    });
+    return arr;
+  }
+  var matrix=srs.map(function(a){return srs.map(function(b){
+    if(a.k===b.k) return 1.0;
+    var sa=getSeries(a.k),sb=getSeries(b.k),len=Math.min(sa.length,sb.length);
+    return pearson(sa.slice(0,len),sb.slice(0,len));
+  });});
+  function corrColor(r){
+    if(r===null) return 'var(--surf2)';
+    if(r>=0.8)  return 'rgba(26,127,55,.9)';
+    if(r>=0.6)  return 'rgba(63,185,80,.65)';
+    if(r>=0.3)  return 'rgba(63,185,80,.3)';
+    if(r>=-0.3) return 'rgba(125,133,144,.2)';
+    if(r>=-0.6) return 'rgba(240,136,62,.4)';
+    return 'rgba(248,81,73,.7)';
+  }
+  var html='<tr><th style="padding:6px 10px;font-size:11px;color:var(--mu);text-align:left"></th>';
+  srs.forEach(function(s){html+='<th style="padding:6px 8px;font-size:11px;color:'+s.c+';text-align:center;white-space:nowrap">'+s.lb+'</th>';});
+  html+='</tr>';
+  srs.forEach(function(a,i){
+    html+='<tr><th style="padding:6px 10px;font-size:11px;color:'+a.c+';text-align:left;white-space:nowrap">'+a.lb+'</th>';
+    srs.forEach(function(b,j){
+      var r=matrix[i][j];
+      var bg=corrColor(r),txt=r!==null?r.toFixed(2):'—';
+      var tc=(r!==null&&Math.abs(r)>=0.6)?'#fff':'var(--tx)';
+      var isSelf=(i===j);
+      html+='<td style="padding:7px 8px;background:'+bg+';color:'+(isSelf?'var(--mu)':tc)+
+        ';text-align:center;border-radius:3px;cursor:'+(isSelf?'default':'pointer')+
+        ';font-weight:'+(isSelf?'400':'500')+'"'+
+        (isSelf?'':' onclick="showCorrDetail(\''+a.lb+'\',\''+b.lb+'\','+r+')"')+
+        ' title="'+a.lb+' × '+b.lb+': '+txt+'">'+txt+'</td>';
+    });
+    html+='</tr>';
+  });
+  tbl.innerHTML=html;
+  if(detail) detail.style.display='none';
+}
 function initCrossMonthHeatmap() {
   var MN_SHORT=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   var idxSel=document.getElementById('cm2-idx');
