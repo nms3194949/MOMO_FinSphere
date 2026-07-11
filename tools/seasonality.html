@@ -338,6 +338,7 @@ var DASH_POOL  = [[],[6,3],[3,3],[8,2,2,2],[4,2],[6,2],[2,2],[8,4],[4,4],[6,2,2,
 
 function buildSR() {
   if (!D || !D.meta) return;
+  loadSectorKeys();
   SR = [];
   hid = {};
   var poolIdx = 0;
@@ -350,7 +351,8 @@ function buildSR() {
       c:  color,
       ds: DASH_POOL[SR.length % DASH_POOL.length]
     });
-    hid[SR.length-1] = false;
+    // 板塊 ETF 預設隱藏（hid=true），不影響其他指數
+    hid[SR.length-1] = (sectorKeys.indexOf(k) !== -1);
   });
 }
 
@@ -547,6 +549,7 @@ function initUI() {
   pw.innerHTML = '';
   SR.forEach(function(s,i){
     var p=document.createElement('span'); p.className='pill';
+    if(hid[i]) p.classList.add('off');
     p.style.borderColor=s.c; p.style.color=s.c;
     p.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+s.c+';flex-shrink:0"></span>'+s.lb;
     p.onclick=function(){hid[i]=!hid[i];p.classList.toggle('off',hid[i]);draw();};
@@ -1148,6 +1151,576 @@ function renderIwinTable(k) {
   updateIwinStats(k, iwin, n);
 }
 
+
+function initCrossMonthHeatmap() {
+  var MN_SHORT=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var idxSel=document.getElementById('cm2-idx');
+  var xmSel =document.getElementById('cm2-xm');
+  var xdSel =document.getElementById('cm2-xd');
+  if(!idxSel) return;
+
+  idxSel.innerHTML='';
+  SR.forEach(function(s){
+    var o=document.createElement('option');
+    o.value=s.k; o.textContent=s.lb; idxSel.appendChild(o);
+  });
+  var bk=getBaseKey(); if(bk) idxSel.value=bk;
+
+  xmSel.innerHTML='';
+  MN_SHORT.forEach(function(m,i){
+    var o=document.createElement('option');
+    o.value=i+1; o.textContent=m; xmSel.appendChild(o);
+  });
+  xmSel.value=9; // 預設9月出場
+
+  // 出場日下拉
+  xmSel.onchange=function(){ updateCm2Days(); };
+  updateCm2Days();
+  drawCrossMonthHeatmap();
+}
+
+function updateCm2Days() {
+  var xmSel=document.getElementById('cm2-xm');
+  var xdSel=document.getElementById('cm2-xd');
+  if(!xmSel||!xdSel) return;
+  var m=parseInt(xmSel.value);
+  var bk=getBaseKey()||(SR[0]&&SR[0].k);
+  var maxD=23;
+  if(D&&D.intramonth&&bk&&D.intramonth[bk]&&D.intramonth[bk][String(m)]){
+    maxD=D.intramonth[bk][String(m)].length;
+  }
+  var cur=parseInt(xdSel.value)||maxD;
+  xdSel.innerHTML='';
+  for(var d=1;d<=maxD;d++){
+    var o=document.createElement('option'); o.value=d; o.textContent='D'+d; xdSel.appendChild(o);
+  }
+  xdSel.value=Math.min(cur,maxD);
+}
+
+function drawCrossMonthHeatmap() {
+  var idxKey=document.getElementById('cm2-idx').value;
+  var xm    =parseInt(document.getElementById('cm2-xm').value);
+  var xd    =parseInt(document.getElementById('cm2-xd').value)-1;
+  var tbl   =document.getElementById('cm2-tbl');
+  var detail=document.getElementById('cm2-detail');
+  if(!tbl) return;
+
+  if(!D||!D.cross_month_win||!D.cross_month_win[idxKey]){
+    tbl.innerHTML='<tr><td style="color:var(--or);padding:12px">請重新執行 GAS「重新計算所有指數」後重新整理。</td></tr>';
+    return;
+  }
+
+  var mat=D.cross_month_win[idxKey][String(xm)];
+  if(!mat||!mat[String(xd)]){ tbl.innerHTML=''; return; }
+  var row=mat[String(xd)];
+
+  var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var s=SR.find(function(s){return s.k===idxKey;})||{lb:idxKey};
+
+  // ── 計算今天約是哪個月第幾個交易日 ──────────────────────────
+  var today    = new Date();
+  var todayM   = today.getMonth()+1;  // 1-12
+  var todayDay = today.getDate();
+  // 估算：每月約有 22 個交易日，月曆日 ÷ (30/22) ≈ 第幾個交易日
+  // 更精確：假設每月 1 號是 D1，跳過週末
+  var d = new Date(today.getFullYear(), todayM-1, 1);
+  var tradingDay = 0;
+  while(d <= today) {
+    var dow = d.getDay();
+    if(dow!==0 && dow!==6) tradingDay++;
+    d.setDate(d.getDate()+1);
+  }
+  tradingDay = Math.max(1, tradingDay) - 1; // 0-based
+
+  // header
+  var maxED=0;
+  for(var em2=1;em2<=12;em2++){
+    if(row[String(em2)]){
+      var keys=Object.keys(row[String(em2)]).map(Number);
+      if(keys.length) maxED=Math.max(maxED,Math.max.apply(null,keys)+1);
+    }
+  }
+  var html='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px">進場↓</th>';
+  for(var d2=0;d2<maxED;d2++){
+    var isToday=(d2===tradingDay);
+    html+='<th class="iwin-head" style="'+(isToday?'color:var(--rd);font-weight:700':'')+'">D'+(d2+1)+
+      (isToday?'<div style="font-size:7px;color:var(--rd)">今</div>':'')+'</th>';
+  }
+  html+='</tr>';
+
+  for(var em=1;em<=12;em++){
+    var isNowRow=(em===todayM);
+    html+='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px;'+(isNowRow?'color:var(--rd);font-weight:700':'')+'">'+
+      MN_S[em-1]+'</th>';
+    for(var ed=0;ed<maxED;ed++){
+      var wr=(row[String(em)]&&row[String(em)][String(ed)]!==undefined)?row[String(em)][String(ed)]:null;
+      var skip=(xm===em&&xd===ed);
+      var isNow=(em===todayM && ed===tradingDay);
+      var nowStyle=isNow?';outline:2px solid #f85149;outline-offset:-1px;z-index:1;position:relative':'';
+      if(skip||wr===null){
+        html+='<td style="width:26px;height:22px'+nowStyle+'">'+(isNow?'<span style="font-size:8px;color:var(--rd);font-weight:700">今</span>':'')+'</td>';
+      } else {
+        var bg=iwinColor(wr);
+        var tc=(wr>=60||wr<40)?'#fff':'var(--tx)';
+        html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+';width:26px;height:22px;font-size:9px'+nowStyle+'"'+
+          ' title="'+MN_S[em-1]+' D'+(ed+1)+' 進 → '+MN_S[xm-1]+' D'+(xd+1)+' 出：'+wr+'%'+(isNow?' ◀ 今天約在此':'')+'"'+
+          ' onclick="showCm2Detail('+em+','+(ed+1)+','+xm+','+(xd+1)+','+wr+',\''+s.lb+'\')">'+
+          (isNow?'<b>'+wr+'%</b>':wr+'%')+'</td>';
+      }
+    }
+    html+='</tr>';
+  }
+  tbl.innerHTML=html;
+  // 顯示今天位置說明
+  var todayLabel = MN_S[todayM-1]+' 第 '+(tradingDay+1)+' 個交易日（D'+(tradingDay+1)+'）';
+  var cm2detail = document.getElementById('cm2-detail');
+  if(cm2detail){
+    cm2detail.style.display='block';
+    cm2detail.innerHTML='<span style="color:var(--rd)">▣</span> 今天約為 <b style="color:var(--rd)">'+todayLabel+'</b>，對應熱力圖中紅框位置。點擊格子查看詳細勝率說明。';
+  }
+}
+
+function showCm2Detail(em,ed,xm,xd,wr,label) {
+  var detail=document.getElementById('cm2-detail');
+  if(!detail) return;
+  var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var color=iwinColor(wr);
+  var strength=wr>=75?'強勢 ✓✓':wr>=65?'偏強 ✓':wr>=55?'中性偏強':wr>=45?'中性':wr>=35?'偏弱 ✗':'弱勢 ✗✗';
+  detail.style.display='block';
+  detail.innerHTML=
+    '<b style="color:'+color+';font-size:16px">'+wr+'%</b>　'+
+    '【'+label+'】'+MN_S[em-1]+' D'+ed+' 進場 → '+MN_S[xm-1]+' D'+xd+' 出場　<b>'+strength+'</b>'+
+    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史 '+wr+'% 的年份為正報酬</span>';
+}
+
+function updateIwinStats(k, iwin, n) {
+  var all=[], best=null, worst=null;
+  for(var ei=0;ei<n-1;ei++){
+    for(var eo=ei+1;eo<n;eo++){
+      var wr=iwin[ei]&&iwin[ei][eo]!==undefined?iwin[ei][eo]:null;
+      if(wr===null) continue;
+      all.push({ei:ei,eo:eo,wr:wr});
+      if(!best||wr>best.wr) best={ei:ei,eo:eo,wr:wr};
+      if(!worst||wr<worst.wr) worst={ei:ei,eo:eo,wr:wr};
+    }
+  }
+  if(!all.length) return;
+
+  var avg=Math.round(all.reduce(function(s,v){return s+v.wr;},0)/all.length*10)/10;
+  var hiCnt=all.filter(function(v){return v.wr>=65;}).length;
+  var loCnt=all.filter(function(v){return v.wr<40;}).length;
+
+  // 平均勝率卡
+  var avgEl=document.getElementById('iwin-avg-wr');
+  if(avgEl){
+    var ac=avg>=60?'var(--gr)':avg>=50?'var(--tx)':'var(--rd)';
+    avgEl.style.color=ac;
+    avgEl.innerHTML='<span style="font-size:22px;font-weight:700">'+avg+'%</span>'+
+      '<div style="font-size:10px;color:var(--mu);margin-top:4px">'+
+        '<span style="color:var(--gr)">▲'+hiCnt+'個</span> &gt;65%　'+
+        '<span style="color:var(--rd)">▼'+loCnt+'個</span> &lt;40%</div>';
+  }
+
+  // 最佳組合
+  var bestEl=document.getElementById('iwin-best');
+  if(bestEl&&best){
+    bestEl.innerHTML=
+      '<span style="font-size:20px;font-weight:700;color:var(--gr)">'+best.wr+'%</span>'+
+      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(best.ei+1)+'→D'+(best.eo+1)+'</span>';
+  }
+
+  // 最差組合
+  var worstEl=document.getElementById('iwin-worst');
+  if(worstEl&&worst){
+    worstEl.innerHTML=
+      '<span style="font-size:20px;font-weight:700;color:var(--rd)">'+worst.wr+'%</span>'+
+      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(worst.ei+1)+'→D'+(worst.eo+1)+'</span>';
+  }
+
+  // 本月最佳進場排行（出場=本月末）
+  var rankEl=document.getElementById('iwin-rank');
+  if(rankEl){
+    var lastDay=n-1;
+    var exits=[];
+    for(var ei2=0;ei2<lastDay;ei2++){
+      var wr2=iwin[ei2]&&iwin[ei2][lastDay]!==undefined?iwin[ei2][lastDay]:null;
+      if(wr2!==null) exits.push({ei:ei2,wr:wr2});
+    }
+    exits.sort(function(a,b){return b.wr-a.wr;});
+    rankEl.innerHTML='';
+    exits.slice(0,5).forEach(function(item,i){
+      var c=item.wr>=65?'var(--gr)':item.wr>=50?'var(--tx)':'var(--or)';
+      var pct=Math.round(item.wr/exits[0].wr*100);
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:5px;cursor:pointer';
+      row.title='D'+(item.ei+1)+'進→D'+n+'出 勝率'+item.wr+'%';
+      row.onclick=(function(ei,eo,wr){return function(){showIwinDetail(ei+1,eo+1,wr);};})(item.ei,lastDay,item.wr);
+      row.innerHTML=
+        '<span style="font-size:10px;color:var(--mu);min-width:12px">'+(i+1)+'.</span>'+
+        '<span style="font-size:11px;min-width:26px;color:var(--tx)">D'+(item.ei+1)+'</span>'+
+        '<div style="flex:1;height:5px;background:var(--surf);border-radius:2px;overflow:hidden">'+
+          '<div style="height:100%;width:'+pct+'%;background:'+c+'"></div></div>'+
+        '<span style="font-size:11px;font-weight:600;color:'+c+';min-width:36px;text-align:right">'+item.wr+'%</span>';
+      rankEl.appendChild(row);
+    });
+  }
+}
+
+function showIwinDetail(ei, eo, wr) {
+  var detail = document.getElementById('iwin-detail');
+  if (!detail) return;
+  var s = SR.find(function(s){ return s.k===iwinIdxKey; });
+  var label = s ? s.lb : iwinIdxKey;
+  if (wr===null) { detail.style.display='none'; return; }
+  var strength = wr>=75?'強勢 ✓✓': wr>=65?'偏強 ✓': wr>=55?'中性偏強 ～': wr>=45?'中性 ～': wr>=35?'偏弱 ✗':'弱勢 ✗✗';
+  var color = iwinColor(wr);
+  detail.style.display='block';
+  detail.innerHTML =
+    '<b style="color:'+color+';font-size:16px">'+wr+'%</b>　' +
+    '【'+label+'】D'+ei+' 進場 → D'+eo+' 出場　<b>'+strength+'</b>' +
+    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史上 '+wr+'% 的年份此區間為正報酬</span>';
+}
+
+function drawVixIntra(k) {
+  var card = document.getElementById('vix-intra-card');
+  if (!D.intramonth || !D.intramonth['VIX'] || !D.intramonth['VIX'][k] || !D.intramonth['VIX'][k].length) {
+    card.style.display = 'none'; return;
+  }
+  card.style.display = '';
+  var vixData = D.intramonth['VIX'][k];
+  var labels = Array.from({length:vixData.length}, function(_,i){ return 'D'+(i+1); });
+  document.getElementById('vix-intra-title').textContent = MN[cm] + ' VIX 月內歷史平均變化';
+  vixLineChart.data.labels = labels;
+  vixLineChart.data.datasets = [{
+    label:'VIX',
+    data: vixData,
+    borderColor:'#f85149',
+    backgroundColor:'rgba(248,81,73,0.1)',
+    borderWidth:2,
+    pointRadius:3,
+    pointHoverRadius:5,
+    tension:0.3,
+    fill:true
+  }];
+  vixLineChart.update();
+}
+
+function drawMonthly(){
+  var ai=actIdx();
+  var datasets = ai.map(function(i){
+    var s=SR[i];
+    var vals=Array.from({length:12},function(_,m){return D.monthly_avg[s.k][String(m+1)]||0;});
+    return{type:'bar',label:s.lb,data:vals,yAxisID:'y',
+      backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
+      borderColor:s.c,borderWidth:1,borderRadius:4};
+  });
+  // VIX 折線（右軸）
+  if (D.monthly_avg && D.monthly_avg['VIX']) {
+    var vixVals = Array.from({length:12}, function(_,m){ return D.monthly_avg['VIX'][String(m+1)]||null; });
+    datasets.push({
+      type:'line', label:'VIX', data:vixVals, yAxisID:'y2',
+      borderColor:'#f85149', backgroundColor:'rgba(248,81,73,0.08)',
+      borderWidth:2, pointRadius:4, pointHoverRadius:6,
+      pointBackgroundColor:'#f85149', tension:0.3, fill:false,
+      order:0  // 折線畫在長條上方
+    });
+  }
+  bChart.data.datasets = datasets;
+  bChart.update();
+
+  // 熱力圖切換按鈕（每次重建，因 SR 可能變動）
+  var tabWrap = document.getElementById('hm-tabs');
+  tabWrap.innerHTML = '';
+  if (curHmIdx >= SR.length) curHmIdx = 0;
+  SR.forEach(function(s, i) {
+    var btn = document.createElement('button');
+    btn.className = 'hm-tab';
+    btn.textContent = s.lb;
+    btn.dataset.i = i;
+    btn.onclick = function() {
+      curHmIdx = parseInt(this.dataset.i);
+      renderHeatmap();
+    };
+    tabWrap.appendChild(btn);
+  });
+  renderHeatmap();
+}
+
+function renderHeatmap() {
+  if (!SR.length) return;
+  // curHmIdx 超出範圍時重置為 0
+  if (curHmIdx >= SR.length || !SR[curHmIdx]) curHmIdx = 0;
+  var s = SR[curHmIdx];
+  // 更新 tab 樣式
+  document.querySelectorAll('.hm-tab').forEach(function(btn, i) {
+    btn.classList.toggle('on', i === curHmIdx);
+    btn.style.background = (i === curHmIdx) ? SR[i].c : '';
+  });
+  document.getElementById('hmt').textContent = s.lb + ' — 各年各月報酬（%）';
+  if (!D.monthly_returns || !D.monthly_returns[s.k]) return;
+  var yrs = Object.keys(D.monthly_returns[s.k])
+    .filter(function(y){ return Object.keys(D.monthly_returns[s.k][y]).length>0; }).sort();
+  var avgRow = '<tr class="ar"><td class="yl">平均</td>'+
+    Array.from({length:12}, function(_,m){ var v=D.monthly_avg[s.k][String(m+1)]||0;
+      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>3?'#fff':'var(--tx)')+'">'+
+        (v>0?'+':'')+v.toFixed(1)+'%</td>';}).join('')+'</tr>';
+  var rows = yrs.map(function(y){ return'<tr><td class="yl">'+y+'</td>'+
+    Array.from({length:12}, function(_,m){ var v=D.monthly_returns[s.k][y][String(m+1)];
+      if(v===undefined)return'<td style="color:var(--bd)">—</td>';
+      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>8?'#fff':'var(--tx)')+'">'+
+        (v>0?'+':'')+v.toFixed(1)+'</td>';}).join('')+'</tr>';}).join('');
+  document.getElementById('hm').innerHTML =
+    '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
+  // VIX 月份熱力圖
+  drawVixMonthly();
+  initCrossMonthHeatmap();
+  drawRelativeStrength();
+  drawCorrMatrix();
+}
+
+// ── 相對強弱比較圖 ───────────────────────────────────────────
+var rsChart = null;
+
+function drawRelativeStrength() {
+  var ctx = document.getElementById('rs-chart');
+  if (!ctx || !D || !D.monthly_avg) return;
+
+  // 排除 VIX
+  var keys = SR.filter(function(s){ return D.monthly_avg[s.k]; });
+  if (!keys.length) return;
+
+  // 每個月算全體平均，然後各指數算偏差
+  var datasets = keys.map(function(s) {
+    var vals = Array.from({length:12}, function(_,m){
+      var v = D.monthly_avg[s.k][String(m+1)];
+      return (v !== undefined) ? v : null;
+    });
+    // 每月全體均值
+    var devs = vals.map(function(v, m) {
+      if (v === null) return null;
+      var peers = keys.map(function(s2){
+        var x = D.monthly_avg[s2.k][String(m+1)];
+        return x !== undefined ? x : null;
+      }).filter(function(x){ return x !== null; });
+      var mean = peers.reduce(function(a,b){return a+b;},0) / peers.length;
+      return Math.round((v - mean)*100)/100;
+    });
+    return {
+      label: s.lb, data: devs,
+      borderColor: s.c, backgroundColor: s.c+'30',
+      borderWidth: 2, borderDash: s.ds,
+      pointRadius: 4, pointHoverRadius: 6,
+      tension: 0.3, fill: false
+    };
+  });
+
+  if (rsChart) rsChart.destroy();
+  rsChart = new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: { labels: MN, datasets: datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'bottom',
+          labels: { color: '#7d8590', font: { size: 11 }, boxWidth: 20, padding: 12 }},
+        tooltip: {
+          backgroundColor: '#161b22', borderColor: '#30363d', borderWidth: 1,
+          callbacks: {
+            label: function(c) {
+              var v = c.parsed.y;
+              if (v === null) return null;
+              return ' ' + c.dataset.label + ': ' + (v>=0?'+':'') + v.toFixed(2) + '%';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7d8590', font: { size: 11 } } },
+        y: {
+          grid: {
+            color: function(ctx2) { return ctx2.tick.value===0?'rgba(255,255,255,0.25)':'rgba(255,255,255,0.05)'; },
+            lineWidth: function(ctx2) { return ctx2.tick.value===0?1.5:1; },
+            borderDash: function(ctx2) { return ctx2.tick.value===0?[5,4]:[]; }
+          },
+          ticks: { color: '#7d8590', font: { size: 11 }, callback: function(v){ return (v>=0?'+':'')+v.toFixed(1)+'%'; } },
+          title: { display: true, text: '相對偏差（%）', color: '#7d8590', font: { size: 11 } }
+        }
+      }
+    }
+  });
+}
+
+// ── 相關係數熱力圖 ───────────────────────────────────────────
+
+function drawCorrMatrix() {
+  var tbl     = document.getElementById('corr-tbl');
+  var mSel    = document.getElementById('corr-month');
+  var detail  = document.getElementById('corr-detail');
+  if (!tbl || !D || !D.monthly_returns) return;
+
+  // 建立月份下拉（只建一次）
+  if (mSel && mSel.options.length === 1) {
+    MN.forEach(function(m, i) {
+      var o = document.createElement('option');
+      o.value = i+1; o.textContent = m; mSel.appendChild(o);
+    });
+    mSel.onchange = function() { drawCorrMatrix(); };
+  }
+
+  var filterM = mSel ? parseInt(mSel.value) : 0;
+  var keys = SR.filter(function(s){ return D.monthly_returns[s.k]; });
+  if (!keys.length) return;
+
+  // 收集各指數在指定月份的報酬序列
+  function getSeries(k) {
+    var mr = D.monthly_returns[k];
+    var arr = [];
+    Object.keys(mr).sort().forEach(function(y) {
+      if (filterM === 0) {
+        // 全年：每個月都加
+        Object.keys(mr[y]).forEach(function(m) {
+          if (mr[y][m] !== undefined) arr.push(mr[y][m]);
+        });
+      } else {
+        if (mr[y][String(filterM)] !== undefined) arr.push(mr[y][String(filterM)]);
+      }
+    });
+    return arr;
+  }
+
+  // 計算相關係數矩陣
+  var matrix = keys.map(function(a) {
+    return keys.map(function(b) {
+      if (a.k === b.k) return 1.0;
+      var sa = getSeries(a.k), sb = getSeries(b.k);
+      // 對齊長度
+      var len = Math.min(sa.length, sb.length);
+      return pearson(sa.slice(0, len), sb.slice(0, len));
+    });
+  });
+
+  // 相關係數顏色
+  function corrColor(r) {
+    if (r === null) return 'var(--surf2)';
+    if (r >= 0.8)  return 'rgba(26,127,55,.9)';
+    if (r >= 0.6)  return 'rgba(63,185,80,.65)';
+    if (r >= 0.3)  return 'rgba(63,185,80,.3)';
+    if (r >= -0.3) return 'rgba(125,133,144,.2)';
+    if (r >= -0.6) return 'rgba(240,136,62,.4)';
+    return 'rgba(248,81,73,.7)';
+  }
+
+  // 渲染表格
+  var html = '<tr><th style="padding:6px 10px;font-size:11px;color:var(--mu);text-align:left"></th>';
+  keys.forEach(function(s) {
+    html += '<th style="padding:6px 8px;font-size:11px;color:'+s.c+';text-align:center;white-space:nowrap">'+s.lb+'</th>';
+  });
+  html += '</tr>';
+
+  keys.forEach(function(a, i) {
+    html += '<tr><th style="padding:6px 10px;font-size:11px;color:'+a.c+';text-align:left;white-space:nowrap">'+a.lb+'</th>';
+    keys.forEach(function(b, j) {
+      var r = matrix[i][j];
+      var bg = corrColor(r);
+      var txt = r !== null ? r.toFixed(2) : '—';
+      var tc = (r !== null && Math.abs(r) >= 0.6) ? '#fff' : 'var(--tx)';
+      var isSelf = (i === j);
+      html += '<td style="padding:7px 8px;background:'+bg+';color:'+(isSelf?'var(--mu)':tc)+
+        ';text-align:center;border-radius:3px;cursor:'+(isSelf?'default':'pointer')+
+        ';font-weight:'+(isSelf?'400':'500')+'"'+
+        (isSelf?'':' onclick="showCorrDetail(\''+a.lb+'\',\''+b.lb+'\','+r+')"')+
+        ' title="'+a.lb+' × '+b.lb+': '+txt+'">'+txt+'</td>';
+    });
+    html += '</tr>';
+  });
+  tbl.innerHTML = html;
+  if (detail) detail.style.display = 'none';
+}
+
+function showCorrDetail(la, lb, r) {
+  var detail = document.getElementById('corr-detail');
+  if (!detail) return;
+  var strength, color, desc;
+  if      (r >= 0.8)  { strength='高度正相關'; color='var(--gr)';
+    desc='兩市場高度同步，資金通常同漲同跌，輪動效應弱。'; }
+  else if (r >= 0.5)  { strength='中度正相關'; color='#3fb950';
+    desc='大方向相同但幅度不同，存在一定的相對強弱空間。'; }
+  else if (r >= 0.2)  { strength='低度正相關'; color='var(--mu)';
+    desc='相關性低，兩市場走勢較為獨立，輪動機會較多。'; }
+  else if (r >= -0.2) { strength='幾乎不相關'; color='var(--mu)';
+    desc='走勢獨立，可作為分散配置的候選組合。'; }
+  else if (r >= -0.5) { strength='中度負相關'; color='var(--or)';
+    desc='兩市場傾向反向走勢，明顯的蹺蹺板效應。'; }
+  else                { strength='高度負相關'; color='var(--rd)';
+    desc='強烈的反向關係，資金在兩者之間快速輪動。'; }
+
+  detail.style.display = 'block';
+  detail.innerHTML =
+    '<b style="color:'+color+'">'+la+' × '+lb+'</b>　' +
+    '相關係數 <b style="color:'+color+'">'+r.toFixed(3)+'</b>　'+strength+'　' +
+    '<span style="color:var(--mu)">'+desc+'</span>';
+}
+
+function drawVixMonthly() {
+  var card = document.getElementById('vix-monthly-card');
+  if (!D.monthly_returns || !D.monthly_returns['VIX'] || !D.monthly_avg || !D.monthly_avg['VIX']) {
+    card.style.display = 'none'; return;
+  }
+  card.style.display = '';
+  var vixAvg = D.monthly_avg['VIX'];
+  var vixYrs = Object.keys(D.monthly_returns['VIX'])
+    .filter(function(y){ return Object.keys(D.monthly_returns['VIX'][y]).length>0; }).sort();
+
+  // avg row — VIX 用絕對水位（月平均 VIX 值），顏色: 高=紅, 低=綠
+  var avgRow = '<tr class="ar"><td class="yl">平均水位</td>'+
+    Array.from({length:12}, function(_,m){
+      var v = vixAvg[String(m+1)];
+      if (v===undefined) return '<td style="color:var(--bd)">—</td>';
+      return '<td style="background:'+hcVix(v)+';color:#fff">'+v.toFixed(1)+'</td>';
+    }).join('')+'</tr>';
+
+  // year rows — 顯示各年月平均 VIX
+  var rows = vixYrs.map(function(y){
+    return '<tr><td class="yl">'+y+'</td>'+
+      Array.from({length:12}, function(_,m){
+        var v = D.monthly_returns['VIX'][y][String(m+1)];
+        if (v===undefined) return '<td style="color:var(--bd)">—</td>';
+        return '<td style="background:'+hcVixRet(v)+';color:'+(Math.abs(v)>15?'#fff':'var(--tx)')+'">'+
+          (v>0?'+':'')+v.toFixed(1)+'</td>';
+      }).join('')+'</tr>';
+  }).join('');
+
+  document.getElementById('vix-hm').innerHTML =
+    '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+
+    avgRow+rows;
+}
+
+// VIX 絕對水位熱力圖（15=平靜, 40=恐慌）
+
+function hcVix(v) {
+  var t = Math.min(Math.max((v-12)/35, 0), 1);
+  return 'rgba('+Math.round(63+t*170)+','+Math.round(185-t*140)+','+Math.round(80-t*60)+','+(0.4+t*0.5)+')';
+}
+// VIX 月報酬熱力圖（VIX漲=恐慌，用紅；VIX跌=平靜，用綠）
+
+function hcVixRet(v) {
+  if (!v) return 'transparent';
+  var t = Math.min(Math.abs(v)/30, 1);
+  return v>0
+    ? 'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')'
+    : 'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')';
+}
+
+function hc(v){
+  if(!v)return'transparent';
+  var t=Math.min(Math.abs(v)/12,1);
+  return v>0?'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')':'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')';
+}
+
+fetchData();
+
+
 // ── 板塊輪動 ─────────────────────────────────────────────────
 var sectorKeys  = [];   // 目前設定為板塊的 key 陣列
 var sLChart     = null;
@@ -1218,7 +1791,13 @@ var SECTOR_COLOR_MAP = {
 function loadSectorKeys() {
   try {
     var saved = localStorage.getItem('momo_sector_keys');
-    sectorKeys = saved !== null ? JSON.parse(saved) : DEFAULT_SECTOR_KEYS.slice();
+    if (saved !== null) {
+      sectorKeys = JSON.parse(saved);
+    } else {
+      // 第一次：只把 XL 系列板塊 ETF 加入，大盤指數不加
+      sectorKeys = DEFAULT_SECTOR_KEYS.slice();
+      saveSectorKeys();
+    }
   } catch(e) { sectorKeys = DEFAULT_SECTOR_KEYS.slice(); }
 }
 function saveSectorKeys() {
@@ -1227,6 +1806,10 @@ function saveSectorKeys() {
 function getSectorColor(k) {
   return SECTOR_COLOR_MAP[k] || COLOR_POOL[Object.keys(D.meta||{}).indexOf(k) % COLOR_POOL.length] || '#7d8590';
 }
+// 大盤指數 key 清單（板塊輪動預設不顯示）
+var MARKET_KEYS = ['DJI','NASDAQ','NASDAQ100','Russell2000','TWII','S&P 500','SP500',
+                   'Nikkei225','KOSPI','DAX','NIFTY50','DXY','SOX','Gold','WTI'];
+
 function getSectorSR() {
   if (!D || !D.meta) return [];
   return Object.keys(D.meta)
