@@ -1734,17 +1734,28 @@ var SECTOR_COLOR_MAP = {
   'XLU':'#ffd700','XLRE':'#98c379'
 };
 
+function getDefaultSectorKeys() {
+  // 自動偵測板塊 ETF：key 名稱含「類股」或「XL」
+  if (D && D.meta) {
+    var patterns = ['XL', '類股'];
+    var detected = Object.keys(D.meta).filter(function(k) {
+      return k !== 'VIX' && patterns.some(function(p){ return k.indexOf(p) !== -1; });
+    });
+    if (detected.length) return detected;
+  }
+  return DEFAULT_SECTOR_KEYS.slice();
+}
+
 function loadSectorKeys() {
   try {
     var saved = localStorage.getItem('momo_sector_keys');
     if (saved !== null) {
       sectorKeys = JSON.parse(saved);
     } else {
-      // 第一次：只把 XL 系列板塊 ETF 加入，大盤指數不加
-      sectorKeys = DEFAULT_SECTOR_KEYS.slice();
+      sectorKeys = getDefaultSectorKeys();
       saveSectorKeys();
     }
-  } catch(e) { sectorKeys = DEFAULT_SECTOR_KEYS.slice(); }
+  } catch(e) { sectorKeys = getDefaultSectorKeys(); }
 }
 function saveSectorKeys() {
   try { localStorage.setItem('momo_sector_keys', JSON.stringify(sectorKeys)); } catch(e){}
