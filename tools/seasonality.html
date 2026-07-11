@@ -1800,27 +1800,28 @@ function drawMonthly(){
   bChart.data.datasets = datasets;
   bChart.update();
 
-  // 建立熱力圖切換按鈕（只建一次）
+  // 熱力圖切換按鈕（每次重建，因 SR 可能變動）
   var tabWrap = document.getElementById('hm-tabs');
-  if (!tabWrap.children.length) {
-    SR.forEach(function(s, i) {
-      var btn = document.createElement('button');
-      btn.className = 'hm-tab';
-      btn.textContent = s.lb;
-      btn.style.setProperty('--tc', s.c);
-      btn.dataset.i = i;
-      btn.onclick = function() {
-        curHmIdx = parseInt(this.dataset.i);
-        renderHeatmap();
-      };
-      tabWrap.appendChild(btn);
-    });
-  }
+  tabWrap.innerHTML = '';
+  if (curHmIdx >= SR.length) curHmIdx = 0;
+  SR.forEach(function(s, i) {
+    var btn = document.createElement('button');
+    btn.className = 'hm-tab';
+    btn.textContent = s.lb;
+    btn.dataset.i = i;
+    btn.onclick = function() {
+      curHmIdx = parseInt(this.dataset.i);
+      renderHeatmap();
+    };
+    tabWrap.appendChild(btn);
+  });
   renderHeatmap();
 }
 
 function renderHeatmap() {
-  // 確保 curHmIdx 指向有資料的指數
+  if (!SR.length) return;
+  // curHmIdx 超出範圍時重置為 0
+  if (curHmIdx >= SR.length || !SR[curHmIdx]) curHmIdx = 0;
   var s = SR[curHmIdx];
   // 更新 tab 樣式
   document.querySelectorAll('.hm-tab').forEach(function(btn, i) {
