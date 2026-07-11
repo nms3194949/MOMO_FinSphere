@@ -62,28 +62,27 @@ main{padding:18px 24px}
 .iwin-cell{width:26px;height:22px;text-align:center;cursor:pointer;font-size:9px;font-weight:500;border-radius:2px;transition:filter .1s;vertical-align:middle}
 .iwin-cell:hover{filter:brightness(1.4);outline:1px solid rgba(255,255,255,.5)}
 .iwin-head{padding:2px 3px;font-size:9px;color:var(--mu);text-align:center;white-space:nowrap;font-weight:600}
+.idx-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid;border-radius:20px;font-size:12px;cursor:pointer;transition:.15s;user-select:none}
+.idx-chip:hover{opacity:.8}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 /* loader */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100}
 .spin{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
 .load-msg{font-size:13px;color:var(--mu);min-height:20px;transition:opacity .2s}
-/* progress bar */
 #prog-wrap{width:280px;display:none}
 #prog-track{width:100%;height:4px;background:var(--surf2);border-radius:2px;overflow:hidden}
 #prog-fill{height:100%;width:0%;background:var(--gold);border-radius:2px;transition:width .5s ease}
 #prog-meta{display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--bd)}
-/* step list */
 #step-list{width:280px;display:none;flex-direction:column;gap:4px}
 .step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--bd);transition:color .3s}
 .step.done{color:var(--gr)}.step.active{color:var(--tx)}
 .step-icon{font-size:14px;min-width:16px;text-align:center}
-/* error */
 #err-box{display:none;background:var(--surf2);border:1px solid var(--rd);border-radius:10px;padding:20px 24px;max-width:400px;text-align:center}
 .err-t{color:var(--rd);font-weight:600;margin-bottom:8px;font-size:15px}
 .err-m{font-size:12px;color:var(--mu);line-height:1.8;text-align:left}
 .retry{margin-top:14px;padding:7px 20px;background:none;border:1px solid var(--gold);color:var(--gold);border-radius:6px;cursor:pointer;font-size:13px}
 .retry:hover{background:var(--gold);color:#000}
-/* status bar */
 .gs-bar{padding:10px 24px;background:var(--surf2);border-top:1px solid var(--bd);font-size:11px;color:var(--mu);display:flex;align-items:center;gap:10px}
 .gs-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--mu)}
 .gs-dot.ok{background:var(--gr)}.gs-dot.err{background:var(--rd)}.gs-dot.loading{background:var(--gold);animation:pulse 1s infinite}
@@ -126,7 +125,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
 
 <main>
   <div class="row" id="mRow"></div>
-  <div class="row"><div id="pills"></div></div>
+  <div class="row" id="pills-row"><div id="pills"></div></div>
   <div id="v-intra">
     <div class="stats">
       <div class="sc"><div class="sc-l">月末平均報酬</div><div class="sc-v" id="s0">—</div></div>
@@ -148,16 +147,10 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <span class="cc-t" id="ct"></span>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
-          <button id="vix-toggle" onclick="toggleVix()" style="
-            padding:3px 11px;border-radius:20px;border:1px solid var(--bd);
-            background:transparent;color:var(--mu);
-            font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap">
-            VIX OFF
-          </button>
+          <button id="vix-toggle" onclick="toggleVix()" style="padding:3px 11px;border-radius:20px;border:1px solid var(--bd);background:transparent;color:var(--mu);font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap">VIX OFF</button>
         </div>
       </div>
       <div class="cb"><canvas id="lc" role="img" aria-label="月內走勢圖"></canvas></div>
-      <!-- 勝率熱力條 -->
       <div style="margin-top:10px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:5px;display:flex;justify-content:space-between">
           <span>各交易日勝率（持有至該日正報酬的歷史比例）</span>
@@ -170,7 +163,6 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <div id="wr-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
       </div>
     </div>
-    <!-- VIX 月內走勢 -->
     <div class="cc" id="vix-intra-card" style="display:none">
       <div class="cc-h">
         <span class="cc-t" id="vix-intra-title"></span>
@@ -178,7 +170,6 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       </div>
       <div class="cb" style="height:200px"><canvas id="vix-lc" role="img" aria-label="VIX月內走勢圖"></canvas></div>
     </div>
-    <!-- 區間勝率矩陣 -->
     <div class="cc">
       <div class="cc-h">
         <div>
@@ -194,37 +185,34 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
             <span style="font-size:11px;color:var(--mu)">縮放：</span>
             <button onclick="iwinZoom(-1)" style="padding:2px 8px;border:1px solid var(--bd);background:var(--surf2);color:var(--mu);border-radius:4px;cursor:pointer;font-size:13px">－</button>
             <span id="iwin-zoom-lbl" style="font-size:11px;color:var(--mu);min-width:28px;text-align:center">1×</span>
-            <button onclick="iwinZoom(1)"  style="padding:2px 8px;border:1px solid var(--bd);background:var(--surf2);color:var(--mu);border-radius:4px;cursor:pointer;font-size:13px">＋</button>
+            <button onclick="iwinZoom(1)" style="padding:2px 8px;border:1px solid var(--bd);background:var(--surf2);color:var(--mu);border-radius:4px;cursor:pointer;font-size:13px">＋</button>
           </div>
         </div>
       </div>
       <div id="iwin-idx-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
-      <!-- 統計卡片 + 矩陣左對齊容器 -->
       <div style="display:inline-block;min-width:0;width:100%">
-      <!-- 統計卡片列 -->
-      <div id="iwin-stats-row" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:160px">
-          <div style="font-size:10px;color:var(--mu);margin-bottom:4px">所有區間平均勝率</div>
-          <div id="iwin-avg-wr" style="font-size:22px;font-weight:700">—</div>
+        <div id="iwin-stats-row" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:160px">
+            <div style="font-size:10px;color:var(--mu);margin-bottom:4px">所有區間平均勝率</div>
+            <div id="iwin-avg-wr" style="font-size:22px;font-weight:700">—</div>
+          </div>
+          <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);border-radius:8px;padding:10px 12px;min-width:160px">
+            <div style="font-size:10px;color:var(--gr);margin-bottom:4px">🏆 最佳進出場</div>
+            <div id="iwin-best" style="font-size:13px;color:var(--tx);line-height:1.7">—</div>
+          </div>
+          <div style="background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 12px;min-width:160px">
+            <div style="font-size:10px;color:var(--rd);margin-bottom:4px">⚠ 最差進出場</div>
+            <div id="iwin-worst" style="font-size:13px;color:var(--tx);line-height:1.7">—</div>
+          </div>
+          <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:200px">
+            <div style="font-size:10px;color:var(--mu);margin-bottom:6px">📅 本月最佳進場（出場=末日）</div>
+            <div id="iwin-rank" style="display:flex;flex-direction:column;gap:4px"></div>
+          </div>
         </div>
-        <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);border-radius:8px;padding:10px 12px;min-width:160px">
-          <div style="font-size:10px;color:var(--gr);margin-bottom:4px">🏆 最佳進出場</div>
-          <div id="iwin-best" style="font-size:13px;color:var(--tx);line-height:1.7">—</div>
-        </div>
-        <div style="background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 12px;min-width:160px">
-          <div style="font-size:10px;color:var(--rd);margin-bottom:4px">⚠ 最差進出場</div>
-          <div id="iwin-worst" style="font-size:13px;color:var(--tx);line-height:1.7">—</div>
-        </div>
-        <div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:200px">
-          <div style="font-size:10px;color:var(--mu);margin-bottom:6px">📅 本月最佳進場（出場=末日）</div>
-          <div id="iwin-rank" style="display:flex;flex-direction:column;gap:4px"></div>
+        <div style="overflow-x:auto;overflow-y:auto;max-height:520px">
+          <table id="iwin-tbl" style="border-collapse:collapse"></table>
         </div>
       </div>
-      <!-- 矩陣 -->
-      <div style="overflow-x:auto;overflow-y:auto;max-height:520px">
-        <table id="iwin-tbl" style="border-collapse:collapse"></table>
-      </div>
-      </div><!-- end wrapper -->
       <div id="iwin-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
     </div>
   </div>
@@ -244,7 +232,6 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       <div style="font-size:11px;color:var(--mu);margin-bottom:8px">綠＝正報酬 紅＝負報酬</div>
       <div class="hm-wrap"><table class="hm" id="hm"></table></div>
     </div>
-    <!-- VIX 月份熱力圖 -->
     <div class="cc" id="vix-monthly-card" style="display:none">
       <div class="cc-h">
         <span class="cc-t">VIX 各月份平均水位熱力圖</span>
@@ -252,89 +239,26 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       </div>
       <div class="hm-wrap"><table class="hm" id="vix-hm"></table></div>
     </div>
-    <!-- 跨月勝率熱力圖 -->
-    <div class="cc">
-      <div class="cc-h">
-        <div>
-          <span class="cc-t">跨月進場勝率熱力圖</span>
-          <span class="cc-s" style="margin-left:8px">固定出場點，看所有進場月日的歷史勝率</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:5px;font-size:10px">
-            <span style="display:inline-block;width:40px;height:7px;border-radius:3px;background:linear-gradient(to right,rgba(248,81,73,.8),rgba(125,133,144,.3),rgba(26,127,55,.9))"></span>
-            <span style="color:var(--rd)">低</span><span style="color:var(--mu)">50%</span><span style="color:var(--gr)">高</span>
-          </div>
-        </div>
-      </div>
-      <!-- 出場設定 -->
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px">
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">指數</div>
-          <select id="cm2-idx" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer"></select>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">固定出場月</div>
-          <select id="cm2-xm" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer"></select>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">固定出場交易日</div>
-          <select id="cm2-xd" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer"></select>
-        </div>
-        <button onclick="drawCrossMonthHeatmap()" style="padding:6px 16px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">更新熱力圖</button>
-      </div>
-      <!-- 熱力圖 -->
-      <div style="overflow-x:auto">
-        <table id="cm2-tbl" style="border-collapse:collapse;font-size:10px"></table>
-      </div>
-      <div id="cm2-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
-    </div>
-    <!-- 相對強弱比較圖 -->
-    <div class="cc">
-      <div class="cc-h">
-        <span class="cc-t">各指數相對強弱比較</span>
-        <span class="cc-s">各月份平均報酬相對全體均值的偏差，正值＝該月相對強勢，負值＝相對弱勢</span>
-      </div>
-      <div class="cb" style="height:300px"><canvas id="rs-chart"></canvas></div>
-    </div>
-    <!-- 相關係數熱力圖 -->
-    <div class="cc">
-      <div class="cc-h">
-        <div>
-          <span class="cc-t">指數相關係數矩陣</span>
-          <span class="cc-s" style="margin-left:8px">各指數月報酬 Pearson 相關係數 ｜ 深綠＝高度正相關 深紅＝負相關</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;color:var(--mu)">篩選月份：</span>
-          <select id="corr-month" style="background:var(--surf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer">
-            <option value="0">全年</option>
-          </select>
-        </div>
-      </div>
-      <div style="overflow-x:auto;margin-top:8px">
-        <table id="corr-tbl" style="border-collapse:collapse;font-size:12px"></table>
-      </div>
-      <div id="corr-detail" style="margin-top:10px;font-size:12px;color:var(--mu);padding:8px 12px;background:var(--surf2);border-radius:6px;display:none"></div>
-    </div>
   </div>
-  <!-- 板塊輪動 -->
+  <!-- 板塊輪動 Tab -->
   <div id="v-sector" style="display:none">
     <!-- 板塊設定 -->
     <div class="cc">
       <div class="cc-h">
         <span class="cc-t">板塊設定</span>
-        <span class="cc-s">選擇哪些指數屬於板塊 ETF，設定會自動儲存</span>
+        <span class="cc-s">點擊圓點加入／移除板塊，設定存在此瀏覽器中</span>
       </div>
-      <div id="sector-cfg" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px"></div>
+      <div id="sector-cfg" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
     <!-- 月內走勢 -->
     <div class="cc">
       <div class="cc-h">
-        <span class="cc-t" id="s-ct"></span>
+        <span class="cc-t" id="s-ct">板塊月內走勢</span>
         <span class="cc-s">歷史平均，X軸＝月內第 N 個交易日，Y軸＝月初至今累積報酬</span>
       </div>
       <div class="cb"><canvas id="s-lc"></canvas></div>
     </div>
-    <!-- 各月份報酬長條圖 -->
+    <!-- 月份長條圖 -->
     <div class="cc">
       <div class="cc-h">
         <span class="cc-t">各月份歷史平均報酬</span>
@@ -355,11 +279,11 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <div class="cc">
       <div class="cc-h">
         <span class="cc-t">板塊相對強弱比較</span>
-        <span class="cc-s">各月份平均報酬相對板塊均值的偏差</span>
+        <span class="cc-s">各月份平均報酬相對板塊均值的偏差，正值＝相對強勢</span>
       </div>
       <div class="cb" style="height:280px"><canvas id="s-rs"></canvas></div>
     </div>
-    <!-- 相關係數 -->
+    <!-- 相關係數矩陣 -->
     <div class="cc">
       <div class="cc-h">
         <div>
@@ -386,7 +310,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
   <span id="gs-txt">—</span>
   <button onclick="fetchData()" style="margin-left:auto;padding:3px 10px;border:1px solid var(--bd);background:none;color:var(--mu);border-radius:5px;cursor:pointer;font-size:11px">重新整理</button>
 </div>
-<footer>資料來源：Investing.com 歷史收盤價。DJI/NASDAQ100/Russell2000：2001–2026；NASDAQ：2001–2019；台股加權：2011–2026。僅供參考，不構成投資建議。</footer>
+<footer>資料來源：Investing.com 歷史收盤價。僅供參考，不構成投資建議。</footer>
 
 <script>
 // ── 資料來源：直接讀取 Google Sheets CSV（SeasonalityJSON 工作表）──
@@ -414,14 +338,12 @@ var DASH_POOL  = [[],[6,3],[3,3],[8,2,2,2],[4,2],[6,2],[2,2],[8,4],[4,4],[6,2,2,
 
 function buildSR() {
   if (!D || !D.meta) return;
-  loadSectorKeys();
   SR = [];
   hid = {};
   var poolIdx = 0;
   Object.keys(D.meta).forEach(function(k) {
     if (k === 'VIX') return;
-    if (sectorKeys.indexOf(k) !== -1) return; // 板塊排除在主視圖外
-    var color = COLOR_MAP[k] || SECTOR_COLOR_MAP[k] || COLOR_POOL[poolIdx++ % COLOR_POOL.length];
+    var color = COLOR_MAP[k] || COLOR_POOL[poolIdx++ % COLOR_POOL.length];
     SR.push({
       k:  k,
       lb: D.meta[k].label || k,
@@ -432,20 +354,6 @@ function buildSR() {
   });
 }
 
-function buildSectorSR() {
-  // 給板塊 Tab 用的 SR，使用板塊顏色
-  if (!D || !D.meta) return [];
-  return Object.keys(D.meta)
-    .filter(function(k){ return k !== 'VIX' && sectorKeys.indexOf(k) !== -1; })
-    .map(function(k){
-      return {
-        k:  k,
-        lb: D.meta[k].label || k,
-        c:  SECTOR_COLOR_MAP[k] || COLOR_POOL[Object.keys(D.meta).indexOf(k) % COLOR_POOL.length],
-        ds: []
-      };
-    });
-}
 
 var MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 var INS=[
@@ -652,14 +560,15 @@ function initUI() {
         cv=b.dataset.v;
         document.querySelectorAll('.nb').forEach(function(x){x.classList.remove('on');});
         b.classList.add('on');
+        document.getElementById('mRow').style.display=cv==='sector'?'none':'';
+        document.getElementById('pills-row').style.display=cv==='sector'?'none':'';
         document.getElementById('v-intra').style.display=cv==='intra'?'':'none';
         document.getElementById('v-monthly').style.display=cv==='monthly'?'':'none';
         document.getElementById('v-sector').style.display=cv==='sector'?'':'none';
-        // 切到月份總覽時隱藏月內專屬卡片
         if(cv==='monthly'){
           document.getElementById('vix-intra-card').style.display='none';
         }
-        if(cv==='sector'){ drawSector(); }
+        if(cv==='sector'){ drawSector(); return; }
         draw();
       };
     });
@@ -1246,35 +1155,7 @@ var sBChart     = null;
 var sRsChart    = null;
 var sHmIdx      = null; // 熱力圖目前指數
 
-// SPDR 板塊 ETF 預設清單
-var DEFAULT_SECTOR_KEYS = ['XLK','XLF','XLE','XLV','XLY','XLP','XLI','XLB','XLU','XLRE'];
 
-// 板塊 ETF 固定顏色
-var SECTOR_COLOR_MAP = {
-  'XLK':  '#58a6ff', // 藍  科技
-  'XLF':  '#d4a843', // 金  金融
-  'XLE':  '#f0883e', // 橘  能源
-  'XLV':  '#3fb950', // 綠  醫療
-  'XLY':  '#bc8cff', // 紫  非必需消費
-  'XLP':  '#ff6eb4', // 粉  必需消費
-  'XLI':  '#40e0d0', // 青  工業
-  'XLB':  '#e06c75', // 紅  原材料
-  'XLU':  '#ffd700', // 黃  公用事業
-  'XLRE': '#98c379', // 淺綠 不動產
-};
-
-function loadSectorKeys() {
-  try {
-    var saved = localStorage.getItem('momo_sector_keys');
-    if (saved !== null) {
-      sectorKeys = JSON.parse(saved);
-    } else {
-      // 第一次使用：預設把 XL 系列全部設為板塊
-      sectorKeys = DEFAULT_SECTOR_KEYS.slice();
-      saveSectorKeys();
-    }
-  } catch(e) { sectorKeys = DEFAULT_SECTOR_KEYS.slice(); }
-}
 function saveSectorKeys() {
   try { localStorage.setItem('momo_sector_keys', JSON.stringify(sectorKeys)); } catch(e){}
 }
@@ -1315,48 +1196,116 @@ function initSectorCfg() {
   }
 }
 
+function hc(v){
+  if(!v)return'transparent';
+  var t=Math.min(Math.abs(v)/12,1);
+  return v>0?'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')':'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')';
+}
+
+fetchData();
+// ── 板塊輪動 ─────────────────────────────────────────────────
+var sectorKeys = [];
+var sLChart = null, sBChart = null, sRsChart = null;
+var sHmIdx = null;
+
+var DEFAULT_SECTOR_KEYS = ['XLK','XLF','XLE','XLV','XLY','XLP','XLI','XLB','XLU','XLRE'];
+var SECTOR_COLOR_MAP = {
+  'XLK':'#58a6ff','XLF':'#d4a843','XLE':'#f0883e','XLV':'#3fb950',
+  'XLY':'#bc8cff','XLP':'#ff6eb4','XLI':'#40e0d0','XLB':'#e06c75',
+  'XLU':'#ffd700','XLRE':'#98c379'
+};
+
+function loadSectorKeys() {
+  try {
+    var saved = localStorage.getItem('momo_sector_keys');
+    sectorKeys = saved !== null ? JSON.parse(saved) : DEFAULT_SECTOR_KEYS.slice();
+  } catch(e) { sectorKeys = DEFAULT_SECTOR_KEYS.slice(); }
+}
+function saveSectorKeys() {
+  try { localStorage.setItem('momo_sector_keys', JSON.stringify(sectorKeys)); } catch(e){}
+}
+function getSectorColor(k) {
+  return SECTOR_COLOR_MAP[k] || COLOR_POOL[Object.keys(D.meta||{}).indexOf(k) % COLOR_POOL.length] || '#7d8590';
+}
 function getSectorSR() {
-  return buildSectorSR();
+  if (!D || !D.meta) return [];
+  return Object.keys(D.meta)
+    .filter(function(k){ return k !== 'VIX' && sectorKeys.indexOf(k) !== -1; })
+    .map(function(k){ return {k:k, lb:D.meta[k].label||k, c:getSectorColor(k), ds:[]}; });
 }
 
 function drawSector() {
-  initSectorCfg();
+  loadSectorKeys();
+  var cfg = document.getElementById('sector-cfg');
+  if (cfg && D && D.meta) {
+    cfg.innerHTML = '';
+    Object.keys(D.meta).filter(function(k){return k!=='VIX';}).forEach(function(k) {
+      var on = sectorKeys.indexOf(k) !== -1;
+      var c = getSectorColor(k);
+      var btn = document.createElement('span');
+      btn.className = 'idx-chip';
+      btn.style.borderColor = on ? c : 'var(--bd)';
+      btn.style.opacity = on ? '1' : '0.4';
+      btn.innerHTML = '<span class="dot" style="background:'+c+'"></span>'+(D.meta[k].label||k);
+      btn.title = on ? '點擊移除板塊' : '點擊加入板塊';
+      btn.onclick = (function(key, color, b) { return function() {
+        var i = sectorKeys.indexOf(key);
+        if (i === -1) { sectorKeys.push(key); b.style.borderColor=color; b.style.opacity='1'; b.title='點擊移除板塊'; }
+        else { sectorKeys.splice(i,1); b.style.borderColor='var(--bd)'; b.style.opacity='0.4'; b.title='點擊加入板塊'; }
+        saveSectorKeys();
+        drawSector();
+      };})(k, c, btn);
+      cfg.appendChild(btn);
+    });
+  }
+
   var srs = getSectorSR();
-  if (!srs.length) return;
+  var noDataEl = document.getElementById('sector-no-data');
+  if (!srs.length) {
+    if (!noDataEl) {
+      var msg = document.createElement('div');
+      msg.id = 'sector-no-data';
+      msg.style.cssText = 'padding:32px;text-align:center;color:var(--mu);font-size:13px;line-height:2.2';
+      msg.innerHTML = '<div style="font-size:32px;margin-bottom:12px">📊</div>'+
+        '<div style="color:var(--tx);font-weight:600;margin-bottom:8px;font-size:15px">尚無板塊資料</div>'+
+        '<div style="font-size:12px">① 從 Investing.com 下載板塊 ETF 歷史資料（XLK、XLF、XLE...）<br>'+
+        '② 使用 DataManager 上傳 CSV<br>'+
+        '③ Google Sheets 執行「季節性分析 → 重新計算所有指數」<br>'+
+        '④ 重新整理後，在上方「板塊設定」點亮對應指數</div>';
+      if (cfg) cfg.parentNode.insertBefore(msg, cfg.nextSibling);
+    }
+    return;
+  }
+  if (noDataEl) noDataEl.remove();
   drawSectorIntra(srs);
   drawSectorMonthly(srs);
   drawSectorHeatmap(srs);
   drawSectorRS(srs);
-  drawSectorCorr(srs);
+  drawSectorCorr();
 }
 
-// 月內走勢
 function drawSectorIntra(srs) {
-  if (!srs) srs = getSectorSR();
   var k = String(cm+1);
   var maxL = Math.max.apply(null, srs.map(function(s){
     return (D.intramonth[s.k]&&D.intramonth[s.k][k]) ? D.intramonth[s.k][k].length : 0;
   }));
-  var labels = Array.from({length:maxL}, function(_,i){ return 'D'+(i+1); });
+  if (!maxL) return;
+  var labels = Array.from({length:maxL}, function(_,i){return'D'+(i+1);});
   var datasets = srs.map(function(s){
-    return {
-      label:s.lb, data:(D.intramonth[s.k]&&D.intramonth[s.k][k])||[],
-      borderColor:s.c, backgroundColor:'transparent',
-      borderWidth:2, borderDash:s.ds,
-      pointRadius:3, pointHoverRadius:5, tension:0.3, fill:false
-    };
+    return {label:s.lb, data:(D.intramonth[s.k]&&D.intramonth[s.k][k])||[],
+      borderColor:s.c, backgroundColor:'transparent', borderWidth:2,
+      pointRadius:3, pointHoverRadius:5, tension:0.3, fill:false};
   });
-  var ctx = document.getElementById('s-lc');
-  if (!ctx) return;
+  var ctx = document.getElementById('s-lc'); if (!ctx) return;
   if (sLChart) { sLChart.destroy(); sLChart=null; }
   sLChart = new Chart(ctx.getContext('2d'), {
     type:'line', data:{labels:labels, datasets:datasets},
-    options:{responsive:true,maintainAspectRatio:false,
+    options:{responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:true,position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:16,padding:10}},
         tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
           callbacks:{title:function(i){return '第'+(i[0].dataIndex+1)+'交易日';},
-                     label:function(c){return ' '+c.dataset.label+': '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';}}}},
+                     label:function(c){return' '+c.dataset.label+': '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';}}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},autoSkip:false,maxRotation:0}},
         y:{grid:{color:function(c){return c.tick.value===0?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.05)';},
@@ -1371,17 +1320,14 @@ function drawSectorIntra(srs) {
   if (ct) ct.textContent = MN[cm]+' 板塊月內各交易日歷史平均累積報酬';
 }
 
-// 月份長條圖
 function drawSectorMonthly(srs) {
-  if (!srs) srs = getSectorSR();
   var datasets = srs.map(function(s){
-    var vals = Array.from({length:12}, function(_,m){ return D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)]||0; });
-    return {label:s.lb, data:vals,
+    var vals = Array.from({length:12},function(_,m){return D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)]||0;});
+    return {label:s.lb,data:vals,
       backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
-      borderColor:s.c, borderWidth:1, borderRadius:4};
+      borderColor:s.c,borderWidth:1,borderRadius:4};
   });
-  var ctx = document.getElementById('s-bc');
-  if (!ctx) return;
+  var ctx = document.getElementById('s-bc'); if (!ctx) return;
   if (sBChart) { sBChart.destroy(); sBChart=null; }
   sBChart = new Chart(ctx.getContext('2d'), {
     type:'bar', data:{labels:MN, datasets:datasets},
@@ -1389,22 +1335,20 @@ function drawSectorMonthly(srs) {
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:true,position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:16,padding:10}},
         tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
-          callbacks:{label:function(c){return ' '+c.dataset.label+': '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';}}}},
+          callbacks:{label:function(c){return' '+c.dataset.label+': '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(2)+'%';}}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11}}},
         y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11},callback:function(v){return v.toFixed(1)+'%';}}}
       },
-      onClick:function(_,els){if(!els.length)return; selM(els[0].index); drawSectorIntra();}
+      onClick:function(_,els){if(!els.length)return;selM(els[0].index);document.querySelector('.nb[data-v="intra"]').click();}
     }
   });
 }
 
-// 熱力圖
 function drawSectorHeatmap(srs) {
   if (!srs) srs = getSectorSR();
   if (!srs.length) return;
-  if (!sHmIdx || srs.findIndex(function(s){return s.k===sHmIdx;})===-1) sHmIdx = srs[0].k;
-  // tabs
+  if (!sHmIdx || !srs.find(function(s){return s.k===sHmIdx;})) sHmIdx = srs[0].k;
   var tabWrap = document.getElementById('s-hm-tabs');
   if (tabWrap) {
     tabWrap.innerHTML='';
@@ -1412,14 +1356,14 @@ function drawSectorHeatmap(srs) {
       var btn=document.createElement('button');
       btn.className='hm-tab'+(s.k===sHmIdx?' on':'');
       btn.textContent=s.lb; btn.style.background=s.k===sHmIdx?s.c:'';
-      btn.onclick=function(){ sHmIdx=s.k; drawSectorHeatmap(); };
+      btn.onclick=function(){sHmIdx=s.k; drawSectorHeatmap();};
       tabWrap.appendChild(btn);
     });
   }
   var s = srs.find(function(s){return s.k===sHmIdx;})||srs[0];
   document.getElementById('s-hmt').textContent = s.lb+' — 各年各月報酬（%）';
   if (!D.monthly_returns||!D.monthly_returns[s.k]) return;
-  var yrs = Object.keys(D.monthly_returns[s.k]).filter(function(y){return Object.keys(D.monthly_returns[s.k][y]).length>0;}).sort();
+  var yrs=Object.keys(D.monthly_returns[s.k]).filter(function(y){return Object.keys(D.monthly_returns[s.k][y]).length>0;}).sort();
   var avgRow='<tr class="ar"><td class="yl">平均</td>'+
     Array.from({length:12},function(_,m){var v=D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)]||0;
       return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>3?'#fff':'var(--tx)')+'">'+
@@ -1433,29 +1377,22 @@ function drawSectorHeatmap(srs) {
     '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
 }
 
-// 相對強弱
 function drawSectorRS(srs) {
-  if (!srs) srs = getSectorSR();
-  if (!srs.length) return;
+  if (!srs||!srs.length) return;
   var datasets = srs.map(function(s){
-    var vals = Array.from({length:12},function(_,m){
-      var v=D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)];
-      return v!==undefined?v:null;
-    });
-    var devs = vals.map(function(v,m){
+    var vals=Array.from({length:12},function(_,m){var v=D.monthly_avg[s.k]&&D.monthly_avg[s.k][String(m+1)];return v!==undefined?v:null;});
+    var devs=vals.map(function(v,m){
       if(v===null) return null;
       var peers=srs.map(function(s2){var x=D.monthly_avg[s2.k]&&D.monthly_avg[s2.k][String(m+1)];return x!==undefined?x:null;}).filter(function(x){return x!==null;});
       var mean=peers.reduce(function(a,b){return a+b;},0)/peers.length;
       return Math.round((v-mean)*100)/100;
     });
-    return {label:s.lb,data:devs,borderColor:s.c,backgroundColor:s.c+'30',
-      borderWidth:2,borderDash:s.ds,pointRadius:4,pointHoverRadius:6,tension:0.3,fill:false};
+    return{label:s.lb,data:devs,borderColor:s.c,backgroundColor:s.c+'28',borderWidth:2,pointRadius:4,pointHoverRadius:6,tension:0.3,fill:false};
   });
-  var ctx = document.getElementById('s-rs');
-  if (!ctx) return;
-  if (sRsChart) { sRsChart.destroy(); sRsChart=null; }
-  sRsChart = new Chart(ctx.getContext('2d'), {
-    type:'line', data:{labels:MN,datasets:datasets},
+  var ctx=document.getElementById('s-rs'); if (!ctx) return;
+  if (sRsChart){sRsChart.destroy();sRsChart=null;}
+  sRsChart=new Chart(ctx.getContext('2d'),{
+    type:'line',data:{labels:MN,datasets:datasets},
     options:{responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:true,position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:16,padding:10}},
@@ -1473,16 +1410,29 @@ function drawSectorRS(srs) {
   });
 }
 
-// 板塊相關係數
-function drawSectorCorr(srs) {
-  if (!srs) srs = getSectorSR();
-  var tbl    = document.getElementById('s-corr-tbl');
-  var detail = document.getElementById('s-corr-detail');
-  var mSel   = document.getElementById('s-corr-month');
+function pearson(a,b) {
+  var n=a.length; if(n<3) return null;
+  var ma=a.reduce(function(s,v){return s+v;},0)/n;
+  var mb=b.reduce(function(s,v){return s+v;},0)/n;
+  var num=0,da=0,db=0;
+  for(var i=0;i<n;i++){num+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)*(a[i]-ma);db+=(b[i]-mb)*(b[i]-mb);}
+  var denom=Math.sqrt(da*db);
+  return denom===0?null:Math.round(num/denom*1000)/1000;
+}
+
+function drawSectorCorr() {
+  var srs = getSectorSR();
+  var tbl=document.getElementById('s-corr-tbl');
+  var mSel=document.getElementById('s-corr-month');
+  var detail=document.getElementById('s-corr-detail');
   if (!tbl||!srs.length) return;
-  var filterM = mSel ? parseInt(mSel.value) : 0;
-  function getSeries(k) {
-    var mr=D.monthly_returns[k]; if(!mr) return [];
+  if (mSel&&mSel.options.length===1) {
+    MN.forEach(function(m,i){var o=document.createElement('option');o.value=i+1;o.textContent=m;mSel.appendChild(o);});
+    mSel.onchange=function(){drawSectorCorr();};
+  }
+  var filterM=mSel?parseInt(mSel.value):0;
+  function getSeries(k){
+    var mr=D.monthly_returns[k]; if(!mr) return[];
     var arr=[];
     Object.keys(mr).sort().forEach(function(y){
       if(filterM===0){Object.keys(mr[y]).forEach(function(m){if(mr[y][m]!==undefined)arr.push(mr[y][m]);});}
@@ -1517,7 +1467,7 @@ function drawSectorCorr(srs) {
       html+='<td style="padding:7px 8px;background:'+bg+';color:'+(isSelf?'var(--mu)':tc)+
         ';text-align:center;border-radius:3px;cursor:'+(isSelf?'default':'pointer')+
         ';font-weight:'+(isSelf?'400':'500')+'"'+
-        (isSelf?'':' onclick="showCorrDetail(\''+a.lb+'\',\''+b.lb+'\','+r+')"')+
+        (isSelf?'':' onclick="showSCorrDetail(''+a.lb+'',''+b.lb+'','+r+')"')+
         ' title="'+a.lb+' × '+b.lb+': '+txt+'">'+txt+'</td>';
     });
     html+='</tr>';
@@ -1525,580 +1475,18 @@ function drawSectorCorr(srs) {
   tbl.innerHTML=html;
   if(detail) detail.style.display='none';
 }
-function initCrossMonthHeatmap() {
-  var MN_SHORT=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  var idxSel=document.getElementById('cm2-idx');
-  var xmSel =document.getElementById('cm2-xm');
-  var xdSel =document.getElementById('cm2-xd');
-  if(!idxSel) return;
 
-  idxSel.innerHTML='';
-  SR.forEach(function(s){
-    var o=document.createElement('option');
-    o.value=s.k; o.textContent=s.lb; idxSel.appendChild(o);
-  });
-  var bk=getBaseKey(); if(bk) idxSel.value=bk;
-
-  xmSel.innerHTML='';
-  MN_SHORT.forEach(function(m,i){
-    var o=document.createElement('option');
-    o.value=i+1; o.textContent=m; xmSel.appendChild(o);
-  });
-  xmSel.value=9; // 預設9月出場
-
-  // 出場日下拉
-  xmSel.onchange=function(){ updateCm2Days(); };
-  updateCm2Days();
-  drawCrossMonthHeatmap();
-}
-
-function updateCm2Days() {
-  var xmSel=document.getElementById('cm2-xm');
-  var xdSel=document.getElementById('cm2-xd');
-  if(!xmSel||!xdSel) return;
-  var m=parseInt(xmSel.value);
-  var bk=getBaseKey()||(SR[0]&&SR[0].k);
-  var maxD=23;
-  if(D&&D.intramonth&&bk&&D.intramonth[bk]&&D.intramonth[bk][String(m)]){
-    maxD=D.intramonth[bk][String(m)].length;
-  }
-  var cur=parseInt(xdSel.value)||maxD;
-  xdSel.innerHTML='';
-  for(var d=1;d<=maxD;d++){
-    var o=document.createElement('option'); o.value=d; o.textContent='D'+d; xdSel.appendChild(o);
-  }
-  xdSel.value=Math.min(cur,maxD);
-}
-
-function drawCrossMonthHeatmap() {
-  var idxKey=document.getElementById('cm2-idx').value;
-  var xm    =parseInt(document.getElementById('cm2-xm').value);
-  var xd    =parseInt(document.getElementById('cm2-xd').value)-1;
-  var tbl   =document.getElementById('cm2-tbl');
-  var detail=document.getElementById('cm2-detail');
-  if(!tbl) return;
-
-  if(!D||!D.cross_month_win||!D.cross_month_win[idxKey]){
-    tbl.innerHTML='<tr><td style="color:var(--or);padding:12px">請重新執行 GAS「重新計算所有指數」後重新整理。</td></tr>';
-    return;
-  }
-
-  var mat=D.cross_month_win[idxKey][String(xm)];
-  if(!mat||!mat[String(xd)]){ tbl.innerHTML=''; return; }
-  var row=mat[String(xd)];
-
-  var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  var s=SR.find(function(s){return s.k===idxKey;})||{lb:idxKey};
-
-  // ── 計算今天約是哪個月第幾個交易日 ──────────────────────────
-  var today    = new Date();
-  var todayM   = today.getMonth()+1;  // 1-12
-  var todayDay = today.getDate();
-  // 估算：每月約有 22 個交易日，月曆日 ÷ (30/22) ≈ 第幾個交易日
-  // 更精確：假設每月 1 號是 D1，跳過週末
-  var d = new Date(today.getFullYear(), todayM-1, 1);
-  var tradingDay = 0;
-  while(d <= today) {
-    var dow = d.getDay();
-    if(dow!==0 && dow!==6) tradingDay++;
-    d.setDate(d.getDate()+1);
-  }
-  tradingDay = Math.max(1, tradingDay) - 1; // 0-based
-
-  // header
-  var maxED=0;
-  for(var em2=1;em2<=12;em2++){
-    if(row[String(em2)]){
-      var keys=Object.keys(row[String(em2)]).map(Number);
-      if(keys.length) maxED=Math.max(maxED,Math.max.apply(null,keys)+1);
-    }
-  }
-  var html='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px">進場↓</th>';
-  for(var d2=0;d2<maxED;d2++){
-    var isToday=(d2===tradingDay);
-    html+='<th class="iwin-head" style="'+(isToday?'color:var(--rd);font-weight:700':'')+'">D'+(d2+1)+
-      (isToday?'<div style="font-size:7px;color:var(--rd)">今</div>':'')+'</th>';
-  }
-  html+='</tr>';
-
-  for(var em=1;em<=12;em++){
-    var isNowRow=(em===todayM);
-    html+='<tr><th class="iwin-head" style="white-space:nowrap;padding:3px 8px;'+(isNowRow?'color:var(--rd);font-weight:700':'')+'">'+
-      MN_S[em-1]+'</th>';
-    for(var ed=0;ed<maxED;ed++){
-      var wr=(row[String(em)]&&row[String(em)][String(ed)]!==undefined)?row[String(em)][String(ed)]:null;
-      var skip=(xm===em&&xd===ed);
-      var isNow=(em===todayM && ed===tradingDay);
-      var nowStyle=isNow?';outline:2px solid #f85149;outline-offset:-1px;z-index:1;position:relative':'';
-      if(skip||wr===null){
-        html+='<td style="width:26px;height:22px'+nowStyle+'">'+(isNow?'<span style="font-size:8px;color:var(--rd);font-weight:700">今</span>':'')+'</td>';
-      } else {
-        var bg=iwinColor(wr);
-        var tc=(wr>=60||wr<40)?'#fff':'var(--tx)';
-        html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+';width:26px;height:22px;font-size:9px'+nowStyle+'"'+
-          ' title="'+MN_S[em-1]+' D'+(ed+1)+' 進 → '+MN_S[xm-1]+' D'+(xd+1)+' 出：'+wr+'%'+(isNow?' ◀ 今天約在此':'')+'"'+
-          ' onclick="showCm2Detail('+em+','+(ed+1)+','+xm+','+(xd+1)+','+wr+',\''+s.lb+'\')">'+
-          (isNow?'<b>'+wr+'%</b>':wr+'%')+'</td>';
-      }
-    }
-    html+='</tr>';
-  }
-  tbl.innerHTML=html;
-  // 顯示今天位置說明
-  var todayLabel = MN_S[todayM-1]+' 第 '+(tradingDay+1)+' 個交易日（D'+(tradingDay+1)+'）';
-  var cm2detail = document.getElementById('cm2-detail');
-  if(cm2detail){
-    cm2detail.style.display='block';
-    cm2detail.innerHTML='<span style="color:var(--rd)">▣</span> 今天約為 <b style="color:var(--rd)">'+todayLabel+'</b>，對應熱力圖中紅框位置。點擊格子查看詳細勝率說明。';
-  }
-}
-
-function showCm2Detail(em,ed,xm,xd,wr,label) {
-  var detail=document.getElementById('cm2-detail');
-  if(!detail) return;
-  var MN_S=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  var color=iwinColor(wr);
-  var strength=wr>=75?'強勢 ✓✓':wr>=65?'偏強 ✓':wr>=55?'中性偏強':wr>=45?'中性':wr>=35?'偏弱 ✗':'弱勢 ✗✗';
+function showSCorrDetail(la,lb,r) {
+  var detail=document.getElementById('s-corr-detail'); if(!detail) return;
+  var strength,color,desc;
+  if(r>=0.8){strength='高度正相關';color='var(--gr)';desc='兩板塊高度同步，輪動效應弱。';}
+  else if(r>=0.5){strength='中度正相關';color='#3fb950';desc='大方向相同，有相對強弱空間。';}
+  else if(r>=0.2){strength='低度正相關';color='var(--mu)';desc='相關性低，輪動機會較多。';}
+  else if(r>=-0.2){strength='幾乎不相關';color='var(--mu)';desc='走勢獨立，可分散配置。';}
+  else if(r>=-0.5){strength='中度負相關';color='var(--or)';desc='兩板塊傾向反向走勢，蹺蹺板效應。';}
+  else{strength='高度負相關';color='var(--rd)';desc='強烈反向關係，資金在兩者間輪動。';}
   detail.style.display='block';
-  detail.innerHTML=
-    '<b style="color:'+color+';font-size:16px">'+wr+'%</b>　'+
-    '【'+label+'】'+MN_S[em-1]+' D'+ed+' 進場 → '+MN_S[xm-1]+' D'+xd+' 出場　<b>'+strength+'</b>'+
-    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史 '+wr+'% 的年份為正報酬</span>';
-}
-function updateIwinStats(k, iwin, n) {
-  var all=[], best=null, worst=null;
-  for(var ei=0;ei<n-1;ei++){
-    for(var eo=ei+1;eo<n;eo++){
-      var wr=iwin[ei]&&iwin[ei][eo]!==undefined?iwin[ei][eo]:null;
-      if(wr===null) continue;
-      all.push({ei:ei,eo:eo,wr:wr});
-      if(!best||wr>best.wr) best={ei:ei,eo:eo,wr:wr};
-      if(!worst||wr<worst.wr) worst={ei:ei,eo:eo,wr:wr};
-    }
-  }
-  if(!all.length) return;
-
-  var avg=Math.round(all.reduce(function(s,v){return s+v.wr;},0)/all.length*10)/10;
-  var hiCnt=all.filter(function(v){return v.wr>=65;}).length;
-  var loCnt=all.filter(function(v){return v.wr<40;}).length;
-
-  // 平均勝率卡
-  var avgEl=document.getElementById('iwin-avg-wr');
-  if(avgEl){
-    var ac=avg>=60?'var(--gr)':avg>=50?'var(--tx)':'var(--rd)';
-    avgEl.style.color=ac;
-    avgEl.innerHTML='<span style="font-size:22px;font-weight:700">'+avg+'%</span>'+
-      '<div style="font-size:10px;color:var(--mu);margin-top:4px">'+
-        '<span style="color:var(--gr)">▲'+hiCnt+'個</span> &gt;65%　'+
-        '<span style="color:var(--rd)">▼'+loCnt+'個</span> &lt;40%</div>';
-  }
-
-  // 最佳組合
-  var bestEl=document.getElementById('iwin-best');
-  if(bestEl&&best){
-    bestEl.innerHTML=
-      '<span style="font-size:20px;font-weight:700;color:var(--gr)">'+best.wr+'%</span>'+
-      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(best.ei+1)+'→D'+(best.eo+1)+'</span>';
-  }
-
-  // 最差組合
-  var worstEl=document.getElementById('iwin-worst');
-  if(worstEl&&worst){
-    worstEl.innerHTML=
-      '<span style="font-size:20px;font-weight:700;color:var(--rd)">'+worst.wr+'%</span>'+
-      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(worst.ei+1)+'→D'+(worst.eo+1)+'</span>';
-  }
-
-  // 本月最佳進場排行（出場=本月末）
-  var rankEl=document.getElementById('iwin-rank');
-  if(rankEl){
-    var lastDay=n-1;
-    var exits=[];
-    for(var ei2=0;ei2<lastDay;ei2++){
-      var wr2=iwin[ei2]&&iwin[ei2][lastDay]!==undefined?iwin[ei2][lastDay]:null;
-      if(wr2!==null) exits.push({ei:ei2,wr:wr2});
-    }
-    exits.sort(function(a,b){return b.wr-a.wr;});
-    rankEl.innerHTML='';
-    exits.slice(0,5).forEach(function(item,i){
-      var c=item.wr>=65?'var(--gr)':item.wr>=50?'var(--tx)':'var(--or)';
-      var pct=Math.round(item.wr/exits[0].wr*100);
-      var row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:5px;cursor:pointer';
-      row.title='D'+(item.ei+1)+'進→D'+n+'出 勝率'+item.wr+'%';
-      row.onclick=(function(ei,eo,wr){return function(){showIwinDetail(ei+1,eo+1,wr);};})(item.ei,lastDay,item.wr);
-      row.innerHTML=
-        '<span style="font-size:10px;color:var(--mu);min-width:12px">'+(i+1)+'.</span>'+
-        '<span style="font-size:11px;min-width:26px;color:var(--tx)">D'+(item.ei+1)+'</span>'+
-        '<div style="flex:1;height:5px;background:var(--surf);border-radius:2px;overflow:hidden">'+
-          '<div style="height:100%;width:'+pct+'%;background:'+c+'"></div></div>'+
-        '<span style="font-size:11px;font-weight:600;color:'+c+';min-width:36px;text-align:right">'+item.wr+'%</span>';
-      rankEl.appendChild(row);
-    });
-  }
-}
-
-function showIwinDetail(ei, eo, wr) {
-  var detail = document.getElementById('iwin-detail');
-  if (!detail) return;
-  var s = SR.find(function(s){ return s.k===iwinIdxKey; });
-  var label = s ? s.lb : iwinIdxKey;
-  if (wr===null) { detail.style.display='none'; return; }
-  var strength = wr>=75?'強勢 ✓✓': wr>=65?'偏強 ✓': wr>=55?'中性偏強 ～': wr>=45?'中性 ～': wr>=35?'偏弱 ✗':'弱勢 ✗✗';
-  var color = iwinColor(wr);
-  detail.style.display='block';
-  detail.innerHTML =
-    '<b style="color:'+color+';font-size:16px">'+wr+'%</b>　' +
-    '【'+label+'】D'+ei+' 進場 → D'+eo+' 出場　<b>'+strength+'</b>' +
-    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史上 '+wr+'% 的年份此區間為正報酬</span>';
-}
-
-function drawVixIntra(k) {
-  var card = document.getElementById('vix-intra-card');
-  if (!D.intramonth || !D.intramonth['VIX'] || !D.intramonth['VIX'][k] || !D.intramonth['VIX'][k].length) {
-    card.style.display = 'none'; return;
-  }
-  card.style.display = '';
-  var vixData = D.intramonth['VIX'][k];
-  var labels = Array.from({length:vixData.length}, function(_,i){ return 'D'+(i+1); });
-  document.getElementById('vix-intra-title').textContent = MN[cm] + ' VIX 月內歷史平均變化';
-  vixLineChart.data.labels = labels;
-  vixLineChart.data.datasets = [{
-    label:'VIX',
-    data: vixData,
-    borderColor:'#f85149',
-    backgroundColor:'rgba(248,81,73,0.1)',
-    borderWidth:2,
-    pointRadius:3,
-    pointHoverRadius:5,
-    tension:0.3,
-    fill:true
-  }];
-  vixLineChart.update();
-}
-
-function drawMonthly(){
-  var ai=actIdx();
-  var datasets = ai.map(function(i){
-    var s=SR[i];
-    var vals=Array.from({length:12},function(_,m){return D.monthly_avg[s.k][String(m+1)]||0;});
-    return{type:'bar',label:s.lb,data:vals,yAxisID:'y',
-      backgroundColor:vals.map(function(v){return v>=0?s.c+'99':s.c+'55';}),
-      borderColor:s.c,borderWidth:1,borderRadius:4};
-  });
-  // VIX 折線（右軸）
-  if (D.monthly_avg && D.monthly_avg['VIX']) {
-    var vixVals = Array.from({length:12}, function(_,m){ return D.monthly_avg['VIX'][String(m+1)]||null; });
-    datasets.push({
-      type:'line', label:'VIX', data:vixVals, yAxisID:'y2',
-      borderColor:'#f85149', backgroundColor:'rgba(248,81,73,0.08)',
-      borderWidth:2, pointRadius:4, pointHoverRadius:6,
-      pointBackgroundColor:'#f85149', tension:0.3, fill:false,
-      order:0  // 折線畫在長條上方
-    });
-  }
-  bChart.data.datasets = datasets;
-  bChart.update();
-
-  // 熱力圖切換按鈕（每次重建，因 SR 可能變動）
-  var tabWrap = document.getElementById('hm-tabs');
-  tabWrap.innerHTML = '';
-  if (curHmIdx >= SR.length) curHmIdx = 0;
-  SR.forEach(function(s, i) {
-    var btn = document.createElement('button');
-    btn.className = 'hm-tab';
-    btn.textContent = s.lb;
-    btn.dataset.i = i;
-    btn.onclick = function() {
-      curHmIdx = parseInt(this.dataset.i);
-      renderHeatmap();
-    };
-    tabWrap.appendChild(btn);
-  });
-  renderHeatmap();
-}
-
-function renderHeatmap() {
-  if (!SR.length) return;
-  // curHmIdx 超出範圍時重置為 0
-  if (curHmIdx >= SR.length || !SR[curHmIdx]) curHmIdx = 0;
-  var s = SR[curHmIdx];
-  // 更新 tab 樣式
-  document.querySelectorAll('.hm-tab').forEach(function(btn, i) {
-    btn.classList.toggle('on', i === curHmIdx);
-    btn.style.background = (i === curHmIdx) ? SR[i].c : '';
-  });
-  document.getElementById('hmt').textContent = s.lb + ' — 各年各月報酬（%）';
-  if (!D.monthly_returns || !D.monthly_returns[s.k]) return;
-  var yrs = Object.keys(D.monthly_returns[s.k])
-    .filter(function(y){ return Object.keys(D.monthly_returns[s.k][y]).length>0; }).sort();
-  var avgRow = '<tr class="ar"><td class="yl">平均</td>'+
-    Array.from({length:12}, function(_,m){ var v=D.monthly_avg[s.k][String(m+1)]||0;
-      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>3?'#fff':'var(--tx)')+'">'+
-        (v>0?'+':'')+v.toFixed(1)+'%</td>';}).join('')+'</tr>';
-  var rows = yrs.map(function(y){ return'<tr><td class="yl">'+y+'</td>'+
-    Array.from({length:12}, function(_,m){ var v=D.monthly_returns[s.k][y][String(m+1)];
-      if(v===undefined)return'<td style="color:var(--bd)">—</td>';
-      return'<td style="background:'+hc(v)+';color:'+(Math.abs(v)>8?'#fff':'var(--tx)')+'">'+
-        (v>0?'+':'')+v.toFixed(1)+'</td>';}).join('')+'</tr>';}).join('');
-  document.getElementById('hm').innerHTML =
-    '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+avgRow+rows;
-  // VIX 月份熱力圖
-  drawVixMonthly();
-  initCrossMonthHeatmap();
-  drawRelativeStrength();
-  drawCorrMatrix();
-}
-
-// ── 相對強弱比較圖 ───────────────────────────────────────────
-var rsChart = null;
-function drawRelativeStrength() {
-  var ctx = document.getElementById('rs-chart');
-  if (!ctx || !D || !D.monthly_avg) return;
-
-  // 排除 VIX
-  var keys = SR.filter(function(s){ return D.monthly_avg[s.k]; });
-  if (!keys.length) return;
-
-  // 每個月算全體平均，然後各指數算偏差
-  var datasets = keys.map(function(s) {
-    var vals = Array.from({length:12}, function(_,m){
-      var v = D.monthly_avg[s.k][String(m+1)];
-      return (v !== undefined) ? v : null;
-    });
-    // 每月全體均值
-    var devs = vals.map(function(v, m) {
-      if (v === null) return null;
-      var peers = keys.map(function(s2){
-        var x = D.monthly_avg[s2.k][String(m+1)];
-        return x !== undefined ? x : null;
-      }).filter(function(x){ return x !== null; });
-      var mean = peers.reduce(function(a,b){return a+b;},0) / peers.length;
-      return Math.round((v - mean)*100)/100;
-    });
-    return {
-      label: s.lb, data: devs,
-      borderColor: s.c, backgroundColor: s.c+'30',
-      borderWidth: 2, borderDash: s.ds,
-      pointRadius: 4, pointHoverRadius: 6,
-      tension: 0.3, fill: false
-    };
-  });
-
-  if (rsChart) rsChart.destroy();
-  rsChart = new Chart(ctx.getContext('2d'), {
-    type: 'line',
-    data: { labels: MN, datasets: datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: true, position: 'bottom',
-          labels: { color: '#7d8590', font: { size: 11 }, boxWidth: 20, padding: 12 }},
-        tooltip: {
-          backgroundColor: '#161b22', borderColor: '#30363d', borderWidth: 1,
-          callbacks: {
-            label: function(c) {
-              var v = c.parsed.y;
-              if (v === null) return null;
-              return ' ' + c.dataset.label + ': ' + (v>=0?'+':'') + v.toFixed(2) + '%';
-            }
-          }
-        }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7d8590', font: { size: 11 } } },
-        y: {
-          grid: {
-            color: function(ctx2) { return ctx2.tick.value===0?'rgba(255,255,255,0.25)':'rgba(255,255,255,0.05)'; },
-            lineWidth: function(ctx2) { return ctx2.tick.value===0?1.5:1; },
-            borderDash: function(ctx2) { return ctx2.tick.value===0?[5,4]:[]; }
-          },
-          ticks: { color: '#7d8590', font: { size: 11 }, callback: function(v){ return (v>=0?'+':'')+v.toFixed(1)+'%'; } },
-          title: { display: true, text: '相對偏差（%）', color: '#7d8590', font: { size: 11 } }
-        }
-      }
-    }
-  });
-}
-
-// ── 相關係數熱力圖 ───────────────────────────────────────────
-function pearson(a, b) {
-  var n = a.length;
-  if (n < 3) return null;
-  var ma = a.reduce(function(s,v){return s+v;},0)/n;
-  var mb = b.reduce(function(s,v){return s+v;},0)/n;
-  var num = 0, da = 0, db = 0;
-  for (var i = 0; i < n; i++) {
-    num += (a[i]-ma)*(b[i]-mb);
-    da  += (a[i]-ma)*(a[i]-ma);
-    db  += (b[i]-mb)*(b[i]-mb);
-  }
-  var denom = Math.sqrt(da*db);
-  return denom === 0 ? null : Math.round(num/denom*1000)/1000;
-}
-
-function drawCorrMatrix() {
-  var tbl     = document.getElementById('corr-tbl');
-  var mSel    = document.getElementById('corr-month');
-  var detail  = document.getElementById('corr-detail');
-  if (!tbl || !D || !D.monthly_returns) return;
-
-  // 建立月份下拉（只建一次）
-  if (mSel && mSel.options.length === 1) {
-    MN.forEach(function(m, i) {
-      var o = document.createElement('option');
-      o.value = i+1; o.textContent = m; mSel.appendChild(o);
-    });
-    mSel.onchange = function() { drawCorrMatrix(); };
-  }
-
-  var filterM = mSel ? parseInt(mSel.value) : 0;
-  var keys = SR.filter(function(s){ return D.monthly_returns[s.k]; });
-  if (!keys.length) return;
-
-  // 收集各指數在指定月份的報酬序列
-  function getSeries(k) {
-    var mr = D.monthly_returns[k];
-    var arr = [];
-    Object.keys(mr).sort().forEach(function(y) {
-      if (filterM === 0) {
-        // 全年：每個月都加
-        Object.keys(mr[y]).forEach(function(m) {
-          if (mr[y][m] !== undefined) arr.push(mr[y][m]);
-        });
-      } else {
-        if (mr[y][String(filterM)] !== undefined) arr.push(mr[y][String(filterM)]);
-      }
-    });
-    return arr;
-  }
-
-  // 計算相關係數矩陣
-  var matrix = keys.map(function(a) {
-    return keys.map(function(b) {
-      if (a.k === b.k) return 1.0;
-      var sa = getSeries(a.k), sb = getSeries(b.k);
-      // 對齊長度
-      var len = Math.min(sa.length, sb.length);
-      return pearson(sa.slice(0, len), sb.slice(0, len));
-    });
-  });
-
-  // 相關係數顏色
-  function corrColor(r) {
-    if (r === null) return 'var(--surf2)';
-    if (r >= 0.8)  return 'rgba(26,127,55,.9)';
-    if (r >= 0.6)  return 'rgba(63,185,80,.65)';
-    if (r >= 0.3)  return 'rgba(63,185,80,.3)';
-    if (r >= -0.3) return 'rgba(125,133,144,.2)';
-    if (r >= -0.6) return 'rgba(240,136,62,.4)';
-    return 'rgba(248,81,73,.7)';
-  }
-
-  // 渲染表格
-  var html = '<tr><th style="padding:6px 10px;font-size:11px;color:var(--mu);text-align:left"></th>';
-  keys.forEach(function(s) {
-    html += '<th style="padding:6px 8px;font-size:11px;color:'+s.c+';text-align:center;white-space:nowrap">'+s.lb+'</th>';
-  });
-  html += '</tr>';
-
-  keys.forEach(function(a, i) {
-    html += '<tr><th style="padding:6px 10px;font-size:11px;color:'+a.c+';text-align:left;white-space:nowrap">'+a.lb+'</th>';
-    keys.forEach(function(b, j) {
-      var r = matrix[i][j];
-      var bg = corrColor(r);
-      var txt = r !== null ? r.toFixed(2) : '—';
-      var tc = (r !== null && Math.abs(r) >= 0.6) ? '#fff' : 'var(--tx)';
-      var isSelf = (i === j);
-      html += '<td style="padding:7px 8px;background:'+bg+';color:'+(isSelf?'var(--mu)':tc)+
-        ';text-align:center;border-radius:3px;cursor:'+(isSelf?'default':'pointer')+
-        ';font-weight:'+(isSelf?'400':'500')+'"'+
-        (isSelf?'':' onclick="showCorrDetail(\''+a.lb+'\',\''+b.lb+'\','+r+')"')+
-        ' title="'+a.lb+' × '+b.lb+': '+txt+'">'+txt+'</td>';
-    });
-    html += '</tr>';
-  });
-  tbl.innerHTML = html;
-  if (detail) detail.style.display = 'none';
-}
-
-function showCorrDetail(la, lb, r) {
-  var detail = document.getElementById('corr-detail');
-  if (!detail) return;
-  var strength, color, desc;
-  if      (r >= 0.8)  { strength='高度正相關'; color='var(--gr)';
-    desc='兩市場高度同步，資金通常同漲同跌，輪動效應弱。'; }
-  else if (r >= 0.5)  { strength='中度正相關'; color='#3fb950';
-    desc='大方向相同但幅度不同，存在一定的相對強弱空間。'; }
-  else if (r >= 0.2)  { strength='低度正相關'; color='var(--mu)';
-    desc='相關性低，兩市場走勢較為獨立，輪動機會較多。'; }
-  else if (r >= -0.2) { strength='幾乎不相關'; color='var(--mu)';
-    desc='走勢獨立，可作為分散配置的候選組合。'; }
-  else if (r >= -0.5) { strength='中度負相關'; color='var(--or)';
-    desc='兩市場傾向反向走勢，明顯的蹺蹺板效應。'; }
-  else                { strength='高度負相關'; color='var(--rd)';
-    desc='強烈的反向關係，資金在兩者之間快速輪動。'; }
-
-  detail.style.display = 'block';
-  detail.innerHTML =
-    '<b style="color:'+color+'">'+la+' × '+lb+'</b>　' +
-    '相關係數 <b style="color:'+color+'">'+r.toFixed(3)+'</b>　'+strength+'　' +
-    '<span style="color:var(--mu)">'+desc+'</span>';
-}
-
-function drawVixMonthly() {
-  var card = document.getElementById('vix-monthly-card');
-  if (!D.monthly_returns || !D.monthly_returns['VIX'] || !D.monthly_avg || !D.monthly_avg['VIX']) {
-    card.style.display = 'none'; return;
-  }
-  card.style.display = '';
-  var vixAvg = D.monthly_avg['VIX'];
-  var vixYrs = Object.keys(D.monthly_returns['VIX'])
-    .filter(function(y){ return Object.keys(D.monthly_returns['VIX'][y]).length>0; }).sort();
-
-  // avg row — VIX 用絕對水位（月平均 VIX 值），顏色: 高=紅, 低=綠
-  var avgRow = '<tr class="ar"><td class="yl">平均水位</td>'+
-    Array.from({length:12}, function(_,m){
-      var v = vixAvg[String(m+1)];
-      if (v===undefined) return '<td style="color:var(--bd)">—</td>';
-      return '<td style="background:'+hcVix(v)+';color:#fff">'+v.toFixed(1)+'</td>';
-    }).join('')+'</tr>';
-
-  // year rows — 顯示各年月平均 VIX
-  var rows = vixYrs.map(function(y){
-    return '<tr><td class="yl">'+y+'</td>'+
-      Array.from({length:12}, function(_,m){
-        var v = D.monthly_returns['VIX'][y][String(m+1)];
-        if (v===undefined) return '<td style="color:var(--bd)">—</td>';
-        return '<td style="background:'+hcVixRet(v)+';color:'+(Math.abs(v)>15?'#fff':'var(--tx)')+'">'+
-          (v>0?'+':'')+v.toFixed(1)+'</td>';
-      }).join('')+'</tr>';
-  }).join('');
-
-  document.getElementById('vix-hm').innerHTML =
-    '<tr><th class="yl">年份</th>'+MN.map(function(m){return'<th>'+m+'</th>';}).join('')+'</tr>'+
-    avgRow+rows;
-}
-
-// VIX 絕對水位熱力圖（15=平靜, 40=恐慌）
-function hcVix(v) {
-  var t = Math.min(Math.max((v-12)/35, 0), 1);
-  return 'rgba('+Math.round(63+t*170)+','+Math.round(185-t*140)+','+Math.round(80-t*60)+','+(0.4+t*0.5)+')';
-}
-// VIX 月報酬熱力圖（VIX漲=恐慌，用紅；VIX跌=平靜，用綠）
-function hcVixRet(v) {
-  if (!v) return 'transparent';
-  var t = Math.min(Math.abs(v)/30, 1);
-  return v>0
-    ? 'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')'
-    : 'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')';
-}
-
-function hc(v){
-  if(!v)return'transparent';
-  var t=Math.min(Math.abs(v)/12,1);
-  return v>0?'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')':'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')';
+  detail.innerHTML='<b style="color:'+color+'">'+la+' × '+lb+'</b>　相關係數 <b style="color:'+color+'">'+r.toFixed(3)+'</b>　'+strength+'　<span style="color:var(--mu)">'+desc+'</span>';
 }
 
 fetchData();
