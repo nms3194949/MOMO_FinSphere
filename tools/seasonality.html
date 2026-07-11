@@ -245,8 +245,8 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <!-- 板塊設定 -->
     <div class="cc">
       <div class="cc-h">
-        <span class="cc-t">板塊設定</span>
-        <span class="cc-s">點擊圓點加入／移除板塊，設定存在此瀏覽器中</span>
+        <span class="cc-t">板塊輪動</span>
+        <span class="cc-s">點擊圓點開關顯示，設定存在此瀏覽器中</span>
       </div>
       <div id="sector-cfg" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
@@ -1721,60 +1721,6 @@ function hc(v){
 fetchData();
 
 
-// ── 板塊輪動 ─────────────────────────────────────────────────
-var sectorKeys  = [];   // 目前設定為板塊的 key 陣列
-var sLChart     = null;
-var sBChart     = null;
-var sRsChart    = null;
-var sHmIdx      = null; // 熱力圖目前指數
-
-
-function saveSectorKeys() {
-  try { localStorage.setItem('momo_sector_keys', JSON.stringify(sectorKeys)); } catch(e){}
-}
-
-function initSectorCfg() {
-  loadSectorKeys();
-  var cfg = document.getElementById('sector-cfg');
-  if (!cfg) return;
-  cfg.innerHTML = '';
-  SR.forEach(function(s) {
-    var on = sectorKeys.indexOf(s.k) !== -1;
-    var btn = document.createElement('button');
-    btn.className = 'idx-chip';
-    btn.style.cursor = 'pointer';
-    btn.style.borderColor = on ? s.c : 'var(--bd)';
-    btn.style.opacity = on ? '1' : '0.45';
-    btn.innerHTML = '<span class="dot" style="background:'+s.c+'"></span>'+s.lb;
-    btn.title = on ? '點擊移除板塊' : '點擊加入板塊';
-    btn.onclick = (function(key, color, b) { return function() {
-      var i = sectorKeys.indexOf(key);
-      if (i === -1) { sectorKeys.push(key); b.style.borderColor=color; b.style.opacity='1'; b.title='點擊移除板塊'; }
-      else          { sectorKeys.splice(i,1); b.style.borderColor='var(--bd)'; b.style.opacity='0.45'; b.title='點擊加入板塊'; }
-      saveSectorKeys();
-      buildSR(); initUI(); // 重建主視圖 pills
-      drawSector();
-    };})(s.k, s.c, btn);
-    cfg.appendChild(btn);
-  });
-
-  // 初始化相關係數月份下拉
-  var mSel = document.getElementById('s-corr-month');
-  if (mSel && mSel.options.length === 1) {
-    MN.forEach(function(m, i) {
-      var o = document.createElement('option');
-      o.value = i+1; o.textContent = m; mSel.appendChild(o);
-    });
-    mSel.onchange = function() { drawSectorCorr(); };
-  }
-}
-
-function hc(v){
-  if(!v)return'transparent';
-  var t=Math.min(Math.abs(v)/12,1);
-  return v>0?'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')':'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')';
-}
-
 fetchData();
 // ── 板塊輪動 ─────────────────────────────────────────────────
 var sectorKeys = [];
@@ -1822,23 +1768,39 @@ function drawSector() {
   var cfg = document.getElementById('sector-cfg');
   if (cfg && D && D.meta) {
     cfg.innerHTML = '';
-    Object.keys(D.meta).filter(function(k){return k!=='VIX';}).forEach(function(k) {
+    Object.keys(D.meta).filter(function(k){ return k !== 'VIX'; }).forEach(function(k) {
       var on = sectorKeys.indexOf(k) !== -1;
-      var c = getSectorColor(k);
-      var btn = document.createElement('span');
-      btn.className = 'idx-chip';
-      btn.style.borderColor = on ? c : 'var(--bd)';
-      btn.style.opacity = on ? '1' : '0.4';
-      btn.innerHTML = '<span class="dot" style="background:'+c+'"></span>'+(D.meta[k].label||k);
-      btn.title = on ? '點擊移除板塊' : '點擊加入板塊';
-      btn.onclick = (function(key, color, b) { return function() {
+      var c  = getSectorColor(k);
+      var p  = document.createElement('span');
+      p.className = 'pill' + (on ? '' : ' off');
+      p.style.borderColor = c;
+      p.style.color = c;
+      p.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:'+c+';flex-shrink:0"></span>'+(D.meta[k].label||k);
+      p.onclick = (function(key, pill) { return function() {
         var i = sectorKeys.indexOf(key);
-        if (i === -1) { sectorKeys.push(key); b.style.borderColor=color; b.style.opacity='1'; b.title='點擊移除板塊'; }
-        else { sectorKeys.splice(i,1); b.style.borderColor='var(--bd)'; b.style.opacity='0.4'; b.title='點擊加入板塊'; }
+        if (i === -1) { sectorKeys.push(key); pill.classList.remove('off'); }
+        else          { sectorKeys.splice(i,1); pill.classList.add('off'); }
         saveSectorKeys();
-        drawSector();
-      };})(k, c, btn);
-      cfg.appendChild(btn);
+        var srs2 = getSectorSR();
+        var noEl = document.getElementById('sector-no-data');
+        if (!srs2.length) {
+          if (!noEl) {
+            var msg2 = document.createElement('div');
+            msg2.id = 'sector-no-data';
+            msg2.style.cssText = 'padding:20px;text-align:center;color:var(--mu);font-size:12px';
+            msg2.textContent = '請點亮至少一個指數以顯示圖表';
+            cfg.parentNode.insertBefore(msg2, cfg.nextSibling);
+          }
+        } else {
+          if (noEl) noEl.remove();
+          drawSectorIntra(srs2);
+          drawSectorMonthly(srs2);
+          drawSectorHeatmap(srs2);
+          drawSectorRS(srs2);
+          drawSectorCorr();
+        }
+      };})(k, p);
+      cfg.appendChild(p);
     });
   }
 
@@ -1850,11 +1812,12 @@ function drawSector() {
       msg.id = 'sector-no-data';
       msg.style.cssText = 'padding:32px;text-align:center;color:var(--mu);font-size:13px;line-height:2.2';
       msg.innerHTML = '<div style="font-size:32px;margin-bottom:12px">📊</div>'+
-        '<div style="color:var(--tx);font-weight:600;margin-bottom:8px;font-size:15px">尚無板塊資料</div>'+
-        '<div style="font-size:12px">① 從 Investing.com 下載板塊 ETF 歷史資料（XLK、XLF、XLE...）<br>'+
-        '② 使用 DataManager 上傳 CSV<br>'+
-        '③ Google Sheets 執行「季節性分析 → 重新計算所有指數」<br>'+
-        '④ 重新整理後，在上方「板塊設定」點亮對應指數</div>';
+        '<div style="color:var(--tx);font-weight:600;margin-bottom:8px;font-size:15px">請點亮上方指數</div>'+
+        '<div style="font-size:12px">若 XLK、XLF 等板塊 ETF 尚未上傳：<br>'+
+        '① 從 Investing.com 下載板塊 ETF 歷史資料<br>'+
+        '② DataManager 上傳 CSV<br>'+
+        '③ Google Sheets 執行「重新計算所有指數」<br>'+
+        '④ 重新整理後點亮上方對應指數</div>';
       if (cfg) cfg.parentNode.insertBefore(msg, cfg.nextSibling);
     }
     return;
