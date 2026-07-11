@@ -250,6 +250,22 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       </div>
       <div id="sector-cfg" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
+    <!-- 板塊動能排行 -->
+    <div class="cc">
+      <div class="cc-h">
+        <div>
+          <span class="cc-t">📈 板塊動能排行</span>
+          <span class="cc-s" style="margin-left:8px">近期累積報酬排名 ｜ 動能策略：資金傾向流入近期最強的板塊</span>
+        </div>
+        <div id="s-mom-tabs" style="display:flex;gap:5px">
+          <button class="hm-tab on" data-p="3" onclick="setMomPeriod(3,this)" style="background:var(--gold)">近3月</button>
+          <button class="hm-tab" data-p="6" onclick="setMomPeriod(6,this)">近6月</button>
+          <button class="hm-tab" data-p="12" onclick="setMomPeriod(12,this)">近12月</button>
+        </div>
+      </div>
+      <div id="s-mom" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div id="s-mom-note" style="margin-top:8px;font-size:11px;color:var(--mu)"></div>
+    </div>
     <!-- 月內走勢 -->
     <div class="cc">
       <div class="cc-h">
@@ -282,6 +298,14 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
         <span class="cc-s">各月份平均報酬相對板塊均值的偏差，正值＝相對強勢</span>
       </div>
       <div class="cb" style="height:280px"><canvas id="s-rs"></canvas></div>
+    </div>
+    <!-- 板塊 vs S&P 500 相對強弱線 -->
+    <div class="cc">
+      <div class="cc-h">
+        <span class="cc-t">板塊 ÷ S&amp;P 500 相對強弱線（RS Line）</span>
+        <span class="cc-s">近12個月，起點=100 ｜ 線往上＝跑贏大盤（資金流入），往下＝跑輸大盤</span>
+      </div>
+      <div class="cb" style="height:300px"><canvas id="s-rsline"></canvas></div>
     </div>
     <!-- 相關係數矩陣 -->
     <div class="cc">
@@ -1128,9 +1152,12 @@ function renderIwinTable(k) {
         var nowBorder  = (isNowEntry || isNowExit)
           ? ';outline:2px solid #f85149;outline-offset:-1px;position:relative;z-index:1' : '';
         var titleExtra = isNowEntry ? ' ← 今天約在此（進場）' : isNowExit ? ' ← 今天約在此（出場）' : '';
+        // tooltip 加入平均報酬與盈虧比
+        var st = wr!==null ? calcIntervalStats(iwinIdxKey, k, ei, eo2) : null;
+        var statTxt = st ? '｜均報 '+(st.avg>=0?'+':'')+st.avg.toFixed(2)+'% 盈虧比 '+(st.pl!==null?st.pl.toFixed(2):'∞') : '';
         html+='<td class="iwin-cell" style="background:'+bg+';color:'+tc+
           ';width:'+cw+'px;height:'+ch+'px;font-size:'+fs+'px'+nowBorder+'"'+
-          ' title="D'+(ei+1)+'進→D'+(eo2+1)+'出 勝率'+(wr!==null?wr+'%':'—')+titleExtra+'"'+
+          ' title="D'+(ei+1)+'進→D'+(eo2+1)+'出 勝率'+(wr!==null?wr+'%':'—')+statTxt+titleExtra+'"'+
           ' onclick="showIwinDetail('+(ei+1)+','+(eo2+1)+','+(wr!==null?wr:'null')+')">'+
           (wr!==null?(isNowEntry||isNowExit?'<b>'+txt+'</b>':txt):'')+'</td>';
       }
@@ -1324,17 +1351,21 @@ function updateIwinStats(k, iwin, n) {
   // 最佳組合
   var bestEl=document.getElementById('iwin-best');
   if(bestEl&&best){
+    var bSt=calcIntervalStats(iwinIdxKey,k,best.ei,best.eo);
     bestEl.innerHTML=
       '<span style="font-size:20px;font-weight:700;color:var(--gr)">'+best.wr+'%</span>'+
-      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(best.ei+1)+'→D'+(best.eo+1)+'</span>';
+      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(best.ei+1)+'→D'+(best.eo+1)+'</span>'+
+      (bSt?'<div style="font-size:10px;color:var(--mu);margin-top:2px">均報 <b style="color:'+(bSt.avg>=0?'var(--gr)':'var(--rd)')+'">'+(bSt.avg>=0?'+':'')+bSt.avg.toFixed(2)+'%</b> 盈虧比 '+(bSt.pl!==null?bSt.pl.toFixed(2):'∞')+'</div>':'');
   }
 
   // 最差組合
   var worstEl=document.getElementById('iwin-worst');
   if(worstEl&&worst){
+    var wSt=calcIntervalStats(iwinIdxKey,k,worst.ei,worst.eo);
     worstEl.innerHTML=
       '<span style="font-size:20px;font-weight:700;color:var(--rd)">'+worst.wr+'%</span>'+
-      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(worst.ei+1)+'→D'+(worst.eo+1)+'</span>';
+      '<span style="font-size:11px;color:var(--mu);margin-left:6px">D'+(worst.ei+1)+'→D'+(worst.eo+1)+'</span>'+
+      (wSt?'<div style="font-size:10px;color:var(--mu);margin-top:2px">均報 <b style="color:'+(wSt.avg>=0?'var(--gr)':'var(--rd)')+'">'+(wSt.avg>=0?'+':'')+wSt.avg.toFixed(2)+'%</b> 盈虧比 '+(wSt.pl!==null?wSt.pl.toFixed(2):'∞')+'</div>':'');
   }
 
   // 本月最佳進場排行（出場=本月末）
@@ -1366,6 +1397,29 @@ function updateIwinStats(k, iwin, n) {
   }
 }
 
+// 用 yearly_intra 即時計算區間的平均報酬與盈虧比
+function calcIntervalStats(idxKey, month, ei0, eo0) {
+  // ei0/eo0 為 0-based 交易日
+  if (!D.yearly_intra || !D.yearly_intra[idxKey]) return null;
+  var yearly = D.yearly_intra[idxKey];
+  var rets = [];
+  Object.keys(yearly).forEach(function(y) {
+    var arr = yearly[y][month] || yearly[y][String(month)];
+    if (!arr || arr.length <= eo0 || arr[ei0] === undefined) return;
+    // 區間報酬 = (1+r_出場)/(1+r_進場) - 1
+    var r = ((1 + arr[eo0]/100) / (1 + arr[ei0]/100) - 1) * 100;
+    rets.push(r);
+  });
+  if (rets.length < 3) return null;
+  var wins   = rets.filter(function(r){ return r > 0; });
+  var losses = rets.filter(function(r){ return r <= 0; });
+  var avg     = rets.reduce(function(s,v){return s+v;},0) / rets.length;
+  var avgWin  = wins.length   ? wins.reduce(function(s,v){return s+v;},0)/wins.length     : 0;
+  var avgLoss = losses.length ? losses.reduce(function(s,v){return s+v;},0)/losses.length : 0;
+  var pl = avgLoss !== 0 ? Math.abs(avgWin / avgLoss) : null;
+  return { n:rets.length, avg:avg, avgWin:avgWin, avgLoss:avgLoss, pl:pl };
+}
+
 function showIwinDetail(ei, eo, wr) {
   var detail = document.getElementById('iwin-detail');
   if (!detail) return;
@@ -1374,11 +1428,36 @@ function showIwinDetail(ei, eo, wr) {
   if (wr===null) { detail.style.display='none'; return; }
   var strength = wr>=75?'強勢 ✓✓': wr>=65?'偏強 ✓': wr>=55?'中性偏強 ～': wr>=45?'中性 ～': wr>=35?'偏弱 ✗':'弱勢 ✗✗';
   var color = iwinColor(wr);
+
+  // 補充統計：平均報酬、盈虧比、期望值判斷
+  var extra = '';
+  var st = calcIntervalStats(iwinIdxKey, String(cm+1), ei-1, eo-1);
+  if (st) {
+    var avgColor = st.avg >= 0 ? 'var(--gr)' : 'var(--rd)';
+    var plTxt = st.pl !== null ? st.pl.toFixed(2) : '∞';
+    // 期望值提示：勝率高但盈虧比差 → 警告
+    var evNote = '';
+    if (wr >= 60 && st.pl !== null && st.pl < 0.7) {
+      evNote = '<span style="color:var(--or)">　⚠ 勝率高但盈虧比低，賺小賠大，注意期望值</span>';
+    } else if (wr < 50 && st.pl !== null && st.pl > 1.8) {
+      evNote = '<span style="color:var(--bl)">　💡 勝率低但盈虧比佳，屬於賺大賠小型</span>';
+    }
+    extra =
+      '<div style="margin-top:6px;font-size:12px;color:var(--mu)">'+
+      '平均報酬 <b style="color:'+avgColor+'">'+(st.avg>=0?'+':'')+st.avg.toFixed(2)+'%</b>　｜　'+
+      '賺時平均 <b style="color:var(--gr)">+'+st.avgWin.toFixed(2)+'%</b>　'+
+      '賠時平均 <b style="color:var(--rd)">'+st.avgLoss.toFixed(2)+'%</b>　｜　'+
+      '盈虧比 <b style="color:'+(st.pl===null||st.pl>=1?'var(--gr)':'var(--or)')+'">'+plTxt+'</b>'+
+      '　<span style="font-size:11px">（'+st.n+' 年樣本）</span>'+
+      evNote + '</div>';
+  }
+
   detail.style.display='block';
   detail.innerHTML =
     '<b style="color:'+color+';font-size:16px">'+wr+'%</b>　' +
     '【'+label+'】D'+ei+' 進場 → D'+eo+' 出場　<b>'+strength+'</b>' +
-    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史上 '+wr+'% 的年份此區間為正報酬</span>';
+    '<span style="color:var(--mu);font-size:11px;margin-left:8px">歷史上 '+wr+'% 的年份此區間為正報酬</span>' +
+    extra;
 }
 
 function drawVixIntra(k) {
@@ -1804,10 +1883,12 @@ function drawSector() {
           }
         } else {
           if (noEl) noEl.remove();
+          drawSectorMomentum(srs2);
           drawSectorIntra(srs2);
           drawSectorMonthly(srs2);
           drawSectorHeatmap(srs2);
           drawSectorRS(srs2);
+          drawSectorRSLine(srs2);
           drawSectorCorr();
         }
       };})(k, p);
@@ -1834,10 +1915,12 @@ function drawSector() {
     return;
   }
   if (noDataEl) noDataEl.remove();
+  drawSectorMomentum(srs);
   drawSectorIntra(srs);
   drawSectorMonthly(srs);
   drawSectorHeatmap(srs);
   drawSectorRS(srs);
+  drawSectorRSLine(srs);
   drawSectorCorr();
 }
 
@@ -1962,6 +2045,146 @@ function drawSectorRS(srs) {
                  borderDash:function(c){return c.tick.value===0?[5,4]:[];}},
            ticks:{color:'#7d8590',font:{size:11},callback:function(v){return(v>=0?'+':'')+v.toFixed(1)+'%';}},
            title:{display:true,text:'相對偏差（%）',color:'#7d8590',font:{size:11}}}
+      }
+    }
+  });
+}
+
+// ── 板塊動能排行 ─────────────────────────────────────────────
+var sMomPeriod = 3;
+var sRsLineChart = null;
+
+function setMomPeriod(p, btn) {
+  sMomPeriod = p;
+  document.querySelectorAll('#s-mom-tabs .hm-tab').forEach(function(b){
+    b.classList.toggle('on', b === btn);
+    b.style.background = (b === btn) ? 'var(--gold)' : '';
+  });
+  drawSectorMomentum(getSectorSR());
+}
+
+// 取得最近 n 個有資料的月份 [{y,m},...]（以 S&P 500 或第一個板塊為基準）
+function getRecentMonthList(n) {
+  var bk = getBaseKey();
+  if (!bk || !D.monthly_returns[bk]) {
+    var srs = getSectorSR();
+    bk = srs.length ? srs[0].k : null;
+  }
+  var mr = bk && D.monthly_returns[bk];
+  if (!mr) return [];
+  var list = [];
+  Object.keys(mr).sort().forEach(function(y){
+    for (var m = 1; m <= 12; m++) {
+      if (mr[y][String(m)] !== undefined) list.push({y:y, m:m});
+    }
+  });
+  return list.slice(-n);
+}
+
+function drawSectorMomentum(srs) {
+  if (!srs) srs = getSectorSR();
+  var wrap = document.getElementById('s-mom');
+  var note = document.getElementById('s-mom-note');
+  if (!wrap || !srs.length) { if(wrap) wrap.innerHTML=''; return; }
+
+  var months = getRecentMonthList(sMomPeriod);
+  if (!months.length) { wrap.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px">尚無足夠資料</div>'; return; }
+
+  // 計算各板塊近 N 月累積報酬
+  var results = [];
+  srs.forEach(function(s) {
+    var mr = D.monthly_returns[s.k];
+    if (!mr) return;
+    var cum = 1, valid = 0;
+    months.forEach(function(mm) {
+      var r = mr[mm.y] && mr[mm.y][String(mm.m)];
+      if (r !== undefined) { cum *= (1 + r/100); valid++; }
+    });
+    if (valid >= Math.ceil(months.length * 0.8)) { // 至少八成月份有資料
+      results.push({s:s, ret: Math.round((cum-1)*10000)/100, months: valid});
+    }
+  });
+  results.sort(function(a,b){ return b.ret - a.ret; });
+
+  if (!results.length) { wrap.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px">尚無足夠資料</div>'; return; }
+
+  var maxAbs = Math.max.apply(null, results.map(function(r){ return Math.abs(r.ret); })) || 1;
+  wrap.innerHTML = '';
+  results.forEach(function(r, i) {
+    var pct   = Math.round(Math.abs(r.ret)/maxAbs*100);
+    var color = r.ret >= 0 ? r.s.c : 'var(--rd)';
+    var medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.';
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px';
+    row.innerHTML =
+      '<span style="font-size:12px;min-width:26px;text-align:center">'+medal+'</span>'+
+      '<span style="font-size:12px;min-width:110px;color:'+r.s.c+'">'+r.s.lb+'</span>'+
+      '<div style="flex:1;height:14px;background:var(--surf2);border-radius:4px;overflow:hidden">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+(r.ret>=0?r.s.c:'rgba(248,81,73,.6)')+';border-radius:4px;transition:width .3s"></div></div>'+
+      '<span style="font-size:13px;font-weight:600;min-width:64px;text-align:right;color:'+(r.ret>=0?'var(--gr)':'var(--rd)')+'">'+
+        (r.ret>=0?'+':'')+r.ret.toFixed(1)+'%</span>';
+    wrap.appendChild(row);
+  });
+
+  var first = months[0], last = months[months.length-1];
+  if (note) note.textContent =
+    '統計區間：'+first.y+'/'+first.m+' – '+last.y+'/'+last.m+
+    '　｜　動能策略參考：前 2–3 名為資金流入板塊，末位為資金流出板塊';
+}
+
+// ── 板塊 vs S&P 500 相對強弱線 ──────────────────────────────
+function drawSectorRSLine(srs) {
+  if (!srs) srs = getSectorSR();
+  var ctx = document.getElementById('s-rsline');
+  if (!ctx || !srs.length) return;
+
+  var bk = getBaseKey();
+  if (!bk || !D.monthly_returns[bk]) {
+    if (sRsLineChart) { sRsLineChart.destroy(); sRsLineChart=null; }
+    return;
+  }
+
+  var months = getRecentMonthList(12);
+  if (months.length < 3) return;
+  var labels = months.map(function(mm){ return String(mm.y).slice(2)+'/'+mm.m; });
+
+  var spMr = D.monthly_returns[bk];
+  var datasets = srs.map(function(s) {
+    if (s.k === bk) return null; // S&P 自己不用畫
+    var mr = D.monthly_returns[s.k];
+    if (!mr) return null;
+    var secCum = 1, spCum = 1;
+    var data = months.map(function(mm) {
+      var rSec = mr[mm.y]   && mr[mm.y][String(mm.m)];
+      var rSp  = spMr[mm.y] && spMr[mm.y][String(mm.m)];
+      if (rSec === undefined || rSp === undefined) return null;
+      secCum *= (1 + rSec/100);
+      spCum  *= (1 + rSp/100);
+      return Math.round(secCum/spCum*10000)/100; // 起點100
+    });
+    return {label:s.lb, data:data, borderColor:s.c, backgroundColor:'transparent',
+      borderWidth:2, pointRadius:2.5, pointHoverRadius:5, tension:0.3, fill:false, spanGaps:true};
+  }).filter(function(d){ return d !== null; });
+
+  if (sRsLineChart) { sRsLineChart.destroy(); sRsLineChart=null; }
+  sRsLineChart = new Chart(ctx.getContext('2d'), {
+    type:'line', data:{labels:labels, datasets:datasets},
+    options:{responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:16,padding:10}},
+        tooltip:{backgroundColor:'#161b22',borderColor:'#30363d',borderWidth:1,
+          callbacks:{label:function(c){
+            var v=c.parsed.y; if(v===null) return null;
+            var tag = v>100?'跑贏大盤':v<100?'跑輸大盤':'持平';
+            return ' '+c.dataset.label+': '+v.toFixed(1)+'（'+tag+'）';
+          }}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7d8590',font:{size:11}}},
+        y:{grid:{color:function(c){return c.tick.value===100?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.05)';},
+                 lineWidth:function(c){return c.tick.value===100?1.5:1;},
+                 borderDash:function(c){return c.tick.value===100?[5,4]:[];}},
+           ticks:{color:'#7d8590',font:{size:11}},
+           title:{display:true,text:'RS（100=同步大盤）',color:'#7d8590',font:{size:11}}}
       }
     }
   });
