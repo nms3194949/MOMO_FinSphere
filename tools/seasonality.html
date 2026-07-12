@@ -2467,12 +2467,45 @@ function computeBreadthScore() {
   return { score: score, detail: up+'/'+avail.length+' 板塊上漲' };
 }
 
+// ── Yahoo ticker ↔ Google Sheets 工作表 key 對照 ────────────
+// 因為 Sheets 可能用英文代號（XLK）或中文名稱（科技類股）命名，
+// LiveQuotes 只有英文 ticker，這裡需要橋接找到 D 裡對應的 key
+var SECTOR_TICKER_INFO = {
+  'XLK':  { zh:'科技' },
+  'XLF':  { zh:'金融' },
+  'XLE':  { zh:'能源' },
+  'XLV':  { zh:'醫療保健' },
+  'XLY':  { zh:'非必需消費' },
+  'XLP':  { zh:'必需消費' },
+  'XLI':  { zh:'工業' },
+  'XLB':  { zh:'原材料' },
+  'XLU':  { zh:'公用事業' },
+  'XLRE': { zh:'不動產' }
+};
+
+function findSectorDKey(ticker) {
+  if (!D || !D.meta) return null;
+  var info = SECTOR_TICKER_INFO[ticker];
+  if (!info) return null;
+  var keys = Object.keys(D.meta);
+  // 先找英文代號直接出現在工作表名稱裡的
+  var direct = keys.find(function(k){ return k.toUpperCase().indexOf(ticker) !== -1; });
+  if (direct) return direct;
+  // 再找中文關鍵字出現在工作表名稱或 label 裡的
+  var zh = keys.find(function(k){
+    return k.indexOf(info.zh) !== -1 ||
+      (D.meta[k].label && D.meta[k].label.indexOf(info.zh) !== -1);
+  });
+  return zh || null;
+}
+
 // ── 5. Sector Rotation Score：近3月動能前3名的攻守屬性 ────────
 function computeSectorRotationScore() {
   var months = getRecentMonthList(3);
   if (!months.length) return { score:50, detail:'資料不足', topSector:null };
-  var results = SECTOR_TICKERS.map(function(t) {
-    var mr = D.monthly_returns && D.monthly_returns[t];
+  var results = Object.keys(SECTOR_TICKER_INFO).map(function(t) {
+    var dKey = findSectorDKey(t);
+    var mr = dKey && D.monthly_returns && D.monthly_returns[dKey];
     if (!mr) return null;
     var cum = 1, valid = 0;
     months.forEach(function(mm){
@@ -2480,10 +2513,10 @@ function computeSectorRotationScore() {
       if (r !== undefined) { cum *= (1+r/100); valid++; }
     });
     if (valid < Math.ceil(months.length*0.8)) return null;
-    var lbl = (D.meta[t] && D.meta[t].label) || t;
+    var lbl = (D.meta[dKey] && D.meta[dKey].label) || dKey;
     return { t:t, lbl:lbl, ret: (cum-1)*100 };
   }).filter(function(x){ return x!==null; });
-  if (!results.length) return { score:50, detail:'資料不足', topSector:null };
+  if (!results.length) return { score:50, detail:'資料不足（板塊資料尚未上傳或未計算）', topSector:null };
   results.sort(function(a,b){ return b.ret - a.ret; });
   var top3 = results.slice(0,3);
   var offCount = top3.filter(function(r){ return OFFENSIVE_SECTORS.indexOf(r.t)!==-1; }).length;
@@ -2575,7 +2608,8 @@ function generateDecisionSummary(mkt) {
 
   var action;
   if (mkt.total >= 65) {
-    action = '可考慮分批布局，避免一次追高；重點觀察 '+(s.sectorRotation.topSector||'領先板塊')+'。';
+    action = '可考慮分批布局，避免一次追高；'+
+      (s.sectorRotation.topSector ? '重點觀察 '+s.sectorRotation.topSector+'。' : '（板塊資料不足，無法給出重點板塊建議）');
   } else if (mkt.total >= 45) {
     action = '建議中性觀望，等待更明確訊號；若已有部位可維持不動。';
   } else {
