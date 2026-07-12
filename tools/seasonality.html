@@ -65,6 +65,11 @@ main{padding:18px 24px}
 .idx-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid;border-radius:20px;font-size:12px;cursor:pointer;transition:.15s;user-select:none}
 .idx-chip:hover{opacity:.8}
 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fut-tbl{border-collapse:collapse;width:100%;min-width:520px}
+.fut-tbl th{padding:8px 10px;font-size:12px;color:var(--mu);text-align:center;border-bottom:1px solid var(--bd);white-space:nowrap}
+.fut-tbl th.fut-now{color:var(--gold)}
+.fut-cell{padding:6px 8px;vertical-align:top;border-right:1px solid var(--bd)}
+.fut-row{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:5px;margin-bottom:3px;font-size:12px}
 /* loader */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100}
 .spin{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}
@@ -265,6 +270,19 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       </div>
       <div id="s-mom" style="display:flex;flex-direction:column;gap:6px"></div>
       <div id="s-mom-note" style="margin-top:8px;font-size:11px;color:var(--mu)"></div>
+    </div>
+    <!-- 未來 3 月板塊熱力表 -->
+    <div class="cc">
+      <div class="cc-h">
+        <div>
+          <span class="cc-t">🔮 未來 3 月板塊布局建議</span>
+          <span class="cc-s" style="margin-left:8px">依歷史季節性平均報酬排序，由當前月份往後推算</span>
+        </div>
+      </div>
+      <div id="s-future" style="overflow-x:auto"></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--mu)">
+        ⚠ 純歷史統計規律，不構成投資建議；請搭配上方「板塊動能排行」的近期實際表現交叉確認
+      </div>
     </div>
     <!-- 月內走勢 -->
     <div class="cc">
@@ -1884,6 +1902,7 @@ function drawSector() {
         } else {
           if (noEl) noEl.remove();
           drawSectorMomentum(srs2);
+          drawSectorFuture(srs2);
           drawSectorIntra(srs2);
           drawSectorMonthly(srs2);
           drawSectorHeatmap(srs2);
@@ -1916,6 +1935,7 @@ function drawSector() {
   }
   if (noDataEl) noDataEl.remove();
   drawSectorMomentum(srs);
+  drawSectorFuture(srs);
   drawSectorIntra(srs);
   drawSectorMonthly(srs);
   drawSectorHeatmap(srs);
@@ -2130,6 +2150,55 @@ function drawSectorMomentum(srs) {
   if (note) note.textContent =
     '統計區間：'+first.y+'/'+first.m+' – '+last.y+'/'+last.m+
     '　｜　動能策略參考：前 2–3 名為資金流入板塊，末位為資金流出板塊';
+}
+
+// ── 未來 3 月板塊布局建議 ────────────────────────────────────
+function drawSectorFuture(srs) {
+  if (!srs) srs = getSectorSR();
+  var wrap = document.getElementById('s-future');
+  if (!wrap) return;
+  if (!srs.length) { wrap.innerHTML=''; return; }
+
+  var thisMonth = new Date().getMonth() + 1; // 1-12，以「今天」為準，非月內走勢選的月份
+  var monthsAhead = [thisMonth, (thisMonth%12)+1, ((thisMonth+1)%12)+1];
+
+  var html = '<table class="fut-tbl"><tr>';
+  monthsAhead.forEach(function(m, i) {
+    html += '<th class="'+(i===0?'fut-now':'')+'">'+MN[m-1]+(i===0?'（本月）':i===1?'（下月）':'（後月）')+'</th>';
+  });
+  html += '</tr><tr>';
+
+  monthsAhead.forEach(function(m) {
+    var results = srs.map(function(s) {
+      var v = D.monthly_avg[s.k] && D.monthly_avg[s.k][String(m)];
+      return v !== undefined ? {s:s, ret:v} : null;
+    }).filter(function(x){ return x !== null; });
+    results.sort(function(a,b){ return b.ret - a.ret; });
+
+    html += '<td class="fut-cell">';
+    if (!results.length) {
+      html += '<div style="color:var(--mu);font-size:11px;padding:6px">無資料</div>';
+    } else {
+      var maxAbs = Math.max.apply(null, results.map(function(r){return Math.abs(r.ret);})) || 1;
+      results.forEach(function(r, i) {
+        var medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+        var pct = Math.round(Math.abs(r.ret)/maxAbs*100);
+        var barColor = r.ret>=0 ? r.s.c : 'rgba(248,81,73,.6)';
+        var bg = i < 3 ? (r.ret>=0?'rgba(63,185,80,.08)':'rgba(248,81,73,.08)') : 'transparent';
+        html +=
+          '<div class="fut-row" style="background:'+bg+'">'+
+            '<span style="min-width:16px;text-align:center">'+medal+'</span>'+
+            '<span style="min-width:8px;height:8px;border-radius:50%;background:'+r.s.c+';flex-shrink:0"></span>'+
+            '<span style="flex:1;color:'+r.s.c+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px">'+r.s.lb+'</span>'+
+            '<span style="font-weight:600;color:'+(r.ret>=0?'var(--gr)':'var(--rd)')+';min-width:48px;text-align:right">'+
+              (r.ret>=0?'+':'')+r.ret.toFixed(2)+'%</span>'+
+          '</div>';
+      });
+    }
+    html += '</td>';
+  });
+  html += '</tr></table>';
+  wrap.innerHTML = html;
 }
 
 // ── 板塊 vs S&P 500 相對強弱線 ──────────────────────────────
