@@ -65,6 +65,9 @@ main{padding:18px 24px}
 .idx-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid;border-radius:20px;font-size:12px;cursor:pointer;transition:.15s;user-select:none}
 .idx-chip:hover{opacity:.8}
 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dc-sub{background:rgba(0,0,0,.25);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;text-align:center;min-width:76px}
+.dc-sub-lbl{font-size:9px;color:var(--mu);margin-bottom:2px;white-space:nowrap}
+.dc-sub-val{font-size:15px;font-weight:700}
 .fut-tbl{border-collapse:collapse;width:100%;min-width:520px}
 .fut-tbl th{padding:8px 10px;font-size:12px;color:var(--mu);text-align:center;border-bottom:1px solid var(--bd);white-space:nowrap}
 .fut-tbl th.fut-now{color:var(--gold)}
@@ -129,6 +132,37 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
 </header>
 
 <main>
+  <!-- ══════ Decision Summary Card ══════ -->
+  <div id="decision-card" style="display:none;background:linear-gradient(135deg,var(--surf) 0%,var(--surf2) 100%);border:1px solid var(--bd);border-radius:12px;padding:18px 22px;margin-bottom:18px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:4px">MARKET SCORE</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span id="dc-score" style="font-size:36px;font-weight:800;color:var(--gold)">—</span>
+            <span id="dc-stars" style="font-size:16px;color:var(--gold)">—</span>
+          </div>
+        </div>
+        <div style="width:1px;height:38px;background:var(--bd)"></div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:4px">BIAS</div>
+          <div id="dc-bias" style="font-size:18px;font-weight:700">—</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:4px">RISK</div>
+          <div id="dc-risk" style="font-size:18px;font-weight:700">—</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:4px">BEST SECTOR</div>
+          <div id="dc-sector" style="font-size:18px;font-weight:700">—</div>
+        </div>
+      </div>
+      <div id="dc-subscores" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+    </div>
+    <div id="dc-summary" style="margin-top:14px;padding:12px 16px;background:rgba(0,0,0,.2);border-radius:8px;font-size:13px;line-height:1.9;color:var(--tx)"></div>
+    <div id="dc-meta" style="margin-top:8px;font-size:10px;color:var(--bd)"></div>
+  </div>
+
   <div class="row" id="mRow"></div>
   <div class="row" id="pills-row"><div id="pills"></div></div>
   <div id="v-intra">
@@ -565,6 +599,7 @@ function fetchData() {
         document.getElementById('loader').style.display = 'none';
         setStatus('ok','✓ 已從 Google Sheets 載入　計算時間：'+ts+'　耗時 '+elapsed+'s');
         buildSR(); initUI(); selM(cm); drawMonthly();
+        fetchLiveQuotes();
       }, 400);
     })
     .catch(function(e) {
@@ -1815,10 +1850,6 @@ function hc(v){
   return v>0?'rgba(63,'+Math.round(80+t*120)+',80,'+(0.25+t*0.6)+')':'rgba('+Math.round(150+t*80)+',50,50,'+(0.25+t*0.6)+')';
 }
 
-fetchData();
-
-
-fetchData();
 // ── 板塊輪動 ─────────────────────────────────────────────────
 var sectorKeys = [];
 var sLChart = null, sBChart = null, sRsChart = null;
@@ -2336,6 +2367,272 @@ function showSCorrDetail(la,lb,r) {
   else{strength='高度負相關';color='var(--rd)';desc='強烈反向關係，資金在兩者間輪動。';}
   detail.style.display='block';
   detail.innerHTML='<b style="color:'+color+'">'+la+' × '+lb+'</b>　相關係數 <b style="color:'+color+'">'+r.toFixed(3)+'</b>　'+strength+'　<span style="color:var(--mu)">'+desc+'</span>';
+}
+
+// ════════════════════════════════════════════════════════════
+// Decision Engine — 綜合市場評分模組
+// 純函式運算，不涉及 UI；資料輸入 = D（歷史統計）+ LQ（即時報價）
+// ════════════════════════════════════════════════════════════
+
+var LQ = null; // 即時報價 map，key = ticker（如 '^GSPC'、'XLK'）
+var GAS_LIVE_URL = 'https://script.google.com/macros/s/AKfycbyj2fX5_kTIJOJSnIKIyqdwpAtjJhEeHQIdDsGUbafKDI21y51F-uQqiskTWj1Z6JTmDg/exec?action=live';
+
+var SECTOR_TICKERS   = ['XLK','XLF','XLE','XLV','XLY','XLP','XLI','XLB','XLU','XLRE'];
+var OFFENSIVE_SECTORS = ['XLK','XLY','XLI','XLB'];
+var DEFENSIVE_SECTORS = ['XLP','XLU','XLV'];
+
+function fetchLiveQuotes() {
+  fetch(GAS_LIVE_URL)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(json){
+      LQ = json;
+      renderDecisionCard();
+    })
+    .catch(function(e){
+      Logger_safe('即時報價載入失敗，Decision Engine 將使用中性預設值: '+e);
+      LQ = null;
+      renderDecisionCard();
+    });
+}
+function Logger_safe(msg){ if(window.console) console.warn(msg); }
+
+// ── 共用：今天是本月第幾個交易日（0-based）────────────────────
+function getTodayTradingDayInfo() {
+  var today = new Date();
+  var month = today.getMonth() + 1;
+  var d = new Date(today.getFullYear(), month-1, 1);
+  var td = 0;
+  while (d <= today) {
+    var dow = d.getDay();
+    if (dow !== 0 && dow !== 6) td++;
+    d.setDate(d.getDate()+1);
+  }
+  return { month: month, tradingDay: Math.max(1, td) - 1, monthKey: String(month) };
+}
+
+// ── 1. Seasonality Score：今日進場至月底，歷史區間勝率 ─────────
+function computeSeasonalityScore() {
+  var bk = getBaseKey();
+  var info = getTodayTradingDayInfo();
+  if (!bk || !D.intramonth || !D.intramonth[bk] || !D.intramonth[bk][info.monthKey]) {
+    return { score:50, detail:'資料不足，使用中性值' };
+  }
+  var nDays = D.intramonth[bk][info.monthKey].length;
+  var entryDay = Math.min(info.tradingDay, Math.max(0, nDays-2));
+  var exitDay  = nDays - 1;
+  var wr = null;
+  var iwin = D.intramonth_iwin && D.intramonth_iwin[bk] && D.intramonth_iwin[bk][info.monthKey];
+  if (iwin && iwin[entryDay] && iwin[entryDay][exitDay] !== undefined && iwin[entryDay][exitDay] !== null) {
+    wr = iwin[entryDay][exitDay];
+  } else {
+    var win = D.intramonth_win && D.intramonth_win[bk] && D.intramonth_win[bk][info.monthKey];
+    wr = win ? win[Math.min(info.tradingDay, win.length-1)] : null;
+  }
+  if (wr === null || wr === undefined) return { score:50, detail:'資料不足，使用中性值' };
+  return { score: wr, detail: MN[info.month-1]+' D'+(entryDay+1)+' 進場至月底歷史勝率 '+wr+'%' };
+}
+
+// ── 2. Momentum Score：S&P 500 當日漲跌幅 ─────────────────────
+function computeMomentumScore() {
+  if (!LQ || !LQ['^GSPC']) return { score:50, detail:'無即時資料，使用中性值' };
+  var chg = LQ['^GSPC'].changePct;
+  var score = Math.max(0, Math.min(100, 50 + chg*15));
+  return { score: Math.round(score), detail:'S&P 500 今日 '+(chg>=0?'+':'')+chg+'%' };
+}
+
+// ── 3. VIX Score：VIX 現值水位 + 變化方向（分數越高＝越平靜）──
+function computeVixScore() {
+  if (!LQ || !LQ['^VIX']) return { score:50, detail:'無即時資料，使用中性值' };
+  var v = LQ['^VIX'].price;
+  var chg = LQ['^VIX'].changePct;
+  var base;
+  if      (v < 15) base = 90;
+  else if (v < 20) base = 75;
+  else if (v < 25) base = 55;
+  else if (v < 30) base = 35;
+  else if (v < 40) base = 15;
+  else             base = 5;
+  var adj = chg <= -5 ? 8 : (chg >= 10 ? -20 : (chg >= 5 ? -10 : 0));
+  var score = Math.max(0, Math.min(100, base + adj));
+  return { score: Math.round(score), detail:'VIX 現值 '+v+'（'+(chg>=0?'+':'')+chg+'%）' };
+}
+
+// ── 4. Breadth Score：10 板塊中上漲家數比例 ────────────────────
+function computeBreadthScore() {
+  if (!LQ) return { score:50, detail:'無即時資料，使用中性值' };
+  var avail = SECTOR_TICKERS.filter(function(t){ return LQ[t]; });
+  if (!avail.length) return { score:50, detail:'無板塊即時資料' };
+  var up = avail.filter(function(t){ return LQ[t].changePct > 0; }).length;
+  var score = Math.round(up/avail.length*100);
+  return { score: score, detail: up+'/'+avail.length+' 板塊上漲' };
+}
+
+// ── 5. Sector Rotation Score：近3月動能前3名的攻守屬性 ────────
+function computeSectorRotationScore() {
+  var months = getRecentMonthList(3);
+  if (!months.length) return { score:50, detail:'資料不足', topSector:null };
+  var results = SECTOR_TICKERS.map(function(t) {
+    var mr = D.monthly_returns && D.monthly_returns[t];
+    if (!mr) return null;
+    var cum = 1, valid = 0;
+    months.forEach(function(mm){
+      var r = mr[mm.y] && mr[mm.y][String(mm.m)];
+      if (r !== undefined) { cum *= (1+r/100); valid++; }
+    });
+    if (valid < Math.ceil(months.length*0.8)) return null;
+    var lbl = (D.meta[t] && D.meta[t].label) || t;
+    return { t:t, lbl:lbl, ret: (cum-1)*100 };
+  }).filter(function(x){ return x!==null; });
+  if (!results.length) return { score:50, detail:'資料不足', topSector:null };
+  results.sort(function(a,b){ return b.ret - a.ret; });
+  var top3 = results.slice(0,3);
+  var offCount = top3.filter(function(r){ return OFFENSIVE_SECTORS.indexOf(r.t)!==-1; }).length;
+  var defCount = top3.filter(function(r){ return DEFENSIVE_SECTORS.indexOf(r.t)!==-1; }).length;
+  var score = Math.max(0, Math.min(100, 50 + (offCount-defCount)*15));
+  return {
+    score: score,
+    detail: '近3月領先：'+top3.map(function(r){return r.lbl;}).join('、'),
+    topSector: results[0].lbl
+  };
+}
+
+// ── 6. Winning Probability Score：短期5日進場勝率 ──────────────
+function computeWinProbScore() {
+  var bk = getBaseKey();
+  var info = getTodayTradingDayInfo();
+  if (!bk || !D.intramonth_iwin || !D.intramonth_iwin[bk] || !D.intramonth_iwin[bk][info.monthKey]) {
+    return { score:50, detail:'資料不足，使用中性值' };
+  }
+  var iwin = D.intramonth_iwin[bk][info.monthKey];
+  var nDays = D.intramonth[bk][info.monthKey].length;
+  var entryDay = Math.min(info.tradingDay, nDays-1);
+  var exitDay  = Math.min(entryDay+5, nDays-1);
+  if (exitDay <= entryDay) return { score:50, detail:'已近月底，短期樣本不足' };
+  var wr = iwin[entryDay] && iwin[entryDay][exitDay];
+  if (wr === undefined || wr === null) return { score:50, detail:'資料不足，使用中性值' };
+  return { score: wr, detail: '未來5個交易日歷史勝率 '+wr+'%' };
+}
+
+// ── 合成 Market Score ───────────────────────────────────────
+var SCORE_WEIGHTS = {
+  seasonality: 0.25, momentum: 0.20, vix: 0.20,
+  breadth: 0.15, sectorRotation: 0.10, winProb: 0.10
+};
+
+function computeMarketScore() {
+  var s = computeSeasonalityScore();
+  var m = computeMomentumScore();
+  var v = computeVixScore();
+  var b = computeBreadthScore();
+  var r = computeSectorRotationScore();
+  var w = computeWinProbScore();
+
+  var total =
+    s.score * SCORE_WEIGHTS.seasonality +
+    m.score * SCORE_WEIGHTS.momentum +
+    v.score * SCORE_WEIGHTS.vix +
+    b.score * SCORE_WEIGHTS.breadth +
+    r.score * SCORE_WEIGHTS.sectorRotation +
+    w.score * SCORE_WEIGHTS.winProb;
+
+  return {
+    total: Math.round(total),
+    subs: { seasonality:s, momentum:m, vix:v, breadth:b, sectorRotation:r, winProb:w }
+  };
+}
+
+function scoreToGrade(score) {
+  if (score >= 80) return { stars:5, bias:'Strong Bullish', biasZh:'強烈偏多', color:'var(--gr)' };
+  if (score >= 65) return { stars:4, bias:'Bullish',        biasZh:'偏多',     color:'var(--gr)' };
+  if (score >= 45) return { stars:3, bias:'Neutral',        biasZh:'中性',     color:'var(--mu)' };
+  if (score >= 30) return { stars:2, bias:'Weak',           biasZh:'偏弱',     color:'var(--or)' };
+  return               { stars:1, bias:'Bearish',        biasZh:'偏空',     color:'var(--rd)' };
+}
+
+function scoreToRisk(vixScore) {
+  if (vixScore >= 70) return { level:'Low',    zh:'偏低', color:'var(--gr)' };
+  if (vixScore >= 40) return { level:'Medium', zh:'中等', color:'var(--or)' };
+  return                 { level:'High',   zh:'偏高', color:'var(--rd)' };
+}
+
+// ── 自然語言 Summary（Why / So What / What Should I Do）───────
+function generateDecisionSummary(mkt) {
+  var s = mkt.subs;
+  var info = getTodayTradingDayInfo();
+  var grade = scoreToGrade(mkt.total);
+  var risk  = scoreToRisk(s.vix.score);
+
+  var why =
+    '目前是 '+MN[info.month-1]+' 第 '+(info.tradingDay+1)+' 個交易日。'+
+    s.seasonality.detail+'。'+
+    (LQ && LQ['^VIX'] ? 'VIX 現值 '+LQ['^VIX'].price+'。' : '') +
+    (s.sectorRotation.topSector ? s.sectorRotation.detail+'。' : '');
+
+  var soWhat =
+    s.breadth.detail+'，資金動能偏向'+
+    (s.sectorRotation.score >= 60 ? '進攻型' : s.sectorRotation.score <= 40 ? '防禦型' : '中性')+
+    '板塊，整體市場處於「'+grade.biasZh+'」環境，風險評估「'+risk.zh+'」。';
+
+  var action;
+  if (mkt.total >= 65) {
+    action = '可考慮分批布局，避免一次追高；重點觀察 '+(s.sectorRotation.topSector||'領先板塊')+'。';
+  } else if (mkt.total >= 45) {
+    action = '建議中性觀望，等待更明確訊號；若已有部位可維持不動。';
+  } else {
+    action = '建議降低部位或暫緩進場，優先關注風險控管。';
+  }
+  if (LQ && LQ['^VIX'] && LQ['^VIX'].changePct >= 10) {
+    action += ' ⚠ VIX 短線急升，留意市場波動加劇。';
+  }
+
+  return {
+    why: why, soWhat: soWhat, action: action,
+    full: '<b>Why｜</b>'+why+'<br><b>So What｜</b>'+soWhat+'<br><b>Action｜</b>'+action
+  };
+}
+
+// ── 渲染 Decision Summary Card ─────────────────────────────────
+function renderDecisionCard() {
+  if (!D) return;
+  var card = document.getElementById('decision-card');
+  if (!card) return;
+  card.style.display = '';
+
+  var mkt   = computeMarketScore();
+  var grade = scoreToGrade(mkt.total);
+  var risk  = scoreToRisk(mkt.subs.vix.score);
+  var summary = generateDecisionSummary(mkt);
+
+  document.getElementById('dc-score').textContent = mkt.total;
+  document.getElementById('dc-score').style.color = grade.color;
+  document.getElementById('dc-stars').textContent = '★'.repeat(grade.stars)+'☆'.repeat(5-grade.stars);
+  document.getElementById('dc-bias').textContent = grade.biasZh + '（'+grade.bias+'）';
+  document.getElementById('dc-bias').style.color = grade.color;
+  document.getElementById('dc-risk').textContent = risk.zh;
+  document.getElementById('dc-risk').style.color = risk.color;
+  document.getElementById('dc-sector').textContent = mkt.subs.sectorRotation.topSector || '—';
+
+  var subLabels = {
+    seasonality:'季節性', momentum:'動能', vix:'VIX',
+    breadth:'廣度', sectorRotation:'板塊輪動', winProb:'短期勝率'
+  };
+  var subsEl = document.getElementById('dc-subscores');
+  subsEl.innerHTML = '';
+  Object.keys(subLabels).forEach(function(key) {
+    var sc = mkt.subs[key].score;
+    var c  = sc>=65?'var(--gr)':sc>=45?'var(--mu)':'var(--rd)';
+    var div = document.createElement('div');
+    div.className = 'dc-sub';
+    div.title = mkt.subs[key].detail;
+    div.innerHTML = '<div class="dc-sub-lbl">'+subLabels[key]+'</div><div class="dc-sub-val" style="color:'+c+'">'+sc+'</div>';
+    subsEl.appendChild(div);
+  });
+
+  document.getElementById('dc-summary').innerHTML = summary.full;
+  document.getElementById('dc-meta').textContent =
+    '⚠ 純歷史統計與即時報價綜合評分，不構成投資建議　｜　'+
+    (LQ ? '即時資料已更新' : '即時資料未載入，部分子分數為中性預設值') +
+    '　｜　更新時間 '+new Date().toLocaleString('zh-TW');
 }
 
 fetchData();
