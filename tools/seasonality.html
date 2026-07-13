@@ -2342,38 +2342,52 @@ function drawSectorDeceleration(srs) {
   }
   if (!srs.length) { wrap.innerHTML=''; return; }
 
-  // 大盤（S&P 500）的減速幅度，當作比較基準
-  var mktDecel = LQ['^GSPC'] ? LQ['^GSPC'].decelDelta : null;
-  // VIX 近1週是否下降，當作確認訊號
+  // VIX 近1週是否下降，當作額外確認訊號
   var vixFalling = LQ['^VIX'] && LQ['^VIX'].ret1w !== null ? LQ['^VIX'].ret1w < 0 : null;
+
+  // z-score 顯著性分級（雙尾常態分布對照）：
+  // |z|>=1.96 ≈ 95%信心；|z|>=1.65 ≈ 90%信心；|z|>=1.0 ≈ 68%信心（僅供參考不嚴謹）
+  function zConfidence(z) {
+    var az = Math.abs(z);
+    if (az >= 1.96) return { label:'高信心（≈95%）', tier:3 };
+    if (az >= 1.65) return { label:'中信心（≈90%）', tier:2 };
+    if (az >= 1.0)  return { label:'低信心（≈68%）', tier:1 };
+    return { label:'不顯著（可能是雜訊）', tier:0 };
+  }
 
   // 先算出「所有」板塊的原始數值（不篩選），供驗證用
   var allRaw = srs.map(function(s) {
     var ticker = Object.keys(SECTOR_TICKER_INFO).find(function(t){ return findSectorDKey(t) === s.k; });
-    if (!ticker || !LQ[ticker]) return { s:s, wA:null, wB:null, delta:null, note:'無即時資料' };
-    var wA = LQ[ticker].windowARet, wB = LQ[ticker].windowBRet, delta = LQ[ticker].decelDelta;
-    if (wA === null || wB === null || delta === null) return { s:s, wA:null, wB:null, delta:null, note:'資料不足' };
-    var reason = (wA >= 0) ? '較舊段就已經是正的，不算下跌' :
-                 (wB >= 0) ? '較新段已翻正，非「還在跌但變慢」' :
-                 (delta <= 0) ? '跌勢沒有放緩（甚至在加速）' : '符合放緩條件';
-    return { s:s, wA:wA, wB:wB, delta:delta, note:reason };
+    if (!ticker || !LQ[ticker]) return { s:s, wA:null, wB:null, delta:null, z:null, note:'無即時資料' };
+    var wA = LQ[ticker].windowARet, wB = LQ[ticker].windowBRet, delta = LQ[ticker].decelDelta, z = LQ[ticker].decelZ;
+    if (wA === null || wB === null || delta === null) return { s:s, wA:null, wB:null, delta:null, z:null, note:'資料不足' };
+    var reason;
+    if      (wA >= 0) reason = '較舊段就已經是正的，不算下跌';
+    else if (wB >= 0) reason = '較新段已翻正，非「還在跌但變慢」';
+    else if (delta <= 0) reason = '跌勢沒有放緩（甚至在加速）';
+    else if (z === null) reason = '資料天數不足以估計波動度';
+    else if (Math.abs(z) < 1.0) reason = '減速幅度在正常波動範圍內，判斷為雜訊';
+    else reason = '符合放緩條件，'+zConfidence(z).label;
+    return { s:s, wA:wA, wB:wB, delta:delta, z:z, note:reason };
   });
 
+  // 篩選條件：方向正確（還在跌、且在放緩）且 z-score 達到最低顯著性（|z|>=1.0）
   var results = allRaw.filter(function(r) {
-    return r.wA !== null && r.wA < 0 && r.wB < 0 && r.delta > 0;
+    return r.wA !== null && r.wA < 0 && r.wB < 0 && r.delta > 0 &&
+           r.z !== null && Math.abs(r.z) >= 1.0;
   }).map(function(r) {
-    var beatsMarket = (mktDecel !== null) && (r.delta > mktDecel);
-    var strength = 1 + (beatsMarket?1:0) + (vixFalling?1:0);
-    return { s:r.s, wA:r.wA, wB:r.wB, delta:r.delta, beatsMarket:beatsMarket, strength:strength };
+    var conf = zConfidence(r.z);
+    return { s:r.s, wA:r.wA, wB:r.wB, delta:r.delta, z:r.z, conf:conf };
   });
 
   var html = '';
   if (!results.length) {
-    html += '<div style="color:var(--mu);font-size:12px;padding:4px 4px 10px">目前沒有板塊出現「跌勢放緩」訊號</div>';
+    html += '<div style="color:var(--mu);font-size:12px;padding:4px 4px 10px">目前沒有板塊出現「統計上顯著」的跌勢放緩訊號</div>';
   } else {
-    results.sort(function(a,b){ return b.strength - a.strength || b.delta - a.delta; });
+    results.sort(function(a,b){ return Math.abs(b.z) - Math.abs(a.z); });
     results.forEach(function(r) {
-      var stars = '🟢'.repeat(r.strength) + '⚪'.repeat(3-r.strength);
+      var tierColor = r.conf.tier>=3?'var(--gr)':r.conf.tier>=2?'#3fb950':'var(--or)';
+      var stars = '🟢'.repeat(r.conf.tier) + '⚪'.repeat(3-r.conf.tier);
       html +=
         '<div style="background:var(--surf2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:8px">'+
           '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
@@ -2381,13 +2395,13 @@ function drawSectorDeceleration(srs) {
               '<span style="width:8px;height:8px;border-radius:50%;background:'+r.s.c+';flex-shrink:0"></span>'+
               '<span style="font-weight:600;color:'+r.s.c+'">'+r.s.lb+'</span>'+
             '</div>'+
-            '<span style="font-size:14px">'+stars+'</span>'+
+            '<span style="font-size:14px" title="z-score='+r.z.toFixed(2)+'">'+stars+'</span>'+
           '</div>'+
           '<div style="font-size:12px;color:var(--mu);line-height:1.7">'+
             '較舊5日均日報酬 <b style="color:var(--rd)">'+r.wA.toFixed(2)+'%</b>　→　'+
             '較新5日均日報酬 <b style="color:'+(r.wB<0?'var(--or)':'var(--gr)')+'">'+r.wB.toFixed(2)+'%</b>'+
-            '　（跌勢放緩 <b style="color:var(--gr)">+'+r.delta.toFixed(2)+'%</b>）<br>'+
-            (r.beatsMarket ? '<span style="color:var(--gr)">✓ 減速幅度優於大盤</span>　' : '<span style="color:var(--mu)">－ 減速幅度與大盤相近或較弱</span>　')+
+            '　（放緩 <b style="color:var(--gr)">+'+r.delta.toFixed(2)+'%</b>，z='+r.z.toFixed(2)+'）<br>'+
+            '<span style="color:'+tierColor+'">● '+r.conf.label+'</span>　'+
             (vixFalling===true ? '<span style="color:var(--gr)">✓ VIX 近1週同步下降</span>' :
              vixFalling===false ? '<span style="color:var(--or)">－ VIX 近1週未下降</span>' : '')+
           '</div>'+
@@ -2405,23 +2419,26 @@ function drawSectorDeceleration(srs) {
           '<th style="text-align:right;padding:4px;color:var(--mu)">較舊5日均日報酬</th>'+
           '<th style="text-align:right;padding:4px;color:var(--mu)">較新5日均日報酬</th>'+
           '<th style="text-align:right;padding:4px;color:var(--mu)">變化量</th>'+
+          '<th style="text-align:right;padding:4px;color:var(--mu)">z-score</th>'+
           '<th style="text-align:left;padding:4px;color:var(--mu)">判定</th>'+
         '</tr>'+
     allRaw.map(function(r) {
       var fmt = function(v){ return v===null?'—':((v>=0?'+':'')+v.toFixed(3)+'%'); };
+      var fmtZ = function(v){ return v===null?'—':v.toFixed(2); };
       var c = function(v){ return v===null?'var(--bd)':(v>=0?'var(--gr)':'var(--rd)'); };
       return '<tr style="border-bottom:1px solid var(--bd)">'+
         '<td style="padding:4px;color:'+r.s.c+'">'+r.s.lb+'</td>'+
         '<td style="padding:4px;text-align:right;color:'+c(r.wA)+'">'+fmt(r.wA)+'</td>'+
         '<td style="padding:4px;text-align:right;color:'+c(r.wB)+'">'+fmt(r.wB)+'</td>'+
         '<td style="padding:4px;text-align:right;color:'+c(r.delta)+'">'+fmt(r.delta)+'</td>'+
+        '<td style="padding:4px;text-align:right;color:var(--tx)">'+fmtZ(r.z)+'</td>'+
         '<td style="padding:4px;color:var(--mu)">'+r.note+'</td>'+
       '</tr>';
     }).join('') +
       '</table>'+
       '<div style="font-size:10px;color:var(--bd);margin-top:6px">'+
-        '大盤（S&P 500）減速量：'+(mktDecel!==null?(mktDecel>=0?'+':'')+mktDecel.toFixed(3)+'%':'—')+
-        '　｜　VIX近1週：'+(vixFalling===true?'下降':vixFalling===false?'上升':'—')+
+        'z-score＝減速幅度 ÷ 該板塊近期日報酬標準差的統計誤差　｜　VIX近1週：'+
+        (vixFalling===true?'下降':vixFalling===false?'上升':'—')+
       '</div>'+
     '</details>';
 
@@ -2429,7 +2446,7 @@ function drawSectorDeceleration(srs) {
 
   if (note) {
     note.textContent = results.length
-      ? '訊號強度：🟢越多代表確認條件越多（跌勢放緩／優於大盤／VIX同步下降）　｜　⚠ 統計傾向，非保證會反彈，建議搭配其他指標交叉確認'
+      ? '🟢越多代表統計顯著性越高（|z|≥1.96／1.65／1.0）　｜　⚠ 統計傾向，非保證會反彈，建議搭配其他指標交叉確認'
       : '';
   }
 }
