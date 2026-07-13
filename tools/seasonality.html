@@ -2374,7 +2374,7 @@ function drawSectorDeceleration(srs) {
   // 篩選條件：方向正確（還在跌、且在放緩）且 z-score 達到最低顯著性（|z|>=1.0）
   var results = allRaw.filter(function(r) {
     return r.wA !== null && r.wA < 0 && r.wB < 0 && r.delta > 0 &&
-           r.z !== null && Math.abs(r.z) >= 1.0;
+           typeof r.z === 'number' && !isNaN(r.z) && Math.abs(r.z) >= 1.0;
   }).map(function(r) {
     var conf = zConfidence(r.z);
     return { s:r.s, wA:r.wA, wB:r.wB, delta:r.delta, z:r.z, conf:conf };
@@ -2423,9 +2423,9 @@ function drawSectorDeceleration(srs) {
           '<th style="text-align:left;padding:4px;color:var(--mu)">判定</th>'+
         '</tr>'+
     allRaw.map(function(r) {
-      var fmt = function(v){ return v===null?'—':((v>=0?'+':'')+v.toFixed(3)+'%'); };
-      var fmtZ = function(v){ return v===null?'—':v.toFixed(2); };
-      var c = function(v){ return v===null?'var(--bd)':(v>=0?'var(--gr)':'var(--rd)'); };
+      var fmt = function(v){ return (typeof v==='number'&&!isNaN(v)) ? ((v>=0?'+':'')+v.toFixed(3)+'%') : '—'; };
+      var fmtZ = function(v){ return (typeof v==='number'&&!isNaN(v)) ? v.toFixed(2) : '—'; };
+      var c = function(v){ return (typeof v==='number'&&!isNaN(v)) ? (v>=0?'var(--gr)':'var(--rd)') : 'var(--bd)'; };
       return '<tr style="border-bottom:1px solid var(--bd)">'+
         '<td style="padding:4px;color:'+r.s.c+'">'+r.s.lb+'</td>'+
         '<td style="padding:4px;text-align:right;color:'+c(r.wA)+'">'+fmt(r.wA)+'</td>'+
