@@ -305,6 +305,21 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
       <div id="s-mom" style="display:flex;flex-direction:column;gap:6px"></div>
       <div id="s-mom-note" style="margin-top:8px;font-size:11px;color:var(--mu)"></div>
     </div>
+    <!-- 近期實際表現排行（用每日累積的真實報價，非歷史平均）-->
+    <div class="cc">
+      <div class="cc-h">
+        <div>
+          <span class="cc-t">📈 近期實際表現排行</span>
+          <span class="cc-s" style="margin-left:8px">依每日累積的真實收盤價計算，非歷史季節性平均</span>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button class="hm-tab on" data-p="1w" onclick="setRecentPeriod('1w',this)" style="background:var(--gold)">近1週</button>
+          <button class="hm-tab" data-p="1m" onclick="setRecentPeriod('1m',this)">近1月</button>
+        </div>
+      </div>
+      <div id="s-recent" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div id="s-recent-note" style="margin-top:8px;font-size:11px;color:var(--mu)"></div>
+    </div>
     <!-- 未來 3 月板塊熱力表 -->
     <div class="cc">
       <div class="cc-h">
@@ -1933,6 +1948,7 @@ function drawSector() {
         } else {
           if (noEl) noEl.remove();
           drawSectorMomentum(srs2);
+          drawSectorRecentPerformance(srs2);
           drawSectorFuture(srs2);
           drawSectorIntra(srs2);
           drawSectorMonthly(srs2);
@@ -1966,6 +1982,7 @@ function drawSector() {
   }
   if (noDataEl) noDataEl.remove();
   drawSectorMomentum(srs);
+  drawSectorRecentPerformance(srs);
   drawSectorFuture(srs);
   drawSectorIntra(srs);
   drawSectorMonthly(srs);
@@ -2232,6 +2249,73 @@ function drawSectorFuture(srs) {
   wrap.innerHTML = html;
 }
 
+// ── 近期實際表現排行（用 LQ 每日累積的真實報酬）─────────────────
+var sRecentPeriod = '1w';
+
+function setRecentPeriod(p, btn) {
+  sRecentPeriod = p;
+  btn.parentElement.querySelectorAll('.hm-tab').forEach(function(b){
+    b.classList.remove('on'); b.style.background='';
+  });
+  btn.classList.add('on'); btn.style.background='var(--gold)';
+  drawSectorRecentPerformance(getSectorSR());
+}
+
+function drawSectorRecentPerformance(srs) {
+  if (!srs) srs = getSectorSR();
+  var wrap = document.getElementById('s-recent');
+  var note = document.getElementById('s-recent-note');
+  if (!wrap) return;
+
+  if (!LQ) {
+    wrap.innerHTML = '<div style="color:var(--mu);font-size:12px;padding:8px">即時資料載入中，稍候會自動顯示...</div>';
+    return;
+  }
+  if (!srs.length) { wrap.innerHTML=''; return; }
+
+  var field = sRecentPeriod === '1w' ? 'ret1w' : 'ret1m';
+  var results = srs.map(function(s) {
+    // 反查這個板塊對應的 Yahoo ticker
+    var ticker = Object.keys(SECTOR_TICKER_INFO).find(function(t){ return findSectorDKey(t) === s.k; });
+    if (!ticker || !LQ[ticker] || LQ[ticker][field] === null || LQ[ticker][field] === undefined) return null;
+    return { s:s, ret: LQ[ticker][field], asOf: LQ[ticker].asOf };
+  }).filter(function(x){ return x!==null; });
+
+  if (!results.length) {
+    wrap.innerHTML = '<div style="color:var(--mu);font-size:12px;padding:8px">資料尚未累積足夠天數，請稍候幾天再回來看（'+
+      (sRecentPeriod==='1w'?'近1週需要約5個交易日':'近1月需要約21個交易日')+'）</div>';
+    return;
+  }
+
+  results.sort(function(a,b){ return b.ret - a.ret; });
+  var maxAbs = Math.max.apply(null, results.map(function(r){return Math.abs(r.ret);})) || 1;
+
+  wrap.innerHTML = '';
+  results.forEach(function(r, i) {
+    var medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    var pct = Math.round(Math.abs(r.ret)/maxAbs*100);
+    var barColor = r.ret>=0 ? r.s.c : 'rgba(248,81,73,.7)';
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 4px';
+    row.innerHTML =
+      '<span style="min-width:20px;text-align:center">'+medal+'</span>'+
+      '<span style="min-width:8px;height:8px;border-radius:50%;background:'+r.s.c+';flex-shrink:0"></span>'+
+      '<span style="min-width:90px;color:'+r.s.c+'">'+r.s.lb+'</span>'+
+      '<div style="flex:1;height:8px;background:var(--surf2);border-radius:4px;overflow:hidden">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+barColor+'"></div></div>'+
+      '<span style="font-weight:700;min-width:56px;text-align:right;color:'+(r.ret>=0?'var(--gr)':'var(--rd)')+'">'+
+        (r.ret>=0?'+':'')+r.ret.toFixed(2)+'%</span>';
+    wrap.appendChild(row);
+  });
+
+  if (note) {
+    var asOf = results[0].asOf || '—';
+    note.textContent = '資料截至 '+asOf+'　｜　'+
+      (sRecentPeriod==='1w' ? '近1週＝約5個交易日累積報酬' : '近1月＝約21個交易日累積報酬')+
+      '　｜　依每日 Yahoo Finance 收盤價自動計算';
+  }
+}
+
 // ── 板塊 vs S&P 500 相對強弱線 ──────────────────────────────
 function drawSectorRSLine(srs) {
   if (!srs) srs = getSectorSR();
@@ -2387,6 +2471,7 @@ function fetchLiveQuotes() {
     .then(function(json){
       LQ = json;
       renderDecisionCard();
+      if (typeof drawSectorRecentPerformance === 'function') drawSectorRecentPerformance(getSectorSR());
     })
     .catch(function(e){
       Logger_safe('即時報價載入失敗，Decision Engine 將使用中性預設值: '+e);
