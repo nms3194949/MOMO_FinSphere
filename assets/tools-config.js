@@ -72,6 +72,15 @@ window.MOMO_TOOLS_CONFIG = [
     external: true,
     showOnHome: true
   },
+       {
+    id: "double-dip",
+    category: "double-dip",
+    title: "一魚雙吃",
+    desc: "雙配息試算",
+    href: "/MOMO_FinSphere/tools/double-dip.html",
+    external: true,
+    showOnHome: true
+  },
   {
     id: "etf-dashboard",
     category: "ETF",
