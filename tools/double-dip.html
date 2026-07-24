@@ -540,13 +540,13 @@ function recalc(){
   } else {
     const amt = Math.abs(delta);
     const perFund = amt / stkCount;
-    const perFundCur = curStk / stkCount;
-    const ratioTxt = curStk > 0 ? `（約為目前股票型基金總部位的 <span class="hl">${((amt/curStk)*100).toFixed(1)}%</span>）` : '';
+    const ratioTxt = curDiv > 0 ? `（約為目前配息基金部位的 <span class="hl">${((amt/curDiv)*100).toFixed(1)}%</span>）` : '';
+    const perFundShareTxt = stkCount > 1 ? `（占本次轉入總額的 <span class="hl">${(100/stkCount).toFixed(1)}%</span>）` : '';
     out.innerHTML = `
       <div class="action-box buy-stk">
         <div class="headline">市場轉多 → 賣出配息基金，轉入股票型基金</div>
         <div class="amount">NT$ ${fmt(amt)}</div>
-        <div class="detail">從配息基金（一魚雙吃部位）賣出 <span class="hl">NT$ ${fmt(amt)}</span>，轉入股票型基金${ratioTxt}，使股票型部位達到 <span class="hl">NT$ ${fmt(stkAmt)}</span>（<span class="hl">${(stkRatio*100).toFixed(1)}%</span>）。<span class="sub-line">若平均分攤在 ${stkCount} 檔股票型基金，每檔約需買進 <span class="hl">NT$ ${fmt(perFund)}</span>（約為該檔部位的 <span class="hl">${perFundCur>0 ? ((perFund/perFundCur)*100).toFixed(1) : '0'}%</span>）。</span></div>
+        <div class="detail">從配息基金（一魚雙吃部位）賣出 <span class="hl">NT$ ${fmt(amt)}</span>${ratioTxt}，轉入股票型基金，使股票型部位達到 <span class="hl">NT$ ${fmt(stkAmt)}</span>（<span class="hl">${(stkRatio*100).toFixed(1)}%</span>）。<span class="sub-line">若平均分攤在 ${stkCount} 檔股票型基金，每檔約需買進 <span class="hl">NT$ ${fmt(perFund)}</span>${perFundShareTxt}。</span></div>
       </div>`;
   }
 }
