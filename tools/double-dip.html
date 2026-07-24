@@ -102,14 +102,24 @@
   }
   .add-btn:hover{ background:rgba(210,198,150,0.08); }
 
-  .sheet-source{
-    background:rgba(255,255,255,0.02); border:1px solid var(--navy-line); border-radius:10px;
-    padding:14px 16px 16px;
+  .data-status{
+    display:inline-flex; align-items:center; gap:8px; margin-top:22px;
+    background:rgba(255,255,255,0.03); border:1px solid var(--navy-line);
+    border-radius:999px; padding:7px 14px; font-size:12.5px; color:var(--ink-dim);
   }
-  .sheet-source-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-  .sheet-status{ font-size:12.5px; color:var(--ink-dim); }
-  .sheet-status.ok{ color:var(--gold); }
-  .sheet-status.err{ color:var(--bear); }
+  .data-status .dot{
+    width:9px; height:9px; border-radius:50%; background:var(--ink-dim); flex-shrink:0;
+    box-shadow:0 0 0 3px rgba(255,255,255,0.03);
+  }
+  .data-status .dot.ok{ background:var(--gold); box-shadow:0 0 0 3px rgba(210,198,150,0.18); }
+  .data-status .dot.err{ background:var(--bear); box-shadow:0 0 0 3px rgba(90,122,158,0.2); }
+  .data-status .dot.loading{ background:var(--ink-dim); animation:pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+  .data-status button{
+    background:none; border:none; color:var(--gold); cursor:pointer; font-size:14px;
+    padding:0; line-height:1; margin-left:2px;
+  }
+  .data-status button:hover{ opacity:0.75; }
 
   .result-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:6px; }
   .stat{
@@ -169,8 +179,7 @@
     .hero{ padding:40px 0 28px; }
     .hero h1{ font-size:27px; }
     .add-btn, .mini-btn{ padding:11px 16px; font-size:13.5px; width:100%; }
-    .sheet-source-row{ flex-direction:column; align-items:stretch; }
-    .sheet-source-row .add-btn{ width:100%; }
+    .data-status{ width:100%; justify-content:center; }
     select, input[type=text], input[type=number]{ font-size:16px; padding:12px 14px; }
     .stat{ padding:14px 16px; }
     .stat .value{ font-size:19px; }
@@ -251,24 +260,18 @@
       </svg>
       <div class="cycle-caption"><span>同一筆本金</span><span>兩段配息週期／月</span></div>
     </div>
-  </div>
 
-  <!-- SECTION 0: 資料來源 -->
-  <div class="card">
-    <h2><span class="idx">0</span>基金總表資料來源</h2>
-    <div class="sub">透過 GAS Web App 讀取「基金清單moneydj」試算表 Config 分頁，登入後自動載入，基金1、基金2 皆從同一份清單挑選。</div>
-    <div class="sheet-source">
-      <div class="sheet-source-row">
-        <span class="sheet-status" id="sheetStatus">尚未讀取</span>
-        <button class="add-btn" id="refreshSheet">↻ 重新整理基金總表</button>
-      </div>
+    <div class="data-status">
+      <span class="dot" id="statusDot"></span>
+      <span id="sheetStatus">尚未讀取</span>
+      <button id="refreshSheet" title="重新整理基金總表">↻</button>
     </div>
   </div>
 
   <!-- SECTION A -->
   <div class="card">
     <h2><span class="idx">1</span>基本設定</h2>
-    <div class="sub">總資金與目標年化配息率；月中基金1 預設為安聯收益成長基金-AMg7月收，配息率會自動帶入總表數值。</div>
+    <div class="sub">總資金、目標年化配息率，以及月中／月底搭配的基金；月中基金1 預設為安聯收益成長基金-AMg7月收。</div>
     <div class="row">
       <div class="field">
         <label>總資金（元）</label>
@@ -288,25 +291,19 @@
         <input type="hidden" id="f1rate" value="9.12">
       </div>
     </div>
-  </div>
-
-  <!-- SECTION B -->
-  <div class="card">
-    <h2><span class="idx">2</span>月底基金2</h2>
-    <div class="sub">依市場狀況選擇搭配的月底基金，配息率越高＝股票型比重可以留越多。選好即自動試算。</div>
-
-    <div class="row">
+    <div class="row" style="margin-top:14px;">
       <div class="field">
-        <label>月底基金2（從總表選擇）</label>
+        <label>月底基金2（依市場狀況選擇，配息率越高＝股票型比重可留越多）</label>
         <select id="f2Select"><option>讀取中…</option></select>
         <input type="hidden" id="f2rate" value="16.74">
       </div>
     </div>
   </div>
 
+
   <!-- SECTION C -->
   <div class="card highlight">
-    <h2><span class="idx">3</span>建議配置比例</h2>
+    <h2><span class="idx">2</span>建議配置比例</h2>
     <div class="sub">為了讓「一魚雙吃」的合併配息率仍能打到目標年化報酬，資金應如何切分。</div>
 
     <div class="result-grid">
@@ -340,7 +337,7 @@
 
   <!-- SECTION D -->
   <div class="card highlight">
-    <h2><span class="idx">4</span>部位再平衡</h2>
+    <h2><span class="idx">3</span>部位再平衡</h2>
     <div class="sub">輸入目前實際持有的配息基金與股票型基金金額，算出這次市場轉換要「賣出多少、轉入多少」。</div>
 
     <div class="row">
@@ -436,7 +433,8 @@ async function doLogin(){
 /* ---------- 基金總表 ---------- */
 async function fetchSheetFunds(){
   const statusEl = $('sheetStatus');
-  statusEl.className = 'sheet-status';
+  const dotEl = $('statusDot');
+  dotEl.className = 'dot loading';
   statusEl.textContent = '讀取中…';
   try{
     const data = await callApi('funds');
@@ -444,13 +442,13 @@ async function fetchSheetFunds(){
       throw new Error(data && data.error ? data.error : '回傳格式錯誤');
     }
     sheetFunds = data.funds;
-    statusEl.className = 'sheet-status ok';
+    dotEl.className = 'dot ok';
     const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
     statusEl.textContent = `已讀取 ${sheetFunds.length} 檔基金（${now} 更新）`;
     populateSelects();
   } catch(err){
-    statusEl.className = 'sheet-status err';
-    statusEl.textContent = '讀取失敗：' + err.message + '（請確認 Config 分頁欄位名稱與試算表存取權限）';
+    dotEl.className = 'dot err';
+    statusEl.textContent = '讀取失敗：' + err.message;
   }
 }
 
