@@ -183,6 +183,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <option value="iv">排序：隱波</option>
           <option value="eff_delta">排序：有效Delta</option>
           <option value="move5pct">排序：漲5%報酬</option>
+          <option value="rr_ratio">排序：風報比</option>
         </select>
         <select class="field" id="selLimit" style="max-width:110px">
           <option value="20" selected>20 列</option>
@@ -195,6 +196,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkLowIV" checked/>排除隱波&lt;5%</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNeedPrice"/>僅顯示有股價🟢</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNoETF"/>排除ETF權證</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;color:var(--gold-soft);font-weight:700"><input type="checkbox" id="chkShortMode"/>⚡ 短打模式（1~3日）</label>
       </div>
 
       <!-- 手機版控制列 -->
@@ -215,6 +217,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
             <option value="s1" selected>排序：S1</option>
             <option value="move5pct">排序：漲5%</option>
             <option value="eff_delta">排序：Delta</option>
+            <option value="rr_ratio">排序：風報比</option>
             <option value="days_left">排序：天數</option>
             <option value="spread">排序：價差比</option>
           </select>
@@ -237,6 +240,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkLowIVMob" checked/>排除隱波&lt;5%</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNeedPriceMob"/>僅顯示有股價🟢</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNoETFMob"/>排除ETF權證</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--gold-soft);font-weight:700"><input type="checkbox" id="chkShortModeMob"/>⚡ 短打模式</label>
         </div>
         <button class="btn btn-outline btn-sm" id="btnResetMob">重置</button>
       </div>
@@ -273,6 +277,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
             <th data-key="iv">隱波<span class="sort-icon"></span></th>
             <th data-key="eff_delta">有效Delta<span class="sort-icon"></span></th>
             <th data-key="move5pct">漲5%報酬<span class="sort-icon"></span></th>
+            <th data-key="rr_ratio">風報比<span class="sort-icon"></span></th>
             <th>價內外</th>
             <th>帶入計算</th>
           </tr></thead>
@@ -288,7 +293,9 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <span style="color:var(--purple)">■ 隱波 &gt; 80%（過高）</span>
         <span style="color:var(--muted)">漲5%報酬：以履約價為近似現貨，BS重算之報酬%</span>
         <span style="font-size:11px;color:var(--muted)">🟢 有真實股價　🔴 無股價（用履約價估算，Delta 可能失真）</span>
-        <span style="font-size:11px;color:var(--muted)">🥇🥈🥉 同標的 CP 值排名（搜尋特定標的時顯示，綜合 Delta、報酬、隱波、價差、天數）</span>
+        <span style="font-size:11px;color:var(--muted)">🥇🥈🥉 同標的 CP 值排名（搜尋特定標的時顯示）</span>
+        <span style="font-size:11px;color:var(--muted)">風報比＝標的漲5%報酬 ÷ 跌5%虧損，&ge;1.2 金色（賺多賠少）、&lt;1 紅色（賠多賺少）</span>
+        <span style="font-size:11px;color:var(--gold-soft)">⚡ 短打模式：CP 排名改為重視 價差比(30) + 平價程度(25) + Delta(25) + 風報比(12) + 隱波(8)，不看天數</span>
       </div>
     </div>
   </div>
@@ -653,10 +660,28 @@ const ETF_PATTERNS = [
 ];
 function isETF(name){return ETF_PATTERNS.some(p=>p.test(name));}
 
-/* ===== CP值計算（同標的內排名用）===== */
-function calcCP(r){
+/* ===== CP值計算（同標的內排名用）=====
+   一般模式：重視 Delta、報酬、隱波、價差、天數
+   短打模式（1~3日）：重視 價差比、平價程度、Delta、風報比
+                     不看天數（短打用不到），隱波權重提高（防被壓）  */
+function calcCP(r, shortMode){
   if(r.eff_delta==null||r.move5pct==null||r.iv==null||r.spread==null||r.days_left==null) return null;
-  // 各指標分數（標準化後加權）
+
+  if(shortMode){
+    // 價差比是短打最大成本，權重最高
+    const spreadScore = Math.max(0,(8-r.spread))/8 * 30;
+    // 越接近平價越好（有內含價值撐著，抗隱波被壓）
+    const mnScore     = r.mn_dist!=null ? Math.max(0,(0.3-r.mn_dist))/0.3 * 25 : 10;
+    // Delta 要跟得上標的
+    const deltaScore  = Math.min(r.eff_delta,1) * 25;
+    // 風報比：賺賠比例
+    const rrScore     = r.rr_ratio!=null ? Math.min(Math.max(r.rr_ratio,0),2)/2 * 12 : 0;
+    // 隱波越低越不容易被壓
+    const ivScore     = Math.max(0,(100-r.iv))/100 * 8;
+    return spreadScore + mnScore + deltaScore + rrScore + ivScore;
+  }
+
+  // 一般模式（波段）
   const deltaScore  = Math.min(r.eff_delta, 1) * 50;               // 有效Delta，最重要，最高50分
   const move5Score  = Math.min(Math.max(r.move5pct,0),50)/50 * 25; // 漲5%報酬，最高25分
   const ivScore     = Math.max(0, (100 - r.iv)) / 100 * 15;        // 隱波越低越好，最高15分
@@ -691,7 +716,7 @@ function preprocess(){
     }
     const realPrice=underlyingCode&&STOCK_PRICES[underlyingCode]?STOCK_PRICES[underlyingCode]:null;
 
-    let eff_delta=null, move5pct=null;
+    let eff_delta=null, move5pct=null, drop5pct=null, rr_ratio=null, mn_dist=null;
     if(iv&&exr&&days_left&&strike){
       const K=num(strike);
       const S=realPrice||K; // 有真實股價用真實股價，否則 fallback 到履約價
@@ -704,6 +729,14 @@ function preprocess(){
         eff_delta=Math.abs(delta)*exr;
         const movePct=type==='call'?0.05:-0.05;
         move5pct=calcMove5pct(type,S,K,T,v,exr,sp/100,movePct);
+        // 猜錯方向時的虧損（標的反向5%）
+        drop5pct=calcMove5pct(type,S,K,T,v,exr,sp/100,-movePct);
+        // 風報比 = 賺的 ÷ 賠的，>1 代表賺多賠少
+        if(move5pct!=null&&drop5pct!=null&&drop5pct<0){
+          rr_ratio=move5pct/Math.abs(drop5pct);
+        }
+        // 離平價的距離（0=平價，越大越價外/價內）
+        if(realPrice) mn_dist=Math.abs(S-K)/S;
       }
     }
 
@@ -715,7 +748,7 @@ function preprocess(){
       price:r["權證成交價"]||r["FLD_WAR_TXN_PRICE"],
       iv,
       moneyness:r["價內外程度"]||r["FLD_IN_OUT"],
-      eff_delta,move5pct,
+      eff_delta,move5pct,drop5pct,rr_ratio,mn_dist,
       has_price:realPrice!=null, // 是否有真實股價
       is_etf:isETF(name),         // 是否為ETF標的
       cp_score:null,               // CP分數（後面計算）
@@ -773,6 +806,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 function filterSort(){
   const type=$('#selType').value;
   const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked,dropLowIV=$('#chkLowIV').checked,needPrice=$('#chkNeedPrice').checked,noETF=$('#chkNoETF').checked;
+  const shortMode=$('#chkShortMode').checked;
   const rawQ=norm($('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
@@ -808,7 +842,7 @@ function filterSort(){
   }).sort((a,b)=>{const va=a[sortKey]??Infinity,vb=b[sortKey]??Infinity;return(va-vb)*sortDir;});
   // CP排名：搜尋特定標的時計算前三名並置頂
   if(q.length>0&&rows.length>1){
-    rows.forEach(r=>{ r.cp_score=calcCP(r); r.medal=''; });
+    rows.forEach(r=>{ r.cp_score=calcCP(r,shortMode); r.medal=''; });
     const ranked=[...rows].filter(r=>r.cp_score!=null).sort((a,b)=>b.cp_score-a.cp_score);
     const medals=['🥇','🥈','🥉'];
     const top3=ranked.slice(0,3);
@@ -832,7 +866,7 @@ function render(){
   const limit=lv==='all'?Math.min(rows.length,500):parseInt(lv);
   const tb=$('#tbody'); tb.innerHTML='';
   if(rows.length===0){
-    tb.innerHTML='<tr><td colspan="16" style="padding:28px;text-align:center;color:var(--muted)">無符合條件的權證，請放寬篩選條件</td></tr>';
+    tb.innerHTML='<tr><td colspan="17" style="padding:28px;text-align:center;color:var(--muted)">無符合條件的權證，請放寬篩選條件</td></tr>';
   } else {
     rows.slice(0,limit).forEach(r=>{
       const tr=document.createElement('tr');
@@ -847,6 +881,9 @@ function render(){
       const ivCls=r.iv!=null&&r.iv<5?'eff-bad':r.iv>80?'purple':'';
 
       const move5Str=r.move5pct!=null?(r.move5pct>=0?'+':'')+r.move5pct.toFixed(1)+'%':'—';
+      // 風報比：>=1.2 金色、>=1 白、<1 紅
+      const rrStr=r.rr_ratio!=null?r.rr_ratio.toFixed(2):'—';
+      const rrCls=r.rr_ratio==null?'':(r.rr_ratio>=1.2?'eff-good':r.rr_ratio>=1?'':'eff-bad');
 
       tr.innerHTML=`
         <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
@@ -863,6 +900,7 @@ function render(){
         <td class="${ivCls}">${fmt(r.iv,2)}</td>
         <td class="${effCls}">${r.eff_delta!=null?r.eff_delta.toFixed(2):'—'} <span style="font-size:9px">${r.has_price?'🟢':'🔴'}</span></td>
         <td class="${move5Cls}">${move5Str}</td>
+        <td class="${rrCls}">${rrStr}</td>
         <td>${r.moneyness||'—'}</td>
         <td><button class="btn btn-sm" onclick='loadToCalc(${JSON.stringify(r)})'>帶入 →</button></td>
       `;
@@ -889,7 +927,7 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
     render();
   });
 });
-['selType','chkZero','selLimit','chkIV','chkLowIV','chkNeedPrice','chkNoETF'].forEach(id=>$('#'+id).addEventListener('change',render));
+['selType','chkZero','selLimit','chkIV','chkLowIV','chkNeedPrice','chkNoETF','chkShortMode'].forEach(id=>$('#'+id).addEventListener('change',render));
 // 排序選單同步 sortKey
 $('#selSortKey').addEventListener('change',()=>{
   const k=$('#selSortKey').value;
@@ -910,6 +948,7 @@ function filterSortMob(){
   const dropLowIV=isMob?$('#chkLowIVMob').checked:$('#chkLowIV').checked;
   const needPrice=isMob?$('#chkNeedPriceMob').checked:$('#chkNeedPrice').checked;
   const noETF=isMob?$('#chkNoETFMob').checked:$('#chkNoETF').checked;
+  const shortMode=isMob?$('#chkShortModeMob').checked:$('#chkShortMode').checked;
   const rawQ=norm(isMob?$('#nameFilterMob').value:$('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat(isMob?$('#fDaysMob').value:$('#fDays').value);
@@ -953,7 +992,7 @@ function renderMobile(){
   // CP 排名（手機版搜尋時）
   const mobQ=norm($('#nameFilterMob').value).trim();
   if(mobQ.length>0&&rawRows.length>1){
-    rawRows.forEach(r=>{ r.cp_score=calcCP(r); r.medal=''; });
+    rawRows.forEach(r=>{ r.cp_score=calcCP(r,$('#chkShortModeMob').checked); r.medal=''; });
     const ranked=[...rawRows].filter(r=>r.cp_score!=null).sort((a,b)=>b.cp_score-a.cp_score);
     const top3=ranked.slice(0,3);
     top3.forEach((r,i)=>{ r.medal=['🥇','🥈','🥉'][i]; });
@@ -1027,6 +1066,10 @@ function renderMobile(){
           <div class="wv ${spreadCls}">${fmt(r.spread,2)}</div>
         </div>
         <div class="wcard-item">
+          <div class="wl">風報比</div>
+          <div class="wv ${r.rr_ratio==null?'':(r.rr_ratio>=1.2?'eff-good':r.rr_ratio>=1?'':'eff-bad')}">${r.rr_ratio!=null?r.rr_ratio.toFixed(2):'—'}</div>
+        </div>
+        <div class="wcard-item">
           <div class="wl">價內外</div>
           <div class="wv" style="font-size:11px;font-weight:400;color:var(--muted)">${r.moneyness||'—'}</div>
         </div>
@@ -1058,7 +1101,7 @@ let dbtM;const dbRM=()=>{clearTimeout(dbtM);dbtM=setTimeout(renderAll,280);};
 ['nameFilterMob','fDaysMob','fS2Mob','fEffDeltaMob','fMove5Mob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('input',dbRM);
 });
-['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob','chkNeedPriceMob','chkNoETFMob'].forEach(id=>{
+['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob','chkNeedPriceMob','chkNoETFMob','chkShortModeMob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('change',renderAll);
 });
 window.addEventListener('resize',()=>{if(PROC.length>0)renderAll();});
