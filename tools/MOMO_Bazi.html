@@ -159,6 +159,42 @@ table.summary .zg-cell{font-size:.75rem;color:var(--stone);}
   position:absolute;top:.3rem;right:.5rem;color:var(--stone);
   cursor:pointer;font-size:.85rem;line-height:1;
 }
+
+/* ── 合盤查詢 ── */
+.mt-sec{border-top:1px solid var(--divider);margin-top:.9rem;padding-top:.9rem;}
+.mt-sec-title{font-size:.78rem;color:var(--stone);letter-spacing:.1em;margin-bottom:.6rem;}
+.mt-row{display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:.7rem;}
+.mt-field{display:flex;flex-direction:column;gap:.25rem;}
+.mt-field label{font-size:.73rem;color:var(--stone);letter-spacing:.08em;}
+.mt-field select,.mt-field input{padding:.38rem .55rem;border:1px solid var(--divider);border-radius:2px;
+  font-size:.86rem;background:white;color:var(--ink);font-family:inherit;}
+.mt-field select:focus,.mt-field input:focus{outline:none;border-color:var(--gold);}
+.mt-cb{font-size:.82rem;display:flex;align-items:center;gap:.28rem;cursor:pointer;white-space:nowrap;}
+.mt-cb-group{display:flex;gap:.6rem;flex-wrap:wrap;}
+.mt-mini-link{font-size:.74rem;color:var(--gold);cursor:pointer;text-decoration:underline;}
+.mt-legend{display:flex;gap:.9rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.mt-leg{display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--stone);}
+.mt-leg-dot{width:12px;height:12px;border-radius:2px;}
+.mt-nav{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem;padding:.6rem;background:var(--paper-dark);border-radius:2px;}
+.mt-nav a{padding:.25rem .5rem;background:white;border:1px solid var(--divider);border-radius:2px;
+  font-size:.76rem;color:var(--stone);text-decoration:none;white-space:nowrap;}
+.mt-nav a:hover{border-color:var(--gold);color:var(--ink);}
+.mt-year{margin-bottom:1.1rem;}
+.mt-year-title{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:1rem;font-weight:700;
+  padding:.4rem .8rem;background:var(--paper-dark);border-left:3px solid var(--gold);margin-bottom:.5rem;}
+.mt-year-badge{font-size:.72rem;color:var(--stone);font-family:inherit;font-weight:400;}
+.mt-chips{display:flex;flex-wrap:wrap;gap:.4rem;}
+.mt-chip{display:flex;align-items:center;gap:.4rem;padding:.32rem .6rem;background:white;
+  border:1px solid var(--divider);border-radius:2px;font-size:.8rem;}
+.mt-chip:hover{border-color:var(--gold);background:#fdf9f0;}
+.mt-chip-date{color:var(--stone);min-width:3.3rem;}
+.mt-chip-tg{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:.92rem;font-weight:900;min-width:1.1rem;}
+.mt-tags{display:flex;gap:.2rem;}
+.mt-tag{font-family:'Noto Serif TC','DFKai-SB','標楷體',serif;font-size:.92rem;font-weight:700;
+  padding:.05rem .28rem;border-radius:2px;display:inline-flex;align-items:baseline;gap:.1rem;}
+.mt-tag.liuhe{background:rgba(255,214,0,.18);border:1px solid #c8a000;}
+.mt-tag.sanhe{background:rgba(46,125,50,.12);border:1px solid #2e7d32;}
+.mt-tag small{font-size:.58rem;opacity:.75;font-family:inherit;}
 </style>
 </head>
 <body>
@@ -185,6 +221,7 @@ table.summary .zg-cell{font-size:.75rem;color:var(--stone);}
     <div class="tabs" id="tabBar">
       <div class="tab active" data-tab="manual" onclick="switchTab('manual')">✏️ 手動輸入</div>
       <div class="tab" data-tab="excel" onclick="switchTab('excel')">📊 上傳 Excel</div>
+      <div class="tab" data-tab="match" onclick="switchTab('match')">💞 合盤查詢</div>
     </div>
     <div id="tab-manual" class="tab-panel active">
       <div class="format-hint">
@@ -230,6 +267,92 @@ table.summary .zg-cell{font-size:.75rem;color:var(--stone);}
       </div>
     </div>
 
+    <!-- 合盤查詢 -->
+    <div id="tab-match" class="tab-panel">
+      <div class="format-hint">
+        設定你的四柱地支，查詢與你各柱形成<strong>六合</strong>或<strong>三合</strong>的出生日期。
+        可從「手動輸入」算好八字後按下方「帶入結果」自動填入。
+      </div>
+
+      <div class="mt-row">
+        <div class="mt-field"><label>年柱地支</label><select id="mtYea"></select></div>
+        <div class="mt-field"><label>月柱地支</label><select id="mtMon"></select></div>
+        <div class="mt-field"><label>日柱地支</label><select id="mtDay"></select></div>
+        <div class="mt-field"><label>時柱地支（可不設）</label><select id="mtHou"></select></div>
+        <button class="btn-secondary" onclick="mtImportFromResults()" style="padding:.38rem .9rem;font-size:.8rem;">↙ 帶入結果</button>
+      </div>
+
+      <div class="mt-row">
+        <div class="mt-field"><label>起始年</label><input type="number" id="mtFrom" value="1950" min="1950" max="2025" style="width:5.5rem;"></div>
+        <div class="mt-field"><label>結束年</label><input type="number" id="mtTo" value="2010" min="1950" max="2025" style="width:5.5rem;"></div>
+        <div class="mt-field"><label>最少合柱數</label>
+          <select id="mtMin">
+            <option value="4">四柱全合（含時柱）</option>
+            <option value="3" selected>年月日三柱全合</option>
+            <option value="2">任意兩柱合</option>
+            <option value="1">任意一柱合</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-sec">
+        <div class="mt-sec-title">── 進階篩選</div>
+
+        <div class="mt-row">
+          <div class="mt-field">
+            <label>合的類型</label>
+            <div class="mt-cb-group">
+              <label class="mt-cb"><input type="checkbox" id="mtLiuhe" checked> 六合</label>
+              <label class="mt-cb"><input type="checkbox" id="mtSanhe" checked> 三合</label>
+            </div>
+          </div>
+
+          <div class="mt-field">
+            <label>必合的柱</label>
+            <div class="mt-cb-group">
+              <label class="mt-cb"><input type="checkbox" id="mtMustYea"> 年柱</label>
+              <label class="mt-cb"><input type="checkbox" id="mtMustMon"> 月柱</label>
+              <label class="mt-cb"><input type="checkbox" id="mtMustDay" checked> 日柱</label>
+              <label class="mt-cb"><input type="checkbox" id="mtMustHou"> 時柱</label>
+            </div>
+          </div>
+
+          <div class="mt-field">
+            <label>純度</label>
+            <div class="mt-cb-group">
+              <label class="mt-cb"><input type="radio" name="mtPure" value="any" checked> 混合都算</label>
+              <label class="mt-cb"><input type="radio" name="mtPure" value="allLiuhe"> 全六合</label>
+              <label class="mt-cb"><input type="radio" name="mtPure" value="allSanhe"> 全三合</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-row" style="align-items:flex-start;">
+          <div class="mt-field" style="flex:1;">
+            <label>對方日柱天干（可多選）</label>
+            <div class="mt-cb-group" id="mtTGBox"></div>
+            <div style="display:flex;gap:.6rem;margin-top:.35rem;">
+              <a class="mt-mini-link" onclick="mtSetAllTG(true)">全選</a>
+              <a class="mt-mini-link" onclick="mtSetAllTG(false)">全消</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="mtSearch()">▶ 開始查詢</button>
+        <button class="btn-secondary" onclick="mtClear()">清除結果</button>
+      </div>
+
+      <div class="mt-legend" style="margin-top:1rem;">
+        <div class="mt-leg"><div class="mt-leg-dot" style="background:#ffd600;"></div>六合</div>
+        <div class="mt-leg"><div class="mt-leg-dot" style="background:#2e7d32;"></div>三合</div>
+      </div>
+
+      <div id="mtStatus" style="font-size:.82rem;color:var(--jade);min-height:1.2rem;margin-bottom:.6rem;"></div>
+      <div id="mtResults"></div>
+    </div>
+
   </div>
   <div class="export-bar" id="exportBar" style="display:none">
     <span class="result-count" id="resultCount"></span>
@@ -254,6 +377,36 @@ const TG_WX={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'�
 const DZ_WX={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
 const ZANGGAN={子:['癸'],丑:['己','癸','辛'],寅:['甲','丙','戊'],卯:['乙'],辰:['戊','乙','癸'],巳:['丙','庚','戊'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']};
 const JQ={
+  1950:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1951:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1952:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1953:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1954:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1955:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1956:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1957:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1958:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1959:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1960:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1961:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1962:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1963:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1964:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1965:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1966:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1967:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1968:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1969:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1970:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1971:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1972:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1973:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1974:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1975:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1976:[[2,5],[3,5],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,7],[1,6]],
+  1977:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1978:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
+  1979:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
   1980:[[2,5],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
   1981:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
   1982:[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,8],[12,8],[1,6]],
@@ -398,7 +551,7 @@ function renderPerson(r){
     (r.hasHour?' '+String(r.hour).padStart(2,'0')+':'+String(r.minute).padStart(2,'0'):'（未提供時辰）');
   function bc(ct,cl=''){return'<div class="bc '+cl+'">'+ct+'</div>';}
   function tgspan(p){return p?'<span class="tg-ch '+wxcls(p.tg)+'">'+p.tg+'</span>':'';}
-  function dzspan(p){return p?'<span class="dz-ch '+wxcls(p.dz)+'" data-dz="'+p.dz+'"">'+p.dz+'</span>':'';}
+  function dzspan(p){return p?'<span class="dz-ch '+wxcls(p.dz)+'" data-dz="'+p.dz+'">'+p.dz+'</span>':'';}
   function zg(p,dayTG){
     if(!p)return'';
     return'<div class="zg-wrap">'+(ZANGGAN[p.dz]||[]).map(c=>{
@@ -414,7 +567,7 @@ function renderPerson(r){
     return '<div class="pillar-stack">'
       +(ss?'<span class="pillar-ss">'+ss+'</span>':'')
       +'<span class="tg-ch '+wxcls(p.tg)+'">'+p.tg+'</span>'
-      +'<span class="dz-ch '+wxcls(p.dz)+'" data-dz="'+p.dz+'"">'+p.dz+'</span>'
+      +'<span class="dz-ch '+wxcls(p.dz)+'" data-dz="'+p.dz+'">'+p.dz+'</span>'
       +'</div>';
   }
   g+=bc('','hdr lbl')+bc('時柱','hdr')+bc('日柱','hdr')+bc('月柱','hdr')+bc('年柱','hdr');
@@ -474,7 +627,7 @@ function renderTableView(){
     return'<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;gap:0.05rem;">'
       +(ss?'<span style="font-size:.7rem;color:var(--stone);letter-spacing:.05em;">'+ss+'</span>':'')
       +'<span class="'+wxcls(p.tg)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1rem;font-weight:900;">'+p.tg+'</span>'
-      +'<span class="dz-ch '+wxcls(p.dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;" data-dz="'+p.dz+'"">'+p.dz+'</span>'
+      +'<span class="dz-ch '+wxcls(p.dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;" data-dz="'+p.dz+'">'+p.dz+'</span>'
       +'</div>';
   }
   function zgc(p,dayTG){
@@ -582,6 +735,7 @@ window.addEventListener('load', ()=>{
   document.querySelectorAll('.tab-panel').forEach(p=>{
     p.style.display = p.id==='tab-manual' ? 'block' : 'none';
   });
+  mtInit();
   document.getElementById('loginPw').focus();
 });
 
@@ -764,7 +918,7 @@ async function cloudSearch(){
       return '<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;gap:.05rem;">'
         +(ss?'<span style="font-size:.7rem;color:var(--stone);">'+ss+'</span>':'')
         +'<span class="'+wxcls(tg)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1rem;font-weight:900;">'+tg+'</span>'
-        +'<span class="dz-ch '+wxcls(dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;" data-dz="'+dz+'"">'+dz+'</span>'
+        +'<span class="dz-ch '+wxcls(dz)+'" style="font-family:DFKai-SB,標楷體,serif;font-size:1.15rem;font-weight:900;" data-dz="'+dz+'">'+dz+'</span>'
         +'</div>';
     }
     function zgCell(zg){
@@ -924,6 +1078,179 @@ function clearUpload(){
   document.getElementById('uploadStatus').textContent='';
   document.getElementById('btnClearUpload').style.display='none';
   clearResults();
+}
+
+// ══ 合盤查詢 ══════════════════════════════════
+const MT_TG_LIST=[['甲','木'],['乙','木'],['丙','火'],['丁','火'],['戊','土'],
+                  ['己','土'],['庚','金'],['辛','金'],['壬','水'],['癸','水']];
+
+function mtInit(){
+  ['mtYea','mtMon','mtDay','mtHou'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el||el.options.length) return;
+    if(i===3) el.innerHTML='<option value="">不設定</option>';
+    DZ.forEach(d=>{
+      const o=document.createElement('option'); o.value=d; o.textContent=d; el.appendChild(o);
+    });
+  });
+  const box=document.getElementById('mtTGBox');
+  if(box && !box.children.length){
+    box.innerHTML=MT_TG_LIST.map(([t,w])=>
+      '<label class="mt-cb"><input type="checkbox" class="mt-tg" value="'+t+'" checked>'
+      +'<span class="w-'+w+'">'+t+w+'</span></label>').join('');
+  }
+}
+
+function mtSetAllTG(v){ document.querySelectorAll('.mt-tg').forEach(cb=>cb.checked=v); }
+
+// 從目前結果帶入第一筆的四柱地支
+function mtImportFromResults(){
+  const r=(allResults||[]).find(x=>!x.error);
+  if(!r){ alert('目前沒有推算結果，請先在「手動輸入」或「上傳 Excel」算一次'); return; }
+  document.getElementById('mtYea').value=r.yp.dz;
+  document.getElementById('mtMon').value=r.mp.dz;
+  document.getElementById('mtDay').value=r.dp.dz;
+  document.getElementById('mtHou').value=r.hp?r.hp.dz:'';
+  document.getElementById('mtStatus').textContent='已帶入「'+r.name+'」的四柱地支';
+}
+
+function mtIsHe(mine,theirs){
+  if(!mine||!theirs) return null;
+  if(DZ_LIUHE[mine]===theirs) return 'liuhe';
+  if((DZ_SANHE[mine]||[]).includes(theirs)) return 'sanhe';
+  return null;
+}
+
+function mtSearch(){
+  const myYea=document.getElementById('mtYea').value;
+  const myMon=document.getElementById('mtMon').value;
+  const myDay=document.getElementById('mtDay').value;
+  const myHou=document.getElementById('mtHou').value;
+  const fromY=+document.getElementById('mtFrom').value;
+  const toY=+document.getElementById('mtTo').value;
+  const minMatch=+document.getElementById('mtMin').value;
+  const useHou=!!myHou;
+
+  const okLiuhe=document.getElementById('mtLiuhe').checked;
+  const okSanhe=document.getElementById('mtSanhe').checked;
+  const mustYea=document.getElementById('mtMustYea').checked;
+  const mustMon=document.getElementById('mtMustMon').checked;
+  const mustDay=document.getElementById('mtMustDay').checked;
+  const mustHou=document.getElementById('mtMustHou').checked;
+  const pure=document.querySelector('input[name="mtPure"]:checked').value;
+  const okTG=new Set([...document.querySelectorAll('.mt-tg')].filter(x=>x.checked).map(x=>x.value));
+
+  if(fromY>toY){ alert('起始年不可大於結束年'); return; }
+  if(!okTG.size){ alert('請至少勾選一個天干'); return; }
+
+  const st=document.getElementById('mtStatus');
+  st.textContent='查詢中…';
+
+  const filt=t=>{
+    if(!t) return null;
+    if(t==='liuhe'&&!okLiuhe) return null;
+    if(t==='sanhe'&&!okSanhe) return null;
+    return t;
+  };
+  const HR_MAP=[0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,0];
+
+  const out=[];
+  const end=new Date(toY,11,31);
+  for(let cur=new Date(fromY,0,1); cur<=end; cur.setDate(cur.getDate()+1)){
+    const y=cur.getFullYear(), m=cur.getMonth()+1, d=cur.getDate();
+    try{
+      const dp=getDayPillar(y,m,d);
+      if(!okTG.has(dp.tg)) continue;
+
+      const yp=getYearPillarFromBaziYear(getBaziYear(y,m,d).baziY);
+      const mp=getMonthPillar(y,m,d);
+
+      const yT=filt(mtIsHe(myYea,yp.dz));
+      const mT=filt(mtIsHe(myMon,mp.dz));
+      const dT=filt(mtIsHe(myDay,dp.dz));
+
+      if(mustYea&&!yT) continue;
+      if(mustMon&&!mT) continue;
+      if(mustDay&&!dT) continue;
+
+      let n=(yT?1:0)+(mT?1:0)+(dT?1:0);
+      let hT=null;
+      if(useHou){
+        const seen=new Set(), hits=[];
+        for(let h=0;h<24;h++){
+          const hdz=DZ[HR_MAP[h]];
+          if(seen.has(hdz)) continue; seen.add(hdz);
+          const t=filt(mtIsHe(myHou,hdz));
+          if(t) hits.push({dz:hdz,type:t});
+        }
+        if(hits.length){ hT=hits; n++; }
+        if(mustHou&&!hT) continue;
+      }
+      if(n<minMatch) continue;
+
+      if(pure!=='any'){
+        const ts=[];
+        if(yT)ts.push(yT); if(mT)ts.push(mT); if(dT)ts.push(dT);
+        if(hT)hT.forEach(x=>ts.push(x.type));
+        if(pure==='allLiuhe'&&!ts.every(t=>t==='liuhe')) continue;
+        if(pure==='allSanhe'&&!ts.every(t=>t==='sanhe')) continue;
+      }
+
+      out.push({y,m,d,dayTG:dp.tg,ydz:yp.dz,mdz:mp.dz,ddz:dp.dz,yT,mT,dT,hT});
+    }catch(e){}
+  }
+
+  mtRender(out);
+}
+
+function mtRender(list){
+  const st=document.getElementById('mtStatus');
+  const box=document.getElementById('mtResults');
+  if(!list.length){
+    st.textContent='';
+    box.innerHTML='<div class="empty-state">沒有符合條件的日期，試著放寬條件</div>';
+    return;
+  }
+  st.textContent='共 '+list.length+' 筆符合日期';
+
+  const byY={};
+  list.forEach(r=>{ (byY[r.y]=byY[r.y]||[]).push(r); });
+  const years=Object.keys(byY).sort();
+
+  function tag(dz,type){
+    const label=type==='liuhe'?'六合':'三合';
+    return '<span class="mt-tag '+type+' '+wxcls(dz)+'">'+dz+'<small>'+label+'</small></span>';
+  }
+
+  let html='<div class="mt-nav">'+years.map(y=>
+    '<a href="#mty'+y+'">'+y+'（'+byY[y].length+'）</a>').join('')+'</div>';
+
+  years.forEach(y=>{
+    const rows=byY[y];
+    html+='<div class="mt-year" id="mty'+y+'">'
+      +'<div class="mt-year-title">'+y+' 年 <span class="mt-year-badge">（'+rows.length+' 個日期）</span></div>'
+      +'<div class="mt-chips">';
+    rows.forEach(r=>{
+      const md=String(r.m).padStart(2,'0')+'/'+String(r.d).padStart(2,'0');
+      html+='<div class="mt-chip">'
+        +'<span class="mt-chip-date">'+md+'</span>'
+        +'<span class="mt-chip-tg '+wxcls(r.dayTG)+'">'+r.dayTG+'</span>'
+        +'<div class="mt-tags">'
+        +(r.yT?tag(r.ydz,r.yT):'')
+        +(r.mT?tag(r.mdz,r.mT):'')
+        +(r.dT?tag(r.ddz,r.dT):'')
+        +(r.hT?r.hT.map(h=>tag(h.dz,h.type)).join(''):'')
+        +'</div></div>';
+    });
+    html+='</div></div>';
+  });
+
+  box.innerHTML=html;
+}
+
+function mtClear(){
+  document.getElementById('mtResults').innerHTML='';
+  document.getElementById('mtStatus').textContent='';
 }
 
 function downloadTemplate(){
