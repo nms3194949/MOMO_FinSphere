@@ -196,6 +196,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkLowIV" checked/>排除隱波&lt;5%</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNeedPrice"/>僅顯示有股價🟢</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNoETF"/>排除ETF權證</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="chkNoLottery"/>排除彩券型🎟</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;color:var(--gold-soft);font-weight:700"><input type="checkbox" id="chkShortMode"/>⚡ 短打模式（1~3日）</label>
       </div>
 
@@ -240,6 +241,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkLowIVMob" checked/>排除隱波&lt;5%</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNeedPriceMob"/>僅顯示有股價🟢</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNoETFMob"/>排除ETF權證</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)"><input type="checkbox" id="chkNoLotteryMob"/>排除彩券型🎟</label>
           <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:var(--gold-soft);font-weight:700"><input type="checkbox" id="chkShortModeMob"/>⚡ 短打模式</label>
         </div>
         <button class="btn btn-outline btn-sm" id="btnResetMob">重置</button>
@@ -247,7 +249,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
 
       <div class="filter-bar">
         <span style="color:var(--gold-soft);font-size:12px;font-weight:700">篩選：</span>
-        <label>天數 ≥ <input class="fi" id="fDays" type="number" value="80"/></label>
+        <label>天數 ≥ <input class="fi" id="fDays" type="number" value="60"/></label>
         <label>S2 ≤ <input class="fi" id="fS2" type="number" placeholder="不限"/> %</label>
         <label>S1 ≤ <input class="fi" id="fS1" type="number" placeholder="不限"/></label>
         <label>隱波 ≤ <input class="fi" id="fIV" type="number" placeholder="不限"/></label>
@@ -295,6 +297,7 @@ hr{border:none;border-top:.5px solid var(--line);margin:.8rem 0}
         <span style="font-size:11px;color:var(--muted)">🟢 有真實股價　🔴 無股價（用履約價估算，Delta 可能失真）</span>
         <span style="font-size:11px;color:var(--muted)">🥇🥈🥉 同標的 CP 值排名（搜尋特定標的時顯示）</span>
         <span style="font-size:11px;color:var(--muted)">風報比＝標的漲5%報酬 ÷ 跌5%虧損，&ge;1.2 金色（賺多賠少）、&lt;1 紅色（賠多賺少）</span>
+        <span style="font-size:11px;color:#F5C4B3">🎟 彩券型：價外 &gt;20% 且 Delta &lt; 0.05，報酬率虛高（基期小），標的須大漲才有價值</span>
         <span style="font-size:11px;color:var(--gold-soft)">⚡ 短打模式：CP 排名改為重視 價差比(30) + 平價程度(25) + Delta(25) + 風報比(12) + 隱波(8)，不看天數</span>
       </div>
     </div>
@@ -687,7 +690,9 @@ function calcCP(r, shortMode){
   const ivScore     = Math.max(0, (100 - r.iv)) / 100 * 15;        // 隱波越低越好，最高15分
   const spreadScore = Math.max(0, (15 - r.spread)) / 15 * 8;       // 價差越低越好，最高8分
   const dayScore    = Math.min(r.days_left, 365) / 365 * 2;        // 天數越長越好，最高2分（不主導排名）
-  return deltaScore + move5Score + ivScore + spreadScore + dayScore;
+  const total = deltaScore + move5Score + ivScore + spreadScore + dayScore;
+  // 彩券型扣分：報酬率是基期小造成的假象，不應靠這項拿高分
+  return r.is_lottery ? total - move5Score * 0.6 : total;
 }
 
 function preprocess(){
@@ -749,6 +754,10 @@ function preprocess(){
       iv,
       moneyness:r["價內外程度"]||r["FLD_IN_OUT"],
       eff_delta,move5pct,drop5pct,rr_ratio,mn_dist,
+      // 彩券型：深度價外 + Delta 極低 + 報酬看似很高（基期小造成）
+      is_lottery:(realPrice!=null && mn_dist!=null && mn_dist>0.20
+                  && eff_delta!=null && eff_delta<0.05
+                  && move5pct!=null && move5pct>25),
       has_price:realPrice!=null, // 是否有真實股價
       is_etf:isETF(name),         // 是否為ETF標的
       cp_score:null,               // CP分數（後面計算）
@@ -806,7 +815,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 function filterSort(){
   const type=$('#selType').value;
   const dropZ=$('#chkZero').checked,needIV=$('#chkIV').checked,dropLowIV=$('#chkLowIV').checked,needPrice=$('#chkNeedPrice').checked,noETF=$('#chkNoETF').checked;
-  const shortMode=$('#chkShortMode').checked;
+  const shortMode=$('#chkShortMode').checked,noLottery=$('#chkNoLottery').checked;
   const rawQ=norm($('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat($('#fDays').value),maxS2=parseFloat($('#fS2').value);
@@ -831,6 +840,7 @@ function filterSort(){
     if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
     if(needPrice&&!x.has_price)return false;
     if(noETF&&x.is_etf)return false;
+    if(noLottery&&x.is_lottery)return false;
     if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
     if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
     if(!isNaN(maxS1)&&x.s1!=null&&x.s1*100>maxS1)return false;
@@ -887,7 +897,7 @@ function render(){
 
       tr.innerHTML=`
         <td class="sticky-col"><a href="https://www.wantgoo.com/stock/warrant/${r.code}" target="_blank" style="color:var(--gold-soft)">${r.code}</a></td>
-        <td>${r.medal?'<span style="margin-right:4px;font-size:14px">'+r.medal+'</span>':''}${r.name}</td>
+        <td>${r.medal?'<span style="margin-right:4px;font-size:14px">'+r.medal+'</span>':''}${r.name}${r.is_lottery?' <span title="深度價外＋Delta極低，報酬率虛高" style="background:#4A1B0C;color:#F5C4B3;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;margin-left:3px">🎟 彩券</span>':''}</td>
         <td><span class="tag ${r.cp}">${r.cp}</span></td>
         <td class="${r.spread!=null&&r.spread>15?'eff-bad':''}">${fmt(r.spread,3)}</td>
         <td class="${Math.abs(r.leverage??0)>5?'gold':''}">${fmt(Math.abs(r.leverage),2)}</td>
@@ -927,7 +937,7 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
     render();
   });
 });
-['selType','chkZero','selLimit','chkIV','chkLowIV','chkNeedPrice','chkNoETF','chkShortMode'].forEach(id=>$('#'+id).addEventListener('change',render));
+['selType','chkZero','selLimit','chkIV','chkLowIV','chkNeedPrice','chkNoETF','chkShortMode','chkNoLottery'].forEach(id=>$('#'+id).addEventListener('change',render));
 // 排序選單同步 sortKey
 $('#selSortKey').addEventListener('change',()=>{
   const k=$('#selSortKey').value;
@@ -949,6 +959,7 @@ function filterSortMob(){
   const needPrice=isMob?$('#chkNeedPriceMob').checked:$('#chkNeedPrice').checked;
   const noETF=isMob?$('#chkNoETFMob').checked:$('#chkNoETF').checked;
   const shortMode=isMob?$('#chkShortModeMob').checked:$('#chkShortMode').checked;
+  const noLottery=isMob?$('#chkNoLotteryMob').checked:$('#chkNoLottery').checked;
   const rawQ=norm(isMob?$('#nameFilterMob').value:$('#nameFilter').value);
   const q=rawQ.split(/\s+/).filter(Boolean);
   const minD=parseFloat(isMob?$('#fDaysMob').value:$('#fDays').value);
@@ -973,6 +984,7 @@ function filterSortMob(){
     if(dropLowIV&&x.iv!=null&&x.iv<5)return false;
     if(needPrice&&!x.has_price)return false;
     if(noETF&&x.is_etf)return false;
+    if(noLottery&&x.is_lottery)return false;
     if(!isNaN(minD)&&x.days_left!=null&&x.days_left<minD)return false;
     if(!isNaN(maxS2)&&x.s2!=null&&x.s2*100>maxS2)return false;
     if(!isNaN(minEffDelta)&&(x.eff_delta==null||x.eff_delta<minEffDelta))return false;
@@ -1028,7 +1040,7 @@ function renderMobile(){
     div.innerHTML=`
       <div class="wcard-header">
         <span class="wcard-code">${r.code}</span>
-        <span class="wcard-name">${r.medal?r.medal+' ':''}${r.name}</span>
+        <span class="wcard-name">${r.medal?r.medal+' ':''}${r.name}${r.is_lottery?' <span style="background:#4A1B0C;color:#F5C4B3;padding:1px 4px;border-radius:3px;font-size:9px;font-weight:700">🎟</span>':''}</span>
         <span style="font-size:11px">${r.has_price?'🟢':'🔴'}</span>
         <span class="tag ${r.cp}">${r.cp}</span>
       </div>
@@ -1101,7 +1113,7 @@ let dbtM;const dbRM=()=>{clearTimeout(dbtM);dbtM=setTimeout(renderAll,280);};
 ['nameFilterMob','fDaysMob','fS2Mob','fEffDeltaMob','fMove5Mob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('input',dbRM);
 });
-['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob','chkNeedPriceMob','chkNoETFMob','chkShortModeMob'].forEach(id=>{
+['selTypeMob','selSortKeyMob','chkZeroMob','chkIVMob','chkLowIVMob','chkNeedPriceMob','chkNoETFMob','chkShortModeMob','chkNoLotteryMob'].forEach(id=>{
   const el=$('#'+id);if(el)el.addEventListener('change',renderAll);
 });
 window.addEventListener('resize',()=>{if(PROC.length>0)renderAll();});
