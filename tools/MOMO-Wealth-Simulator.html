@@ -118,6 +118,55 @@
     .pct{font-weight:900;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.04);font-size:11px;}
     .pct.up{border-color:rgba(52,211,153,0.25);background:rgba(52,211,153,0.10);color:#a7f3d0;}
     .pct.down{border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.10);color:#fecaca;}
+    .pct.gold{border-color:rgba(249,226,124,0.30);background:rgba(249,226,124,0.10);color:#F9E27C;}
+    .pct.neutral{border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#94a3b8;}
+    /* 風險揭露（網頁與匯出圖都會顯示） */
+    .report-disclaimer{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:#64748b;line-height:1.7;}
+    .report-disclaimer #disclaimer-meta{color:#8aa0b8;font-weight:800;margin-bottom:4px;}
+
+    /* ─── IG 匯出按鈕 ─── */
+    .btn-export-ig{background:transparent;border:1px solid rgba(249,226,124,.45);color:var(--gold-strong);}
+
+    /* ─── IG 直式圖（1080×1350）：平時不可見，匯出時於複本中顯示 ─── */
+    #ig-capture{position:absolute;left:0;top:0;width:1080px;height:1350px;padding:56px;display:none;flex-direction:column;justify-content:space-between;
+      background:linear-gradient(180deg,#0F1A33 0%,#0A1221 55%);color:var(--ink);opacity:0;pointer-events:none;z-index:-1;overflow:hidden;}
+    #ig-capture.ready{display:flex;}
+    #ig-capture b{font-weight:900;}
+    .ig-brand{font-size:18px;letter-spacing:6px;color:#9c8a45;font-weight:900;}
+    .ig-title{font-size:56px;font-weight:900;color:#F9E27C;margin-top:8px;line-height:1.15;}
+    .ig-sub{font-size:21px;color:#94a3b8;font-weight:700;margin-top:10px;}
+    .ig-hero{border-radius:24px;padding:24px 32px;background:linear-gradient(135deg,rgba(249,226,124,.18),rgba(56,189,248,.06));border:2px solid rgba(249,226,124,.35);}
+    .ig-hero-label{font-size:22px;font-weight:900;color:#E9D18A;}
+    .ig-hero-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 0 6px;}
+    .ig-hero-value{font-size:84px;font-weight:900;color:#fff;line-height:1.1;white-space:nowrap;}
+    .ig-ratio{font-size:24px;font-weight:900;color:#c4b5fd;padding:8px 18px;border-radius:999px;border:2px solid rgba(167,139,250,.45);background:rgba(167,139,250,.14);white-space:nowrap;}
+    .ig-ratio:empty{display:none;}
+    .ig-hero-line{font-size:24px;color:#cbd5e1;font-weight:700;}
+    .ig-hero-line b{color:#F9E27C;}
+    .ig-chart-box{border-radius:20px;padding:16px 20px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);}
+    .ig-chart-title{font-size:18px;font-weight:900;color:#94a3b8;margin-bottom:4px;}
+    .ig-cards{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+    .ig-card{border-radius:20px;padding:20px 26px;background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.08);}
+    .ig-card.a{border-color:rgba(249,226,124,.35);}
+    .ig-card.b{border-color:rgba(56,189,248,.35);}
+    .ig-card-head{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;color:#e2e8f0;}
+    .ig-card-label{font-size:16px;color:#7c8ea6;font-weight:800;margin-top:10px;}
+    .ig-card-big{font-size:46px;font-weight:900;line-height:1.15;margin-bottom:8px;}
+    .ig-card.a .ig-card-big{color:#F9E27C;}
+    .ig-card.b .ig-card-big{color:#bfeaff;}
+    .ig-kv{display:flex;justify-content:space-between;align-items:baseline;font-size:19px;color:#94a3b8;font-weight:700;padding:6px 0;border-top:1px solid rgba(255,255,255,.07);}
+    .ig-kv b{color:#fff;}
+    .ig-kv .ig-up{color:#6ee7b7;margin-left:8px;font-size:17px;}
+    .ig-kv .ig-down{color:#fca5a5;margin-left:8px;font-size:17px;}
+    .ig-kv .ig-neg{color:#fca5a5;}
+    .ig-foot{display:flex;gap:24px;align-items:flex-end;justify-content:space-between;}
+    .ig-disclaimer{flex:1;font-size:13.5px;line-height:1.55;color:#64748b;}
+    #ig-meta{color:#8aa0b8;font-weight:800;margin-bottom:4px;}
+    .ig-contact{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(249,226,124,.28);flex:0 0 auto;}
+    .ig-contact img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(249,226,124,.5);background:#0b1426;}
+    .ig-qr{background:#fff;padding:6px;border-radius:10px;line-height:0;}
+    .ig-contact-text div{font-size:15px;color:#cfe2ff;font-weight:800;}
+    .ig-contact-text b{font-size:24px;color:#F9E27C;}
     .lead-topline{display:flex;align-items:center;justify-content:space-between;gap:10px;}
     .lead-pct{font-size:12px;font-weight:900;padding:5px 10px;border-radius:999px;border:1px solid rgba(56,189,248,.25);background:rgba(56,189,248,.10);color:#bfeaff;white-space:nowrap;position:relative;z-index:2;}
     .lead-pct.positive{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.10);color:#a7f3d0;}
@@ -320,7 +369,7 @@
         </div>
 
         <div class="strat-block original">
-          <div class="block-header"><span style="color:var(--accent-blue)">比較基準 (B)</span></div>
+          <div class="block-header"><span style="color:var(--accent-blue)">原始方案 (B)</span></div>
           <div class="weights-area" id="dynamic-weights-area-bench">
             <label style="margin-bottom:8px;color:var(--accent-blue);">權重設定 (%)（可🔒鎖定）</label>
             <div id="weights-container-bench"></div>
@@ -340,6 +389,7 @@
         </div>
 
         <button class="btn-export-full" id="btn-export" type="button">匯出完整報告</button>
+        <button class="btn-export-full btn-export-ig" id="btn-export-ig" type="button">📱 匯出 IG 直式圖（1080×1350）</button>
       </div>
 
       <!-- ═══════════ 右側輸出區 ═══════════ -->
@@ -389,16 +439,16 @@
             <div class="metric-card">
               <div class="metric-top">
                 <div class="metric-title-group"><span class="dot gold"></span> MOMO｜累積領配息</div>
-                <span class="pct up" id="momo-div-pct">+0.0%</span>
+                <span class="pct neutral" id="momo-div-pct">—</span>
               </div>
               <div class="glow-amount glow-gold" id="momo-acc-div-big">$ 0</div>
               <div class="sub">推估方式：<b>起始本金 × 年配息率 × 時間</b></div>
-              <div class="sub">（不影響主圖，僅作現金流比較）</div>
+              <div class="sub" id="div-tradeoff">（不影響主圖，僅作現金流比較）</div>
             </div>
             <div class="metric-card">
               <div class="metric-top">
                 <div class="metric-title-group"><span class="dot blue"></span> 原始方案｜累積領配息</div>
-                <span class="pct up" id="bench-div-pct">+0.0%</span>
+                <span class="pct neutral" id="bench-div-pct">對照組</span>
               </div>
               <div class="glow-amount glow-blue" id="bench-acc-div-big">$ 0</div>
               <div class="sub">推估方式：<b>起始本金 × 年配息率 × 時間</b></div>
@@ -409,8 +459,9 @@
                 <div class="metric-title-group"><span class="dot purple"></span> 領先／領息差額比</div>
               </div>
               <div class="ratio-num"><span id="lead-div-ratio">—</span> <small>倍</small></div>
+              <div class="sub" id="ratio-caption">每少領 1 元配息，換回的總價值</div>
               <div class="sub">領先價值：<b id="lead-div-ratio-lead">$ 0</b></div>
-              <div class="sub">差額絕對值：<b id="lead-div-ratio-diff">$ 0</b></div>
+              <div class="sub">領息差額：<b id="lead-div-ratio-diff">$ 0</b></div>
             </div>
           </div>
 
@@ -430,7 +481,7 @@
               </div>
               <div class="sel-card">
                 <div class="sel-head">
-                  <div class="left"><span class="dot blue"></span> B 組合（基準）</div>
+                  <div class="left"><span class="dot blue"></span> B 組合（原始方案）</div>
                   <div class="sel-pill blue" id="sel-pill-b">已選 0｜合計 0.0%</div>
                 </div>
                 <div class="sel-list" id="sel-list-b"><div class="sel-empty">尚未選擇基金</div></div>
@@ -442,7 +493,7 @@
             <div class="section-title"><span>🛠 上傳數據驗證區（走勢 %）</span></div>
             <div class="validation-grid">
               <div class="v-chart-box">
-                <div class="v-title" style="border-color:var(--accent-blue)">比較基準走勢</div>
+                <div class="v-title" style="border-color:var(--accent-blue)">原始方案走勢</div>
                 <div class="v-chart-h"><canvas id="valBenchChart"></canvas></div>
               </div>
               <div class="v-chart-box">
@@ -474,7 +525,7 @@
             <div class="section-title"><span>🔗 基金相關係數矩陣（日報酬率，依進場區間）</span></div>
             <div class="corr-tabs" id="corr-tabs">
               <button class="corr-tab active" type="button" data-tab="momo">A 組（MOMO）</button>
-              <button class="corr-tab" type="button" data-tab="bench">B 組（基準）</button>
+              <button class="corr-tab" type="button" data-tab="bench">B 組（原始方案）</button>
               <button class="corr-tab" type="button" data-tab="both">A + B 合併</button>
             </div>
             <div class="corr-canvas-wrap" id="corr-wrap"><canvas id="corrCanvas"></canvas></div>
@@ -483,6 +534,69 @@
               <div class="corr-legend-labels"><span>-1</span><span>0</span><span>+1</span></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 風險揭露：網頁與匯出圖都會顯示 -->
+    <div class="report-disclaimer">
+      <div id="disclaimer-meta">回測資訊：請選擇基金後自動產生</div>
+      <div id="disclaimer-warn">※ 本圖為歷史淨值回測與情境模擬，僅供說明資產配置概念，不構成投資建議，亦非任何報酬之保證。基金過去績效不代表未來表現；基金配息率不代表報酬率，過去配息率不代表未來配息率，配息來源可能為本金。基金淨值會因市場因素上下波動，投資前請詳閱基金公開說明書及投資型保險商品說明書。</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ IG 直式圖（1080×1350，僅匯出時使用，畫面上不可見） ═══════════ -->
+  <div id="ig-capture" aria-hidden="true">
+    <div class="ig-head">
+      <div class="ig-brand">MOMO FINSPHERE｜雙贏策略</div>
+      <div class="ig-title" id="ig-title">同樣的本金，兩種配置</div>
+      <div class="ig-sub" id="ig-subtitle"></div>
+    </div>
+
+    <div class="ig-hero">
+      <div class="ig-hero-label" id="ig-hero-label">MOMO 策略領先</div>
+      <div class="ig-hero-row">
+        <div class="ig-hero-value" id="ig-hero-value">$ 0</div>
+        <div class="ig-ratio" id="ig-ratio"></div>
+      </div>
+      <div class="ig-hero-line" id="ig-hero-line"></div>
+    </div>
+
+    <div class="ig-chart-box">
+      <div class="ig-chart-title">淨值走勢（不含息）</div>
+      <canvas id="ig-chart" width="928" height="340" style="width:928px;height:340px;"></canvas>
+    </div>
+
+    <div class="ig-cards">
+      <div class="ig-card a">
+        <div class="ig-card-head"><span class="dot gold"></span>MOMO 策略（A）</div>
+        <div class="ig-card-label">總含息價值</div>
+        <div class="ig-card-big" id="ig-a-total">$ 0</div>
+        <div class="ig-kv"><span>期末本金</span><b id="ig-a-principal">$ 0</b></div>
+        <div class="ig-kv"><span>累積配息</span><b id="ig-a-div">$ 0</b></div>
+        <div class="ig-kv"><span>最大回撤</span><b id="ig-a-mdd">0.0%</b></div>
+      </div>
+      <div class="ig-card b">
+        <div class="ig-card-head"><span class="dot blue"></span>原始方案（B）</div>
+        <div class="ig-card-label">總含息價值</div>
+        <div class="ig-card-big" id="ig-b-total">$ 0</div>
+        <div class="ig-kv"><span>期末本金</span><b id="ig-b-principal">$ 0</b></div>
+        <div class="ig-kv"><span>累積配息</span><b id="ig-b-div">$ 0</b></div>
+        <div class="ig-kv"><span>最大回撤</span><b id="ig-b-mdd">0.0%</b></div>
+      </div>
+    </div>
+
+    <div class="ig-foot">
+      <div class="ig-disclaimer">
+        <div id="ig-meta"></div>
+        <div id="ig-warn"></div>
+      </div>
+      <div class="ig-contact">
+        <img id="ig-avatar" alt="advisor" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <div class="ig-qr"><div id="ig-qr"></div></div>
+        <div class="ig-contact-text">
+          <div>LINE 加入諮詢</div>
+          <b>@028tuwbk</b>
         </div>
       </div>
     </div>
@@ -741,7 +855,7 @@
         <div class="fund-item fund-head">
           <div style="padding-left:4px;font-weight:900;">基金名稱</div>
           <div class="chk-col" style="color:var(--gold);font-weight:900;">MOMO<br>(A)</div>
-          <div class="chk-col" style="color:var(--accent-blue);font-weight:900;">基準<br>(B)</div>
+          <div class="chk-col" style="color:var(--accent-blue);font-weight:900;">原始<br>(B)</div>
         </div>`];
       for (const name of state.fundNames){
         const color = getBrandColor(name), safe = escapeHtml(name);
@@ -1063,6 +1177,57 @@
       el.classList.toggle('down', pct < 0);
     }
 
+    // ─── 以息換值：把「少領配息」轉成論點，而不是紅字負數 ───
+    const wan = v => `${(Math.abs(v) / 10000).toFixed(1)}萬`;
+    function setBadge(el, text, cls){ el.textContent = text; el.className = `pct ${cls}`; }
+
+    function renderDivTradeoff(momoDiv, benchDiv, lead){
+      const badge = $('momo-div-pct'), line = $('div-tradeoff'), cap = $('ratio-caption');
+      const gap = momoDiv - benchDiv;
+
+      if (!state.momo.length || !state.bench.length){
+        setBadge(badge, '—', 'neutral');
+        line.textContent = '（不影響主圖，僅作現金流比較）';
+        cap.textContent = '每少領 1 元配息，換回的總價值';
+        return;
+      }
+      if (gap < -1){
+        setBadge(badge, `少領 ${wan(gap)}`, 'gold');
+        if (lead > 0){
+          line.innerHTML = `少領 <b>${money(-gap)}</b>，總價值多 <b>${money(lead)}</b>`;
+          cap.textContent = '每少領 1 元配息，換回的總價值';
+        } else {
+          line.innerHTML = `少領 <b>${money(-gap)}</b> 配息`;
+          cap.textContent = '少領的配息尚未換回總價值';
+        }
+      } else if (gap > 1){
+        setBadge(badge, `多領 ${wan(gap)}`, 'up');
+        line.innerHTML = `配息比原始方案多 <b>${money(gap)}</b>`;
+        cap.textContent = 'A 配息較多：領先價值 ÷ 領息差額';
+      } else {
+        setBadge(badge, '配息持平', 'neutral');
+        line.textContent = '兩組合累積配息相近';
+        cap.textContent = '領息差額過小，不計算倍數';
+      }
+    }
+
+    // ─── 風險揭露：回測區間與估算方式（隨設定自動更新）───
+    function updateDisclaimer(s){
+      const el = $('disclaimer-meta');
+      if (!s){ el.textContent = '回測資訊：請選擇基金後自動產生'; return; }
+      const yields = [];
+      if (state.momo.length)  yields.push(`A ${num('momo-div').toFixed(2)}%`);
+      if (state.bench.length) yields.push(`B ${num('bench-div').toFixed(2)}%`);
+      const parts = [
+        `回測區間：${s.labels[0]} ～ ${s.labels[s.histLen - 1]}（${$('entry-window-label').textContent}）`,
+        `初始本金 ${money(s.p0)}`,
+        `累積配息依目前年配息率估算（${yields.join('／')}），非實際配息紀錄`
+      ];
+      if (state.showFuture) parts.push(`虛線為依 CAGR 假設推估之未來 ${$('proj-years').value} 年情境，非預期報酬`);
+      parts.push(`製表日 ${dateKey(new Date())}`);
+      el.textContent = parts.join('｜');
+    }
+
     let lastLeadValue = 0;
     function animateNum(el, from, to, ms = 520){
       if (!el) return;
@@ -1094,7 +1259,9 @@
       ['momo-total','bench-total','momo-principal','bench-principal','momo-acc-div-big','bench-acc-div-big','lead-div-ratio-lead','lead-div-ratio-diff']
         .forEach(id => $(id).textContent = money(0));
       ['momo-mdd','bench-mdd'].forEach(id => $(id).textContent = '-0.0%');
-      ['momo-nav-pct','bench-nav-pct','momo-div-pct','bench-div-pct'].forEach(id => setPctBadge($(id), 0));
+      ['momo-nav-pct','bench-nav-pct'].forEach(id => setPctBadge($(id), 0));
+      renderDivTradeoff(0, 0, 0);
+      updateDisclaimer(null);
       $('lead-div-ratio').textContent = '—';
       setLeadCard(0, 1, 0, 0);
       $('mdd-tbody').innerHTML = '<tr><td colspan="4" style="color:#475569;text-align:center;padding:20px;">請先選擇基金並確認選擇</td></tr>';
@@ -1120,7 +1287,7 @@
 
       const ds = [];
       if (s.momoP) ds.push({ label:'MOMO策略 淨值(不含息)', data:s.momoP, borderColor:'#F9E27C', backgroundColor:grad, borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill: s.benchP ? 1 : false, segment });
-      if (s.benchP) ds.push({ label:'比較基準(B) 淨值(不含息)', data:s.benchP, borderColor:'#38BDF8', backgroundColor:'rgba(56,189,248,0.06)', borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill:false, segment });
+      if (s.benchP) ds.push({ label:'原始方案(B) 淨值(不含息)', data:s.benchP, borderColor:'#38BDF8', backgroundColor:'rgba(56,189,248,0.06)', borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill:false, segment });
       ds.push({ label:'初始水位', data:s.labels.map(() => s.p0), borderColor:'rgba(255,255,255,0.28)', borderWidth:1.5, tension:0, fill:false, borderDash:[3, 6] });
       ch.data.labels = s.labels;
       ch.data.datasets = ds;
@@ -1139,8 +1306,6 @@
       $('momo-acc-div-big').textContent = money(momoDiv);
       $('bench-acc-div-big').textContent = money(benchDiv);
 
-      setPctBadge($('momo-div-pct'), (momoDiv - benchDiv) / Math.max(1, benchDiv) * 100);
-      setPctBadge($('bench-div-pct'), 0);
       setPctBadge($('momo-nav-pct'), s.momoP ? (momoP / s.momoP[0] - 1) * 100 : 0);
       setPctBadge($('bench-nav-pct'), s.benchP ? (benchP / s.benchP[0] - 1) * 100 : 0);
 
@@ -1154,6 +1319,8 @@
       } else { rEl.textContent = '—'; rEl.style.color = ''; }
       $('lead-div-ratio-lead').textContent = money(lead);
       $('lead-div-ratio-diff').textContent = money(diffAbs);
+      renderDivTradeoff(momoDiv, benchDiv, lead);
+      updateDisclaimer(s);
 
       setLeadCard(lead, benchTW, momoP - benchP, momoDiv - benchDiv);
 
@@ -1175,7 +1342,7 @@
         <td><span style="font-weight:900;color:#fff">${money(d.troughVal)}</span><div class="date-sub">${d.troughDate}</div></td>
         <td><span class="mdd-badge">${d.mdd.toFixed(2)}%</span></td>
       </tr>`;
-      const html = row('MOMO 組合', mD) + row('比較基準', bD);
+      const html = row('MOMO 組合', mD) + row('原始方案', bD);
       $('mdd-tbody').innerHTML = html || '<tr><td colspan="4" style="color:#475569;text-align:center;padding:20px;">資料不足，請先選擇基金</td></tr>';
     }
 
@@ -1364,6 +1531,146 @@
     }
 
     // ════════════════════════════════════════════════════════
+    // IG 直式圖匯出（1080×1350）
+    // 只用「歷史回測段」，不含未來推演，避免被解讀為報酬承諾
+    // ════════════════════════════════════════════════════════
+    const signPct = v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
+    const wanLabel = v => {
+      const w = v / 10000;
+      return `${Number.isInteger(w) ? w : w.toFixed(1)} 萬`;
+    };
+
+    function fillIgCard(s){
+      const i = s.histLen - 1;
+      const hist = arr => arr.slice(0, s.histLen);
+      const labels = hist(s.labels);
+      const mP = s.momoP[i], bP = s.benchP[i];
+      const mD = s.momoDiv[i], bD = s.benchDiv[i];
+      const mT = mP + mD, bT = bP + bD;
+      const lead = mT - bT, gap = mD - bD;
+      const mPct = (mP / s.momoP[0] - 1) * 100, bPct = (bP / s.benchP[0] - 1) * 100;
+      const mMdd = calcMddDetail(hist(s.momoP), labels)?.mdd ?? 0;
+      const bMdd = calcMddDetail(hist(s.benchP), labels)?.mdd ?? 0;
+      const entryLabel = $('entry-window-label').textContent;
+
+      $('ig-title').textContent = `同樣 ${wanLabel(s.p0)}，兩種配置`;
+      $('ig-subtitle').textContent = `${entryLabel}歷史回測｜${labels[0]} ～ ${labels[i]}`;
+
+      // 主視覺：領先價值 + 以息換值
+      const heroVal = $('ig-hero-value');
+      heroVal.textContent = money(lead);
+      heroVal.style.color = lead >= 0 ? '#ffffff' : '#fca5a5';
+      $('ig-hero-label').textContent = lead > 0 ? 'MOMO 策略領先' : '領先價值（A − B）';
+
+      let line = '', ratio = '';
+      if (gap < -1 && lead > 0){
+        line = `少領 <b>${money(-gap)}</b> 配息，總價值多 <b>${money(lead)}</b>`;
+        ratio = `以息換值 ${(lead / -gap).toFixed(2)} 倍`;
+      } else if (gap < -1){
+        line = `少領 <b>${money(-gap)}</b> 配息，總價值少 <b>${money(Math.abs(lead))}</b>`;
+      } else if (gap > 1){
+        line = `配息多 <b>${money(gap)}</b>，總價值${lead >= 0 ? '多' : '少'} <b>${money(Math.abs(lead))}</b>`;
+      } else {
+        line = `兩組合累積配息相近，總價值差 <b>${money(Math.abs(lead))}</b>`;
+      }
+      $('ig-hero-line').innerHTML = line;
+      $('ig-ratio').textContent = ratio;
+
+      // A / B 對照卡
+      const pctSpan = v => `<span class="${v >= 0 ? 'ig-up' : 'ig-down'}">${signPct(v)}</span>`;
+      $('ig-a-total').textContent = money(mT);
+      $('ig-b-total').textContent = money(bT);
+      $('ig-a-principal').innerHTML = `${money(mP)}${pctSpan(mPct)}`;
+      $('ig-b-principal').innerHTML = `${money(bP)}${pctSpan(bPct)}`;
+      $('ig-a-div').textContent = money(mD);
+      $('ig-b-div').textContent = money(bD);
+      $('ig-a-mdd').innerHTML = `<span class="ig-neg">${mMdd.toFixed(1)}%</span>`;
+      $('ig-b-mdd').innerHTML = `<span class="ig-neg">${bMdd.toFixed(1)}%</span>`;
+
+      // 風險揭露
+      $('ig-meta').textContent = [
+        `回測區間 ${labels[0]} ～ ${labels[i]}`,
+        `累積配息依目前年配息率估算（A ${num('momo-div').toFixed(2)}%／B ${num('bench-div').toFixed(2)}%），非實際配息紀錄`,
+        `未計入保單相關費用`,
+        `製表日 ${dateKey(new Date())}`
+      ].join('｜');
+      $('ig-warn').textContent = $('disclaimer-warn').textContent;
+    }
+
+    function renderIgChart(s){
+      const h = s.histLen;
+      const labels = s.labels.slice(0, h);
+      const canvas = $('ig-chart');
+      return new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label:'MOMO 策略（A）', data:s.momoP.slice(0, h), borderColor:'#F9E27C', backgroundColor:'rgba(249,226,124,0.14)', borderWidth:4, pointRadius:0, tension:0.1, fill:1 },
+            { label:'原始方案（B）',  data:s.benchP.slice(0, h), borderColor:'#38BDF8', borderWidth:4, pointRadius:0, tension:0.1, fill:false },
+            { label:'初始本金',       data:labels.map(() => s.p0), borderColor:'rgba(255,255,255,0.35)', borderWidth:2, borderDash:[6, 8], pointRadius:0, fill:false }
+          ]
+        },
+        options: {
+          responsive: false, animation: false, devicePixelRatio: 2,
+          layout: { padding: { top: 0, right: 10, bottom: 0, left: 0 } },
+          plugins: {
+            legend: { labels: { color:'#cbd5e1', font:{ size:19, weight:'700', family:'"Noto Sans TC", sans-serif' }, usePointStyle:true, boxWidth:14, boxHeight:14, padding:22 } },
+            tooltip: { enabled: false }
+          },
+          scales: {
+            x: { grid: { display:false },
+                 ticks: { color:'#7c8ea6', font:{ size:17 }, maxTicksLimit:6, maxRotation:0, autoSkip:true,
+                          callback(v){ return String(this.getLabelForValue(v)).slice(0, 7); } } },
+            y: { grid: { color:'rgba(255,255,255,0.07)' },
+                 ticks: { color:'#7c8ea6', font:{ size:17 }, maxTicksLimit:6, callback: v => `${Math.round(v / 10000)}萬` } }
+          }
+        }
+      });
+    }
+
+    async function exportIG(){
+      if (state.exporting) return;
+      const s = buildSeries();
+      if (!s || !s.momoP || !s.benchP){ alert('請先選擇 A、B 兩組基金並按「確認選擇」'); return; }
+
+      const btn = $('btn-export-ig'), oldText = btn.textContent;
+      const box = $('ig-capture');
+      const scrollPos = window.scrollY;
+      let igChart = null;
+      state.exporting = true;
+      btn.disabled = true; btn.textContent = '⏳ 產生 IG 圖中...';
+
+      try {
+        fillIgCard(s);
+        box.classList.add('ready');
+        igChart = renderIgChart(s);
+        if (document.fonts && document.fonts.ready) await document.fonts.ready;
+        await nextFrame();
+        await sleep(120);
+        window.scrollTo(0, 0);
+        const canvas = await html2canvas(box, {
+          backgroundColor: '#0A1221', scale: 1, width: 1080, height: 1350,
+          useCORS: true, allowTaint: false, scrollX: 0, scrollY: 0, windowWidth: 1280,
+          onclone: doc => { const c = doc.getElementById('ig-capture'); if (c) c.style.opacity = '1'; }
+        });
+        const a = document.createElement('a');
+        a.download = `MOMO_IG_${dateKey(new Date())}.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      } catch (err) {
+        console.error(err);
+        alert('IG 圖產生失敗，請重新整理後再試。');
+      } finally {
+        try { igChart && igChart.destroy(); } catch(_) {}
+        box.classList.remove('ready');
+        window.scrollTo(0, scrollPos);
+        state.exporting = false;
+        btn.disabled = false; btn.textContent = oldText;
+      }
+    }
+
+    // ════════════════════════════════════════════════════════
     // 匯出（✅ 修正：截圖後畫面可正常還原）
     // ════════════════════════════════════════════════════════
     function resizeAllCharts(){
@@ -1427,6 +1734,7 @@
       $('btn-load').addEventListener('click', fetchAllData);
       $('btn-apply').addEventListener('click', applySelection);
       $('btn-export').addEventListener('click', exportImg);
+      $('btn-export-ig').addEventListener('click', exportIG);
       $('fund-filter').addEventListener('input', applyFundFilter);
       $('toggle-only-selected').addEventListener('change', applyFundFilter);
 
@@ -1474,6 +1782,12 @@
       img.onerror = () => { img.onerror = null; img.src = FALLBACK_AVATAR; };
       img.src = ADVISOR_AVATAR_URL;
       new QRCode($('qrcode-target'), { text: LINE_QR_URL, width: 44, height: 44 });
+
+      // IG 直式圖用的頭像與 QR Code
+      const igImg = $('ig-avatar');
+      igImg.onerror = () => { igImg.onerror = null; igImg.src = FALLBACK_AVATAR; };
+      igImg.src = ADVISOR_AVATAR_URL;
+      new QRCode($('ig-qr'), { text: LINE_QR_URL, width: 92, height: 92 });
       bindEvents();
       initMainChart();
       resetOutputs();
