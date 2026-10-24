@@ -83,7 +83,7 @@
     .tab { flex: 1; max-width: 260px; padding: 10px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); font: 700 15px var(--sans); cursor: pointer; }
     .tab.on { background: var(--gold); border-color: var(--gold); color: #0a1221; }
     .frames { position: relative; }
-    .frames iframe { display: block; width: 100%; border: 0; border-radius: 16px; background: #000; min-height: 600px; }
+    .frames iframe { display: block; width: 100%; border: 0; border-radius: 16px; background: transparent; min-height: 600px; }
     .frames iframe.off { position: absolute; left: -10000px; top: 0; visibility: hidden; }
     .note { color: var(--muted); font-size: 13px; margin: 14px 0 0; }
 
@@ -167,7 +167,7 @@
       var d = doc(f); if (!d || d.getElementById('cycle-embed-css')) return;
       var st = d.createElement('style'); st.id = 'cycle-embed-css';
       // min-height:100vh 在 iframe 內會讓高度一直長大，嵌入時取消
-      st.textContent = '.btn-back{display:none!important}html,body{min-height:0!important;height:auto!important}body{padding-bottom:16px!important}';
+      st.textContent = '.btn-back{display:none!important}html,body{min-height:0!important;height:auto!important}body{padding:0 0 4px!important;background:transparent!important}.momo-compass-card{width:100%!important}';
       d.head.appendChild(st);
       d.querySelectorAll('a[href]').forEach(function (a) { a.target = '_top'; });
     }

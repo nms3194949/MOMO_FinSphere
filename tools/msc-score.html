@@ -428,39 +428,39 @@
   function getFactorSummary(key, score) {
     if (score == null) return '';
     if (key === 'credit') {
-      if (score >= 14) return '<strong>利差收斂：</strong>風險偏好佳，有利股/高收債。';
-      if (score <= 8)  return '<strong>利差擴大：</strong>避險情緒升溫，減碼信用債。';
-      return '<strong>中性觀察：</strong>利差持平，維持現有部位。';
+      if (score >= 14) return '<strong>利差收斂：</strong>風險偏好佳，信用市場相對穩定。';
+      if (score <= 8)  return '<strong>利差擴大：</strong>避險情緒升溫，信用風險上升。';
+      return '<strong>中性觀察：</strong>利差持平，信用環境變化不大。';
     }
     if (key === 'rates') {
-      if (score <= 6)  return '<strong>曲線倒掛：</strong>警示衰退風險，關注公債/防禦。';
-      if (score >= 14) return '<strong>環境寬鬆：</strong>利率壓力減輕，有利科技成長。';
-      return '<strong>利率盤整：</strong>等待央行訊號，平衡配置。';
+      if (score <= 6)  return '<strong>曲線倒掛：</strong>歷史上常被視為衰退的提前訊號。';
+      if (score >= 14) return '<strong>環境寬鬆：</strong>利率壓力減輕，評價面壓力下降。';
+      return '<strong>利率盤整：</strong>方向未明，市場等待央行訊號。';
     }
     if (key === 'macro') {
-      if (score >= 12) return '<strong>經濟擴張：</strong>數據穩健，核心持股續抱。';
-      if (score <= 8)  return '<strong>數據疲軟：</strong>動能減弱，適度提高現金/債券。';
+      if (score >= 12) return '<strong>經濟擴張：</strong>經濟數據穩健。';
+      if (score <= 8)  return '<strong>數據疲軟：</strong>經濟動能減弱。';
       return '<strong>景氣溫和：</strong>軟著陸預期，方向尚不明確。';
     }
     if (key === 'equity') {
       if (score >= 14) return '<strong>多頭排列：</strong>動能強勁，需留意估值偏高的風險。';
-      if (score <= 6)  return '<strong>動能轉弱：</strong>跌破支撐，嚴設停損或避險。';
-      return '<strong>高檔震盪：</strong>指數乖離，等待拉回買點。';
+      if (score <= 6)  return '<strong>動能轉弱：</strong>股市動能轉弱，波動可能放大。';
+      return '<strong>高檔震盪：</strong>指數乖離偏大，震盪機率提高。';
     }
     if (key === 'eps') {
-      if (score >= 12) return '<strong>獲利成長：</strong>基本面支撐，逢回買進績優股。';
-      if (score <= 8)  return '<strong>獲利衰退：</strong>基本面逆風，保守觀望。';
-      return '<strong>財報持平：</strong>個股表現分歧，選股不選市。';
+      if (score >= 12) return '<strong>獲利成長：</strong>企業獲利成長，基本面有支撐。';
+      if (score <= 8)  return '<strong>獲利衰退：</strong>企業獲利下滑，基本面逆風。';
+      return '<strong>財報持平：</strong>企業獲利持平，個別表現分歧。';
     }
     if (key === 'sentiment') {
-      if (score >= 15) return '<strong>市場平穩：</strong>恐慌指數低，適合波段操作。';
-      if (score <= 6)  return '<strong>極度恐慌：</strong>波動加劇，留意超跌反彈機會。';
-      return '<strong>情緒中性：</strong>市場觀望，減少槓桿操作。';
+      if (score >= 15) return '<strong>市場平穩：</strong>恐慌指數低，市場情緒平穩。';
+      if (score <= 6)  return '<strong>極度恐慌：</strong>恐慌指數偏高，波動加劇。';
+      return '<strong>情緒中性：</strong>市場情緒中性，觀望氣氛較濃。';
     }
     if (key === 'liquidity') {
-      if (score >= 12) return '<strong>資金寬鬆：</strong>有利加密貨幣與風險資產。';
-      if (score <= 8)  return '<strong>資金緊縮：</strong>資產價格承壓，現金為王。';
-      return '<strong>流動性持平：</strong>資金中性，關注實質基本面。';
+      if (score >= 12) return '<strong>資金寬鬆：</strong>市場資金充沛，風險偏好較高。';
+      if (score <= 8)  return '<strong>資金緊縮：</strong>資金收緊，資產價格承壓。';
+      return '<strong>流動性持平：</strong>資金面中性。';
     }
     return '';
   }

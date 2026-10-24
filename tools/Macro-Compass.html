@@ -6,168 +6,95 @@
   <title>景氣羅盤（長週期）｜MOMO財商智庫</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* ========= 1. 核心樣式 ========= */
+    /* ========= 景氣羅盤：與 MCS／景氣循環頁同一套配色（深藍＋香檳金） ========= */
     :root {
-      --momo-bg: #0A1221;
-      --momo-gold: #FFD700;
-      --momo-gold-soft: #F6E6B0;
-      --momo-green: #2D7A77;
-      --momo-red: #E74C3C;
-      --momo-purple: #9B59B6;
-      --momo-text-main: #F7F7F7;
-      --momo-text-sub: #B0B8D0;
-      --ambient-color: rgba(62, 82, 117, 0.8);
+      --bg: #0a1221; --card: #0c152a; --card-2: #111b30;
+      --line: rgba(233,209,138,.18); --line-2: rgba(233,209,138,.10);
+      --gold: #d2c696; --gold-2: #e9d18a; --ink: #edeff5; --ink-2: #aab2bf; --muted: #7a8296;
+      --spring: #5fb3a1; --summer: #e9d18a; --autumn: #e8a07a; --winter: #8fa8d6;
+      /* 舊變數名稱保留給程式使用 */
+      --momo-gold: var(--gold); --momo-gold-soft: var(--gold-2); --momo-text-sub: var(--ink-2);
     }
-
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-      color: var(--momo-text-main);
-      overflow-x: hidden;
+      margin: 0; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center;
+      background: var(--bg); color: var(--ink); padding: 16px 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      overflow-x: hidden; -webkit-font-smoothing: antialiased;
     }
+    .ambient-bg { display: none; }
 
-    .ambient-bg {
-      position: fixed; inset: -20%; z-index: -1;
-      background: radial-gradient(circle at 50% 50%, var(--ambient-color) 0%, #000000 70%);
-      transition: background 1.2s ease; opacity: 0.9; filter: blur(40px);
-    }
-
-    .momo-compass-card {
-      width: min(1120px, 100vw - 24px);
-      background: rgba(15, 20, 35, 0.65);
-      backdrop-filter: blur(12px);
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .momo-compass-inner {
-      position: relative; z-index: 2;
-      display: grid; grid-template-columns: minmax(0, 1.2fr) 340px;
-      gap: 30px; align-items: start;
-    }
-
+    .momo-compass-card { width: min(1100px, 100%); background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+    .momo-compass-inner { display: grid; grid-template-columns: minmax(0, 1.2fr) 320px; gap: 24px; align-items: start; }
     @media (max-width: 900px) {
       .momo-compass-inner { grid-template-columns: 1fr; }
-      .compass-panel { order: -1; margin-bottom: 20px; }
+      .compass-panel { order: -1; margin-bottom: 18px; }
     }
 
     /* Header */
-    .header-group {
-      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
-      margin-bottom: 20px; gap: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 20px;
-    }
-    .brand-title { font-size: 15px; font-weight: 700; color: var(--momo-gold-soft); letter-spacing: 1px; }
-    .logo { width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 30% 0, #fff7d0, #FFD700); display: grid; place-items: center; color: #000; font-weight: 900; box-shadow: 0 0 15px var(--momo-gold); }
-    .logo-wrap { margin-right: 10px; }
-    .text-caption { font-size: 11px; color: #aaa; }
+    .header-group { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--line-2); }
+    .brand-title { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: .04em; }
+    .text-caption { font-size: 12px; color: var(--muted); }
+    .time-machine-wrapper { flex: 1; min-width: 260px; max-width: 480px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--card-2); border: 1px solid var(--line-2); border-radius: 999px; }
+    .time-machine-wrapper > div:first-child { color: var(--gold) !important; font-size: 12px; }
+    .tm-slider { flex: 1; cursor: pointer; accent-color: var(--gold); }
+    .tm-year { font-size: 14px; font-weight: 800; color: var(--ink); min-width: 64px; font-variant-numeric: tabular-nums; }
+    .btn-play { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--gold); background: transparent; color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: background .2s; }
+    .btn-play:hover { background: rgba(210,198,150,.12); }
 
-    .time-machine-wrapper {
-      flex: 1; min-width: 280px; max-width: 500px;
-      background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 12px;
-    }
-    .tm-slider { flex: 1; cursor: pointer; accent-color: var(--momo-gold); }
-    .tm-year { font-family: monospace; font-size: 14px; color: #fff; font-weight: bold; min-width: 60px; }
-    .btn-play {
-      background: transparent; border: 1px solid var(--momo-gold); color: var(--momo-gold);
-      border-radius: 50%; width: 28px; height: 28px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; margin-left: 8px; transition: all 0.2s; font-size: 12px;
-    }
-    .btn-play:hover { background: rgba(255, 215, 0, 0.1); }
-
-    /* Metrics Col */
+    /* 左欄 */
     .metrics-col { display: flex; flex-direction: column; gap: 12px; }
+    .strategy-card { background: var(--card-2); border: 1px solid var(--line-2); border-radius: 14px; padding: 16px 18px; }
+    .strategy-title { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--gold); margin-bottom: 6px; }
+    .strategy-text { font-size: 15px; line-height: 1.7; color: var(--ink); margin-bottom: 10px; }
+    .strategy-text span { color: var(--gold-2) !important; font-weight: 700; }
+    .sector-rotation-block { margin-top: 12px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .sector-label { font-size: 12px; color: var(--ink-2); margin-right: 2px; }
+    .sector-tag, .sector-tag.active { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: rgba(210,198,150,.12); border: 1px solid rgba(210,198,150,.25); color: var(--gold-2); box-shadow: none; }
+    .alloc-container { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-2); }
+    .allocation-bar-wrapper { display: flex; height: 8px; border-radius: 999px; overflow: hidden; margin-top: 8px; background: rgba(255,255,255,.06); }
+    .alloc-segment { height: 100%; transition: width .5s ease; }
+    #segStock { background: var(--gold) !important; }
+    #segBond { background: var(--spring) !important; }
+    #segCash { background: #4a5670 !important; }
+    .alloc-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+    .alloc-val { color: var(--ink); font-weight: 700; margin-left: 2px; font-variant-numeric: tabular-nums; }
 
-    .strategy-card {
-      background: linear-gradient(135deg, rgba(30, 40, 70, 0.4), rgba(10, 15, 30, 0.6));
-      border: 1px solid rgba(255,255,255,0.1); border-left: 3px solid var(--momo-gold);
-      border-radius: 12px; padding: 16px;
-    }
-    .strategy-title { font-size: 13px; color: var(--momo-gold); font-weight: bold; margin-bottom: 8px; letter-spacing: 1px; }
-    .strategy-text { font-size: 15px; color: #fff; line-height: 1.6; margin-bottom: 12px; font-weight: 500; }
+    .metric-card { background: var(--card-2); border: 1px solid var(--line-2); border-radius: 14px; padding: 12px 16px; }
+    .metric-card--compact { padding: 10px 16px; }
+    .metric-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+    .metric-name { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+    .metric-val { font-size: 13px; font-weight: 700; color: var(--gold-2) !important; font-variant-numeric: tabular-nums; }
+    .chart-box { height: 60px; width: 100%; position: relative; margin-top: 4px; }
+    #barRisk { background-color: var(--gold) !important; }
 
-    .sector-rotation-block { margin-top: 15px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .sector-label { font-size: 12px; font-weight: bold; color: #ddd; margin-right: 4px; }
-    .sector-tag {
-      font-size: 12px; padding: 5px 12px; border-radius: 20px;
-      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-      color: var(--momo-gold-soft); transition: all 0.3s;
-    }
-    .sector-tag.active { background: rgba(255, 215, 0, 0.25); border-color: var(--momo-gold); color: #fff; box-shadow: 0 0 12px rgba(255, 215, 0, 0.3); }
-
-    .alloc-container { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-    .allocation-bar-wrapper { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-    .alloc-segment { height: 100%; transition: width 0.5s ease; }
-    .alloc-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--momo-text-sub); margin-top: 6px; }
-    .alloc-val { color: #fff; font-weight: bold; margin-left: 2px; }
-
-    .metric-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; }
-    .metric-card--compact { padding: 10px 14px; }
-    .metric-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .metric-name { font-size: 13px; font-weight: 600; color: #ccc; }
-    .metric-val { font-size: 13px; color: var(--momo-gold-soft); font-family: monospace; font-weight: bold; }
-    .chart-box { height: 60px; width: 100%; position: relative; margin-top: 5px; }
-
-    /* Compass Panel */
+    /* 右欄：羅盤 */
     .compass-panel { display: flex; flex-direction: column; gap: 10px; position: relative; }
-    .compass-container {
-      width: 300px; height: 300px; position: relative; border-radius: 50%; align-self: center;
-      box-shadow: 0 0 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1); background: rgba(8, 12, 21, 0.9);
-    }
-    .season-ring {
-      position: absolute; inset: 0; border-radius: 50%;
-      background: conic-gradient(from 0deg, #2d7a77 0deg 90deg, #c9a227 90deg 180deg, #d9534f 180deg 270deg, #3e5275 270deg 360deg);
-      opacity: 0.25; mask: radial-gradient(transparent 58%, #000 59%);
-    }
-    .season-label {
-      position: absolute; font-size: 11px; font-weight: bold; color: var(--momo-text-sub);
-      transform: translate(-50%, -50%); text-align: center; line-height: 1.3;
-    }
-    .lbl-spring { top: 12%; right: 12%; color: #57c3aa; }
-    .lbl-summer { bottom: 12%; right: 12%; color: #f6e6b0; }
-    .lbl-autumn { bottom: 12%; left: 12%; color: #ff9966; }
-    .lbl-winter { top: 12%; left: 12%; color: #8fa0c0; }
+    .compass-container { width: 290px; height: 290px; position: relative; border-radius: 50%; align-self: center; background: var(--card-2); box-shadow: 0 0 0 1px var(--line-2); }
+    .season-ring { position: absolute; inset: 0; border-radius: 50%; opacity: .35;
+      background: conic-gradient(from 0deg, var(--spring) 0deg 90deg, var(--summer) 90deg 180deg, var(--autumn) 180deg 270deg, var(--winter) 270deg 360deg);
+      mask: radial-gradient(transparent 60%, #000 61%); -webkit-mask: radial-gradient(transparent 60%, #000 61%); }
+    .season-label { position: absolute; font-size: 11px; font-weight: 700; transform: translate(-50%, -50%); text-align: center; line-height: 1.35; }
+    .lbl-spring { top: 12%; right: 12%; color: var(--spring); }
+    .lbl-summer { bottom: 12%; right: 12%; color: var(--summer); }
+    .lbl-autumn { bottom: 12%; left: 12%; color: var(--autumn); }
+    .lbl-winter { top: 12%; left: 12%; color: var(--winter); }
+    .compass-hand-container { position: absolute; inset: 0; transition: transform .2s linear; pointer-events: none; z-index: 10; }
+    .compass-hand-line { position: absolute; top: 12%; left: 50%; width: 2px; height: 38%; transform-origin: 50% 100%; background: linear-gradient(to bottom, var(--gold-2), transparent); }
+    .compass-core { position: absolute; inset: 28%; border-radius: 50%; background: var(--card); box-shadow: 0 0 0 1px var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
+    .compass-core .text-caption { color: var(--gold) !important; }
+    .core-score { font-size: 44px; font-weight: 800; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
+    .core-status { margin-top: 6px; font-size: 13px; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.06); font-weight: 700; }
+    .ecm-gauge-container { position: absolute; bottom: -26px; width: 100%; text-align: center; z-index: 5; }
+    .ecm-bar-bg { width: 180px; height: 6px; background: rgba(255,255,255,.08); margin: 0 auto; border-radius: 999px; overflow: hidden; position: relative; }
+    .ecm-bar-fill { height: 100%; background: linear-gradient(90deg, var(--spring), var(--gold)); transition: width .3s; position: absolute; left: 0; }
+    .ecm-label { font-size: 11px; color: var(--ink-2); margin-top: 5px; }
 
-    .compass-hand-container { position: absolute; inset: 0; transition: transform 0.2s linear; pointer-events: none; z-index: 10; }
-    .compass-hand-line {
-      position: absolute; top: 12%; left: 50%; width: 2px; height: 38%; transform-origin: 50% 100%;
-      background: linear-gradient(to bottom, #fff, transparent); opacity: 0.9; box-shadow: 0 0 8px rgba(255,255,255,0.5);
-    }
-
-    .compass-core {
-      position: absolute; inset: 28%; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #1a233a, #05080f);
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 10px 20px rgba(0,0,0,0.8);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20;
-    }
-    .core-score { font-size: 46px; font-weight: 700; color: #fff; line-height: 1; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
-    .core-status { margin-top: 6px; font-size: 14px; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.1); color: var(--momo-gold-soft); font-weight: bold; }
-
-    .ecm-gauge-container { position: absolute; bottom: -24px; width: 100%; text-align: center; z-index: 5; }
-    .ecm-bar-bg { width: 180px; height: 6px; background: #222; margin: 0 auto; border-radius: 4px; overflow: hidden; position: relative; }
-    .ecm-bar-fill { height: 100%; background: linear-gradient(90deg, #2D7A77, #C9A227); transition: width 0.3s; position: absolute; left: 0; }
-    .ecm-label { font-size: 11px; color: var(--momo-text-sub); margin-top: 5px; }
-
-    .history-card {
-      background: rgba(20, 26, 45, 0.9); border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);
-      padding: 12px 16px; margin-top: 35px; font-size: 12px; line-height: 1.6;
-    }
-    .history-title { font-size: 13px; font-weight: 600; color: var(--momo-gold-soft); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-    .history-tag { font-size: 11px; color: var(--momo-text-sub); }
-    .history-highlight { color: #F6E6B0; font-weight: 600; }
-    .history-empty { color: var(--momo-text-sub); font-style: italic; }
-
+    .history-card { margin-top: 38px; background: var(--card-2); border: 1px solid var(--line-2); border-radius: 14px; padding: 12px 16px; font-size: 13px; line-height: 1.7; }
+    .history-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 13px; font-weight: 700; color: var(--gold-2); }
+    .history-tag { font-size: 12px; color: var(--muted); }
+    .history-highlight { color: var(--gold-2); font-weight: 700; }
+    .history-empty { color: var(--ink-2); }
   </style>
   <!-- MOMO財商智庫：網站圖示、GA4、統一頁尾與免責聲明 -->
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -223,7 +150,7 @@
       <div class="metric-card">
         <div class="metric-head">
           <span class="metric-name">納茲達克指數 (Nasdaq 40年走勢 - 對數)</span>
-          <span class="metric-val" id="valNasdaq" style="color:#9B59B6;">--</span>
+          <span class="metric-val" id="valNasdaq">--</span>
         </div>
         <div class="chart-box" id="chartNasdaq"></div>
       </div>
@@ -294,10 +221,10 @@
 <script>
   /* ========= 設定物件 ========= */
   const SEASONS = [
-    { key: "spring", name: "春｜復甦期", range: [0, 90], sectors: ["金融股", "非必需消費", "房地產"], ambientBg: "rgba(45, 122, 119, 0.9)", accent: "#2D7A77" },
-    { key: "summer", name: "夏｜過熱期", range: [90, 180], sectors: ["科技股", "工業", "原物料"], ambientBg: "rgba(255, 215, 0, 0.7)", accent: "#FFD700" },
-    { key: "autumn", name: "秋｜滯脹期", range: [180, 270], sectors: ["能源", "醫療健保", "必需消費"], ambientBg: "rgba(231, 76, 60, 0.8)", accent: "#E74C3C" },
-    { key: "winter", name: "冬｜衰退期", range: [270, 360], sectors: ["公用事業", "電信", "長天期公債"], ambientBg: "rgba(93, 173, 226, 0.8)", accent: "#5DADE2" }
+    { key: "spring", name: "春｜復甦期", range: [0, 90], sectors: ["金融股", "非必需消費", "房地產"], ambientBg: "rgba(45, 122, 119, 0.9)", accent: "#5fb3a1" },
+    { key: "summer", name: "夏｜過熱期", range: [90, 180], sectors: ["科技股", "工業", "原物料"], ambientBg: "rgba(255, 215, 0, 0.7)", accent: "#e9d18a" },
+    { key: "autumn", name: "秋｜滯脹期", range: [180, 270], sectors: ["能源", "醫療健保", "必需消費"], ambientBg: "rgba(231, 76, 60, 0.8)", accent: "#e8a07a" },
+    { key: "winter", name: "冬｜衰退期", range: [270, 360], sectors: ["公用事業", "電信", "長天期公債"], ambientBg: "rgba(93, 173, 226, 0.8)", accent: "#8fa8d6" }
   ];
 
  // ★ 全歷史事件庫 (2000-2024)
@@ -442,14 +369,14 @@
       `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;">` +
       `<defs>
           <linearGradient id="${gid}" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style="stop-color:${color1}; stop-opacity:0.8" />
-            <stop offset="100%" style="stop-color:${color2}; stop-opacity:0.1" />
+            <stop offset="0%" style="stop-color:${color1}; stop-opacity:0.35" />
+            <stop offset="100%" style="stop-color:${color2}; stop-opacity:0.02" />
           </linearGradient>
         </defs>
         <path d="${areaD}" fill="url(#${gid})" style="stroke:none;" />
         <path d="${pathD}" stroke="${color1}" fill="none" stroke-width="2" />` +
       (curX !== null && curY !== null && currentY >= startY && currentY <= endY
-        ? `<circle cx="${curX}" cy="${curY}" r="4" fill="#fff" stroke="${color1}" stroke-width="2" />`
+        ? `<circle cx="${curX}" cy="${curY}" r="4" fill="#0c152a" stroke="${color1}" stroke-width="2" />`
         : "") +
       `<text x="5" y="${h - 5}" fill="#666" font-size="9">${startY}</text>
         <text x="${w - 30}" y="${h - 5}" fill="#666" font-size="9">${endY}</text>
@@ -565,7 +492,7 @@
 
     const barRisk = document.getElementById("barRisk");
     barRisk.style.width = riskScore + "%";
-    barRisk.style.backgroundColor = riskScore > 60 ? "#E74C3C" : "#2D7A77";
+    barRisk.style.backgroundColor = riskScore > 60 ? "#e8a07a" : "#d2c696";
     document.getElementById("valRisk").textContent = riskScore + "/100";
     
     const ecmPct = (ecmVal + 1) * 50;
@@ -574,7 +501,7 @@
     // Charting (範圍統一 2000-2040)
     const currentNasdaq = drawCustomChart("chartNasdaq", {
       startY: 2000, endY: 2040, currentY: year,
-      color1: "#9B59B6", color2: "#8E44AD",
+      color1: "#8fa8d6", color2: "#5d74a3",
       dataFn: getNasdaqSimulation,
       useLogScale: true 
     });
@@ -582,12 +509,12 @@
 
     drawWaveChart("chartKon", {
       startY: 2000, endY: 2040, period: 60, currentY: year,
-      color1: "#FFD700", color2: "#F6E6B0", phase: 0
+      color1: "#d2c696", color2: "#a88a3d", phase: 0
     });
 
     drawWaveChart("chartEcm", {
       startY: 2000, endY: 2040, period: 10, currentY: year,
-      color1: "#2D7A77", color2: "#57c3aa", phase: 0
+      color1: "#5fb3a1", color2: "#2d7a77", phase: 0
     });
 
     updateHistoryBlock(year);
