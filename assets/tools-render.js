@@ -1,73 +1,55 @@
 // assets/tools-render.js
+// 讀 assets/tools-config.js，產生工具卡片
+// 首頁：MOMO_TOOLS.initHomeSection()（#home-tools-grid，showOnHome 前 6 個）
+// 總覽頁：MOMO_TOOLS.initToolsPage()（#tools-grid，含分類篩選 [data-tools-filter]）
 (function () {
-  const CONFIG = (window.MOMO_TOOLS_CONFIG || []).slice();
+  var CONFIG = (window.MOMO_TOOLS_CONFIG || []).slice();
 
-  function createCard(t) {
-    const card = document.createElement("article");
-    card.className = "tool-card";
-    card.innerHTML = `
-      <div class="tool-pill-row">
-        <span class="tool-pill">${mapCategory(t.category)}</span>
-      </div>
-      <h3 class="tool-title">${t.title}</h3>
-      <p class="tool-desc">${t.desc || ""}</p>
-      <div class="tool-footer">
-        <a class="btn btn-gold" href="${t.href}"
-           ${t.external ? 'target="_blank" rel="noopener noreferrer"' : ""}>
-          開啟工具
-        </a>
-      </div>
-    `;
-    return card;
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
   }
 
-  function mapCategory(cat) {
-    switch (cat) {
-      case "crypto": return "加密策略";
-      case "fund": return "基金工具";
-      case "warrant": return "權證工具";
-      default: return "工具";
-    }
+  function card(t) {
+    var a = document.createElement('a');
+    a.className = 'tool-card';
+    a.href = t.href;
+    a.innerHTML =
+      '<span class="tool-pill">' + esc(t.label || '工具') + '</span>' +
+      '<h3 class="tool-title">' + esc(t.title) + '</h3>' +
+      '<p class="tool-desc">' + esc(t.desc) + '</p>' +
+      '<span class="tool-go">開啟工具 →</span>';
+    return a;
   }
 
-  // 首頁「智能工具」區塊：只取 showOnHome = true 的前 3 個
   function initHomeSection() {
-    const box = document.getElementById("home-tools-grid");
+    var box = document.getElementById('home-tools-grid');
     if (!box) return;
-
-    box.innerHTML = "";
-    CONFIG.filter(t => t.showOnHome)
-          .slice(0, 3)
-          .forEach(t => box.appendChild(createCard(t)));
+    box.innerHTML = '';
+    CONFIG.filter(function (t) { return t.showOnHome; }).slice(0, 6)
+      .forEach(function (t) { box.appendChild(card(t)); });
   }
 
-  // 工具總覽頁：支援分類 tab
   function initToolsPage() {
-    const grid = document.getElementById("tools-grid");
+    var grid = document.getElementById('tools-grid');
     if (!grid) return;
-
-    const tabs = document.querySelectorAll("[data-tools-filter]");
+    var tabs = document.querySelectorAll('[data-tools-filter]');
     function render(filter) {
-      grid.innerHTML = "";
-      CONFIG.filter(t => filter === "all" || t.category === filter)
-            .forEach(t => grid.appendChild(createCard(t)));
+      grid.innerHTML = '';
+      CONFIG.filter(function (t) { return filter === 'all' || t.category === filter; })
+        .forEach(function (t) { grid.appendChild(card(t)); });
     }
-
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(x => x.classList.remove("is-active"));
-        tab.classList.add("is-active");
-        render(tab.dataset.toolsFilter || "all");
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (x) { x.classList.remove('is-active'); x.setAttribute('aria-selected', 'false'); });
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+        render(tab.getAttribute('data-tools-filter') || 'all');
       });
     });
-
-    // 預設顯示「全部」
-    render("all");
+    render('all');
   }
 
-  // 暴露給外面呼叫
-  window.MOMO_TOOLS = {
-    initHomeSection,
-    initToolsPage
-  };
+  window.MOMO_TOOLS = { initHomeSection: initHomeSection, initToolsPage: initToolsPage };
 })();
