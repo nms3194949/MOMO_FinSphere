@@ -1,5 +1,5 @@
 /*!
- * MOMO雙贏策略｜自用工具密碼頁 assets/momo-gate.js
+ * MOMO財商智庫｜自用工具密碼頁 assets/momo-gate.js
  * 放在自用頁面 <head> 的最前面（不要加 defer / async）：
  *   <script src="/MOMO_FinSphere/assets/momo-gate.js"></script>
  *
@@ -68,7 +68,7 @@
     g.innerHTML =
       '<form class="g-box" autocomplete="on">' +
         '<img src="/icon-192.png" alt="">' +
-        '<h1>MOMO 自用工具</h1>' +
+        '<h1>MOMO專用工具</h1>' +
         '<p>請輸入密碼（這台裝置會記住 ' + DAYS + ' 天）</p>' +
         '<input type="password" name="password" autocomplete="current-password" placeholder="密碼" required autofocus>' +
         '<button type="submit">進入</button>' +

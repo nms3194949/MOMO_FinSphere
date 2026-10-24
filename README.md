@@ -1,6 +1,6 @@
-# MOMO雙贏策略｜工具區（MOMO_FinSphere）
+# MOMO財商智庫（MOMO_FinSphere）
 
-MOMO雙贏策略的互動工具網站：配息現金流試算、景氣儀表板、季節性分析、基金與 ETF 數據工具。
+MOMO雙贏策略旗下的工具與數據網站：配息現金流試算、景氣儀表板、季節性分析、基金與 ETF 數據工具。
 
 - 工具首頁：https://nms3194949.github.io/MOMO_FinSphere/
 - 配置筆記（文章）：https://nms3194949.github.io/momo-blog/
@@ -19,7 +19,7 @@ MOMO雙贏策略的互動工具網站：配息現金流試算、景氣儀表板�
 | `assets/tools-config.js` | 工具清單（首頁與總覽頁共用），新增工具改這裡 |
 | `assets/tools-render.js` | 工具卡片產生器 |
 | `assets/momo-gate.js` | 自用工具密碼頁（放在自用頁 `<head>` 最前面） |
-| `me/index.html` | 自用工具首頁（有密碼，可加到手機主畫面） |
+| `me/index.html` | 專用工具首頁（有密碼，可加到手機主畫面） |
 | `tools/cycle.html` | 景氣循環儀表板：整合 MCS（短週期）與景氣羅盤（長週期） |
 
 ## 自用工具

@@ -1,5 +1,5 @@
 /*!
- * MOMO雙贏策略｜舊官網共用腳本 assets/momo-site.js
+ * MOMO財商智庫｜舊官網共用腳本 assets/momo-site.js
  * 1. 載入 GA4（和部落格同一個評估 ID，三個網站數據在同一個報表）
  * 2. 追蹤 LINE / IG / Threads 點擊（line_click、instagram_click、threads_click，含 link_location）
  * 3. 在每頁底部加上統一頁尾：部落格、工具、LINE、IG、Threads 連結＋免責聲明
@@ -99,7 +99,7 @@
     f.setAttribute('role', 'contentinfo');
     f.innerHTML =
       '<div class="mf-in">' +
-        '<a class="mf-brand" href="' + HOME + '"><img src="/icon-96.png" alt="" width="28" height="28">MOMO雙贏策略</a>' +
+        '<a class="mf-brand" href="' + HOME + '"><img src="/icon-96.png" alt="" width="28" height="28">MOMO財商智庫</a>' +
         '<div class="mf-links">' +
           '<a href="' + BLOG + '">配置筆記（文章）</a>' +
           '<a href="' + TOOLS + '">所有工具</a>' +
@@ -108,7 +108,7 @@
           '<a href="' + utm(THREADS, 'footer') + '" target="_blank" rel="noopener">Threads</a>' +
         '</div>' +
         '<p class="mf-disc">' + DISCLAIMER + '</p>' +
-        '<p class="mf-copy">© ' + new Date().getFullYear() + ' MOMO雙贏策略｜保單基金規劃・資產配置教育</p>' +
+        '<p class="mf-copy">© ' + new Date().getFullYear() + ' MOMO財商智庫｜MOMO財商智庫旗下的工具與數據網站</p>' +
       '</div>';
     document.body.appendChild(f);
   }
@@ -137,12 +137,12 @@
     bar.innerHTML =
       '<div class="mt-in">' +
         (PRIVATE
-          ? '<a class="mt-brand" href="' + ME + '" aria-label="MOMO 自用工具首頁"><img src="/icon-96.png" alt="" width="30" height="30">MOMO 自用工具</a>' +
+          ? '<a class="mt-brand" href="' + ME + '" aria-label="MOMO專用工具首頁"><img src="/icon-96.png" alt="" width="30" height="30">MOMO專用工具</a>' +
             '<nav class="mt-nav" aria-label="自用導覽">' +
               '<a href="' + ME + '">工具清單</a>' +
               '<a class="mt-hide" href="' + HOME + '">官網</a>' +
             '</nav>'
-          : '<a class="mt-brand" href="' + HOME + '" aria-label="MOMO雙贏策略 工具首頁"><img src="/icon-96.png" alt="" width="30" height="30">MOMO雙贏策略</a>' +
+          : '<a class="mt-brand" href="' + HOME + '" aria-label="MOMO財商智庫 工具首頁"><img src="/icon-96.png" alt="" width="30" height="30">MOMO財商智庫</a>' +
             '<nav class="mt-nav" aria-label="網站導覽">' +
               '<a class="mt-hide" href="' + TOOLS + '">所有工具</a>' +
               '<a class="mt-hide" href="' + BLOG + '">文章</a>' +
