@@ -10,10 +10,8 @@
 
 ## 景氣與市場數據
 
-- [MOMO景氣羅盤](https://nms3194949.github.io/MOMO_FinSphere/tools/Macro-Compass.html): 總體經濟指標與景氣位置
-- [MCS 景氣循環儀表板](https://nms3194949.github.io/MOMO_FinSphere/tools/msc-score.html): 以信用利差、利率、流動性、情緒等因子計算 0–100 景氣分數與四個象限（衰退、放緩、成長、過熱）
+- [景氣循環儀表板](https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html): 同一頁對照兩種週期——短週期 MCS 景氣分數（信用利差、利率、流動性、情緒等因子，0–100 分，衰退／放緩／成長／過熱四象限）與長週期雙週期景氣羅盤（2000 年起的景氣位置與歷史事件）
 - [長周期交易平均](https://nms3194949.github.io/MOMO_FinSphere/tools/seasonality.html): 各市場月份與季節性的歷史統計
-- [基金監控雷達](https://nms3194949.github.io/MOMO_FinSphere/tools/fund_radar.html): 基金淨值與指標變化追蹤
 - [台股ETF監控](https://nms3194949.github.io/MOMO_FinSphere/tools/etf-dashboard.html): 台股 ETF 報酬與配息資料整理
 
 ## 相關網站

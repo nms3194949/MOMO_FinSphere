@@ -18,6 +18,15 @@ MOMO雙贏策略的互動工具網站：配息現金流試算、景氣儀表板�
 | `assets/momo-site.js` | 共用腳本：GA4、LINE/IG/Threads 點擊事件、統一頁尾與免責聲明（每頁都要載入） |
 | `assets/tools-config.js` | 工具清單（首頁與總覽頁共用），新增工具改這裡 |
 | `assets/tools-render.js` | 工具卡片產生器 |
+| `assets/momo-gate.js` | 自用工具密碼頁（放在自用頁 `<head>` 最前面） |
+| `me/index.html` | 自用工具首頁（有密碼，可加到手機主畫面） |
+| `tools/cycle.html` | 景氣循環儀表板：整合 MCS（短週期）與景氣羅盤（長週期） |
+
+## 自用工具
+
+自用頁在 `<head>` 最前面加上 `<script src="/MOMO_FinSphere/assets/momo-gate.js"></script>`，就會要求輸入密碼、不送 GA、不加公開頁尾，頂部品牌列改連到自用首頁。
+更換密碼：開 `me/` → 最下方「更換密碼」產生新的 HASH，貼到 `momo-gate.js`。
+注意：這是前端密碼，只能擋一般人，repo 公開時原始碼仍看得到。
 
 ## 新增工具頁時
 
