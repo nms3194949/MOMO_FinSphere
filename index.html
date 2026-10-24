@@ -95,7 +95,7 @@
           "isAccessibleForFree": true
         }
       ],
-      "dateModified": "2026-10-25"
+      "dateModified": "2026-10-24"
     },
     {
       "@type": "FAQPage",
@@ -351,11 +351,18 @@
              START／END 之間的內容會被自動覆蓋，請勿手動修改。
              沒有靜態數據時，前端才改向 GAS（getMacro）抓取；都失敗則整區隱藏。 -->
         <!-- SNAP:MACRO:START -->
-        <div class="macro" id="macro" hidden aria-labelledby="macro-title">
-          <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">資料來源：FRED</span></div>
-          <div class="macro-grid" id="macro-grid"></div>
+        <div class="macro" id="macro" aria-labelledby="macro-title">
+          <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">FRED｜<time datetime="2026-10-24">2026-10-24</time><em>｜▲▼ 與上期比較</em></span></div>
+          <div class="macro-grid" id="macro-grid">
+            <div class="mc" title="長天期利率，影響債券與配息基金的淨值｜資料日期 2026-10-22"><div class="n">美債10年殖利率</div><div class="v">4.96<small>%</small></div><div class="s"><span class="d " title="較上月">—0.00</span></div></div>
+            <div class="mc" title="殖利率曲線斜率，負值代表倒掛｜資料日期 2026-10-23"><div class="n">10Y−2Y利差</div><div class="v">0.31<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.05</span><span class="t">正斜率</span></div></div>
+            <div class="mc" title="聯準會政策利率（目標區間上限）｜資料日期 2026-10-24"><div class="n">聯邦基金利率</div><div class="v">4.00<small>%</small></div><div class="s"><span class="d up" title="較上季">▲0.25</span><span class="t warn">升息循環</span></div></div>
+            <div class="mc" title="通膨速度，聯準會目標約 2%｜資料日期 2026-09"><div class="n">美國CPI年增</div><div class="v">4.0<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.3</span><span class="t warn">高於目標</span></div></div>
+            <div class="mc" title="市場資金水位的變化｜資料日期 2026-08"><div class="n">美國M2年增</div><div class="v">5.7<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.3</span><span class="t">資金擴張</span></div></div>
+            <div class="mc" title="信用風險溫度，越高代表市場越擔心違約｜資料日期 2026-10-22"><div class="n">高收益債利差</div><div class="v">3.40<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.72</span><span class="t">風險偏低</span></div></div>
+          </div>
         </div>
-        <!-- SNAP:MACRO:END -->
+<!-- SNAP:MACRO:END -->
       </div>
     </section>
 
