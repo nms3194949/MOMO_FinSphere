@@ -16,8 +16,6 @@ MOMO雙贏策略旗下的工具與數據網站：配息現金流試算、景氣�
 | `dividend-calculator.html` | 配息現金流試算（總報酬假設上限 6%，畫面揭露） |
 | `tools/` | 各工具頁與工具總覽頁 |
 | `assets/momo-site.js` | 共用腳本：GA4、LINE/IG/Threads 點擊事件、統一頁尾與免責聲明（每頁都要載入） |
-| `assets/tools-config.js` | 工具清單（首頁與總覽頁共用），新增工具改這裡 |
-| `assets/tools-render.js` | 工具卡片產生器 |
 | `assets/momo-gate.js` | 自用工具密碼頁（放在自用頁 `<head>` 最前面） |
 | `me/index.html` | 專用工具首頁（有密碼，可加到手機主畫面） |
 | `tools/cycle.html` | 景氣循環儀表板：整合 MCS（短週期）與景氣羅盤（長週期） |
@@ -37,7 +35,7 @@ MOMO雙贏策略旗下的工具與數據網站：配息現金流試算、景氣�
    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
    <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
    ```
-2. 在 `assets/tools-config.js` 加一筆工具資料
+2. 在 `index.html`（數據與分析工具區）與 `tools/index.html` 各加一張工具卡片
 3. 在 `sitemap.xml` 加網址
 
 ## 文字原則

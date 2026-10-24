@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MOMO財商智庫 — 市場季節性分析</title>
+<title>市場季節性分析｜S&amp;P 500 月內走勢與勝率｜MOMO財商智庫</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -103,6 +103,120 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
   <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+  <!-- SEO／GEO：頁面說明與結構化資料 -->
+  <meta name="description" content="以 S&amp;P 500 長期歷史收盤價統計市場季節性：月內各交易日的平均累積報酬與勝率、月份總覽、板塊輪動與區間勝率矩陣，搭配 VIX 觀察波動。內容僅供教育參考。">
+  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/tools/seasonality.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MOMO財商智庫">
+  <meta property="og:title" content="市場季節性分析｜S&amp;P 500 月內走勢與勝率｜MOMO財商智庫">
+  <meta property="og:description" content="以 S&amp;P 500 長期歷史收盤價統計市場季節性：月內各交易日的平均累積報酬與勝率、月份總覽、板塊輪動與區間勝率矩陣，搭配 VIX 觀察波動。內容僅供教育參考。">
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/tools/seasonality.html">
+  <meta property="og:image" content="https://nms3194949.github.io/og-default.png">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "市場季節性分析",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/seasonality.html",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web Browser",
+      "inLanguage": "zh-Hant-TW",
+      "isAccessibleForFree": true,
+      "description": "以 S&P 500 長期歷史收盤價統計市場季節性：月內各交易日的平均累積報酬與勝率、月份總覽、板塊輪動與區間勝率矩陣，搭配 VIX 觀察波動。內容僅供教育參考。",
+      "dateModified": "2026-10-25",
+      "isPartOf": {
+        "@id": "https://nms3194949.github.io/#website"
+      },
+      "author": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "publisher": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "MOMO雙贏策略",
+          "item": "https://nms3194949.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MOMO財商智庫",
+          "item": "https://nms3194949.github.io/MOMO_FinSphere/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "所有工具",
+          "item": "https://nms3194949.github.io/MOMO_FinSphere/tools/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "市場季節性分析"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "市場季節性是什麼？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "市場季節性是指股市在特定月份或月內特定交易日，歷史上平均表現較好或較差的規律，例如月初與月底的平均報酬差異。它是對過去資料的統計，不保證未來重複。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "「各交易日勝率」怎麼看？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "勝率是指歷史上在月初進場、持有到該交易日時為正報酬的比例。例如某交易日勝率 60%，代表過去有六成的月份持有到該日是賺錢的。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "可以用季節性決定買賣時點嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不建議單獨使用。季節性只反映歷史平均，個別年份可能完全相反，也會受到利率、景氣與突發事件影響。內容僅供教育參考，不構成投資建議。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "資料從哪裡來？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "以 Investing.com 的歷史收盤價計算，基準為 S&P 500，並輔以 VIX 波動率指數。"
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+  <style id="momo-about-css">
+.momo-about{all:initial;display:block;box-sizing:border-box;background:#fffdf8;border-top:1px solid #e4dccb;color:#44506a;font:15px/1.8 -apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:.02em;padding:32px 16px 8px;margin-top:40px}
+.momo-about *{box-sizing:border-box}
+.momo-about .ma-in{max-width:960px;margin:0 auto}
+.momo-about h2{font-size:22px;line-height:1.4;color:#0c152a;margin:0 0 10px;font-weight:800}
+.momo-about h3{font-size:16px;color:#0c152a;margin:22px 0 8px;font-weight:800}
+.momo-about p{margin:0 0 10px;max-width:820px}
+.momo-about b{color:#0c152a}
+.momo-about .ma-upd{font-size:13px;color:#7a8296}
+.momo-about details{background:#f6f1e7;border:1px solid #e4dccb;border-radius:12px;padding:10px 14px;margin:0 0 8px}
+.momo-about summary{cursor:pointer;font-weight:700;color:#0c152a}
+.momo-about details p{margin:6px 0 0}
+</style>
 </head>
 <body>
 
@@ -2897,5 +3011,18 @@ function renderDecisionCard() {
 
 fetchData();
 </script>
+<!-- 關於這個工具（純文字，給讀者與搜尋引擎／AI 爬蟲） -->
+<section class="momo-about" aria-labelledby="about-title">
+  <div class="ma-in">
+    <h2 id="about-title">關於市場季節性分析</h2>
+    <p>市場季節性是指股市在一年中的不同月份、或一個月中的不同交易日，歷史上呈現的平均表現規律。這個工具以 <b>S&amp;P 500</b> 長期歷史收盤價為基準、搭配 <b>VIX</b> 波動率，統計月內各交易日的平均累積報酬與勝率、各月份的表現，以及板塊輪動的歷史傾向。</p>
+    <p class="ma-upd">最後更新：<time datetime="2026-10-25">2026-10-25</time>｜MOMO財商智庫</p>
+    <h3>常見問題</h3>
+    <details><summary>市場季節性是什麼？</summary><p>市場季節性是指股市在特定月份或月內特定交易日，歷史上平均表現較好或較差的規律，例如月初與月底的平均報酬差異。它是對過去資料的統計，不保證未來重複。</p></details>
+    <details><summary>「各交易日勝率」怎麼看？</summary><p>勝率是指歷史上在月初進場、持有到該交易日時為正報酬的比例。例如某交易日勝率 60%，代表過去有六成的月份持有到該日是賺錢的。</p></details>
+    <details><summary>可以用季節性決定買賣時點嗎？</summary><p>不建議單獨使用。季節性只反映歷史平均，個別年份可能完全相反，也會受到利率、景氣與突發事件影響。內容僅供教育參考，不構成投資建議。</p></details>
+    <details><summary>資料從哪裡來？</summary><p>以 Investing.com 的歷史收盤價計算，基準為 S&amp;P 500，並輔以 VIX 波動率指數。</p></details>
+  </div>
+</section>
 </body>
 </html>

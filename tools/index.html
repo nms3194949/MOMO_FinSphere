@@ -23,16 +23,49 @@
   <meta property="og:image" content="https://nms3194949.github.io/og-default.png">
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "所有工具｜MOMO財商智庫",
-    "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/",
-    "inLanguage": "zh-Hant-TW",
-    "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
-    "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
-    "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
-  }
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "所有工具｜MOMO財商智庫",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/",
+      "inLanguage": "zh-Hant-TW",
+      "isPartOf": {
+        "@id": "https://nms3194949.github.io/#website"
+      },
+      "author": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "publisher": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "dateModified": "2026-10-25"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "MOMO雙贏策略",
+          "item": "https://nms3194949.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MOMO財商智庫",
+          "item": "https://nms3194949.github.io/MOMO_FinSphere/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "所有工具"
+        }
+      ]
+    }
+  ]
+}
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,6 +98,7 @@
     .tool-tab { padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: 600 14px var(--sans); cursor: pointer; }
     .tool-tab.is-active { background: var(--ink); border-color: var(--ink); color: var(--surface); }
     .tools-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-bottom: 24px; }
+    .tool-card[hidden] { display: none; }
     .tool-card { display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; text-decoration: none; transition: transform .15s, border-color .15s; }
     .tool-card:hover { transform: translateY(-2px); border-color: var(--gold-soft); }
     .tool-pill { align-self: flex-start; padding: 2px 10px; border-radius: 999px; background: var(--gold-bg); color: var(--gold); font-size: 12px; font-weight: 700; }
@@ -96,13 +130,50 @@
       <button type="button" class="tool-tab" data-tools-filter="fund" role="tab" aria-selected="false">基金與 ETF</button>
     </div>
 
-    <div class="tools-grid" id="tools-grid" aria-live="polite"></div>
+    <!-- 工具卡片直接寫在 HTML；分類按鈕只負責顯示／隱藏（data-cat） -->
+    <div class="tools-grid" id="tools-grid" aria-live="polite">
+      <a class="tool-card" href="/MOMO_FinSphere/dividend-calculator.html" data-cat="calc">
+        <span class="tool-pill">試算</span>
+        <h3 class="tool-title">配息現金流試算</h3>
+        <p class="tool-desc">輸入本金、配息率與總報酬假設（最高 6%），看每月配息、淨值變化與幾年後的本金。</p>
+        <span class="tool-go">開啟工具 →</span>
+      </a>
+      <a class="tool-card" href="/MOMO_FinSphere/tools/cycle.html" data-cat="market">
+        <span class="tool-pill">景氣</span>
+        <h3 class="tool-title">景氣循環儀表板</h3>
+        <p class="tool-desc">短週期看 MCS 景氣分數（7 個經濟與市場因子），長週期看雙週期景氣羅盤，同一頁對照。</p>
+        <span class="tool-go">開啟工具 →</span>
+      </a>
+      <a class="tool-card" href="/MOMO_FinSphere/tools/seasonality.html" data-cat="market">
+        <span class="tool-pill">季節性</span>
+        <h3 class="tool-title">市場季節性分析</h3>
+        <p class="tool-desc">以 S&amp;P 500 長期歷史資料，統計月內走勢、各交易日勝率與板塊輪動的季節規律。</p>
+        <span class="tool-go">開啟工具 →</span>
+      </a>
+      <a class="tool-card" href="/MOMO_FinSphere/tools/etf-dashboard.html" data-cat="fund">
+        <span class="tool-pill">ETF 數據</span>
+        <h3 class="tool-title">台股 ETF 績效比較</h3>
+        <p class="tool-desc">以還原權息估算台股 ETF 的年化價差與配息率，可依配置比例換算每月配息。</p>
+        <span class="tool-go">開啟工具 →</span>
+      </a>
+    </div>
     <p class="note">工具中的數據、分數與歷史統計僅供教育與研究參考，不代表未來表現，也不構成任何買賣或配置建議。</p>
   </main>
 
-  <script src="../assets/tools-config.js"></script>
-  <script src="../assets/tools-render.js"></script>
-  <script>window.MOMO_TOOLS && MOMO_TOOLS.initToolsPage();</script>
+  <script>
+    // 分類篩選：只切換卡片顯示，不重新產生內容
+    (function () {
+      var tabs = document.querySelectorAll('[data-tools-filter]');
+      var cards = document.querySelectorAll('#tools-grid .tool-card');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var f = tab.getAttribute('data-tools-filter');
+          tabs.forEach(function (t) { var on = t === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
+          cards.forEach(function (c) { c.hidden = !(f === 'all' || c.getAttribute('data-cat') === f); });
+        });
+      });
+    })();
+  </script>
   <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </body>
 </html>

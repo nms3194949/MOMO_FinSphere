@@ -25,84 +25,133 @@
   <meta name="twitter:card" content="summary_large_image" />
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://nms3194949.github.io/#website",
-        "name": "MOMO雙贏策略",
-        "url": "https://nms3194949.github.io/",
-        "inLanguage": "zh-Hant-TW",
-        "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
-      },
-      {
-        "@type": "Person",
-        "@id": "https://nms3194949.github.io/momo-blog/about/#person",
-        "name": "MOMO（余明哲）",
-        "alternateName": ["MOMO", "余明哲", "明哲MOMO"],
-        "jobTitle": "保單基金規劃・資產配置教育",
-        "url": "https://nms3194949.github.io/momo-blog/about/",
-        "sameAs": [
-          "https://www.instagram.com/momo_82786/",
-          "https://www.threads.net/@momo_82786"
-        ]
-      },
-      {
-        "@type": "CollectionPage",
-        "@id": "https://nms3194949.github.io/MOMO_FinSphere/#webpage",
-        "name": "MOMO財商智庫｜經濟數據與配息試算工具",
-        "url": "https://nms3194949.github.io/MOMO_FinSphere/",
-        "inLanguage": "zh-Hant-TW",
-        "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
-        "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
-        "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
-        "hasPart": [
-          {
-            "@type": "WebApplication",
-            "name": "配息現金流試算",
-            "url": "https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html",
-            "applicationCategory": "FinanceApplication",
-            "operatingSystem": "Web Browser",
-            "isAccessibleForFree": true
-          },
-          {
-            "@type": "WebApplication",
-            "name": "定期定額退休試算",
-            "url": "https://nms3194949.github.io/momo-blog/tools/retirement/",
-            "applicationCategory": "FinanceApplication",
-            "operatingSystem": "Web Browser",
-            "isAccessibleForFree": true
-          }
-        ]
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "這個網站提供什麼內容？",
-            "acceptedAnswer": { "@type": "Answer", "text": "這裡是 MOMO財商智庫的工具區，提供配息現金流試算、季節性分析、景氣儀表板等互動工具，以及連到配置筆記文章。內容以基金類別與觀念為主，不點名推薦特定基金或商品，也不構成投資建議。" }
-          },
-          {
-            "@type": "Question",
-            "name": "配息率等於報酬率嗎？",
-            "acceptedAnswer": { "@type": "Answer", "text": "不等於。真實報酬 = 配息 + 淨值變化。配息率高不代表賺得多，如果淨值同時下跌，配息可能等於把本金拿回來，配息也可能由本金支出。" }
-          },
-          {
-            "@type": "Question",
-            "name": "試算工具的報酬率是怎麼設定的？",
-            "acceptedAnswer": { "@type": "Answer", "text": "試算的年化總報酬假設最高以 6% 計算，並且直接顯示在畫面上，可以自己往下調整。試算結果只是數學推演，不代表未來實際表現。" }
-          },
-          {
-            "@type": "Question",
-            "name": "想進一步了解自己的配置，可以怎麼做？",
-            "acceptedAnswer": { "@type": "Answer", "text": "可以先閱讀配置筆記文章，或加入官方 LINE 提出你的問題，MOMO 會用白話說明觀念與規劃方向。" }
-          }
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://nms3194949.github.io/#website",
+      "name": "MOMO雙贏策略",
+      "url": "https://nms3194949.github.io/",
+      "inLanguage": "zh-Hant-TW",
+      "publisher": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
       }
-    ]
-  }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://nms3194949.github.io/momo-blog/about/#person",
+      "name": "MOMO（余明哲）",
+      "alternateName": [
+        "MOMO",
+        "余明哲",
+        "明哲MOMO"
+      ],
+      "jobTitle": "保單基金規劃・資產配置教育",
+      "url": "https://nms3194949.github.io/momo-blog/about/",
+      "sameAs": [
+        "https://www.instagram.com/momo_82786/",
+        "https://www.threads.net/@momo_82786"
+      ]
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": "https://nms3194949.github.io/MOMO_FinSphere/#webpage",
+      "name": "MOMO財商智庫｜經濟數據與配息試算工具",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/",
+      "inLanguage": "zh-Hant-TW",
+      "isPartOf": {
+        "@id": "https://nms3194949.github.io/#website"
+      },
+      "author": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "publisher": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "hasPart": [
+        {
+          "@type": "WebApplication",
+          "name": "配息現金流試算",
+          "url": "https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Web Browser",
+          "isAccessibleForFree": true
+        },
+        {
+          "@type": "WebApplication",
+          "name": "定期定額退休試算",
+          "url": "https://nms3194949.github.io/momo-blog/tools/retirement/",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Web Browser",
+          "isAccessibleForFree": true
+        },
+        {
+          "@type": "WebApplication",
+          "name": "景氣循環儀表板",
+          "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Web Browser",
+          "isAccessibleForFree": true
+        }
+      ],
+      "dateModified": "2026-10-25"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "這個網站提供什麼內容？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "這裡是 MOMO財商智庫的工具區，提供配息現金流試算、季節性分析、景氣儀表板等互動工具，以及連到配置筆記文章。內容以基金類別與觀念為主，不點名推薦特定基金或商品，也不構成投資建議。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "配息率等於報酬率嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不等於。真實報酬 = 配息 + 淨值變化。配息率高不代表賺得多，如果淨值同時下跌，配息可能等於把本金拿回來，配息也可能由本金支出。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "試算工具的報酬率是怎麼設定的？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "試算的年化總報酬假設最高以 6% 計算，並且直接顯示在畫面上，可以自己往下調整。試算結果只是數學推演，不代表未來實際表現。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "想進一步了解自己的配置，可以怎麼做？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "可以先閱讀配置筆記文章，或加入官方 LINE 提出你的問題，MOMO 會用白話說明觀念與規劃方向。"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "MOMO雙贏策略",
+          "item": "https://nms3194949.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MOMO財商智庫"
+        }
+      ]
+    }
+  ]
+}
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -263,7 +312,6 @@
     }
   </style>
 
-  <script defer src="/MOMO_FinSphere/assets/tools-config.js"></script>
   <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </head>
 <body>
@@ -299,11 +347,15 @@
           <a class="hero-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="hero" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">加入官方 LINE →</a>
         </div>
 
-        <!-- 經濟數據速覽：資料由 GAS（getMacro）每 6 小時從 FRED 更新；載入失敗時整區隱藏 -->
+        <!-- 經濟數據速覽：由 GitHub Actions 每天寫入靜態數據（scripts/snapshot.mjs）。
+             START／END 之間的內容會被自動覆蓋，請勿手動修改。
+             沒有靜態數據時，前端才改向 GAS（getMacro）抓取；都失敗則整區隱藏。 -->
+        <!-- SNAP:MACRO:START -->
         <div class="macro" id="macro" hidden aria-labelledby="macro-title">
           <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">資料來源：FRED</span></div>
           <div class="macro-grid" id="macro-grid"></div>
         </div>
+        <!-- SNAP:MACRO:END -->
       </div>
     </section>
 
@@ -402,7 +454,33 @@
           </div>
           <a class="more" href="./tools/">查看全部工具 →</a>
         </div>
-        <div class="grid-3" id="home-tools-grid"></div>
+        <!-- 工具卡片直接寫在 HTML（讓搜尋引擎與 AI 爬蟲讀得到）；新增工具時同步修改 tools/index.html -->
+        <div class="grid-2" id="home-tools-grid">
+          <a class="tool-card" href="/MOMO_FinSphere/dividend-calculator.html" data-cat="calc">
+            <span class="tool-pill">試算</span>
+            <h3 class="tool-title">配息現金流試算</h3>
+            <p class="tool-desc">輸入本金、配息率與總報酬假設（最高 6%），看每月配息、淨值變化與幾年後的本金。</p>
+            <span class="tool-go">開啟工具 →</span>
+          </a>
+          <a class="tool-card" href="/MOMO_FinSphere/tools/cycle.html" data-cat="market">
+            <span class="tool-pill">景氣</span>
+            <h3 class="tool-title">景氣循環儀表板</h3>
+            <p class="tool-desc">短週期看 MCS 景氣分數（7 個經濟與市場因子），長週期看雙週期景氣羅盤，同一頁對照。</p>
+            <span class="tool-go">開啟工具 →</span>
+          </a>
+          <a class="tool-card" href="/MOMO_FinSphere/tools/seasonality.html" data-cat="market">
+            <span class="tool-pill">季節性</span>
+            <h3 class="tool-title">市場季節性分析</h3>
+            <p class="tool-desc">以 S&amp;P 500 長期歷史資料，統計月內走勢、各交易日勝率與板塊輪動的季節規律。</p>
+            <span class="tool-go">開啟工具 →</span>
+          </a>
+          <a class="tool-card" href="/MOMO_FinSphere/tools/etf-dashboard.html" data-cat="fund">
+            <span class="tool-pill">ETF 數據</span>
+            <h3 class="tool-title">台股 ETF 績效比較</h3>
+            <p class="tool-desc">以還原權息估算台股 ETF 的年化價差與配息率，可依配置比例換算每月配息。</p>
+            <span class="tool-go">開啟工具 →</span>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -507,19 +585,6 @@
       });
     }
 
-    /* 工具卡片（讀 assets/tools-config.js） */
-    function renderTools() {
-      var box = $('home-tools-grid');
-      var list = (window.MOMO_TOOLS_CONFIG || []).filter(function (t) { return t.showOnHome; }).slice(0, 6);
-      if (!box || !list.length) return;
-      box.innerHTML = list.map(function (t) {
-        return '<a class="tool-card" href="' + esc(t.href) + '">' +
-          '<span class="tool-pill">' + esc(t.label || '工具') + '</span>' +
-          '<h3 class="tool-title">' + esc(t.title) + '</h3>' +
-          '<p class="tool-desc">' + esc(t.desc) + '</p>' +
-          '<span class="tool-go">開啟工具 →</span></a>';
-      }).join('');
-    }
 
     /* 配息入帳紀錄（Google Sheets → GAS API）
        只顯示入帳日期、金額、本月合計；不顯示年化配息率與年均成長率。
@@ -589,7 +654,7 @@
       var grid = $('macro-grid'), list = (data && data.items) || [];
       var cells = list.filter(function (it) { return MACRO_META[it.id] && it.value != null; }).map(function (it) {
         var m = MACRO_META[it.id], v = Number(it.value), p = it.prev == null ? null : Number(it.prev);
-        var diff = p == null ? null : v - p;
+        var diff = p == null ? null : Math.round((v - p) * Math.pow(10, m.dp)) / Math.pow(10, m.dp);
         var dTxt = diff == null ? '' : (diff > 0 ? '▲' : diff < 0 ? '▼' : '—') + Math.abs(diff).toFixed(m.dp);
         var dCls = diff > 0 ? 'up' : diff < 0 ? 'down' : '';
         var tag = m.tag ? m.tag(v, p) : null;
@@ -607,6 +672,8 @@
     }
 
     function loadMacro() {
+      // 已有每日快照寫入的靜態數據，就不再重抓
+      if ($('macro-grid').children.length) return;
       var KEY = 'momo_macro_v1';
       try { var c = JSON.parse(localStorage.getItem(KEY) || 'null'); if (c) renderMacro(c); } catch (e) {}
       var GAS_URL = 'https://script.google.com/macros/s/AKfycbwZigk7WKYouppEKrx6sAS6sepldPt4qnNHGj4JOaizocceyJ5HR9cV78sW0Db5vTBf4w/exec';
@@ -616,8 +683,8 @@
         .catch(function () {});
     }
 
-    function boot() { applyUtm(); renderTools(); loadMacro(); loadDividends(); lazyIg(); }
-    // defer 腳本（tools-config、momo-site）會在 DOMContentLoaded 之前跑完
+    function boot() { applyUtm(); loadMacro(); loadDividends(); lazyIg(); }
+    // defer 腳本（momo-site）會在 DOMContentLoaded 之前跑完
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   })();
   </script>

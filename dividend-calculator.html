@@ -23,40 +23,101 @@
   <meta property="og:image" content="https://nms3194949.github.io/og-default.png" />
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebApplication",
-        "name": "配息現金流試算",
-        "url": "https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html",
-        "applicationCategory": "FinanceApplication",
-        "operatingSystem": "Web Browser",
-        "inLanguage": "zh-Hant-TW",
-        "isAccessibleForFree": true,
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
-        "description": "輸入本金、配息率與年化總報酬假設（最高 6%），試算每月配息、每年淨值變化與幾年後的本金。",
-        "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
-        "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
-        "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "配息現金流試算",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web Browser",
+      "inLanguage": "zh-Hant-TW",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "TWD"
       },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "配息率 8%，代表一年賺 8% 嗎？",
-            "acceptedAnswer": { "@type": "Answer", "text": "不一定。真實報酬 = 配息 + 淨值變化。如果配息率 8%、淨值同時下跌 5%，一年的真實報酬大約只有 3%；配息也可能由本金支出。" }
-          },
-          {
-            "@type": "Question",
-            "name": "為什麼總報酬假設最高只能設 6%？",
-            "acceptedAnswer": { "@type": "Answer", "text": "試算用保守的假設比較能看清楚風險。本工具的年化總報酬假設上限為 6%，並顯示在畫面上；實際結果會隨市場變動，可能更高也可能更低，甚至虧損。" }
-          }
-        ]
+      "description": "輸入本金、配息率與年化總報酬假設（最高 6%），試算每月配息、每年淨值變化與幾年後的本金，理解配息率不等於報酬率。",
+      "dateModified": "2026-10-25",
+      "isPartOf": {
+        "@id": "https://nms3194949.github.io/#website"
+      },
+      "author": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "publisher": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
       }
-    ]
-  }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "MOMO雙贏策略",
+          "item": "https://nms3194949.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MOMO財商智庫",
+          "item": "https://nms3194949.github.io/MOMO_FinSphere/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "所有工具",
+          "item": "https://nms3194949.github.io/MOMO_FinSphere/tools/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "配息現金流試算"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "配息率 8%，代表一年賺 8% 嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不一定。真實報酬 = 配息 + 淨值變化。如果配息率 8%、淨值同時下跌 2%，一年的真實報酬大約只有 6%；配息也可能由本金支出。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "配息率比總報酬高，本金會怎樣？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "差額會反映在淨值下跌。以 100 萬元、年化總報酬 6%、配息率 8% 計算，每月約領 6,667 元，但 5 年後本金約剩 903,921 元、10 年後約剩 817,073 元，等於有一部分配息是領回自己的本金。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "為什麼總報酬假設最高只能設 6%？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "試算用保守的假設比較能看清楚風險。本工具的年化總報酬假設上限為 6%，並顯示在畫面上；實際結果會隨市場變動，可能更高也可能更低，甚至虧損。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "這個試算有考慮哪些成本？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "沒有。試算假設配息領出不再投入，總報酬與配息率每年不變，未計入費用、稅負與匯率，結果僅供教育參考。"
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -84,6 +145,15 @@
     .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 40px 0 8px; }
     h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1.35; margin: 0 0 10px; }
     .lead { color: var(--ink-2); margin: 0 0 24px; max-width: 680px; }
+    .answer { margin: 0 0 10px; max-width: 720px; font-size: 16.5px; line-height: 1.85; }
+    .answer b { color: var(--ink); }
+    .updated { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
+    table.ex td:first-child, table.ex th:first-child { text-align: left; font-weight: 700; }
+    table.ex { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .small-note { font-size: 13px; color: var(--muted) !important; margin-top: 8px; }
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+    .faq summary { cursor: pointer; font-weight: 700; }
+    .faq details p { margin: 8px 0 0; }
     .formula { display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--gold-bg); font-weight: 700; font-size: 15px; }
 
     .grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; }
@@ -153,7 +223,8 @@
   <main class="wrap">
     <p class="eyebrow">配息現金流試算</p>
     <h1>配息率，不等於報酬率</h1>
-    <p class="lead">輸入本金、配息率和年化總報酬假設，看每月領到多少、淨值每年怎麼變，以及幾年後本金剩多少。</p>
+    <p class="answer"><b>配息率不等於報酬率。</b>真實報酬 = 配息 + 淨值變化。如果基金一年總報酬 6%、配息率 8%，多配出的 2% 會反映在淨值下跌：100 萬元每月約領 6,667 元，但 5 年後本金約剩 90.4 萬元。下面的試算可以自己調整配息率與總報酬假設（上限 6%）。</p>
+    <p class="lead">輸入本金、配息率和年化總報酬假設，看每月領到多少、淨值每年怎麼變，以及幾年後本金剩多少。<span class="updated">最後更新：<time datetime="2026-10-25">2026-10-25</time></span></p>
     <span class="formula">真實報酬 = 配息 + 淨值變化</span>
 
     <div class="grid" style="margin-top:22px">
@@ -219,11 +290,35 @@
       </section>
     </div>
 
+    <section class="section" aria-labelledby="ex-title">
+      <h2 id="ex-title">算例：同樣 100 萬，配息率不同會怎樣？</h2>
+      <p>假設年化總報酬都是 6%（配息 + 淨值變化），配息領出不再投入。配息率越高，每月領得越多，但淨值每年的變化 = 6% − 配息率，本金會跟著改變。</p>
+      <div class="table-wrap">
+        <table class="ex">
+          <thead><tr><th>配息率</th><th>每月配息</th><th>淨值每年變化</th><th>5 年後本金</th><th>5 年累計配息</th><th>10 年後本金</th><th>10 年累計配息</th></tr></thead>
+          <tbody>
+            <tr><td>4%</td><td>3,333</td><td>+2.0%</td><td>1,104,081</td><td>208,162</td><td>1,218,994</td><td>437,989</td></tr>
+            <tr><td>6%</td><td>5,000</td><td>0%</td><td>1,000,000</td><td>300,000</td><td>1,000,000</td><td>600,000</td></tr>
+            <tr><td>8%</td><td>6,667</td><td>−2.0%</td><td>903,921</td><td>384,317</td><td>817,073</td><td>731,709</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small-note">單位：新台幣元。試算假設總報酬與配息率每年不變，未計入費用、稅負與匯率；實際淨值與配息會隨市場變動，可能虧損。</p>
+    </section>
+
     <section class="section">
       <h2>怎麼看這個試算？</h2>
       <p>很多人只看配息率：「年配 8%，100 萬一年領 8 萬」。但配息是從基金資產裡配出來的，如果基金一年的總報酬只有 6%，多配出去的 2% 就會反映在淨值下跌上，也就是配息有一部分來自本金。</p>
       <p>所以這個試算把「配息」和「淨值變化」拆開來看：總報酬假設 − 配息率 = 淨值每年變化。配息率越接近或高於總報酬，本金越容易越領越少；配息率較低，本金則有機會隨時間成長。</p>
       <p>想用每月固定投入的方式規劃退休，可以改用<a href="/momo-blog/tools/retirement/">定期定額退休試算</a>；更多配置觀念可以看<a href="/momo-blog/">配置筆記</a>。</p>
+    </section>
+
+    <section class="section faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">常見問題</h2>
+      <details><summary>配息率 8%，代表一年賺 8% 嗎？</summary><p>不一定。真實報酬 = 配息 + 淨值變化。如果配息率 8%、淨值同時下跌 2%，一年的真實報酬大約只有 6%；配息也可能由本金支出。</p></details>
+      <details><summary>配息率比總報酬高，本金會怎樣？</summary><p>差額會反映在淨值下跌。以 100 萬元、年化總報酬 6%、配息率 8% 計算，每月約領 6,667 元，但 5 年後本金約剩 903,921 元、10 年後約剩 817,073 元，等於有一部分配息是領回自己的本金。</p></details>
+      <details><summary>為什麼總報酬假設最高只能設 6%？</summary><p>試算用保守的假設比較能看清楚風險。本工具的年化總報酬假設上限為 6%，並顯示在畫面上；實際結果會隨市場變動，可能更高也可能更低，甚至虧損。</p></details>
+      <details><summary>這個試算有考慮哪些成本？</summary><p>沒有。試算假設配息領出不再投入，總報酬與配息率每年不變，未計入費用、稅負與匯率，結果僅供教育參考。</p></details>
     </section>
 
     <div class="cta cta-box">

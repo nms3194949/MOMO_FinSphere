@@ -25,17 +25,45 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "景氣循環儀表板",
-    "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html",
-    "applicationCategory": "FinanceApplication",
-    "operatingSystem": "Web Browser",
-    "inLanguage": "zh-Hant-TW",
-    "isAccessibleForFree": true,
-    "description": "對照短週期 MCS 景氣分數與長週期雙週期景氣羅盤，了解目前景氣溫度與大週期位置。",
-    "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
-    "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
-    "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html#app",
+        "name": "景氣循環儀表板",
+        "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "inLanguage": "zh-Hant-TW",
+        "isAccessibleForFree": true,
+        "description": "對照短週期 MCS 景氣分數（信用利差、利率、總體經濟、股市動能、企業獲利、市場情緒、流動性 7 個因子）與長週期雙週期景氣羅盤，了解目前景氣溫度與大週期位置。",
+        "dateModified": "2026-10-25",
+        "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
+        "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
+        "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "MOMO雙贏策略", "item": "https://nms3194949.github.io/" },
+          { "@type": "ListItem", "position": 2, "name": "MOMO財商智庫", "item": "https://nms3194949.github.io/MOMO_FinSphere/" },
+          { "@type": "ListItem", "position": 3, "name": "所有工具", "item": "https://nms3194949.github.io/MOMO_FinSphere/tools/" },
+          { "@type": "ListItem", "position": 4, "name": "景氣循環儀表板" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "MCS 景氣分數是什麼？怎麼算的？",
+            "acceptedAnswer": { "@type": "Answer", "text": "MCS（Macro Cycle Scanner）是 MOMO財商智庫的短週期景氣指標，綜合信用利差、利率與殖利率曲線、總體經濟（PMI、初領失業金）、股市動能、企業獲利、市場情緒（VIX）、流動性 7 個因子，計算出 0 到 100 分，再對應衰退、放緩、成長、過熱四個象限。數據主要來自 FRED。" } },
+          { "@type": "Question", "name": "景氣羅盤的春夏秋冬代表什麼？",
+            "acceptedAnswer": { "@type": "Answer", "text": "景氣羅盤把約 60 年的長週期（康波）與約 10 年的資金流向週期合成一個位置：春是復甦、夏是過熱擴張、秋是滯脹放緩、冬是衰退。它是週期模型推演，用來理解長期背景，不是即時經濟數據。" } },
+          { "@type": "Question", "name": "短週期和長週期的訊號不一致時怎麼看？",
+            "acceptedAnswer": { "@type": "Answer", "text": "兩者同向時趨勢通常較明確；方向不一致時，代表短期景氣溫度與長期背景分歧，歷史上市場較容易來回震盪。這是對週期狀態的描述，不代表買賣時點。" } },
+          { "@type": "Question", "name": "景氣分數可以用來決定買賣嗎？",
+            "acceptedAnswer": { "@type": "Answer", "text": "不建議單獨使用。景氣分數、象限與模型配比都是統計與模型推演，僅供教育參考，不代表未來表現，也不構成任何買賣或配置建議。" } }
+        ]
+      }
+    ]
   }
   </script>
 
@@ -56,6 +84,20 @@
     .eyebrow { color: var(--gold); font-weight: 700; font-size: 13px; letter-spacing: .14em; margin: 32px 0 6px; }
     h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(26px, 5.6vw, 38px); line-height: 1.35; margin: 0 0 8px; }
     .lead { color: var(--ink-2); margin: 0 0 22px; max-width: 760px; }
+    .answer { margin: 0 0 10px; max-width: 820px; font-size: 16.5px; line-height: 1.8; color: var(--ink); }
+    .answer b { color: var(--gold-2); }
+    .updated { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
+    .doc { margin-top: 36px; }
+    .doc h2 { font-family: var(--serif); font-size: 24px; margin: 0 0 10px; }
+    .doc h3 { font-size: 17px; margin: 22px 0 8px; color: var(--gold-2); }
+    .doc p { color: var(--ink-2); margin: 0 0 10px; max-width: 820px; }
+    .doc table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .doc th, .doc td { padding: 9px 12px; border-bottom: 1px solid rgba(233,209,138,.14); text-align: left; vertical-align: top; }
+    .doc thead th { color: var(--gold); font-weight: 800; }
+    .doc td:first-child { white-space: nowrap; color: var(--ink); font-weight: 700; }
+    .faq details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+    .faq summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+    .faq details p { margin: 8px 0 0; }
 
     /* 對照摘要 */
     .sum { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
@@ -98,7 +140,10 @@
   <main class="wrap">
     <p class="eyebrow">景氣循環儀表板</p>
     <h1>同一個市場，用兩把尺看</h1>
-    <p class="lead">短週期看的是「接下來幾個月的景氣溫度」，長週期看的是「我們在十年、數十年大週期裡的位置」。兩者方向一致時，訊號比較清楚；方向不同時，通常代表波動會比較大。</p>
+    <!-- SNAP:CYCLE:START -->
+    <p class="answer">景氣循環可以用兩把尺來看：<b>短週期 MCS 景氣分數</b>綜合 7 個經濟與市場因子，衡量接下來幾個月的景氣溫度（0–100 分，分為衰退、放緩、成長、過熱）；<b>長週期景氣羅盤</b>則描述在十年、數十年大週期中的位置（春、夏、秋、冬）。</p>
+    <!-- SNAP:CYCLE:END -->
+    <p class="lead">兩者方向一致時，訊號比較清楚；方向不同時，通常代表波動會比較大。<span class="updated">最後更新：<time datetime="2026-10-25" id="snapDate">2026-10-25</time></span></p>
 
     <section class="sum" aria-label="兩種週期對照">
       <button class="sum-card" type="button" data-go="mcs">
@@ -149,6 +194,43 @@
       <iframe id="fCompass" class="off" src="Macro-Compass.html" title="雙週期景氣羅盤（長週期）" loading="eager"></iframe>
     </div>
     <p class="note">景氣分數、象限與模型配比皆為統計與模型推演，僅供教育參考，不代表未來表現，也不構成任何買賣或配置建議。</p>
+
+    <section class="doc" aria-labelledby="method-title">
+      <h2 id="method-title">方法說明</h2>
+
+      <h3>短週期：MCS 景氣分數（Macro Cycle Scanner）</h3>
+      <p>MCS 使用 FRED 等公開數據，綜合下面 7 個因子得出 0–100 分。分數越高代表景氣越熱，再依分數對應到四個象限。</p>
+      <div class="cmp-wrap">
+        <table>
+          <thead><tr><th>因子</th><th>觀察什麼</th><th>代表數據</th></tr></thead>
+          <tbody>
+            <tr><td>信用風險 CREDIT</td><td>市場對企業違約的擔心程度</td><td>美國高收益債利差</td></tr>
+            <tr><td>利率政策 RATES</td><td>利率水準與殖利率曲線形狀</td><td>10 年期、2 年期公債殖利率與利差</td></tr>
+            <tr><td>總體經濟 MACRO</td><td>製造業景氣與就業</td><td>ISM 製造業 PMI、初領失業金人數</td></tr>
+            <tr><td>股市動能 EQUITY</td><td>股市中期趨勢</td><td>美股指數 6 個月動能與位階</td></tr>
+            <tr><td>企業獲利 EPS</td><td>獲利成長方向</td><td>以股價動能推估的獲利趨勢</td></tr>
+            <tr><td>市場情緒 SENTIMENT</td><td>恐慌或樂觀程度</td><td>VIX 波動率指數</td></tr>
+            <tr><td>流動性 LIQUIDITY</td><td>資金水位與實體需求</td><td>淨流動性、建築許可等</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px">四個象限的意思：<b>衰退 Recession</b>（風險偏好下降、信用利差擴大）、<b>放緩 Slowdown</b>（成長動能減弱但未全面衰退）、<b>成長 Growth</b>（經濟與企業獲利維持成長）、<b>過熱 Heat</b>（情緒偏熱，估值與風險累積）。</p>
+
+      <h3>長週期：雙週期景氣羅盤</h3>
+      <p>景氣羅盤是週期模型，把兩個長度不同的週期合在一起看：約 60 年一輪的長週期（康波，Kondratiev wave）決定羅盤指針的位置，約 10 年一輪的資金流向週期（ECM）描述資金偏向風險資產或避險資產。綜合評分以長週期占 80%、資金流向占 20% 計算。</p>
+      <p>指針落在的區域對應四個季節：<b>春｜復甦</b>、<b>夏｜過熱擴張</b>、<b>秋｜滯脹放緩</b>、<b>冬｜衰退</b>。羅盤可以拉動年份，對照 2000 年以來的重大事件（網路泡沫、金融海嘯、新冠疫情等）。它是模型推演，不是即時經濟數據，適合用來理解長期背景，不適合判斷短期走勢。</p>
+
+      <h3>使用限制</h3>
+      <p>所有分數、象限與模型配比都來自歷史統計與模型假設，市場可能出現模型沒有涵蓋的情況。內容僅供教育參考，不構成任何買賣或配置建議。</p>
+    </section>
+
+    <section class="doc faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">常見問題</h2>
+      <details><summary>MCS 景氣分數是什麼？怎麼算的？</summary><p>MCS（Macro Cycle Scanner）是 MOMO財商智庫的短週期景氣指標，綜合信用利差、利率與殖利率曲線、總體經濟（PMI、初領失業金）、股市動能、企業獲利、市場情緒（VIX）、流動性 7 個因子，計算出 0 到 100 分，再對應衰退、放緩、成長、過熱四個象限。數據主要來自 FRED。</p></details>
+      <details><summary>景氣羅盤的春夏秋冬代表什麼？</summary><p>景氣羅盤把約 60 年的長週期（康波）與約 10 年的資金流向週期合成一個位置：春是復甦、夏是過熱擴張、秋是滯脹放緩、冬是衰退。它是週期模型推演，用來理解長期背景，不是即時經濟數據。</p></details>
+      <details><summary>短週期和長週期的訊號不一致時怎麼看？</summary><p>兩者同向時趨勢通常較明確；方向不一致時，代表短期景氣溫度與長期背景分歧，歷史上市場較容易來回震盪。這是對週期狀態的描述，不代表買賣時點。</p></details>
+      <details><summary>景氣分數可以用來決定買賣嗎？</summary><p>不建議單獨使用。景氣分數、象限與模型配比都是統計與模型推演，僅供教育參考，不代表未來表現，也不構成任何買賣或配置建議。</p></details>
+    </section>
   </main>
 
   <script>
