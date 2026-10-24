@@ -1,370 +1,320 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant-TW">
 <head>
   <meta charset="utf-8" />
-  
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SEBWBQLV4Z"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-    gtag('config', 'G-SEBWBQLV4Z');
-  </script>
-
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-
-  <title>2025 基金配息試算機｜免費線上計算月配息 & 複利成長 - MOMO財商智庫</title>
-  <meta name="description" content="免費的線上配息計算機。輸入本金與配息率，一鍵算出每月現金流、本金成長與複利效果。支援台股 ETF、月配息基金與加密貨幣資產試算。">
-  <meta name="keywords" content="配息試算,基金計算機,月配息計算,複利試算,ETF配息,存股試算,MOMO財商智庫">
+  <title>配息現金流試算｜配息 + 淨值變化一起算｜MOMO雙贏策略</title>
+  <meta name="description" content="免費配息現金流試算：輸入本金、配息率與年化總報酬假設（最高 6%），算出每月配息、每年淨值變化與幾年後的本金，看懂配息率不等於報酬率。" />
+  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html" />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html">
+  <meta name="theme-color" content="#f6f1e7" />
 
-  <meta property="og:title" content="線上基金配息試算機｜MOMO財商智庫">
-  <meta property="og:description" content="輸入本金，立即預覽你的被動收入藍圖。">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html">
-  <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-calc.jpg">
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <link rel="icon" type="image/png" href="favicon.png">
-  <meta name="theme-color" content="#0A1221" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="MOMO雙贏策略" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="配息現金流試算｜MOMO雙贏策略" />
+  <meta property="og:description" content="配息率不等於報酬率。輸入本金與假設，看每月配息與淨值變化。" />
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html" />
+  <meta property="og:image" content="https://nms3194949.github.io/og-default.png" />
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "MOMO 基金配息試算機",
-    "applicationCategory": "FinanceApplication",
-    "operatingSystem": "Web Browser",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "TWD"
-    },
-    "description": "輸入本金與預期配息率，即時計算每月現金流、本金成長與三年總報酬的免費財商工具。",
-    "author": {
-        "@type": "Person",
-        "name": "MOMO",
-        "url": "https://nms3194949.github.io/MOMO_FinSphere/"
-    }
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "配息現金流試算",
+        "url": "https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "inLanguage": "zh-Hant-TW",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+        "description": "輸入本金、配息率與年化總報酬假設（最高 6%），試算每月配息、每年淨值變化與幾年後的本金。",
+        "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
+        "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
+        "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "配息率 8%，代表一年賺 8% 嗎？",
+            "acceptedAnswer": { "@type": "Answer", "text": "不一定。真實報酬 = 配息 + 淨值變化。如果配息率 8%、淨值同時下跌 5%，一年的真實報酬大約只有 3%；配息也可能由本金支出。" }
+          },
+          {
+            "@type": "Question",
+            "name": "為什麼總報酬假設最高只能設 6%？",
+            "acceptedAnswer": { "@type": "Answer", "text": "試算用保守的假設比較能看清楚風險。本工具的年化總報酬假設上限為 6%，並顯示在畫面上；實際結果會隨市場變動，可能更高也可能更低，甚至虧損。" }
+          }
+        ]
+      }
+    ]
   }
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap" />
+
   <style>
-  :root{
-    --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#AAB2BF;
-    --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
-    --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
-    --accent:#2D7A77; --danger: #ff6b6b; --safe: #3dd68c;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; position: relative; overflow-x: hidden;}
-  a{color:inherit;text-decoration:none}
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf; --line-green: #06c755;
+      --warn: #b4562b; --warn-bg: #f8e6dc;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.8; letter-spacing: .02em; }
+    a { color: inherit; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; }
+    .back { color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .back:hover { color: var(--gold); }
 
-  body::before {
-    content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.05), transparent 60%);
-    animation: backgroundMove 25s linear infinite; z-index: -1; pointer-events: none;
-  }
-  @keyframes backgroundMove { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 40px 0 8px; }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1.35; margin: 0 0 10px; }
+    .lead { color: var(--ink-2); margin: 0 0 24px; max-width: 680px; }
+    .formula { display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--gold-bg); font-weight: 700; font-size: 15px; }
 
-  .wrap{max-width:900px; margin:0 auto; padding:16px;} /* 工具頁面縮小寬度聚焦 */
-  .header{display:flex;align-items:center;justify-content:space-between;padding:12px 0; margin-bottom: 20px;}
-  .logo{font-weight:800; font-size: 18px; color: var(--gold-soft);}
-  .nav a{font-size: 14px; color: var(--muted); margin-left: 16px; font-weight: 600;}
-  .nav a:hover{color: #fff;}
+    .grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+    .panel h2 { font-family: var(--serif); font-size: 20px; margin: 0 0 12px; }
 
-  .hero-tool {
-    text-align: center; padding: 40px 20px;
-    background: linear-gradient(180deg, rgba(12,21,42,0) 0%, rgba(12,21,42,0.8) 100%);
-    border-bottom: 1px solid var(--line); margin-bottom: 30px;
-  }
-  .hero-tool h1 {
-    font-size: clamp(24px, 4vw, 36px); margin: 0 0 10px 0;
-    background: var(--gold-grad); -webkit-background-clip: text; color: transparent;
-  }
-  .hero-tool p { color: var(--muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+    .field { margin-bottom: 18px; }
+    .field-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .field label { font-weight: 700; font-size: 15px; }
+    .field .val { font-family: var(--serif); font-weight: 800; color: var(--gold); font-size: 18px; font-variant-numeric: tabular-nums; }
+    .field .hint { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    input[type="number"] { width: 100%; margin-top: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); font: 600 17px var(--sans); font-variant-numeric: tabular-nums; }
+    input[type="number"]:focus { outline: 2px solid var(--gold-soft); border-color: var(--gold-soft); }
+    input[type="range"] { width: 100%; margin: 8px 0 0; accent-color: var(--gold); }
+    .seg { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .seg button { flex: 1; min-width: 56px; padding: 8px 0; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink-2); font: 700 14px var(--sans); cursor: pointer; }
+    .seg button.on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
 
-  /* 引用原本的計算機樣式 */
-  .panel, .strategy-info-box {
-    background: rgba(12, 21, 42, 0.75); backdrop-filter: blur(12px);
-    border: 1px solid rgba(233, 209, 138, 0.18); border-radius: 16px; padding: 20px;
-    margin-bottom: 20px;
-  }
-  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-  
-  /* 按鈕樣式 */
-  .btn-outline { background: transparent; border: 1px solid var(--gold-soft); color: var(--gold-soft); padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: .2s; font-size: 13px; }
-  .btn-outline:hover { background: rgba(233,209,138,.1); }
-  .btn-line { display: block; text-align: center; padding: 14px; border-radius: 99px; background: var(--gold-grad); color: #0A1221; font-weight: 800; box-shadow: 0 8px 16px rgba(0,0,0,.35); text-decoration: none; margin-top: 10px;}
-  
-  /* 輸入元件 */
-  input[type="number"] { width: 100%; background: rgba(14, 22, 42, 0.5); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 18px; font-weight: bold; }
-  input[type="range"] { width: 100%; margin: 15px 0; accent-color: var(--gold); }
-  
-  .strategy-btn { border: 1px solid var(--line); padding: 8px 16px; border-radius: 99px; background: #0e162a; color: var(--muted); cursor: pointer; margin-right: 8px; margin-bottom: 8px; }
-  .strategy-btn.is-active { background: var(--gold-grad); border-color: transparent; color: #0A1221; font-weight: bold; }
+    .assume { margin-top: 4px; padding: 12px 14px; border-radius: 10px; background: var(--gold-bg); font-size: 14px; color: var(--ink); line-height: 1.7; }
+    .assume b { font-variant-numeric: tabular-nums; }
 
-  /* 結果顯示 */
-  .out .kv { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .out .k { color: var(--muted); font-size: 14px; }
-  .out .v { font-size: 18px; font-weight: 700; color: #fff; }
-  .goldCycle { color: var(--gold-soft); }
+    .kv { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 11px 0; border-bottom: 1px dashed var(--line); }
+    .kv:last-of-type { border-bottom: none; }
+    .kv .k { color: var(--ink-2); font-size: 15px; }
+    .kv .v { font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; text-align: right; }
+    .kv.big .v { font-family: var(--serif); font-size: 26px; }
+    .kv .v.neg { color: var(--warn); }
+    .alert { display: none; margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-size: 14px; line-height: 1.7; }
+    .alert.show { display: block; }
 
-  .unlock-overlay {
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.4); border-radius: 8px;
-    text-decoration: none; transition: 0.3s;
-  }
-  .unlock-pill {
-    background: var(--gold); color: #0A1221; padding: 6px 16px; 
-    border-radius: 99px; font-size: 13px; font-weight: 800; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-  }
+    .bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--line); margin: 6px 0 4px; }
+    .bar span { display: block; height: 100%; transition: width .25s; }
+    .bar .b-div { background: var(--gold); }
+    .bar .b-nav { background: var(--ink); }
+    .legend { display: flex; gap: 14px; font-size: 13px; color: var(--ink-2); flex-wrap: wrap; }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
 
-  .footer { text-align: center; color: var(--muted); font-size: 12px; padding: 40px 0; border-top: 1px solid var(--line); margin-top: 40px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+    th, td { padding: 8px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    .table-wrap { overflow-x: auto; margin-top: 8px; }
 
-  /* 特效 */
-  @keyframes flashGold {
-    0% { color: #fff; text-shadow: 0 0 5px #fff; transform: scale(1); }
-    50% { color: #F9E27C; text-shadow: 0 0 20px #F9E27C; transform: scale(1.05); }
-    100% { color: inherit; transform: scale(1); }
-  }
-  .flash-anim { animation: flashGold 0.4s ease-out; }
-  
-  /* 返回首頁浮動鈕 */
-  .back-home { position: fixed; bottom: 20px; left: 20px; background: rgba(12,21,42,0.8); border: 1px solid var(--line); padding: 10px 16px; border-radius: 99px; font-size: 13px; backdrop-filter: blur(5px); color: var(--gold-soft); z-index: 100; }
+    .section { margin-top: 28px; }
+    .section h2 { font-family: var(--serif); font-size: 22px; margin: 0 0 10px; }
+    .section p { color: var(--ink-2); }
+    .cta { margin: 28px 0 8px; text-align: center; padding: 24px 18px; background: var(--surface); border: 1.5px solid var(--gold-soft); border-radius: 14px; }
+    .cta h2 { font-family: var(--serif); font-size: 21px; margin: 0 0 6px; }
+    .cta p { margin: 0 0 14px; color: var(--ink-2); font-size: 15px; }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .btn { display: inline-flex; padding: 11px 22px; border-radius: 999px; font-weight: 700; font-size: 15px; text-decoration: none; border: 1.5px solid transparent; }
+    .btn-line { background: var(--line-green); color: #fff; }
+    .btn-ghost { border-color: var(--ink); }
+
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
   </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </head>
 <body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/"><img src="/icon-96.png" alt="" width="32" height="32" />MOMO雙贏策略</a>
+      <a class="back" href="./">← 回工具首頁</a>
+    </div>
+  </header>
 
   <main class="wrap">
-    <header class="header">
-      <div class="logo">MOMO FinSphere</div>
-      <nav class="nav">
-        <a href="index.html">回首頁</a>
-        <a href="index.html#strategy">策略績效</a>
-        <a href="https://portaly.cc/momo_82786" target="_blank" style="color:var(--gold-soft)">聯絡 MOMO</a>
-      </nav>
-    </header>
+    <p class="eyebrow">配息現金流試算</p>
+    <h1>配息率，不等於報酬率</h1>
+    <p class="lead">輸入本金、配息率和年化總報酬假設，看每月領到多少、淨值每年怎麼變，以及幾年後本金剩多少。</p>
+    <span class="formula">真實報酬 = 配息 + 淨值變化</span>
 
-    <section class="hero-tool">
-      <h1>線上基金配息試算機</h1>
-      <p>只要 3 秒鐘，輸入本金與預期配息率，系統自動計算每月現金流、複利成長效應與 3 年後的資產變化。</p>
-    </section>
+    <div class="grid" style="margin-top:22px">
+      <!-- 輸入 -->
+      <section class="panel" aria-labelledby="in-title">
+        <h2 id="in-title">1. 輸入</h2>
 
-    <section id="calc" class="grid" id="calc-capture">
-        
-        <div class="panel">
-          <h3 style="margin-top:0; color:var(--gold-soft)">1. 設定參數</h3>
+        <div class="field">
+          <label for="amt">投入本金（元）</label>
+          <input id="amt" type="number" inputmode="numeric" min="0" max="1000000000" step="10000" value="1000000" />
+        </div>
 
-          <label style="display:block;margin-bottom:8px;font-size:13px;color:rgba(233,209,138,.9);font-weight:bold">策略模組</label>
-          <div class="strategy-group">
-            <button type="button" class="strategy-btn" data-strategy="start">雙贏起步 (穩健)</button>
-            <button type="button" class="strategy-btn is-active" data-strategy="rise">雙贏躍升 (平衡)</button>
-            <button type="button" class="strategy-btn" data-strategy="peak">雙贏巔峰 (積極)</button>
-          </div>
+        <div class="field">
+          <div class="field-top"><label for="dist">年配息率</label><span class="val" id="distVal">5.0%</span></div>
+          <input id="dist" type="range" min="0" max="10" step="0.5" value="5" aria-describedby="distHint" />
+          <div class="hint" id="distHint">基金每年配出的現金占本金的比例（0–10%）。</div>
+        </div>
 
-          <label for="amt" style="display:block;margin-top:16px;margin-bottom:8px;font-size:13px;color:rgba(233,209,138,.9);font-weight:bold">投入本金 (TWD)</label>
-          <input id="amt" type="number" inputmode="numeric" min="0" step="10000" value="1000000" />
+        <div class="field">
+          <div class="field-top"><label for="ret">年化總報酬假設</label><span class="val" id="retVal">6.0%</span></div>
+          <input id="ret" type="range" min="0" max="6" step="0.5" value="6" aria-describedby="retHint" />
+          <div class="hint" id="retHint">配息加上淨值變化的總和，上限 6%，可以往下調整。</div>
+        </div>
 
-          <div style="display:flex; justify-content:space-between; margin-top:20px; align-items:center;">
-            <label for="distRange" style="margin:0;font-size:13px;color:rgba(233,209,138,.9);font-weight:bold">預估配息率</label>
-            <span id="distNow" style="font-size:18px; font-weight:bold; color:var(--gold-soft)">8%</span>
-          </div>
-          <input id="distRange" type="range" min="0" max="17" step="1" value="8" />
-          
-          <div style="font-size:12px; color:var(--muted); margin-top:-10px; display:flex; gap:8px;">
-            快捷：
-            <span id="dist5" style="cursor:pointer; text-decoration:underline">5%</span>
-            <span id="dist10" style="cursor:pointer; text-decoration:underline">10%</span>
-            <span id="dist15" style="cursor:pointer; text-decoration:underline">15%</span>
-          </div>
-          
-          <div id="strategy-info-box" style="margin-top:20px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; font-size:13px; color:#ccc; line-height:1.5;">
-            <span style="color:var(--gold-soft); font-weight:bold">💡 策略觀點：</span>
-            <span id="info-desc">適合穩健型投資人，股債平衡配置。</span>
+        <div class="field">
+          <label>試算年數</label>
+          <div class="seg" role="group" aria-label="試算年數">
+            <button type="button" data-y="3">3 年</button>
+            <button type="button" data-y="5" class="on">5 年</button>
+            <button type="button" data-y="10">10 年</button>
+            <button type="button" data-y="20">20 年</button>
           </div>
         </div>
 
-        <div class="panel">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 style="margin:0; color:var(--gold-soft)">2. 試算結果</h3>
-            <button id="btn-save-png" class="btn-outline">匯出圖片</button>
-          </div>
-          
-          <div class="out">
-            <div class="kv">
-                <div class="k">預估月配息</div>
-                <div class="v" id="out-monthly" style="color:var(--safe); font-size:20px;">—</div>
-            </div>
-            
-            <div class="kv" style="position:relative; background:linear-gradient(90deg, rgba(201,162,39,0.1), transparent);">
-                <div class="k" style="color:var(--gold);">🔥 AI 優化後配息</div>
-                <div class="v" style="filter:blur(4px); opacity:0.7">$99,999</div>
-                <a href="https://portaly.cc/momo_82786" target="_blank" class="unlock-overlay" style="position:absolute; inset:0;">
-                    <div class="unlock-pill">加入 LINE 解鎖</div>
-                </a>
-            </div>
+        <div class="assume" id="assume"></div>
+      </section>
 
-            <div style="padding:12px; margin:10px 0; background:rgba(0,0,0,0.2); border-radius:8px; display:flex; align-items:center; gap:10px;">
-                <span id="life-icon" style="font-size:20px;">🌱</span>
-                <span id="life-text" style="font-size:13px; color:var(--muted);">累積種子期</span>
-            </div>
+      <!-- 結果 -->
+      <section class="panel" aria-labelledby="out-title" aria-live="polite">
+        <h2 id="out-title">2. 結果</h2>
+        <div class="kv big"><div class="k">每月配息（第 1 年）</div><div class="v" id="oMonthly">—</div></div>
+        <div class="kv"><div class="k">淨值每年變化</div><div class="v" id="oNav">—</div></div>
+        <div class="kv"><div class="k" id="oEndLbl">5 年後本金</div><div class="v" id="oEnd">—</div></div>
+        <div class="kv"><div class="k" id="oDivLbl">5 年累計配息</div><div class="v" id="oDiv">—</div></div>
+        <div class="kv"><div class="k">本金 + 累計配息</div><div class="v" id="oTotal">—</div></div>
 
-            <div class="kv"><div class="k">每年本金成長率</div><div class="v" id="out-grow">—</div></div>
-            <div class="kv"><div class="k">三年後本金</div><div class="v" id="out-3y">—</div></div>
-            <div class="kv"><div class="k">三年總報酬 (含息)</div><div class="v goldCycle" id="out-total">—</div></div>
-          </div>
-
-          <a href="https://portaly.cc/momo_82786" target="_blank" class="btn-line">
-            索取此現金流配置建議 ▶
-          </a>
+        <div style="margin-top:10px">
+          <div class="bar" aria-hidden="true"><span class="b-nav" id="barNav"></span><span class="b-div" id="barDiv"></span></div>
+          <div class="legend"><span><i style="background:var(--ink)"></i>期末本金</span><span><i style="background:var(--gold)"></i>累計配息</span></div>
         </div>
 
+        <div class="alert" id="alert"></div>
+
+        <details style="margin-top:14px">
+          <summary style="cursor:pointer;font-weight:700;color:var(--gold)">逐年明細</summary>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>年度</th><th>年初本金</th><th>當年配息</th><th>年末本金</th></tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>怎麼看這個試算？</h2>
+      <p>很多人只看配息率：「年配 8%，100 萬一年領 8 萬」。但配息是從基金資產裡配出來的，如果基金一年的總報酬只有 6%，多配出去的 2% 就會反映在淨值下跌上，也就是配息有一部分來自本金。</p>
+      <p>所以這個試算把「配息」和「淨值變化」拆開來看：總報酬假設 − 配息率 = 淨值每年變化。配息率越接近或高於總報酬，本金越容易越領越少；配息率較低，本金則有機會隨時間成長。</p>
+      <p>想用每月固定投入的方式規劃退休，可以改用<a href="/momo-blog/tools/retirement/">定期定額退休試算</a>；更多配置觀念可以看<a href="/momo-blog/">配置筆記</a>。</p>
     </section>
 
-    <section style="margin-top:40px; color:var(--muted); font-size:14px; line-height:1.8;">
-        <h2 style="font-size:18px; color:var(--gold-soft);">為什麼您需要基金配息試算？</h2>
-        <p>
-            在規劃退休金或被動收入時，單純的「定存」往往無法抵抗通膨。透過本工具，您可以模擬將資金配置在「月配息基金」或「高股息 ETF」時的現金流狀況。
-            MOMO 的雙贏策略不同於坊間的高風險操作，我們強調<strong>「本金成長」</strong>與<strong>「配息穩定」</strong>的平衡。
-        </p>
-        <p>
-            <strong>使用小撇步：</strong> 試著切換「雙贏起步」與「雙贏巔峰」模式，觀察在不同風險屬性下，您的資產三年後會有什麼樣的驚人變化。
-        </p>
-    </section>
-
-    <footer class="footer">
-      © MOMO財商智庫｜本試算結果僅供參考，實際績效以市場狀況為準。
-    </footer>
+    <div class="cta cta-box">
+      <h2>想知道自己的配置怎麼規劃？</h2>
+      <p>把你的問題傳到官方 LINE，MOMO 用白話說明觀念與方向。</p>
+      <div class="btns">
+        <a class="btn btn-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="cta" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">加入官方 LINE</a>
+        <a class="btn btn-ghost js-utm" data-href="https://www.instagram.com/momo_82786/" data-loc="cta" href="https://www.instagram.com/momo_82786/" target="_blank" rel="noopener">追蹤 Instagram</a>
+      </div>
+    </div>
   </main>
 
-  <a href="index.html" class="back-home">◀ 回首頁</a>
-
   <script>
-  const $ =(id)=>document.getElementById(id);
-  const nfTW = new Intl.NumberFormat('zh-TW');
-  const clamp =(v,min,max)=>Math.min(max,Math.max(min,v));
-  const money =(x)=>'＄'+nfTW.format(Math.round(x));
-  const pct =(x)=>(Math.round(x*100)/100).toFixed(2)+'%';
-  
-  // 載入 html2canvas
-  if(!window.html2canvas){
-      const s=document.createElement('script'); 
-      s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'; 
-      document.head.appendChild(s);
-  }
+  (function () {
+    'use strict';
+    var $ = function (id) { return document.getElementById(id); };
+    var money = function (x) { return '$' + Math.round(x).toLocaleString('en-US'); };
+    var pct = function (x) { return (x > 0 ? '+' : '') + x.toFixed(1) + '%'; };
+    var MAX_RETURN = 6; // 法遵：年化總報酬假設上限 6%
+    var state = { principal: 1000000, dist: 5, ret: 6, years: 5 };
+    var tracked = false;
 
-  // 策略參數
-  const STRATEGY = { start:12.24, rise:27.29, peak:64.22 };
-  const STRATEGY_DESC = {
-      start: "適合穩健型投資人，優先建立安全護城河。",
-      rise: "適合追求成長者，股債平衡配置，加速資產翻倍。",
-      peak: "適合積極型投資人，聚焦高成長機會，報酬潛力最高。"
-  };
-  const SLOPE = 1; 
-  const MONTHLY_MULT = { start:1, rise:1, peak:2.5 };
-  
-  const state = { baseCAGR: STRATEGY.rise, monthlyMul: MONTHLY_MULT.rise, principal: 1000000, dist: 8 };
-
-  function compute({principal, dist, baseCAGR, monthlyMul}){
-    const monthlyBase = principal*(dist/100)/12; 
-    const monthly = monthlyBase * (monthlyMul ?? 1);
-    const grow = Math.max(0, baseCAGR - SLOPE*dist); 
-    const after3y = principal*Math.pow(1+grow/100,3);
-    const div3y = principal*(dist/100)*3 * (monthlyMul ?? 1); 
-    const total = after3y + div3y;
-    return { monthly, grow, after3y, total };
-  }
-
-  function render(o){
-    $('out-monthly').textContent = money(o.monthly);
-    $('out-grow').textContent = pct(o.grow);
-    $('out-3y').textContent = money(o.after3y);
-    
-    const totalEl = $('out-total');
-    if(totalEl.textContent !== money(o.total)) {
-        totalEl.textContent = money(o.total);
-        totalEl.classList.remove('flash-anim');
-        void totalEl.offsetWidth; 
-        totalEl.classList.add('flash-anim');
+    function compute(s) {
+      var r = Math.min(s.ret, MAX_RETURN) / 100;
+      var d = s.dist / 100;
+      var g = r - d; // 淨值每年變化
+      var v = s.principal, cum = 0, rows = [];
+      for (var y = 1; y <= s.years; y++) {
+        var start = v;
+        var div = start * d;
+        v = Math.max(0, start * (1 + g));
+        cum += div;
+        rows.push({ y: y, start: start, div: div, end: v });
+      }
+      return { monthly: s.principal * d / 12, g: g * 100, end: v, cum: cum, total: v + cum, rows: rows };
     }
 
-    // 生活場景
-    const m = o.monthly;
-    let icon='🌱', text='累積種子期';
-    if(m > 3000) { icon='☕'; text='每天一杯星巴克'; }
-    if(m > 10000) { icon='🍱'; text='每月加菜金 + 水電費全免'; }
-    if(m > 25000) { icon='🚗'; text='支付國產車貸'; }
-    if(m > 50000) { icon='🏠'; text='支付房貸，邁向自由'; }
-    $('life-icon').textContent = icon;
-    $('life-text').textContent = text;
-  }
+    function render() {
+      var o = compute(state);
+      $('distVal').textContent = state.dist.toFixed(1) + '%';
+      $('retVal').textContent = state.ret.toFixed(1) + '%';
+      $('oMonthly').textContent = money(o.monthly);
+      var nav = $('oNav');
+      nav.textContent = pct(o.g);
+      nav.classList.toggle('neg', o.g < 0);
+      $('oEndLbl').textContent = state.years + ' 年後本金';
+      $('oDivLbl').textContent = state.years + ' 年累計配息';
+      $('oEnd').textContent = money(o.end);
+      $('oDiv').textContent = money(o.cum);
+      $('oTotal').textContent = money(o.total);
+      var t = o.total || 1;
+      $('barNav').style.width = (o.end / t * 100) + '%';
+      $('barDiv').style.width = (o.cum / t * 100) + '%';
 
-  function update(){
-    const range = $('distRange');
-    const amt = $('amt');
-    $('distNow').textContent = range.value + '%';
-    
-    // 更新狀態
-    state.dist = +range.value;
-    state.principal = +amt.value;
-    
-    render(compute(state));
-  }
+      var al = $('alert');
+      if (o.g < 0) {
+        al.innerHTML = '配息率（' + state.dist.toFixed(1) + '%）高於總報酬假設（' + state.ret.toFixed(1) + '%），差額會反映在淨值下跌：' +
+          state.years + ' 年後本金約剩 <b>' + money(o.end) + '</b>，比投入時少了 <b>' + money(state.principal - o.end) + '</b>。這部分配息等於是領回自己的本金。';
+        al.classList.add('show');
+      } else { al.classList.remove('show'); }
 
-  function init(){
-    // 綁定事件
-    $('distRange').addEventListener('input', update);
-    $('amt').addEventListener('input', update);
-    
-    // 策略按鈕
-    document.querySelectorAll('.strategy-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.strategy-btn').forEach(b => b.classList.remove('is-active'));
-            btn.classList.add('is-active');
-            
-            const key = btn.dataset.strategy;
-            state.baseCAGR = STRATEGY[key];
-            state.monthlyMul = MONTHLY_MULT[key];
-            $('info-desc').textContent = STRATEGY_DESC[key];
-            
-            update();
-        });
+      $('tbody').innerHTML = o.rows.map(function (r) {
+        return '<tr><td>第 ' + r.y + ' 年</td><td>' + money(r.start) + '</td><td>' + money(r.div) + '</td><td>' + money(r.end) + '</td></tr>';
+      }).join('');
+
+      $('assume').innerHTML = '本試算假設：年化總報酬 <b>' + state.ret.toFixed(1) + '%</b>（上限 6%）、年配息率 <b>' + state.dist.toFixed(1) +
+        '%</b>，每年維持不變；配息領出不再投入，未計入費用、稅負與匯率。實際淨值與配息會隨市場變動，可能虧損，結果僅供教育參考。';
+    }
+
+    function touch() { if (!tracked && window.momoTrack) { window.momoTrack('calculator_use', { tool: 'dividend_cashflow' }); tracked = true; } }
+
+    $('amt').addEventListener('input', function () {
+      var v = +this.value; state.principal = Number.isFinite(v) ? Math.min(Math.max(v, 0), 1e9) : 0; render(); touch();
+    });
+    $('dist').addEventListener('input', function () { state.dist = +this.value; render(); touch(); });
+    $('ret').addEventListener('input', function () { state.ret = Math.min(+this.value, MAX_RETURN); render(); touch(); });
+    document.querySelectorAll('.seg button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('.seg button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on'); state.years = +b.getAttribute('data-y'); render(); touch();
+      });
     });
 
-    // 快捷鍵
-    ['dist5','dist10','dist15'].forEach(id => {
-        $(id).addEventListener('click', () => {
-            const val = id.replace('dist','');
-            $('distRange').value = val;
-            update();
-        });
-    });
-
-    // 匯出圖片
-    $('btn-save-png').addEventListener('click', async () => {
-        const target = $('calc');
-        try {
-            const canvas = await html2canvas(target, { backgroundColor:'#0A1221' });
-            const url = canvas.toDataURL("image/png");
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'MOMO_配息試算.png';
-            a.click();
-        } catch(e) { alert('匯出失敗'); }
-    });
-
-    update();
-  }
-
-  document.addEventListener('DOMContentLoaded', init);
+    function utm() {
+      document.querySelectorAll('a.js-utm').forEach(function (a) {
+        if (window.momoUtm) a.href = window.momoUtm(a.getAttribute('data-href'), a.getAttribute('data-loc') || 'cta');
+      });
+    }
+    render();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', utm); else utm();
+  })();
   </script>
 </body>
 </html>
