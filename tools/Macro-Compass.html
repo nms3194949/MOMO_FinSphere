@@ -168,6 +168,11 @@
     .history-empty { color: var(--momo-text-sub); font-style: italic; }
 
   </style>
+  <!-- MOMO雙贏策略：網站圖示、GA4、統一頁尾與免責聲明 -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </head>
 <body>
 
@@ -193,14 +198,14 @@
   <div class="momo-compass-inner">
     <div class="metrics-col">
       <div class="strategy-card">
-        <div class="strategy-title">投資策略建議</div>
+        <div class="strategy-title">景氣情境解讀</div>
         <div class="strategy-text" id="strategyText">分析中...</div>
         <div class="sector-rotation-block">
           <span class="sector-label">強勢板塊:</span>
           <span id="sectorTags"></span>
         </div>
         <div class="alloc-container">
-          <div class="text-caption">建議資產配置比重</div>
+          <div class="text-caption">模型參考配比（試算）</div>
           <div class="allocation-bar-wrapper">
             <div class="alloc-segment" id="segStock" style="width:60%; background:#d9534f;" title="股票"></div>
             <div class="alloc-segment" id="segBond" style="width:30%; background:#2D7A77;" title="債券"></div>

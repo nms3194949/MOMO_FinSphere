@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>MOMO雙贏策略｜月配息 × 資產增值 × 智能決策</title>
+<title>配息與融資現金流試算｜MOMO雙贏策略</title>
 <style>
 :root{--deep:#0A1221;--gold:#C9A227;--gold-soft:#E9D18A;--card:#0F1830;--pos:#39C27A;--neg:#E25A5A;--input:#071226;}
 html,body{margin:0;background:var(--deep);color:#fff;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
@@ -80,6 +80,11 @@ details.collapsible summary::-webkit-details-marker{display:none}
 /* 隱藏自動重算 */
 #autorunWrap{display:none}
 </style>
+  <!-- MOMO雙贏策略：網站圖示、GA4、統一頁尾與免責聲明 -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -88,7 +93,7 @@ details.collapsible summary::-webkit-details-marker{display:none}
     <div class="tabs" role="tablist">
       <button class="tab" id="tab-cash" aria-selected="true">每月配息</button>
       <button class="tab" id="tab-portfolio" aria-selected="false">投組分析</button>
-      <button class="tab" id="tab-ai" aria-selected="false">AI最佳化（Pro）</button>
+      <button class="tab" id="tab-ai" aria-selected="false">權重最佳化（試算）</button>
     </div>
     <button class="btn" id="btnPng">匯出 PNG</button>
   </div>
@@ -194,7 +199,7 @@ details.collapsible summary::-webkit-details-marker{display:none}
 
   <section class="tabpanel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai">
     <div class="ai-card">
-      <h4>AI 最佳化（Pro）</h4>
+      <h4>權重最佳化（試算）</h4>
 
       <div class="ai-grid">
         <div class="field"><label>年化配息率（%）</label><input id="pro_minDy" type="number" class="control" value="7.0" step="0.1"></div>
@@ -477,7 +482,7 @@ async function exportPng(){
     }
     else { 
         target=$('pro_export_target'); 
-        filename='AI最佳化投組'; 
+        filename='權重最佳化試算'; 
     }
     
     const wrapEl = document.querySelector('.wrap');
@@ -906,7 +911,7 @@ function renderPro(list){
         <span class="ai-pill">相關係數：${Number.isFinite(sug.avgPos)?sug.avgPos.toFixed(2):'—未提供—'}</span>
       </div>
       <div class="table-wrap"><table class="table-grid">
-        <thead><tr><th>基金</th><th>3年CAGR</th><th>1年</th><th>配息</th><th>建議比重</th></tr></thead>
+        <thead><tr><th>基金</th><th>3年CAGR</th><th>1年</th><th>配息</th><th>試算比重</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
       ${corrBlock}

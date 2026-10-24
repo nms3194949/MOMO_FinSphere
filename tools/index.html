@@ -1,113 +1,102 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant-TW">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-  <title>MOMO財商智庫｜智能工具總覽</title>
-  <meta name="description" content="集中管理 MOMO 財商智庫相關的試算工具、策略模型與資料介面，一次瀏覽所有智能工具。">
+  <title>所有工具｜MOMO雙贏策略</title>
+  <meta name="description" content="MOMO雙贏策略的互動工具總覽：配息現金流試算、景氣儀表板、季節性分析、基金與 ETF 數據工具。內容僅供教育參考，不構成投資建議。">
   <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/tools/">
   <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#f6f1e7">
 
-  <meta property="og:title" content="MOMO財商智庫｜智能工具總覽">
-  <meta property="og:description" content="基金工具、加密策略、權證工具一次瀏覽，搭配 MOMO 雙贏策略系統。">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/tools/">
-  <meta property="og:image" content="https://nms3194949.github.io/MOMO_FinSphere/og-cover.jpg">
+  <meta property="og:site_name" content="MOMO雙贏策略">
   <meta property="og:locale" content="zh_TW">
+  <meta property="og:title" content="所有工具｜MOMO雙贏策略">
+  <meta property="og:description" content="配息現金流試算、景氣儀表板、季節性分析、基金與 ETF 數據工具一次瀏覽。">
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/tools/">
+  <meta property="og:image" content="https://nms3194949.github.io/og-default.png">
 
-  <meta name="theme-color" content="#0A1221">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "所有工具｜MOMO雙贏策略",
+    "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/",
+    "inLanguage": "zh-Hant-TW",
+    "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
+    "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
+    "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap">
 
   <style>
-    :root{
-      --deep:#0A1221; --card:#0C152A; --ink:#EDEFF5; --muted:#AAB2BF;
-      --gold:#C9A227; --gold-soft:#E9D18A; --line:rgba(233,209,138,.28);
-      --gold-grad:linear-gradient(90deg,#F9E27C 0%,#D9B84B 50%,#B88A1E 100%);
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
     }
-    *{box-sizing:border-box}
-    html,body{margin:0}
-    body{background:var(--deep);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    a{color:inherit;text-decoration:none}
-
-    .page-wrap{max-width:1120px;margin:0 auto;padding:20px 16px 40px}
-    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .logo-row{display:flex;align-items:center;gap:10px;font-weight:800}
-    .logo-row::before{content:"";width:28px;height:28px;border-radius:50%;
-      background:radial-gradient(120% 120% at 20% 20%, var(--gold) 0%, var(--gold-soft) 45%, transparent 46%), #1a1f2b;
-      border:1px solid var(--line)}
-    .back-link{font-size:14px;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
-    .back-link span{font-size:18px;line-height:1}
-    .back-link:hover{color:var(--gold-soft)}
-
-    h1{font-size:26px;margin:4px 0 4px}
-    .lead{margin:0 0 20px;color:var(--muted);font-size:14px}
-
-    .tab-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
-    .tool-tab{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#0D1528;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
-    .tool-tab.is-active{background:var(--gold-grad);border-color:transparent;color:#0A1221}
-
-    .tools-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-    .tool-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px 18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 22px rgba(0,0,0,.45)}
-    .tool-pill-row{display:flex;gap:8px;margin-bottom:4px}
-    .tool-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;border:1px solid rgba(233,209,138,.45);font-size:11px;color:var(--gold-soft)}
-    .tool-title{font-size:19px;margin:0}
-    .tool-desc{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
-    .tool-footer{margin-top:8px}
-    .btn-gold{display:inline-block;padding:9px 16px;border-radius:10px;border:none;background:var(--gold-grad);color:#0A1221;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none}
-    .btn-gold:hover{filter:brightness(1.08)}
-
-    .page-footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
-
-    @media (max-width:600px){
-      h1{font-size:22px}
-    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.8; letter-spacing: .02em; }
+    a { color: inherit; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; }
+    .back { color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .back:hover { color: var(--gold); }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(28px, 6vw, 38px); line-height: 1.35; margin: 40px 0 8px; }
+    .lead { color: var(--ink-2); margin: 0 0 22px; }
+    .tab-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tool-tab { padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: 600 14px var(--sans); cursor: pointer; }
+    .tool-tab.is-active { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+    .tools-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-bottom: 24px; }
+    .tool-card { display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; text-decoration: none; transition: transform .15s, border-color .15s; }
+    .tool-card:hover { transform: translateY(-2px); border-color: var(--gold-soft); }
+    .tool-pill { align-self: flex-start; padding: 2px 10px; border-radius: 999px; background: var(--gold-bg); color: var(--gold); font-size: 12px; font-weight: 700; }
+    .tool-title { font-family: var(--serif); font-size: 18px; margin: 2px 0 0; line-height: 1.45; }
+    .tool-desc { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.7; flex: 1; }
+    .tool-go { color: var(--gold); font-weight: 700; font-size: 14px; }
+    .note { font-size: 13px; color: var(--muted); }
   </style>
 </head>
 <body>
-  <main class="page-wrap">
-    <header class="page-header">
-      <div class="logo-row">MOMO財商智庫</div>
-      <a href="../index.html" class="back-link">
-        <span>←</span> 回首頁
-      </a>
-    </header>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/"><img src="/icon-96.png" alt="" width="32" height="32">MOMO雙贏策略</a>
+      <a class="back" href="../">← 回工具首頁</a>
+    </div>
+  </header>
 
-    <section aria-labelledby="tools-title">
-      <h1 id="tools-title">智能工具總覽</h1>
-      <p class="lead">
-        集中管理 MOMO 財商智庫相關的試算工具、策略模型與資料介面，方便之後持續擴充與維護。
-      </p>
+  <main class="wrap">
+    <h1>所有工具</h1>
+    <p class="lead">試算、景氣、季節性與基金數據工具。自己輸入、自己觀察，把數字當成理解市場的材料。</p>
 
-      <!-- 分類 tab -->
-      <div class="tab-row" role="tablist" aria-label="工具分類篩選">
-        <button type="button" class="tool-tab is-active" data-tools-filter="all" role="tab" aria-selected="true">全部</button>
-        <button type="button" class="tool-tab" data-tools-filter="fund" role="tab" aria-selected="false">基金工具</button>
-        <button type="button" class="tool-tab" data-tools-filter="crypto" role="tab" aria-selected="false">加密策略</button>
-        <button type="button" class="tool-tab" data-tools-filter="warrant" role="tab" aria-selected="false">權證工具</button>
-      </div>
+    <div class="tab-row" role="tablist" aria-label="工具分類">
+      <button type="button" class="tool-tab is-active" data-tools-filter="all" role="tab" aria-selected="true">全部</button>
+      <button type="button" class="tool-tab" data-tools-filter="calc" role="tab" aria-selected="false">試算</button>
+      <button type="button" class="tool-tab" data-tools-filter="market" role="tab" aria-selected="false">景氣與季節性</button>
+      <button type="button" class="tool-tab" data-tools-filter="fund" role="tab" aria-selected="false">基金與 ETF</button>
+      <button type="button" class="tool-tab" data-tools-filter="other" role="tab" aria-selected="false">其他</button>
+    </div>
 
-      <!-- 工具卡片區：由共用 JS 注入 -->
-      <div class="tools-grid" id="tools-grid" aria-live="polite"></div>
-    </section>
-
-    <footer class="page-footer">
-      © MOMO財商智庫｜所有工具僅供教育與模擬研究使用，不構成任何投資建議。請依自身風險承受度謹慎評估。
-    </footer>
+    <div class="tools-grid" id="tools-grid" aria-live="polite"></div>
+    <p class="note">工具中的數據、分數與歷史統計僅供教育與研究參考，不代表未來表現，也不構成任何買賣或配置建議。</p>
   </main>
 
-  <!-- 共用工具設定 + 渲染：工具總覽頁 -->
   <script src="../assets/tools-config.js"></script>
   <script src="../assets/tools-render.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.MOMO_TOOLS && typeof MOMO_TOOLS.initToolsPage === 'function') {
-        MOMO_TOOLS.initToolsPage();
-      }
-    });
-  </script>
+  <script>window.MOMO_TOOLS && MOMO_TOOLS.initToolsPage();</script>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </body>
 </html>

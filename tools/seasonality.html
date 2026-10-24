@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MOMO FinSphere — 市場季節性分析</title>
+<title>MOMO雙贏策略 — 市場季節性分析</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -98,6 +98,11 @@ main{padding:18px 24px}
 footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var(--mu)}
 @media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
+  <!-- MOMO雙贏策略：網站圖示、GA4、統一頁尾與免責聲明 -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </head>
 <body>
 
@@ -123,7 +128,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
 </div>
 
 <header>
-  <div class="logo">MOMO FinSphere <em>市場季節性分析</em></div>
+  <div class="logo">MOMO雙贏策略 <em>市場季節性分析</em></div>
   <nav>
     <button class="nb on" data-v="intra">月內走勢</button>
     <button class="nb" data-v="monthly">月份總覽</button>
@@ -175,7 +180,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <!-- 交易建議區 -->
     <div id="signal-card" style="display:none;margin-bottom:14px">
       <div style="font-size:12px;font-weight:600;color:var(--mu);margin-bottom:8px;letter-spacing:.5px">
-        交易區間建議 <span style="font-weight:400;color:var(--bd)">｜ 基準：S&amp;P 500 × VIX 輔助</span>
+        歷史統計區間 <span style="font-weight:400;color:var(--bd)">｜ 基準：S&amp;P 500 × VIX 輔助</span>
       </div>
       <div id="signal-zones" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
       <div id="signal-summary" style="font-size:12px;color:var(--mu);line-height:1.8;padding:10px 14px;background:var(--surf);border:1px solid var(--bd);border-radius:8px"></div>
@@ -335,7 +340,7 @@ footer{padding:12px 24px;border-top:1px solid var(--bd);font-size:11px;color:var
     <div class="cc">
       <div class="cc-h">
         <div>
-          <span class="cc-t">🔮 未來 3 月板塊布局建議</span>
+          <span class="cc-t">🔮 未來 3 個月板塊歷史傾向</span>
           <span class="cc-s" style="margin-left:8px">依歷史季節性平均報酬排序，由當前月份往後推算</span>
         </div>
       </div>
@@ -896,13 +901,13 @@ function drawSignals(month) {
   if (entryZones.length) {
     var c1 = document.createElement('span');
     c1.className = 'sig-zone sig-entry';
-    c1.innerHTML = '<span class="sig-dot" style="background:#3fb950"></span>建議進場：' + entryZones.join('、');
+    c1.innerHTML = '<span class="sig-dot" style="background:#3fb950"></span>歷史偏強月份：' + entryZones.join('、');
     zonesEl.appendChild(c1);
   }
   if (exitZones.length) {
     var c2 = document.createElement('span');
     c2.className = 'sig-zone sig-exit';
-    c2.innerHTML = '<span class="sig-dot" style="background:#f85149"></span>建議離場：' + exitZones.join('、');
+    c2.innerHTML = '<span class="sig-dot" style="background:#f85149"></span>歷史偏弱月份：' + exitZones.join('、');
     zonesEl.appendChild(c2);
   }
 
@@ -2213,7 +2218,7 @@ function drawSectorMomentum(srs) {
     '　｜　動能策略參考：前 2–3 名為資金流入板塊，末位為資金流出板塊';
 }
 
-// ── 未來 3 月板塊布局建議 ────────────────────────────────────
+// ── 未來 3 個月板塊歷史傾向 ────────────────────────────────────
 function drawSectorFuture(srs) {
   if (!srs) srs = getSectorSR();
   var wrap = document.getElementById('s-future');
