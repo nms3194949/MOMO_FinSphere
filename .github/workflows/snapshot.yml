@@ -1,0 +1,54 @@
+# MOMO財商智庫｜每日數據快照
+# 每天台灣時間早上約 06:17 執行 scripts/snapshot.mjs，把最新經濟數據寫成靜態網頁內容，
+# 有變動才提交，並通知 Bing（IndexNow）。
+# 需要在 repo 的 Settings → Secrets and variables → Actions 新增：FRED_API_KEY
+name: 每日數據快照
+
+on:
+  schedule:
+    - cron: '17 22 * * *'   # UTC 22:17 = 台灣時間 06:17
+  workflow_dispatch:         # 也可以在 Actions 頁面手動執行
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 產生數據快照
+        run: node scripts/snapshot.mjs
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+
+      - name: 有變動才提交
+        id: commit
+        run: |
+          if git diff --quiet; then
+            echo "資料沒有變動，不提交"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "每日數據快照 $(TZ=Asia/Taipei date +%F)"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: 通知 Bing（IndexNow）
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          sleep 90   # 等 GitHub Pages 部署完成
+          node scripts/snapshot.mjs --indexnow || true
