@@ -140,7 +140,7 @@ function compareText(mcs, cmp) {
 
 
 // ── 4. 部落格最新文章（RSS） ──────────────────────────────
-async function fetchPosts(limit = 6) {
+async function fetchPosts(limit = 4) {
   try {
     const res = await fetch(BLOG_RSS);
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -164,6 +164,16 @@ async function fetchPosts(limit = 6) {
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .slice(0, limit);
     if (!posts.length) throw new Error('RSS 沒有文章');
+    // 封面圖：讀每篇文章頁的 og:image（部落格把第一張輪播圖轉成 1080px JPEG）
+    await Promise.all(posts.map(async (p) => {
+      try {
+        const r = await fetch('https://nms3194949.github.io' + p.link);
+        if (!r.ok) return;
+        const page = await r.text();
+        const m = page.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/) || page.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/);
+        if (m && !/og-default/.test(m[1])) p.cover = m[1].replace(/^https?:\/\/nms3194949\.github\.io/, '');
+      } catch (e) { /* 沒有封面就用文字底圖 */ }
+    }));
     return posts;
   } catch (err) {
     console.warn(`⚠ 部落格 RSS 讀取失敗：${err.message}（保留原本的文章列表）`);
@@ -172,11 +182,12 @@ async function fetchPosts(limit = 6) {
 }
 
 function postsHtml(posts) {
-  const cut = (t, n) => (t.length > n ? t.slice(0, n - 1) + '…' : t);
   return posts.map((p) => `          <a class="post" href="${esc(p.link)}">
+            ${p.cover
+              ? `<img class="post-cover" src="${esc(p.cover)}" alt="${esc(p.title)}" width="1080" height="1350" loading="lazy" decoding="async">`
+              : `<span class="post-cover ph" aria-hidden="true">${esc(p.tag || 'MOMO雙贏策略')}</span>`}
             <span class="post-meta"><time datetime="${p.date}">${p.date}</time>${p.tag ? '・' + esc(p.tag) : ''}</span>
             <span class="post-title">${esc(p.title)}</span>
-            <span class="post-desc">${esc(cut(p.desc, 110))}</span>
           </a>`).join('\n');
 }
 
@@ -262,7 +273,7 @@ async function snapshot() {
 
   console.log(`✅ 快照完成：${items.length} 個指標（${asOf}）`
     + `${mcs ? `、MCS ${mcs.score} ${mcs.stage}` : '、MCS 未取得'}、羅盤 ${cmp.season} ${cmp.score}`
-    + `${posts ? `、文章 ${posts.length} 篇` : '、文章未更新'}`);
+    + `${posts ? `、文章 ${posts.length} 篇（封面 ${posts.filter((p) => p.cover).length} 張）` : '、文章未更新'}`);
 }
 
 // ── IndexNow：通知 Bing 等搜尋引擎頁面已更新 ──────────────

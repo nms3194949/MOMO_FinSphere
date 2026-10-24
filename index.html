@@ -95,7 +95,7 @@
           "isAccessibleForFree": true
         }
       ],
-      "dateModified": "2026-10-24"
+      "dateModified": "2026-10-25"
     },
     {
       "@type": "FAQPage",
@@ -252,13 +252,17 @@
     .tool-desc { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.7; flex: 1; }
     .tool-go { color: var(--gold); font-weight: 700; font-size: 14px; }
 
-    /* 最新文章 */
-    .posts { display: grid; gap: 10px; }
-    .post { display: grid; gap: 2px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; transition: border-color .15s, transform .15s; }
-    .post:hover { border-color: var(--gold-soft); transform: translateY(-1px); }
-    .post-meta { font-size: 13px; color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
-    .post-title { font-family: var(--serif); font-size: 18px; font-weight: 800; line-height: 1.5; color: var(--ink); }
-    .post-desc { font-size: 14px; color: var(--ink-2); line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    /* 最新文章：封面卡片 */
+    .posts { display: grid; gap: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .post { display: flex; flex-direction: column; gap: 4px; text-decoration: none; }
+    .post-cover { display: block; width: 100%; aspect-ratio: 4 / 5; height: auto; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); transition: transform .2s, box-shadow .2s; }
+    .post:hover .post-cover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(12,21,42,.12); }
+    .post-cover.ph { display: flex; align-items: flex-end; padding: 14px; font-family: var(--serif); font-weight: 800; font-size: 18px; color: var(--gold-soft);
+      background: linear-gradient(160deg, #1b2742 0%, #0c152a 70%); border-color: transparent; }
+    .post-meta { margin-top: 6px; font-size: 12.5px; color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .post-title { font-family: var(--serif); font-size: 16px; font-weight: 800; line-height: 1.5; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .post:hover .post-title { color: var(--gold); }
+    @media (max-width: 760px) { .posts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } .post-title { font-size: 15px; } }
 
     /* 主題 chips */
     .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
@@ -355,18 +359,11 @@
              START／END 之間的內容會被自動覆蓋，請勿手動修改。
              沒有靜態數據時，前端才改向 GAS（getMacro）抓取；都失敗則整區隱藏。 -->
         <!-- SNAP:MACRO:START -->
-        <div class="macro" id="macro" aria-labelledby="macro-title">
-          <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">FRED｜<time datetime="2026-10-24">2026-10-24</time><em>｜▲▼ 與上期比較</em></span></div>
-          <div class="macro-grid" id="macro-grid">
-            <div class="mc" title="長天期利率，影響債券與配息基金的淨值｜資料日期 2026-10-22"><div class="n">美債10年殖利率</div><div class="v">4.96<small>%</small></div><div class="s"><span class="d " title="較上月">—0.00</span></div></div>
-            <div class="mc" title="殖利率曲線斜率，負值代表倒掛｜資料日期 2026-10-23"><div class="n">10Y−2Y利差</div><div class="v">0.31<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.05</span><span class="t">正斜率</span></div></div>
-            <div class="mc" title="聯準會政策利率（目標區間上限）｜資料日期 2026-10-24"><div class="n">聯邦基金利率</div><div class="v">4.00<small>%</small></div><div class="s"><span class="d up" title="較上季">▲0.25</span><span class="t warn">升息循環</span></div></div>
-            <div class="mc" title="通膨速度，聯準會目標約 2%｜資料日期 2026-09"><div class="n">美國CPI年增</div><div class="v">4.0<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.3</span><span class="t warn">高於目標</span></div></div>
-            <div class="mc" title="市場資金水位的變化｜資料日期 2026-08"><div class="n">美國M2年增</div><div class="v">5.7<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.3</span><span class="t">資金擴張</span></div></div>
-            <div class="mc" title="信用風險溫度，越高代表市場越擔心違約｜資料日期 2026-10-22"><div class="n">高收益債利差</div><div class="v">3.40<small>%</small></div><div class="s"><span class="d up" title="較上月">▲0.72</span><span class="t">風險偏低</span></div></div>
-          </div>
+        <div class="macro" id="macro" hidden aria-labelledby="macro-title">
+          <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">資料來源：FRED</span></div>
+          <div class="macro-grid" id="macro-grid"></div>
         </div>
-<!-- SNAP:MACRO:END -->
+        <!-- SNAP:MACRO:END -->
       </div>
     </section>
 
@@ -531,31 +528,26 @@
         <div class="posts" id="posts">
         <!-- SNAP:POSTS:START -->
           <a class="post" href="/momo-blog/posts/2026-10-post05/">
+            <span class="post-cover ph" aria-hidden="true">配息基金</span>
             <span class="post-meta"><time datetime="2026-10-23">2026-10-23</time>・配息基金</span>
             <span class="post-title">美債殖利率 5%，還要買月配息基金嗎？</span>
-            <span class="post-desc">美債殖利率走高，不代表月配息基金就不能買，也不代表配息率比殖利率高就該買。兩種想法都只看了數字，沒看數字從哪來。買配息基金前先問 3 題：配息是收益配出來還是本金配回來、存續期間多長對利率多敏感、信用風險多高。殖利率高…</span>
           </a>
           <a class="post" href="/momo-blog/posts/2026-10-post04/">
+            <span class="post-cover ph" aria-hidden="true">資產配置</span>
             <span class="post-meta"><time datetime="2026-10-17">2026-10-17</time>・資產配置</span>
             <span class="post-title">同樣 500 萬，為什麼有人越配越安心，有人越配越焦慮？</span>
-            <span class="post-desc">同樣 500 萬，有人越配越安心、有人越配越焦慮，差別不在報酬率，而在配置的順序。焦慮的人先問怎麼賺最多，全部投入、追最近最飆的；安心的人先留不能動的錢、每筆錢分好工作，並清楚最壞會跌多少。資產變大以後，跌 20% 就…</span>
           </a>
           <a class="post" href="/momo-blog/posts/2026-10-post03/">
+            <span class="post-cover ph" aria-hidden="true">現金規劃</span>
             <span class="post-meta"><time datetime="2026-10-11">2026-10-11</time>・現金規劃</span>
             <span class="post-title">市場大跌時，沒現金的人只能看著機會跑掉</span>
-            <span class="post-desc">現金不是最沒效率的錢，而是你的選擇權。市場大跌時，沒有現金的人只剩硬撐或賣在低點兩種選擇，有現金的人多了第三個選擇：分批進場。現金在組合裡負責保護生活、穩住心態與保留機會，它的工作不是賺最多，而是讓你不用被迫做決定。但…</span>
           </a>
           <a class="post" href="/momo-blog/posts/2026-10-post02/">
+            <span class="post-cover ph" aria-hidden="true">資產配置</span>
             <span class="post-meta"><time datetime="2026-10-06">2026-10-06</time>・資產配置</span>
             <span class="post-title">買了 8 支基金，為什麼還是一起跌？</span>
-            <span class="post-desc">買了很多支基金卻一起跌，問題不在支數，而在這些基金賺的是不是同一種錢。名稱不同的基金，底層常常前十大持股重疊、大多是美元計價、都跟著同一個利率方向在動，看起來是 8 個籃子，其實提的是同一個把手。真正的分散，是讓每筆錢…</span>
           </a>
-          <a class="post" href="/momo-blog/posts/2026-10-post01/">
-            <span class="post-meta"><time datetime="2026-10-02">2026-10-02</time>・資產配置</span>
-            <span class="post-title">股、債、黃金一起跌，資產配置失效了嗎？</span>
-            <span class="post-desc">股、債、黃金一起跌，背後是同一個原因：利率重新走高、美元走強、通膨還沒退，高利率同時壓低股票估值與債券價格，也提高持有黃金的成本。這不代表資產配置失效，而是很多人的組合裡藏著同一種風險。比起猜下一個會漲的資產，更重要的…</span>
-          </a>
-<!-- SNAP:POSTS:END -->
+        <!-- SNAP:POSTS:END -->
         </div>
         <nav class="chips" aria-label="文章主題">
           <a href="/momo-blog/tags/%E8%B3%87%E7%94%A2%E9%85%8D%E7%BD%AE/">資產配置</a>
