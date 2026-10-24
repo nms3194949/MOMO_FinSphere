@@ -5,6 +5,7 @@
 //   2. 寫成靜態 HTML／文字，讓搜尋引擎與 AI 爬蟲（不執行 JavaScript）也讀得到：
 //      index.html（SNAP:MACRO）、tools/cycle.html（SNAP:CYCLE）、llms.txt（SNAP:LLMS）
 //      data/macro.json、sitemap.xml 的 lastmod、各頁 dateModified
+//   3. 從 MOMO雙贏策略部落格的 RSS 更新首頁「最新文章」（SNAP:POSTS）
 //   3. 加上 --indexnow 參數時，改為通知 Bing（IndexNow）頁面已更新
 //
 // 本機測試：FRED_API_KEY=你的金鑰 node scripts/snapshot.mjs
@@ -18,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://nms3194949.github.io/MOMO_FinSphere/';
+const BLOG_RSS = 'https://nms3194949.github.io/momo-blog/rss.xml';
 const MCS_API = 'https://mcs-worker.nms3194949.workers.dev?profile=balanced';
 const INDEXNOW_KEY = '152b46d40afee669f85ae0b1dbe8bdf8';
 
@@ -27,7 +29,8 @@ if (process.env.SNAPSHOT_MOCK) {
   globalThis.fetch = async (url) => {
     const key = Object.keys(fx).find((k) => String(url).includes(k));
     if (!key) return { ok: false, status: 404, json: async () => ({}) };
-    return { ok: true, status: 200, json: async () => fx[key] };
+    const v = fx[key];
+    return { ok: true, status: 200, json: async () => v, text: async () => (typeof v === 'string' ? v : JSON.stringify(v)) };
   };
 }
 
@@ -135,6 +138,48 @@ function compareText(mcs, cmp) {
   return '短期降溫、長期偏暖，兩個週期方向分歧。';
 }
 
+
+// ── 4. 部落格最新文章（RSS） ──────────────────────────────
+async function fetchPosts(limit = 6) {
+  try {
+    const res = await fetch(BLOG_RSS);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const xml = await res.text();
+    const pick = (block, tag) => {
+      const m = block.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`));
+      if (!m) return '';
+      return m[1].replace(/^<!\[CDATA\[|\]\]>$/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
+    };
+    const posts = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((m) => {
+      const b = m[1];
+      const d = new Date(pick(b, 'pubDate'));
+      return {
+        title: pick(b, 'title'),
+        link: pick(b, 'link').replace(/^https?:\/\/nms3194949\.github\.io/, ''),
+        desc: pick(b, 'description'),
+        tag: pick(b, 'category'),
+        date: isNaN(d) ? '' : new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' }).format(d),
+      };
+    }).filter((p) => p.title && p.link)
+      .sort((a, b) => (a.date < b.date ? 1 : -1))
+      .slice(0, limit);
+    if (!posts.length) throw new Error('RSS 沒有文章');
+    return posts;
+  } catch (err) {
+    console.warn(`⚠ 部落格 RSS 讀取失敗：${err.message}（保留原本的文章列表）`);
+    return null;
+  }
+}
+
+function postsHtml(posts) {
+  const cut = (t, n) => (t.length > n ? t.slice(0, n - 1) + '…' : t);
+  return posts.map((p) => `          <a class="post" href="${esc(p.link)}">
+            <span class="post-meta"><time datetime="${p.date}">${p.date}</time>${p.tag ? '・' + esc(p.tag) : ''}</span>
+            <span class="post-title">${esc(p.title)}</span>
+            <span class="post-desc">${esc(cut(p.desc, 110))}</span>
+          </a>`).join('\n');
+}
+
 // ── 產生 HTML／文字 ───────────────────────────────────────
 function macroHtml(items, asOf) {
   const meta = Object.fromEntries(SERIES.map((s) => [s.id, s]));
@@ -183,7 +228,7 @@ function llmsText(items, mcs, cmp, asOf) {
 
 // ── 主流程：寫入檔案 ──────────────────────────────────────
 async function snapshot() {
-  const [items, mcs] = await Promise.all([fetchFred(), fetchMcs()]);
+  const [items, mcs, posts] = await Promise.all([fetchFred(), fetchMcs(), fetchPosts()]);
   if (items.length < 3) throw new Error(`FRED 只取得 ${items.length} 個指標，不更新網站`);
   const cmp = compassNow();
   // 「資料日期」用指標裡最新的日資料日期，而不是執行日，避免假日沒新資料也每天提交
@@ -195,6 +240,7 @@ async function snapshot() {
 
   let html = await readFile(file('index.html'), 'utf8');
   html = setDateModified(replaceBetween(html, 'MACRO', macroHtml(items, asOf)), asOf);
+  if (posts) html = replaceBetween(html, 'POSTS', postsHtml(posts));
   await writeFile(file('index.html'), html);
 
   let cyc = await readFile(file('tools/cycle.html'), 'utf8');
@@ -215,7 +261,8 @@ async function snapshot() {
   await writeFile(file('sitemap.xml'), sm);
 
   console.log(`✅ 快照完成：${items.length} 個指標（${asOf}）`
-    + `${mcs ? `、MCS ${mcs.score} ${mcs.stage}` : '、MCS 未取得'}、羅盤 ${cmp.season} ${cmp.score}`);
+    + `${mcs ? `、MCS ${mcs.score} ${mcs.stage}` : '、MCS 未取得'}、羅盤 ${cmp.season} ${cmp.score}`
+    + `${posts ? `、文章 ${posts.length} 篇` : '、文章未更新'}`);
 }
 
 // ── IndexNow：通知 Bing 等搜尋引擎頁面已更新 ──────────────
