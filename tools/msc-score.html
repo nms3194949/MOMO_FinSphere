@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+  <meta name="robots" content="noindex,follow">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>MCS 景氣循環儀表板｜MOMO雙贏策略</title>
@@ -439,10 +440,10 @@
     if (key === 'macro') {
       if (score >= 12) return '<strong>經濟擴張：</strong>數據穩健，核心持股續抱。';
       if (score <= 8)  return '<strong>數據疲軟：</strong>動能減弱，適度提高現金/債券。';
-      return '<strong>景氣溫和：</strong>軟著陸預期，區間操作。';
+      return '<strong>景氣溫和：</strong>軟著陸預期，方向尚不明確。';
     }
     if (key === 'equity') {
-      if (score >= 14) return '<strong>多頭排列：</strong>動能強勁，順勢操作不追高。';
+      if (score >= 14) return '<strong>多頭排列：</strong>動能強勁，需留意估值偏高的風險。';
       if (score <= 6)  return '<strong>動能轉弱：</strong>跌破支撐，嚴設停損或避險。';
       return '<strong>高檔震盪：</strong>指數乖離，等待拉回買點。';
     }
@@ -635,13 +636,13 @@
 
     summary += `<br><br><strong>✦ 情境觀察：</strong>`;
     if (score >= 60 && isLiquidityStrong) {
-      summary += `順勢操作。因流動性強勁，<span class="highlight">科技股、成長股與加密貨幣</span> 表現將優於防禦型資產。但需留意 Equity 分數若過高，切勿過度追價，建議逢回布局。`;
+      summary += `流動性充沛的環境下，歷史上 <span class="highlight">成長型資產</span> 波動與表現通常較活躍；Equity 分數偏高時，也代表估值與追價風險上升。`;
     } else if (score >= 60 && !isLiquidityStrong) {
-      summary += `回歸基本面。資金潮退去，選股將重於選市，聚焦 <span class="highlight">高 EPS 成長</span> 之實質業績股，避開無基之彈的投機標的。`;
+      summary += `資金面轉弱、基本面仍佳，歷史上市場表現較依賴 <span class="highlight">企業獲利</span>，個別資產的分歧通常擴大。`;
     } else if (score < 40) {
-      summary += `防禦為主。建議拉高 <span class="highlight">現金與投資級債 (IG Bond)</span> 部位，降低股票曝險，直至 MACRO 指標落底回升。`;
+      summary += `景氣分數偏低時，歷史上 <span class="highlight">現金與投資級債</span> 等防禦型資產的相對表現較佳，可留意 MACRO 指標是否落底。`;
     } else {
-      summary += `區間操作。市場缺乏明確方向，建議採取 <span class="highlight">股債平衡</span> 配置，並透過網格交易或定期定額分散波動風險。`;
+      summary += `市場缺乏明確方向，<span class="highlight">股債</span> 之間的輪動較頻繁，波動分散的重要性提高。`;
     }
 
     el.innerHTML = summary;

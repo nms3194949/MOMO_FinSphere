@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+  <meta name="robots" content="noindex,follow">
   <meta charset="utf-8" />
-  <title>MOMO 景氣羅盤 V18 (2000-2040版)</title>
+  <title>景氣羅盤（長週期）｜MOMO雙贏策略</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     /* ========= 1. 核心樣式 ========= */
@@ -181,7 +182,7 @@
 <div class="momo-compass-card">
   <div class="header-group">
     <div style="display:flex; align-items:center;">
-      <div class="logo logo-wrap">M</div>
+      <a href="/MOMO_FinSphere/" aria-label="MOMO雙贏策略 工具首頁" style="display:block;margin-right:12px;flex:0 0 auto"><img src="/icon-96.png" alt="MOMO雙贏策略" width="40" height="40" style="width:40px;height:40px;border-radius:50%;display:block"></a>
       <div>
         <div class="brand-title">MOMO 景氣羅盤 V18</div>
         <div class="text-caption">雙週期宏觀模型 (Dual-Cycle Model)</div>
@@ -201,7 +202,7 @@
         <div class="strategy-title">景氣情境解讀</div>
         <div class="strategy-text" id="strategyText">分析中...</div>
         <div class="sector-rotation-block">
-          <span class="sector-label">強勢板塊:</span>
+          <span class="sector-label">歷史常見強勢板塊：</span>
           <span id="sectorTags"></span>
         </div>
         <div class="alloc-container">
@@ -520,13 +521,13 @@
     let rawStock, rawBond, rawCash, strategyMsg;
     if (finalScore >= 70) {
       rawStock = 80; rawBond = 15; rawCash = 5;
-      strategyMsg = "【積極進攻】雙週期向上共振。建議 <span style='color:#E74C3C'>大幅增持科技與成長股</span>。";
+      strategyMsg = "【擴張共振】雙週期同步向上，歷史上 <span style='color:#E74C3C'>成長型資產</span> 相對活躍。";
     } else if (finalScore >= 45) {
       rawStock = 50; rawBond = 40; rawCash = 10;
-      strategyMsg = "【平衡佈局】多空交戰震盪。建議採 <span style='color:#F6E6B0'>股債平衡</span> 策略。";
+      strategyMsg = "【震盪交錯】兩個週期方向不一致，<span style='color:#F6E6B0'>股債輪動</span> 較頻繁。";
     } else {
       rawStock = 30; rawBond = 50; rawCash = 20;
-      strategyMsg = "【防禦優先】下行風險偏高。建議 <span style='color:#5DADE2'>提高公債與現金比重</span>。";
+      strategyMsg = "【收縮階段】下行風險偏高，歷史上 <span style='color:#5DADE2'>公債與現金</span> 相對抗跌。";
     }
 
     const { stock, bond, cash } = normalizeAlloc(rawStock, rawBond, rawCash);
@@ -636,6 +637,8 @@
   });
 
   // Init
+  // 預設顯示今天所在的季度
+  (function(){ const d=new Date(); const y=d.getFullYear()+Math.floor(d.getMonth()/3)/4; slider.value=Math.min(+slider.max, Math.max(+slider.min, y)); })();
   updateModel(slider.value);
 </script>
 </body>

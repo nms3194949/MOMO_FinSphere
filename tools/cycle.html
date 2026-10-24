@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <title>景氣循環儀表板｜短週期 MCS × 長週期景氣羅盤｜MOMO雙贏策略</title>
+  <meta name="description" content="同一頁對照兩種景氣週期：短週期用 MCS 景氣分數（信用利差、利率、PMI、VIX、流動性等因子）看目前的景氣溫度，長週期用雙週期景氣羅盤看在大週期中的位置。內容僅供教育參考。">
+  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#0a1221">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MOMO雙贏策略">
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:title" content="景氣循環儀表板｜MOMO雙贏策略">
+  <meta property="og:description" content="短週期看景氣溫度，長週期看大週期位置，同一頁對照。">
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html">
+  <meta property="og:image" content="https://nms3194949.github.io/og-default.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "景氣循環儀表板",
+    "url": "https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web Browser",
+    "inLanguage": "zh-Hant-TW",
+    "isAccessibleForFree": true,
+    "description": "對照短週期 MCS 景氣分數與長週期雙週期景氣羅盤，了解目前景氣溫度與大週期位置。",
+    "isPartOf": { "@id": "https://nms3194949.github.io/#website" },
+    "author": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" },
+    "publisher": { "@id": "https://nms3194949.github.io/momo-blog/about/#person" }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap">
+
+  <style>
+    :root {
+      --bg: #0a1221; --card: #111b30; --card-2: #0e1729; --ink: #edeff5; --ink-2: #aab2bf; --muted: #7a8296;
+      --line: rgba(233,209,138,.22); --gold: #d2c696; --gold-2: #e9d18a;
+      --recession: #f87171; --slowdown: #fb923c; --growth: #22c55e; --heat: #eab308;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.75; letter-spacing: .02em; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+    .eyebrow { color: var(--gold); font-weight: 700; font-size: 13px; letter-spacing: .14em; margin: 32px 0 6px; }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(26px, 5.6vw, 38px); line-height: 1.35; margin: 0 0 8px; }
+    .lead { color: var(--ink-2); margin: 0 0 22px; max-width: 760px; }
+
+    /* 對照摘要 */
+    .sum { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+    .sum-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 18px 16px; cursor: pointer; transition: border-color .15s, transform .15s; text-align: left; color: inherit; font: inherit; }
+    .sum-card:hover { border-color: rgba(233,209,138,.5); transform: translateY(-1px); }
+    .sum-card .tag { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--gold); }
+    .sum-card h2 { font-family: var(--serif); font-size: 20px; margin: 2px 0 10px; }
+    .sum-row { display: flex; align-items: center; gap: 16px; }
+    .score { font-family: var(--serif); font-weight: 800; font-size: 46px; line-height: 1; min-width: 74px; font-variant-numeric: tabular-nums; }
+    .stage { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 14px; font-weight: 800; background: rgba(255,255,255,.08); }
+    .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .sum-card p { margin: 12px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.7; }
+    .read { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--card-2); border: 1px dashed var(--line); color: var(--ink-2); font-size: 15px; }
+    .read b { color: var(--gold-2); }
+
+    /* 比較表 */
+    .cmp { width: 100%; border-collapse: collapse; margin: 18px 0 6px; font-size: 14px; }
+    .cmp th, .cmp td { padding: 10px 12px; border-bottom: 1px solid rgba(233,209,138,.14); text-align: left; vertical-align: top; }
+    .cmp th { color: var(--muted); font-weight: 600; width: 22%; }
+    .cmp thead th { color: var(--gold); font-weight: 800; }
+    .cmp-wrap { overflow-x: auto; }
+
+    /* 分頁 */
+    .tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; padding: 12px 0; background: var(--bg); margin-top: 18px; }
+    .tab { flex: 1; max-width: 260px; padding: 10px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); font: 700 15px var(--sans); cursor: pointer; }
+    .tab.on { background: var(--gold); border-color: var(--gold); color: #0a1221; }
+    .frames { position: relative; }
+    .frames iframe { display: block; width: 100%; border: 0; border-radius: 16px; background: #000; min-height: 600px; }
+    .frames iframe.off { position: absolute; left: -10000px; top: 0; visibility: hidden; }
+    .note { color: var(--muted); font-size: 13px; margin: 14px 0 0; }
+
+    @media (max-width: 760px) {
+      .sum { grid-template-columns: 1fr; }
+      .score { font-size: 40px; }
+    }
+  </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+</head>
+<body>
+  <main class="wrap">
+    <p class="eyebrow">景氣循環儀表板</p>
+    <h1>同一個市場，用兩把尺看</h1>
+    <p class="lead">短週期看的是「接下來幾個月的景氣溫度」，長週期看的是「我們在十年、數十年大週期裡的位置」。兩者方向一致時，訊號比較清楚；方向不同時，通常代表波動會比較大。</p>
+
+    <section class="sum" aria-label="兩種週期對照">
+      <button class="sum-card" type="button" data-go="mcs">
+        <span class="tag">短週期｜景氣溫度</span>
+        <h2>MCS 景氣分數</h2>
+        <div class="sum-row">
+          <div class="score" id="sMcsScore">--</div>
+          <div>
+            <span class="stage" id="sMcsStage">讀取中</span>
+            <div class="meta" id="sMcsAsOf">即時數據</div>
+          </div>
+        </div>
+        <p>用信用利差、利率、PMI、股市動能、企業獲利、VIX、流動性 7 個因子算出 0–100 分，分成衰退、放緩、成長、過熱四個象限。</p>
+      </button>
+      <button class="sum-card" type="button" data-go="compass">
+        <span class="tag">長週期｜大週期位置</span>
+        <h2>雙週期景氣羅盤</h2>
+        <div class="sum-row">
+          <div class="score" id="sCmpScore">--</div>
+          <div>
+            <span class="stage" id="sCmpStage">讀取中</span>
+            <div class="meta" id="sCmpYear">--</div>
+          </div>
+        </div>
+        <p>結合約 60 年的長週期（康波）與約 10 年的資金流向週期，用春、夏、秋、冬描述大週期位置，可拉動年份回看 2000 年以來的歷史事件。</p>
+      </button>
+    </section>
+    <div class="read" id="sRead">正在對照兩個週期…</div>
+
+    <div class="cmp-wrap">
+      <table class="cmp">
+        <thead><tr><th></th><th>短週期 MCS</th><th>長週期 景氣羅盤</th></tr></thead>
+        <tbody>
+          <tr><th>看多久</th><td>數個月～1、2 年</td><td>10 年～數十年</td></tr>
+          <tr><th>資料來源</th><td>FRED 等即時經濟與市場數據</td><td>週期模型推演（非即時數據）</td></tr>
+          <tr><th>回答的問題</th><td>現在景氣偏熱還是偏冷？</td><td>現在處在大週期的哪個季節？</td></tr>
+          <tr><th>使用方式</th><td>觀察景氣溫度的轉折</td><td>理解長期背景，不用來判斷短線</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="切換儀表板">
+      <button class="tab on" type="button" role="tab" data-tab="mcs" aria-selected="true">短週期 MCS</button>
+      <button class="tab" type="button" role="tab" data-tab="compass" aria-selected="false">長週期 景氣羅盤</button>
+    </nav>
+    <div class="frames">
+      <iframe id="fMcs" src="msc-score.html" title="MCS 景氣循環儀表板（短週期）" loading="eager"></iframe>
+      <iframe id="fCompass" class="off" src="Macro-Compass.html" title="雙週期景氣羅盤（長週期）" loading="eager"></iframe>
+    </div>
+    <p class="note">景氣分數、象限與模型配比皆為統計與模型推演，僅供教育參考，不代表未來表現，也不構成任何買賣或配置建議。</p>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+    var $ = function (id) { return document.getElementById(id); };
+    var frames = { mcs: $('fMcs'), compass: $('fCompass') };
+    var STAGE_ZH = { Recession: '衰退', Slowdown: '放緩', Growth: '成長', Heat: '過熱' };
+    var STAGE_COLOR = { Recession: 'var(--recession)', Slowdown: 'var(--slowdown)', Growth: 'var(--growth)', Heat: 'var(--heat)' };
+    var state = { mcsScore: null, mcsStage: null, cmpScore: null, cmpSeason: null };
+
+    function doc(f) { try { return f.contentDocument; } catch (e) { return null; } }
+
+    /* 嵌入頁的小調整：隱藏重複的返回鈕、外連改在最上層開 */
+    function tidy(f) {
+      var d = doc(f); if (!d || d.getElementById('cycle-embed-css')) return;
+      var st = d.createElement('style'); st.id = 'cycle-embed-css';
+      // min-height:100vh 在 iframe 內會讓高度一直長大，嵌入時取消
+      st.textContent = '.btn-back{display:none!important}html,body{min-height:0!important;height:auto!important}body{padding-bottom:16px!important}';
+      d.head.appendChild(st);
+      d.querySelectorAll('a[href]').forEach(function (a) { a.target = '_top'; });
+    }
+
+    /* 高度自動跟著內容 */
+    function fit(f) {
+      var d = doc(f); if (!d || !d.documentElement) return;
+      var h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+      if (h && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
+    }
+    setInterval(function () { fit(frames.mcs); fit(frames.compass); }, 700);
+
+    function show(key) {
+      document.querySelectorAll('.tab').forEach(function (t) {
+        var on = t.getAttribute('data-tab') === key;
+        t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      Object.keys(frames).forEach(function (k) { frames[k].classList.toggle('off', k !== key); });
+      try { frames[key].contentWindow.dispatchEvent(new Event('resize')); } catch (e) {}
+      setTimeout(function () { fit(frames[key]); }, 300);
+    }
+    document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-tab')); }); });
+    document.querySelectorAll('[data-go]').forEach(function (c) {
+      c.addEventListener('click', function () { show(c.getAttribute('data-go')); document.querySelector('.tabs').scrollIntoView({ behavior: 'smooth' }); });
+    });
+
+    /* 讀短週期 MCS 的數字 */
+    function readMcs() {
+      var d = doc(frames.mcs); if (!d) return false;
+      var sc = d.getElementById('gaugeScoreText'), pill = d.getElementById('mcsStagePill'), asOf = d.getElementById('mcsAsOf'), src = d.getElementById('mcsSource');
+      if (!sc || sc.textContent.trim() === '--') return false;
+      var stage = (pill && pill.textContent.trim()) || '';
+      state.mcsScore = parseFloat(sc.textContent); state.mcsStage = stage;
+      $('sMcsScore').textContent = sc.textContent.trim();
+      var el = $('sMcsStage'); el.textContent = (STAGE_ZH[stage] ? STAGE_ZH[stage] + ' ' : '') + stage; el.style.color = STAGE_COLOR[stage] || '';
+      var simulated = src && /模擬|失敗/.test(src.textContent);
+      $('sMcsAsOf').textContent = simulated ? '連線失敗，顯示模擬數據' : ((asOf && asOf.textContent.trim()) || '即時數據');
+      return true;
+    }
+
+    /* 讀長週期羅盤的數字（羅盤頁預設已是今天所在季度） */
+    function readCompass() {
+      var d = doc(frames.compass); if (!d) return false;
+      var sc = d.getElementById('coreScore'), st = d.getElementById('coreStatus'), yr = d.getElementById('displayYear');
+      if (!sc || sc.textContent.trim() === '--') return false;
+      state.cmpScore = parseFloat(sc.textContent); state.cmpSeason = st ? st.textContent.trim() : '';
+      $('sCmpScore').textContent = sc.textContent.trim();
+      var el = $('sCmpStage'); el.textContent = state.cmpSeason; el.style.color = st ? st.style.color : '';
+      $('sCmpYear').textContent = '模型位置：' + (yr ? yr.textContent.trim() : '--');
+      return true;
+    }
+
+    /* 兩個週期的方向對照（描述性文字，不含買賣建議） */
+    function compare() {
+      if (state.mcsStage == null || state.cmpScore == null) return;
+      var shortUp = state.mcsStage === 'Growth' || state.mcsStage === 'Heat';
+      var longUp = state.cmpScore >= 55;
+      var msg;
+      if (shortUp && longUp) msg = '<b>兩個週期同向偏擴張</b>：短期景氣溫度與長期位置都在上行階段。歷史上這種組合的趨勢較明確，但過熱時也要留意估值與波動放大。';
+      else if (!shortUp && !longUp) msg = '<b>兩個週期同向偏收縮</b>：短期景氣溫度降溫，長期也處在收縮季節。歷史上這種組合防禦型資產相對抗跌，也常是醞釀下一輪週期的階段。';
+      else if (shortUp && !longUp) msg = '<b>短期偏熱、長期偏冷</b>：短期景氣數據仍有支撐，但大週期處在收縮背景。這種分歧通常讓市場來回震盪，反彈與修正都可能比較劇烈。';
+      else msg = '<b>短期降溫、長期偏暖</b>：短期景氣數據轉弱，但大週期背景仍在擴張階段。歷史上這類組合較常見的是週期中的修正，而不是長期趨勢反轉。';
+      $('sRead').innerHTML = msg;
+    }
+
+    function poll(fn, tries) {
+      if (fn()) { compare(); return; }
+      if (tries > 0) setTimeout(function () { poll(fn, tries - 1); }, 500);
+      else if (fn === readMcs) { $('sMcsStage').textContent = '暫無資料'; }
+    }
+
+    // iframe 可能在這段程式執行前就載入完成，所以註冊監聽的同時也檢查一次
+    function onReady(f, reader, tries) {
+      var done = false;
+      function go() { if (done) return; done = true; tidy(f); fit(f); poll(reader, tries); }
+      f.addEventListener('load', go);
+      var d = doc(f);
+      if (d && d.readyState === 'complete' && d.location.href !== 'about:blank') go();
+    }
+    onReady(frames.mcs, readMcs, 40);
+    onReady(frames.compass, readCompass, 20);
+
+    if (/compass/.test(location.hash)) show('compass');
+  })();
+  </script>
+</body>
+</html>

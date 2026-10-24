@@ -1,17 +1,13 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+  <!-- 自用工具：密碼頁（需放最前面） -->
+  <script src="/MOMO_FinSphere/assets/momo-gate.js"></script>
+  <meta name="robots" content="noindex,nofollow">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>配息計算機｜配息許願 × 配息強化｜MOMO雙贏策略</title>
 <meta name="description" content="配息許願：輸入本金與配息率試算三年後資產樣貌。配息強化試算：加入融資部位，掌握每月淨現金流與利息成本。MOMO雙贏策略雙贏策略互動工具。">
-<meta property="og:title" content="配息許願 × 配息強化｜MOMO雙贏策略">
-<meta property="og:description" content="輸入本金與配息率，即時試算每月配息、三年後資產樣貌與槓桿現金流。">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/tools/dividend-simulator.html">
-<meta property="og:image" content="https://nms3194949.github.io/og-default.png">
-<meta property="og:image:type" content="image/png">
-<meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -344,11 +340,11 @@ input[type="range"]::-moz-range-thumb{
 <div class="wrap">
 
   <header class="header">
-    <div class="brandmark">
-      <div class="mono"></div>
+    <a class="brandmark" href="/MOMO_FinSphere/me/" style="text-decoration:none;color:inherit">
+      <img src="/icon-96.png" alt="" width="32" height="32" style="width:32px;height:32px;border-radius:50%;display:block">
       <span class="brand-name serif">MOMO雙贏策略</span>
-    </div>
-    <a class="back" href="https://nms3194949.github.io/MOMO_FinSphere/">回首頁</a>
+    </a>
+    <a class="back" href="/MOMO_FinSphere/me/">自用工具</a>
   </header>
 
   <div class="segmented page-tabs" role="tablist" aria-label="頁面切換">
@@ -416,7 +412,7 @@ input[type="range"]::-moz-range-thumb{
         <span class="locked-tag">限定</span>
       </div>
       <p class="locked-desc">依你目前輸入的本金與配息率，還有 <b>3 種不同的配置情境</b>可以比較，加入 LINE 了解各情境的風險差異。</p>
-      <a class="locked-cta" id="unlock-link" href="https://lin.ee/52RKwM5?utm_source=wish_unlock&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">加入 LINE 解鎖 →</a>
+      <a class="locked-cta" id="unlock-link" href="https://lin.ee/sdrEuGA?utm_source=website&utm_medium=referral&utm_campaign=finsphere_dividend-simulator&utm_content=wish_unlock" target="_blank" rel="noopener noreferrer">加入 LINE 解鎖 →</a>
     </div>
 
     <div class="life-row">
@@ -458,7 +454,7 @@ input[type="range"]::-moz-range-thumb{
 
   <div class="cta-inline">
     <p class="cta-note">想知道如何實際配置出這樣的現金流？</p>
-    <a class="btn-primary" href="https://lin.ee/52RKwM5?utm_source=wish_cta&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
+    <a class="btn-primary" href="https://lin.ee/sdrEuGA?utm_source=website&utm_medium=referral&utm_campaign=finsphere_dividend-simulator&utm_content=wish_cta" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
   </div>
 
   <footer class="footer">
@@ -573,7 +569,7 @@ input[type="range"]::-moz-range-thumb{
 
     <div class="cta-inline">
       <p class="cta-note">想知道如何配置出這樣的配息強化現金流？</p>
-      <a class="btn-primary" href="https://lin.ee/52RKwM5?utm_source=leverage_cta&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
+      <a class="btn-primary" href="https://lin.ee/sdrEuGA?utm_source=website&utm_medium=referral&utm_campaign=finsphere_dividend-simulator&utm_content=leverage_cta" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
     </div>
 
     <footer class="footer">
@@ -589,7 +585,7 @@ input[type="range"]::-moz-range-thumb{
 <div class="cta-fixed" id="cta-fixed" style="display:none">
   <div class="inner">
     <p class="cta-note" id="cta-fixed-note">想知道如何實際配置出這樣的現金流？</p>
-    <a class="btn-primary" id="cta-fixed-link" href="https://lin.ee/52RKwM5?utm_source=wish_cta&utm_medium=calculator&utm_campaign=momo_finsphere" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
+    <a class="btn-primary" id="cta-fixed-link" href="https://lin.ee/sdrEuGA?utm_source=website&utm_medium=referral&utm_campaign=finsphere_dividend-simulator&utm_content=wish_cta" target="_blank" rel="noopener noreferrer">詢問 MOMO 雙贏策略配置</a>
   </div>
 </div>
 
@@ -721,7 +717,7 @@ function setPage(page){
   const ctaLink = $('cta-fixed-link');
   if(ctaLink){
     const source = page === 'leverage' ? 'leverage_cta_fixed' : 'wish_cta_fixed';
-    ctaLink.href = `https://lin.ee/52RKwM5?utm_source=${source}&utm_medium=calculator&utm_campaign=momo_finsphere`;
+    ctaLink.href = `https://lin.ee/sdrEuGA?utm_source=website&utm_medium=referral&utm_campaign=finsphere_dividend-simulator&utm_content=${source}`;
   }
   try{ localStorage.setItem('momo-page', page); }catch(_){}
   updateCtaVisibility();

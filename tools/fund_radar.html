@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+  <!-- 自用工具：密碼頁（需放最前面） -->
+  <script src="/MOMO_FinSphere/assets/momo-gate.js"></script>
+  <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基金戰情室 V43 (Fix)</title>
+    <title>基金戰情室｜自用</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -163,6 +166,29 @@
         .r-date { font-size: 0.75rem; color: #94a3b8; display: block; }
         .r-nav { font-family: 'Roboto Mono'; font-weight: bold; color: var(--green); font-size: 1rem; }
 
+
+        /* ===== 報酬排行（1/3/7/14/30 天 NAV 報酬率） ===== */
+        .view-switch { display:flex; gap:6px; justify-content:center; margin: 0 0 12px; }
+        .view-btn { background: rgba(30,41,59,.8); color:#94a3b8; border:1px solid #334155; padding:7px 16px; border-radius:20px; font-size:.9rem; font-weight:600; cursor:pointer; }
+        .view-btn.active { background:#e2e8f0; color:#0f172a; border-color:#e2e8f0; }
+        .rank-wrap { background: var(--card-bg); border:1px solid #334155; border-radius:16px; overflow:auto; max-height: calc(100vh - 150px); }
+        .rank-table { width:100%; border-collapse:separate; border-spacing:0; font-size:.86rem; font-variant-numeric: tabular-nums; }
+        .rank-table th { position:sticky; top:0; z-index:2; background:#111c33; color:#94a3b8; font-weight:700; padding:10px 8px; text-align:right; white-space:nowrap; cursor:pointer; user-select:none; border-bottom:1px solid #334155; }
+        .rank-table th:first-child, .rank-table td:first-child { text-align:left; position:sticky; left:0; background:var(--card-bg); z-index:1; }
+        .rank-table th:first-child { z-index:3; background:#111c33; }
+        .rank-table th.sorted { color:#f1f5f9; }
+        .rank-table th .arr { opacity:.9; margin-left:3px; }
+        .rank-table td { padding:7px 8px; border-bottom:1px solid rgba(51,65,85,.6); white-space:nowrap; }
+        .rank-table tr:hover td { background:#24324a; }
+        .rank-table tr { cursor:pointer; }
+        .rk-name { max-width: 230px; overflow:hidden; text-overflow:ellipsis; color:#e2e8f0; font-weight:600; }
+        .rk-name small { display:block; color:#64748b; font-weight:500; font-size:.72rem; }
+        .rk-cell { position:relative; min-width:84px; text-align:right; }
+        .rk-bar { position:absolute; top:50%; height:18px; transform:translateY(-50%); border-radius:4px; opacity:.32; }
+        .rk-val { position:relative; font-weight:700; }
+        .rk-up { color:#f87171; } .rk-down { color:#34d399; } .rk-na { color:#475569; }
+        .rk-note { color:#64748b; font-size:.75rem; padding:10px 12px; }
+        @media (max-width:600px){ .rk-name{max-width:130px} .rk-cell{min-width:70px} .rank-table{font-size:.8rem} }
     </style>
   <!-- MOMO雙贏策略：網站圖示、GA4、統一頁尾與免責聲明 -->
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -177,6 +203,11 @@
     <p class="subtitle">雙核策略監控 • 智能詳情分析</p>
 
     <div id="status-display" class="status-bar"></div>
+
+    <div class="view-switch" role="tablist" aria-label="檢視方式">
+        <button class="view-btn" data-view="rank" onclick="setView('rank')">📊 報酬排行</button>
+        <button class="view-btn" data-view="card" onclick="setView('card')">🗂 訊號卡片</button>
+    </div>
 
     <div class="filter-wrapper">
         <div class="filter-container">
@@ -241,6 +272,13 @@
     let currentFilter = 'ALL';
     let bigChartInstance = null; 
 
+    // ===== 報酬排行設定 =====
+    const RET_PERIODS = [1, 3, 7, 14, 30];      // 天數（日曆天）
+    const UP_IS_RED = true;                      // 台灣習慣：漲紅跌綠
+    let currentView = (function(){ try { return localStorage.getItem('fund_radar_view') || 'rank'; } catch(e) { return 'rank'; } })();
+    let rankSort = { key: 7, dir: -1 };          // 預設依 7 天報酬由高到低
+
+
     const STRATEGIES = {
         BOND: { name: "債券領息", color: "#3b82f6", type: "BOND", useBias: true, watch: -0.04, buy: -0.07, desc: "債券看「年線乖離」。當價格跌破年線一定幅度，通常是超跌，適合領息族進場。" },
         BALANCED: { name: "平衡穩健", color: "#a855f7", type: "BALANCED", useBias: false, watch: -0.08, buy: -0.15, desc: "平衡型波動適中，採用「波段回撤」策略，抓中型修正波段。" },
@@ -248,6 +286,7 @@
     };
 
     async function init() {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === currentView));
         const dashboard = document.getElementById('dashboard');
         const loading = document.getElementById('loading');
         const statusDisplay = document.getElementById('status-display');
@@ -405,7 +444,22 @@
                     gap = dd - strategy.buy;
                 }
 
+                // ===== 1/3/7/14/30 天 NAV 報酬率 =====
+                let dated = [];
+                cleanRows.forEach(item => { let v = parseFloat(item.data[i]); if (!isNaN(v)) dated.push({ ts: item.ts, v }); });
+                let rets = {};
+                RET_PERIODS.forEach(n => {
+                    rets[n] = null;
+                    if (dated.length < 2) return;
+                    let last = dated[dated.length - 1];
+                    let target = last.ts - n * 86400000;
+                    for (let k = dated.length - 2; k >= 0; k--) {
+                        if (dated[k].ts <= target) { rets[n] = (last.v - dated[k].v) / dated[k].v; break; }
+                    }
+                });
+
                 tempFunds.push({
+                    rets,
                     name, 
                     nav: currentNav, 
                     high: maxNav, 
@@ -431,6 +485,53 @@
         globalFunds = tempFunds;
     }
 
+
+    function setView(v) {
+        currentView = v;
+        try { localStorage.setItem('fund_radar_view', v); } catch(e) {}
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+        renderDashboard();
+    }
+
+    function sortRank(key) {
+        if (rankSort.key === key) rankSort.dir *= -1;
+        else rankSort = { key, dir: key === 'name' ? 1 : -1 };
+        renderDashboard();
+    }
+
+    function renderRanking(container, list) {
+        const fmt = x => (x > 0 ? '+' : '') + (x * 100).toFixed(2) + '%';
+        // 每個區間各自的最大絕對值，用來畫比例條
+        const maxAbs = {};
+        RET_PERIODS.forEach(n => { maxAbs[n] = Math.max(0.0001, ...list.map(f => Math.abs(f.rets[n] ?? 0))); });
+        const rows = list.slice().sort((a, b) => {
+            if (rankSort.key === 'name') return a.name.localeCompare(b.name, 'zh-Hant') * rankSort.dir;
+            const va = a.rets[rankSort.key], vb = b.rets[rankSort.key];
+            if (va == null && vb == null) return 0;
+            if (va == null) return 1;            // 沒資料的排最後
+            if (vb == null) return -1;
+            return (va - vb) * rankSort.dir;
+        });
+        const arrow = k => rankSort.key === k ? `<span class="arr">${rankSort.dir < 0 ? '▼' : '▲'}</span>` : '';
+        const head = `<tr><th class="${rankSort.key==='name'?'sorted':''}" onclick="sortRank('name')">基金（${rows.length}）${arrow('name')}</th>` +
+            RET_PERIODS.map(n => `<th class="${rankSort.key===n?'sorted':''}" onclick="sortRank(${n})">${n} 天${arrow(n)}</th>`).join('') + '</tr>';
+        const body = rows.map((f, idx) => {
+            const cells = RET_PERIODS.map(n => {
+                const v = f.rets[n];
+                if (v == null) return `<td class="rk-cell"><span class="rk-val rk-na">—</span></td>`;
+                const up = v >= 0, w = Math.min(100, Math.abs(v) / maxAbs[n] * 100);
+                const color = (up === UP_IS_RED) ? '#ef4444' : '#10b981';
+                const side = up ? `right:0;` : `right:0;`;
+                return `<td class="rk-cell"><span class="rk-bar" style="${side}width:${w}%;background:${color}"></span>` +
+                       `<span class="rk-val ${(up === UP_IS_RED) ? 'rk-up' : 'rk-down'}">${fmt(v)}</span></td>`;
+            }).join('');
+            return `<tr data-idx="${idx}"><td class="rk-name" title="${f.name}">${f.name}<small>${f.strategy.name}・NAV ${f.nav}${f.lastDate ? '・' + f.lastDate : ''}</small></td>${cells}</tr>`;
+        }).join('');
+        container.innerHTML = `<div class="rank-wrap"><table class="rank-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>` +
+            `<div class="rk-note">點欄位標題排序（再點一次反向）；點基金開啟詳情。報酬率以最新 NAV 日期往回推 N 個日曆天，取當天或之前最近一筆 NAV 計算，不含配息。</div>`;
+        container.querySelectorAll('tbody tr').forEach(tr => tr.addEventListener('click', () => openModal(rows[+tr.dataset.idx])));
+    }
+
     function setFilter(type) {
         currentFilter = type;
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -453,6 +554,8 @@
             return;
         }
 
+        if (currentView === 'rank') { dashboard.className = ''; renderRanking(dashboard, displayFunds); return; }
+        dashboard.className = 'grid';
         displayFunds.forEach((f) => createCard(dashboard, f));
     }
 
