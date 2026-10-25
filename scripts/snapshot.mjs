@@ -6,6 +6,7 @@
 //      index.html（SNAP:MACRO）、tools/cycle.html（SNAP:CYCLE）、llms.txt（SNAP:LLMS）
 //      data/macro.json、sitemap.xml 的 lastmod、各頁 dateModified
 //   3. 從 MOMO雙贏策略部落格的 RSS 更新首頁「最新文章」（SNAP:POSTS）
+//   4. 更新指標常青頁 indicators/*.html（設定與做法見 scripts/indicators.mjs）
 //   3. 加上 --indexnow 參數時，改為通知 Bing（IndexNow）頁面已更新
 //
 // 本機測試：FRED_API_KEY=你的金鑰 node scripts/snapshot.mjs
@@ -16,6 +17,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { INDICATORS, runIndicators, upsertSitemap } from './indicators.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://nms3194949.github.io/MOMO_FinSphere/';
@@ -36,7 +38,7 @@ if (process.env.SNAPSHOT_MOCK) {
 
 // ── 指標設定（和首頁前端的 MACRO_META 一致） ──────────────────
 const SERIES = [
-  { id: 'DGS10', series: 'DGS10', type: 'daily', lookbackDays: 30, name: '美債10年殖利率', dp: 2, cmp: '月',
+  { id: 'DGS10', series: 'DGS10', type: 'daily', lookbackDays: 30, name: '美債10年殖利率', dp: 2, cmp: '月', page: 'indicators/us10y.html',
     tip: '長天期利率，影響債券與配息基金的淨值' },
   { id: 'T10Y2Y', series: 'T10Y2Y', type: 'daily', lookbackDays: 30, name: '10Y−2Y利差', dp: 2, cmp: '月',
     tip: '殖利率曲線斜率，負值代表倒掛',
@@ -200,11 +202,14 @@ function macroHtml(items, asOf) {
     const dTxt = diff == null ? '' : (diff > 0 ? '▲' : diff < 0 ? '▼' : '—') + Math.abs(diff).toFixed(m.dp);
     const dCls = diff > 0 ? 'up' : diff < 0 ? 'down' : '';
     const tag = m.tag ? m.tag(it.value, it.prev) : null;
-    return `            <div class="mc" title="${esc(`${m.tip}｜資料日期 ${it.date}`)}">` +
+    const open = m.page
+      ? `<a class="mc" href="${m.page}" style="display:block;color:inherit;text-decoration:none" title=`
+      : `<div class="mc" title=`;
+    return `            ${open}"${esc(`${m.tip}｜資料日期 ${it.date}`)}">` +
       `<div class="n">${esc(m.name)}</div>` +
       `<div class="v">${it.value.toFixed(m.dp)}<small>%</small></div>` +
       `<div class="s">${dTxt ? `<span class="d ${dCls}" title="較上${m.cmp}">${dTxt}</span>` : ''}` +
-      `${tag ? `<span class="t${tag[1] ? ' warn' : ''}">${esc(tag[0])}</span>` : ''}</div></div>`;
+      `${tag ? `<span class="t${tag[1] ? ' warn' : ''}">${esc(tag[0])}</span>` : ''}</div>${m.page ? '</a>' : '</div>'}`;
   }).join('\n');
   return `        <div class="macro" id="macro" aria-labelledby="macro-title">
           <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">FRED｜<time datetime="${asOf}">${asOf}</time><em>｜▲▼ 與上期比較</em></span></div>
@@ -233,6 +238,10 @@ function llmsText(items, mcs, cmp, asOf) {
   const out = [`資料更新：${asOf}（來源：FRED，聖路易聯邦準備銀行）`, '', ...lines, ''];
   if (mcs) out.push(`- MCS 景氣分數（短週期）：${mcs.score} 分，${STAGE_ZH[mcs.stage] || ''}（${mcs.stage}）｜${mcs.asOf || asOf}`);
   out.push(`- 景氣羅盤（長週期模型）：${cmp.season}，綜合評分 ${cmp.score}｜模型位置 ${cmp.label}`);
+  if (INDICATORS.length) {
+    out.push('', '指標說明頁（定義、近一年走勢、對債券與配息基金的影響）：');
+    for (const ind of INDICATORS) out.push(`- ${ind.name}：${SITE}indicators/${ind.slug}.html`);
+  }
   out.push('', '以上為數據狀態描述，不構成投資建議。');
   return out.join('\n');
 }
@@ -265,7 +274,10 @@ async function snapshot() {
   llms = replaceBetween(llms, 'LLMS', llmsText(items, mcs, cmp, asOf));
   await writeFile(file('llms.txt'), llms);
 
+  const inds = await runIndicators({ file, replaceBetween, setDateModified, key: process.env.FRED_API_KEY });
+
   let sm = await readFile(file('sitemap.xml'), 'utf8');
+  for (const r of inds) sm = upsertSitemap(sm, SITE + r.page, r.date);
   for (const [u, d] of [[SITE, asOf], [SITE + 'tools/cycle.html', cycDate]]) {
     sm = sm.replace(new RegExp(`(<loc>${u.replace(/[.]/g, '\\.')}</loc><lastmod>)[\\d-]+(</lastmod>)`), `$1${d}$2`);
   }
@@ -273,7 +285,8 @@ async function snapshot() {
 
   console.log(`✅ 快照完成：${items.length} 個指標（${asOf}）`
     + `${mcs ? `、MCS ${mcs.score} ${mcs.stage}` : '、MCS 未取得'}、羅盤 ${cmp.season} ${cmp.score}`
-    + `${posts ? `、文章 ${posts.length} 篇（封面 ${posts.filter((p) => p.cover).length} 張）` : '、文章未更新'}`);
+    + `${posts ? `、文章 ${posts.length} 篇（封面 ${posts.filter((p) => p.cover).length} 張）` : '、文章未更新'}`
+    + `、指標頁 ${inds.length}/${INDICATORS.length}`);
 }
 
 // ── IndexNow：通知 Bing 等搜尋引擎頁面已更新 ──────────────
@@ -282,7 +295,7 @@ async function indexNow() {
     host: 'nms3194949.github.io',
     key: INDEXNOW_KEY,
     keyLocation: `${SITE}${INDEXNOW_KEY}.txt`,
-    urlList: [SITE, `${SITE}tools/cycle.html`, `${SITE}llms.txt`],
+    urlList: [SITE, `${SITE}tools/cycle.html`, `${SITE}llms.txt`, ...INDICATORS.map((i) => `${SITE}indicators/${i.slug}.html`)],
   };
   const res = await fetch('https://api.indexnow.org/indexnow', {
     method: 'POST',
