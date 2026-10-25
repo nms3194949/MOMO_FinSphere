@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <title>聯準會利率現在多少？聯邦基金利率與通膨（CPI）最新數據｜MOMO財商智庫</title>
+  <meta name="description" content="美國聯邦基金利率目標區間與 CPI 年增率最新數據、近一年走勢，每天自動更新。白話說明聯準會利率是什麼、升息降息怎麼影響通膨、現金收益、債券基金與配息基金。" />
+  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/indicators/fed-rate.html" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="明哲MOMO" />
+  <meta name="theme-color" content="#f6f1e7" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="MOMO財商智庫" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="聯準會利率與通膨：最新數據與近一年走勢｜MOMO財商智庫" />
+  <meta property="og:description" content="聯邦基金利率與 CPI 年增率每天自動更新，附升息、降息對配息基金的影響。" />
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/indicators/fed-rate.html" />
+  <meta property="og:image" content="https://nms3194949.github.io/og-default.png" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://nms3194949.github.io/MOMO_FinSphere/indicators/fed-rate.html#webpage",
+      "name": "聯準會利率現在多少？升息、降息對配息基金有什麼影響？",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/indicators/fed-rate.html",
+      "inLanguage": "zh-Hant-TW",
+      "dateModified": "2026-10-22",
+      "isPartOf": {
+        "@id": "https://nms3194949.github.io/#website"
+      },
+      "author": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "publisher": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "about": {
+        "@type": "Thing",
+        "name": "聯邦基金利率與通膨",
+        "alternateName": [
+          "聯準會利率",
+          "美國利率",
+          "聯邦基金利率",
+          "Fed Funds Rate",
+          "CPI 年增率",
+          "美國通膨"
+        ]
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "美國聯邦基金利率目標區間與 CPI 年增率（近一年）",
+      "description": "聯準會聯邦基金利率目標區間（日資料）與美國消費者物價指數年增率（月資料），取自 FRED，每日自動更新。",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/indicators/fed-rate.html",
+      "isBasedOn": [
+        "https://fred.stlouisfed.org/series/DFEDTARU",
+        "https://fred.stlouisfed.org/series/DFEDTARL",
+        "https://fred.stlouisfed.org/series/CPIAUCSL"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "name": "Board of Governors of the Federal Reserve System；U.S. Bureau of Labor Statistics"
+      },
+      "variableMeasured": "聯邦基金利率目標區間上限與下限（%）、美國 CPI 年增率（%）",
+      "temporalCoverage": "2025-10-22/2026-10-22",
+      "dateModified": "2026-10-22",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://nms3194949.github.io/MOMO_FinSphere/data/indicators/fed-rate.json"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "MOMO雙贏策略",
+          "item": "https://nms3194949.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MOMO財商智庫",
+          "item": "https://nms3194949.github.io/MOMO_FinSphere/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "聯邦基金利率與通膨"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "升息一碼是多少？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "一碼是 0.25 個百分點。例如聯邦基金利率目標從 3.75%～4.00% 升一碼，就變成 4.00%～4.25%；升兩碼就是 0.5 個百分點。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "升息對債券基金是好還是壞？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "短期來說，升息通常讓市場殖利率上升、既有債券價格下跌，債券基金淨值會承壓；但之後買進的新債券利息比較高，長期的收益來源也會提高。影響大小和債券天期有關，天期越長，淨值受影響越大。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "CPI 是什麼？為什麼重要？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CPI 是消費者物價指數，用來衡量一般民眾買東西的價格變化，年增率就是和一年前相比漲了多少。聯準會以約 2% 的通膨為長期目標，所以 CPI 是判斷未來會升息或降息的關鍵數據之一。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "聯準會多久決定一次利率？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "聯準會的利率決策會議（FOMC）一年固定召開 8 次，大約每 6 到 8 週一次；遇到重大事件時，也可能臨時開會調整利率。"
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap" />
+
+  <style>
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf; --line-green: #06c755;
+      --up: #b4562b; --down: #1e7a55;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.85; letter-spacing: .02em; }
+    a { color: inherit; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; max-width: 880px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; }
+    .back { color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .back:hover { color: var(--gold); }
+
+    .crumbs { font-size: 13px; color: var(--muted); margin: 24px 0 0; }
+    .crumbs a { text-decoration: none; color: var(--ink-2); }
+    .crumbs a:hover { color: var(--gold); }
+    .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 18px 0 6px; }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(26px, 5.6vw, 36px); line-height: 1.4; margin: 0 0 14px; }
+    .answer { font-size: 17px; line-height: 1.9; margin: 0 0 6px; }
+    .answer b { font-size: 20px; color: var(--ink); }
+    .updated { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 0 28px; }
+    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+    .stat.main { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .stat .k { font-size: 13px; color: var(--ink-2); }
+    .stat.main .k, .stat.main .sub { color: #c9cfdb; }
+    .stat .v { font-family: var(--serif); font-weight: 800; font-size: 26px; line-height: 1.35; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .stat.main .v { color: var(--gold-soft); }
+    .stat .v small { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--muted); }
+    .stat.up .v { color: var(--up); } .stat.down .v { color: var(--down); }
+    .stat .sub { font-size: 12px; color: var(--muted); }
+
+    h2 { font-family: var(--serif); font-size: 23px; line-height: 1.45; margin: 34px 0 12px; }
+    h3 { font-size: 17px; margin: 20px 0 6px; }
+    p { margin: 0 0 12px; color: var(--ink-2); }
+    p b, li b { color: var(--ink); }
+    ul, ol { padding-left: 1.3em; color: var(--ink-2); margin: 0 0 12px; }
+    li { margin: 4px 0; }
+
+    .chart { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 8px; }
+    .chart svg { display: block; width: 100%; height: auto; aspect-ratio: 960 / 320; }
+    .chart .g { stroke: #ece5d6; stroke-width: 1; }
+    .chart .yl { font: 12px var(--sans); fill: var(--muted); text-anchor: end; }
+    .chart .xl { font: 12px var(--sans); fill: var(--muted); text-anchor: middle; }
+    .chart .a { fill: rgba(168,138,61,.12); }
+    .chart .l { fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .chart .hi { fill: var(--up); } .chart .lo { fill: var(--down); }
+    .chart .last { fill: var(--ink); stroke: #fff; stroke-width: 2; }
+    .chart .l2 { fill: none; stroke: #0c152a; stroke-width: 1.6; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
+    .chart .d2 { fill: #0c152a; }
+    .chart .z { stroke: #b4562b; stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .chart .lg { display: inline-flex; align-items: center; gap: 6px; margin-right: 12px; }
+    .chart .lg::before { content: ''; display: inline-block; width: 18px; height: 0; border-top: 2.5px solid var(--gold); }
+    .chart .lg.l2::before { border-top: 2px dashed var(--ink); }
+    .chart figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    caption { text-align: left; font-size: 13px; color: var(--muted); padding: 0 0 6px; }
+    th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    td.up { color: var(--up); } td.down { color: var(--down); }
+    .note { font-size: 13px; color: var(--muted); }
+
+    .formula { display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--gold-bg); color: var(--ink); font-weight: 700; font-size: 15px; margin: 2px 0 12px; }
+    .timeline li { margin: 8px 0; }
+
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+    .faq summary { cursor: pointer; font-weight: 700; }
+    .faq details p { margin: 8px 0 0; }
+
+    .related { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .related a { display: block; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; transition: border-color .15s; }
+    .related a:hover { border-color: var(--gold-soft); }
+    .related .t { display: block; font-size: 12.5px; color: var(--gold); font-weight: 700; }
+    .related .h { display: block; font-weight: 700; line-height: 1.6; }
+    .src { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat .v { font-size: 22px; }
+      .chart { padding: 8px 6px 6px; }
+      .chart .yl, .chart .xl { font-size: 30px; }
+      .chart .l { stroke-width: 2; }
+      th, td { padding: 8px 10px; }
+      td:first-child { white-space: nowrap; }
+    }
+  </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/MOMO_FinSphere/" aria-label="MOMO財商智庫 首頁"><img src="/icon-96.png" alt="" width="32" height="32" />MOMO財商智庫</a>
+      <a class="back" href="/MOMO_FinSphere/#macro">← 經濟數據速覽</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="crumbs" aria-label="麵包屑"><a href="/MOMO_FinSphere/">MOMO財商智庫</a> › <a href="/MOMO_FinSphere/#macro">經濟指標</a> › 聯邦基金利率與通膨</nav>
+    <p class="eyebrow">經濟指標｜政策利率</p>
+    <h1>聯準會利率現在多少？升息、降息對配息基金有什麼影響？</h1>
+
+    <!-- 以下 SNAP 區塊由每日快照（scripts/indicators.mjs）自動更新，請勿手動修改 -->
+    <!-- SNAP:IND_ANSWER:START -->
+      <p class="answer">數據更新中，請稍後再回來看看。</p>
+    <!-- SNAP:IND_ANSWER:END -->
+    <p class="updated">資料來源：FRED｜最後更新：<time datetime="2026-10-22" id="indDate">2026/10/22</time>｜每天自動更新</p>
+
+    <!-- SNAP:IND_STATS:START -->
+    <!-- SNAP:IND_STATS:END -->
+
+    <h2>近一年走勢</h2>
+    <!-- SNAP:IND_CHART:START -->
+    <!-- SNAP:IND_CHART:END -->
+
+    <h2>近 12 個月數據</h2>
+    <!-- SNAP:IND_TABLE:START -->
+    <!-- SNAP:IND_TABLE:END -->
+    <p class="note">目標區間為該月最後一天的聯邦基金利率目標；CPI 年增率為該月的消費者物價年增率，通常在下個月中公布。</p>
+
+    <h2>聯邦基金利率是什麼？</h2>
+    <h3>1. 把它想成全國資金的「水龍頭」</h3>
+    <p>聯邦基金利率是美國銀行之間隔夜互相借錢的利率，由聯準會（Fed）設定一個目標區間，例如 3.75%～4.00%。它是美國最基本的政策利率，會一路影響房貸、企業借款、定存與債券的利率。</p>
+    <ul>
+      <li><b>升息</b>：把水龍頭關小，借錢變貴，消費和投資降溫，用來壓抑通膨。</li>
+      <li><b>降息</b>：把水龍頭開大，借錢變便宜，用來刺激景氣。</li>
+    </ul>
+    <p>新聞常說的「升息一碼」，指的是調高 0.25 個百分點。</p>
+    <h3>2. 為什麼要和通膨（CPI）一起看？</h3>
+    <p>聯準會的主要目標之一，是讓通膨維持在<b>約 2%</b>。CPI（消費者物價指數）年增率就是最常用來看通膨的數字：</p>
+    <ul>
+      <li><b>通膨明顯高於 2%</b>：聯準會傾向維持高利率，甚至升息。</li>
+      <li><b>通膨回落接近 2%</b>：聯準會才比較有降息的空間。</li>
+    </ul>
+    <p>所以上方走勢圖把兩條線放在一起：實線是聯邦基金利率，虛線是 CPI 年增率。</p>
+
+    <h2>升息、降息對你的資產有什麼影響？</h2>
+    <h3>1. 現金和短天期資產：利率高，收益就高</h3>
+    <p>100 萬元放在年利率 4% 的貨幣型資產或定存，一年的利息大約 4 萬；如果利率降到 2%，同樣 100 萬一年只剩約 2 萬。所以<b>在降息循環中，放在現金的收益會跟著下降</b>。</p>
+    <h3>2. 債券基金：降息通常有利淨值</h3>
+    <p>降息時，市場殖利率通常跟著下降，既有債券的價格上漲，債券基金淨值多半會上升；升息時則相反。影響的大小和債券的天期有關，可以參考<a href="/MOMO_FinSphere/indicators/us10y.html">美國 10 年期公債殖利率</a>頁面的說明。</p>
+    <h3>3. 配息基金：配息和淨值要一起看</h3>
+    <p>利率下降時，基金新買進的債券利息比較低，長期下來配息來源可能跟著變少，部分基金會調整配息率。所以觀察配息基金，一樣要看：</p>
+    <span class="formula">真實報酬 = 配息 + 淨值變化</span>
+
+    <h2>歷史上的重要時點</h2>
+    <ul class="timeline">
+      <li><b>2008 年 12 月｜0%～0.25%</b>：金融海嘯後降到接近零，並維持到 2015 年底。</li>
+      <li><b>2020 年 3 月｜0%～0.25%</b>：新冠疫情爆發，聯準會緊急降息回到接近零。</li>
+      <li><b>2022 年 3 月～2023 年 7 月｜升到 5.25%～5.50%</b>：為了對抗高通膨，一年多內升息 11 次，達到 2001 年以來最高。</li>
+      <li><b>2024 年 9 月</b>：開始降息。</li>
+      <li><b>近一年</b>：見上方走勢圖與數據表，每天自動更新。</li>
+    </ul>
+
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">常見問題</h2>
+      <details><summary>升息一碼是多少？</summary><p>一碼是 0.25 個百分點。例如聯邦基金利率目標從 3.75%～4.00% 升一碼，就變成 4.00%～4.25%；升兩碼就是 0.5 個百分點。</p></details>
+      <details><summary>升息對債券基金是好還是壞？</summary><p>短期來說，升息通常讓市場殖利率上升、既有債券價格下跌，債券基金淨值會承壓；但之後買進的新債券利息比較高，長期的收益來源也會提高。影響大小和債券天期有關，天期越長，淨值受影響越大。</p></details>
+      <details><summary>CPI 是什麼？為什麼重要？</summary><p>CPI 是消費者物價指數，用來衡量一般民眾買東西的價格變化，年增率就是和一年前相比漲了多少。聯準會以約 2% 的通膨為長期目標，所以 CPI 是判斷未來會升息或降息的關鍵數據之一。</p></details>
+      <details><summary>聯準會多久決定一次利率？</summary><p>聯準會的利率決策會議（FOMC）一年固定召開 8 次，大約每 6 到 8 週一次；遇到重大事件時，也可能臨時開會調整利率。</p></details>
+    </section>
+
+    <h2>延伸閱讀</h2>
+    <div class="related">
+      <a href="/MOMO_FinSphere/indicators/us10y.html"><span class="t">指標・利率</span><span class="h">美國 10 年期公債殖利率</span></a>
+      <a href="/MOMO_FinSphere/indicators/yield-curve.html"><span class="t">指標・利率</span><span class="h">殖利率曲線：10 年減 2 年利差</span></a>
+      <a href="/momo-blog/posts/2026-10-post03/"><span class="t">配置筆記・現金規劃</span><span class="h">市場大跌時，沒現金的人只能看著機會跑掉</span></a>
+      <a href="/MOMO_FinSphere/dividend-calculator.html"><span class="t">工具・試算</span><span class="h">配息現金流試算：配息 + 淨值變化一起算</span></a>
+    </div>
+
+    <p class="src">資料來源：<a href="https://fred.stlouisfed.org/series/DFEDTARU" rel="noopener" target="_blank">FRED｜聯邦基金利率目標上限（DFEDTARU）</a>、<a href="https://fred.stlouisfed.org/series/DFEDTARL" rel="noopener" target="_blank">下限（DFEDTARL）</a>、<a href="https://fred.stlouisfed.org/series/CPIAUCSL" rel="noopener" target="_blank">美國 CPI（CPIAUCSL）</a>，CPI 年增率由本站依原始指數計算。本頁數據與說明僅供教育參考，不構成任何投資建議。<br />原始數據下載：<a href="/MOMO_FinSphere/data/indicators/fed-rate.json">fed-rate.json</a></p>
+  </main>
+</body>
+</html>

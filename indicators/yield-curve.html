@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <title>殖利率倒掛是什麼？10 年減 2 年利差最新數據與走勢｜MOMO財商智庫</title>
+  <meta name="description" content="美國 10 年期減 2 年期公債利差（殖利率曲線）最新數值、近一年走勢與月度數據，每天自動更新。白話說明殖利率曲線、倒掛代表什麼、倒掛和經濟衰退的關係，以及對債券基金的影響。" />
+  <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="明哲MOMO" />
+  <meta name="theme-color" content="#f6f1e7" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="MOMO財商智庫" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="殖利率曲線倒掛是什麼？10 年減 2 年利差最新數據｜MOMO財商智庫" />
+  <meta property="og:description" content="10 年減 2 年利差每天自動更新，附近一年走勢、月度數據，以及倒掛代表什麼。" />
+  <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html" />
+  <meta property="og:image" content="https://nms3194949.github.io/og-default.png" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html#webpage",
+      "name": "殖利率倒掛是什麼？10 年減 2 年利差現在多少？",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html",
+      "inLanguage": "zh-Hant-TW",
+      "dateModified": "2026-10-22",
+      "isPartOf": {
+        "@id": "https://nms3194949.github.io/#website"
+      },
+      "author": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "publisher": {
+        "@id": "https://nms3194949.github.io/momo-blog/about/#person"
+      },
+      "about": {
+        "@type": "Thing",
+        "name": "殖利率曲線（10 年減 2 年利差）",
+        "alternateName": [
+          "殖利率倒掛",
+          "10年減2年利差",
+          "美債利差",
+          "T10Y2Y",
+          "Yield Curve"
+        ]
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "美國 10 年期減 2 年期公債利差（近一年日資料）",
+      "description": "美國 10 年期與 2 年期公債殖利率的差距（T10Y2Y），用來觀察殖利率曲線是否倒掛，取自 FRED，每日自動更新。",
+      "url": "https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html",
+      "isBasedOn": [
+        "https://fred.stlouisfed.org/series/T10Y2Y",
+        "https://fred.stlouisfed.org/series/DGS10",
+        "https://fred.stlouisfed.org/series/DGS2"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "name": "Federal Reserve Bank of St. Louis"
+      },
+      "variableMeasured": "10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity（百分點）",
+      "temporalCoverage": "2025-10-22/2026-10-22",
+      "dateModified": "2026-10-22",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://nms3194949.github.io/MOMO_FinSphere/data/indicators/yield-curve.json"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "MOMO雙贏策略",
+          "item": "https://nms3194949.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MOMO財商智庫",
+          "item": "https://nms3194949.github.io/MOMO_FinSphere/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "殖利率曲線（10 年減 2 年利差）"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "殖利率倒掛是什麼意思？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "殖利率倒掛是指短天期公債的殖利率高於長天期，最常用「10 年期減 2 年期」來看，數值小於 0 就是倒掛。正常情況下借錢越久利息越高，倒掛代表市場預期未來景氣轉弱、利率可能下降。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "殖利率倒掛就一定會經濟衰退嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不一定。歷史上美國多次衰退前都出現過倒掛，但從倒掛到衰退常間隔 1 到 2 年，也有例外：2022 年起的倒掛持續超過兩年，期間經濟沒有立即衰退。它比較適合當作景氣轉弱的參考訊號之一，而不是預測工具。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "倒掛解除、利差轉正代表什麼？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "代表長天期殖利率重新高於短天期，曲線恢復正斜率。常見的原因是市場預期聯準會降息、短天期利率先下降。過去有些衰退是在倒掛解除後才發生，所以解除倒掛不等於風險消失。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "為什麼常用 10 年減 2 年來看？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "2 年期殖利率主要反映聯準會短期利率政策的預期，10 年期則包含長期成長與通膨的看法，兩者相減能清楚看出市場對短期與長期的看法差距，也是最常被引用的殖利率曲線指標。"
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap" />
+
+  <style>
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf; --line-green: #06c755;
+      --up: #b4562b; --down: #1e7a55;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.85; letter-spacing: .02em; }
+    a { color: inherit; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; max-width: 880px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; }
+    .back { color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .back:hover { color: var(--gold); }
+
+    .crumbs { font-size: 13px; color: var(--muted); margin: 24px 0 0; }
+    .crumbs a { text-decoration: none; color: var(--ink-2); }
+    .crumbs a:hover { color: var(--gold); }
+    .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 18px 0 6px; }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(26px, 5.6vw, 36px); line-height: 1.4; margin: 0 0 14px; }
+    .answer { font-size: 17px; line-height: 1.9; margin: 0 0 6px; }
+    .answer b { font-size: 20px; color: var(--ink); }
+    .updated { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 0 28px; }
+    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+    .stat.main { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .stat .k { font-size: 13px; color: var(--ink-2); }
+    .stat.main .k, .stat.main .sub { color: #c9cfdb; }
+    .stat .v { font-family: var(--serif); font-weight: 800; font-size: 26px; line-height: 1.35; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .stat.main .v { color: var(--gold-soft); }
+    .stat .v small { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--muted); }
+    .stat.up .v { color: var(--up); } .stat.down .v { color: var(--down); }
+    .stat .sub { font-size: 12px; color: var(--muted); }
+
+    h2 { font-family: var(--serif); font-size: 23px; line-height: 1.45; margin: 34px 0 12px; }
+    h3 { font-size: 17px; margin: 20px 0 6px; }
+    p { margin: 0 0 12px; color: var(--ink-2); }
+    p b, li b { color: var(--ink); }
+    ul, ol { padding-left: 1.3em; color: var(--ink-2); margin: 0 0 12px; }
+    li { margin: 4px 0; }
+
+    .chart { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 8px; }
+    .chart svg { display: block; width: 100%; height: auto; aspect-ratio: 960 / 320; }
+    .chart .g { stroke: #ece5d6; stroke-width: 1; }
+    .chart .yl { font: 12px var(--sans); fill: var(--muted); text-anchor: end; }
+    .chart .xl { font: 12px var(--sans); fill: var(--muted); text-anchor: middle; }
+    .chart .a { fill: rgba(168,138,61,.12); }
+    .chart .l { fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .chart .hi { fill: var(--up); } .chart .lo { fill: var(--down); }
+    .chart .last { fill: var(--ink); stroke: #fff; stroke-width: 2; }
+    .chart .l2 { fill: none; stroke: #0c152a; stroke-width: 1.6; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
+    .chart .d2 { fill: #0c152a; }
+    .chart .z { stroke: #b4562b; stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .chart .lg { display: inline-flex; align-items: center; gap: 6px; margin-right: 12px; }
+    .chart .lg::before { content: ''; display: inline-block; width: 18px; height: 0; border-top: 2.5px solid var(--gold); }
+    .chart .lg.l2::before { border-top: 2px dashed var(--ink); }
+    .chart figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    caption { text-align: left; font-size: 13px; color: var(--muted); padding: 0 0 6px; }
+    th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    td.up { color: var(--up); } td.down { color: var(--down); }
+    .note { font-size: 13px; color: var(--muted); }
+
+    .formula { display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--gold-bg); color: var(--ink); font-weight: 700; font-size: 15px; margin: 2px 0 12px; }
+    .timeline li { margin: 8px 0; }
+
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+    .faq summary { cursor: pointer; font-weight: 700; }
+    .faq details p { margin: 8px 0 0; }
+
+    .related { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .related a { display: block; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; transition: border-color .15s; }
+    .related a:hover { border-color: var(--gold-soft); }
+    .related .t { display: block; font-size: 12.5px; color: var(--gold); font-weight: 700; }
+    .related .h { display: block; font-weight: 700; line-height: 1.6; }
+    .src { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat .v { font-size: 22px; }
+      .chart { padding: 8px 6px 6px; }
+      .chart .yl, .chart .xl { font-size: 30px; }
+      .chart .l { stroke-width: 2; }
+      th, td { padding: 8px 10px; }
+      td:first-child { white-space: nowrap; }
+    }
+  </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/MOMO_FinSphere/" aria-label="MOMO財商智庫 首頁"><img src="/icon-96.png" alt="" width="32" height="32" />MOMO財商智庫</a>
+      <a class="back" href="/MOMO_FinSphere/#macro">← 經濟數據速覽</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="crumbs" aria-label="麵包屑"><a href="/MOMO_FinSphere/">MOMO財商智庫</a> › <a href="/MOMO_FinSphere/#macro">經濟指標</a> › 殖利率曲線（10 年減 2 年利差）</nav>
+    <p class="eyebrow">經濟指標｜利率</p>
+    <h1>殖利率倒掛是什麼？10 年減 2 年利差現在多少？</h1>
+
+    <!-- 以下 SNAP 區塊由每日快照（scripts/indicators.mjs）自動更新，請勿手動修改 -->
+    <!-- SNAP:IND_ANSWER:START -->
+      <p class="answer">數據更新中，請稍後再回來看看。</p>
+    <!-- SNAP:IND_ANSWER:END -->
+    <p class="updated">資料來源：FRED｜最後更新：<time datetime="2026-10-22" id="indDate">2026/10/22</time>｜每天自動更新</p>
+
+    <!-- SNAP:IND_STATS:START -->
+    <!-- SNAP:IND_STATS:END -->
+
+    <h2>近一年走勢</h2>
+    <!-- SNAP:IND_CHART:START -->
+    <!-- SNAP:IND_CHART:END -->
+
+    <h2>近 12 個月數據</h2>
+    <!-- SNAP:IND_TABLE:START -->
+    <!-- SNAP:IND_TABLE:END -->
+    <p class="note">月底值為該月最後一個交易日的利差；正數代表 10 年期殖利率高於 2 年期，負數代表倒掛。</p>
+
+    <h2>殖利率曲線是什麼？什麼叫「倒掛」？</h2>
+    <h3>1. 先用借錢來想：借越久，利息通常越高</h3>
+    <p>如果朋友跟你借錢，借 2 年和借 10 年，你應該會希望借 10 年的利息高一點，因為錢被綁比較久、中間變數也比較多。債券市場也是這樣：<b>正常情況下，10 年期公債的殖利率會比 2 年期高</b>。</p>
+    <p>把 1 個月、2 年、5 年、10 年、30 年等不同年期的公債殖利率連成一條線，就是「殖利率曲線」。正常時這條線往右上方斜，叫做<b>正斜率</b>。</p>
+    <h3>2. 倒掛：短期利率反而比長期高</h3>
+    <p>當 2 年期殖利率反而高於 10 年期，曲線就變成往右下斜，這叫做<b>倒掛</b>。這通常代表市場認為：現在利率很高，但未來景氣會轉弱、聯準會之後可能要降息，所以長天期的利率反而比較低。</p>
+    <p>最常用的觀察方式，就是看「10 年期殖利率 − 2 年期殖利率」：</p>
+    <ul>
+      <li><b>大於 0</b>：正斜率，長期利率高於短期，屬於正常狀態。</li>
+      <li><b>接近 0</b>：曲線趨於平坦，長短期利率差不多。</li>
+      <li><b>小於 0</b>：倒掛，短期利率高於長期。</li>
+    </ul>
+
+    <h2>倒掛代表經濟一定會衰退嗎？</h2>
+    <p>歷史上美國好幾次經濟衰退之前，都出現過殖利率倒掛，所以它常被當作景氣轉弱的<b>提前訊號</b>。但有兩點要注意：</p>
+    <ul>
+      <li><b>時間差很長</b>：從開始倒掛到經濟衰退，過去常見間隔 1 到 2 年，不能拿來判斷短期走勢。</li>
+      <li><b>不是每次都準</b>：2022 年開始的倒掛持續超過兩年，期間美國經濟並沒有立即陷入衰退。</li>
+    </ul>
+    <p>所以比較好的用法，是把它當成「景氣溫度計」的其中一個參考，搭配就業、企業獲利等其他數據一起看，而不是單獨用來預測。</p>
+
+    <h2>對債券基金和配息基金的影響</h2>
+    <h3>倒掛時：短天期債券的收益反而比較高</h3>
+    <p>舉例來說，如果 2 年期殖利率 4.5%、10 年期 4.0%（倒掛），100 萬元放在短天期債券，一年的利息收入大約 4.5 萬；放在長天期約 4 萬。也就是說，<b>不必承擔長天期債券較大的淨值波動，也能拿到相近甚至更高的收益</b>。</p>
+    <h3>正斜率時：長天期才有比較多的收益補償</h3>
+    <p>曲線恢復正斜率後，長天期債券的殖利率重新高於短天期，等於用「承擔較大的利率波動」換取「比較高的收益」。這時要比較的，是多出來的收益是否值得承擔額外的淨值波動。</p>
+    <p class="note">以上數字為說明用的假設，實際收益會因債券條件、基金費用與市場變動而不同。長、短天期債券淨值受利率影響的差異，可以參考<a href="/MOMO_FinSphere/indicators/us10y.html">美國 10 年期公債殖利率</a>頁面的說明。</p>
+
+    <h2>歷史上的重要時點</h2>
+    <ul class="timeline">
+      <li><b>2000 年</b>：殖利率曲線倒掛，隨後美國在 2001 年進入衰退（網路泡沫破滅）。</li>
+      <li><b>2006～2007 年</b>：再次倒掛，之後在 2008 年發生金融海嘯。</li>
+      <li><b>2019 年 8 月</b>：短暫倒掛，隔年遇上新冠疫情造成的衰退。</li>
+      <li><b>2022 年 7 月～2024 年 9 月</b>：倒掛超過兩年，是有紀錄以來最長的一次，期間美國經濟沒有立即衰退。</li>
+      <li><b>近一年</b>：見上方走勢圖與數據表，每天自動更新。</li>
+    </ul>
+
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">常見問題</h2>
+      <details><summary>殖利率倒掛是什麼意思？</summary><p>殖利率倒掛是指短天期公債的殖利率高於長天期，最常用「10 年期減 2 年期」來看，數值小於 0 就是倒掛。正常情況下借錢越久利息越高，倒掛代表市場預期未來景氣轉弱、利率可能下降。</p></details>
+      <details><summary>殖利率倒掛就一定會經濟衰退嗎？</summary><p>不一定。歷史上美國多次衰退前都出現過倒掛，但從倒掛到衰退常間隔 1 到 2 年，也有例外：2022 年起的倒掛持續超過兩年，期間經濟沒有立即衰退。它比較適合當作景氣轉弱的參考訊號之一，而不是預測工具。</p></details>
+      <details><summary>倒掛解除、利差轉正代表什麼？</summary><p>代表長天期殖利率重新高於短天期，曲線恢復正斜率。常見的原因是市場預期聯準會降息、短天期利率先下降。過去有些衰退是在倒掛解除後才發生，所以解除倒掛不等於風險消失。</p></details>
+      <details><summary>為什麼常用 10 年減 2 年來看？</summary><p>2 年期殖利率主要反映聯準會短期利率政策的預期，10 年期則包含長期成長與通膨的看法，兩者相減能清楚看出市場對短期與長期的看法差距，也是最常被引用的殖利率曲線指標。</p></details>
+    </section>
+
+    <h2>延伸閱讀</h2>
+    <div class="related">
+      <a href="/MOMO_FinSphere/indicators/us10y.html"><span class="t">指標・利率</span><span class="h">美國 10 年期公債殖利率</span></a>
+      <a href="/MOMO_FinSphere/indicators/fed-rate.html"><span class="t">指標・政策</span><span class="h">聯邦基金利率與通膨</span></a>
+      <a href="/momo-blog/posts/2026-10-post05/"><span class="t">配置筆記・美債與利率</span><span class="h">美債殖利率 5%，還要買月配息基金嗎？</span></a>
+      <a href="/MOMO_FinSphere/tools/cycle.html"><span class="t">工具・景氣</span><span class="h">景氣循環儀表板：短週期 MCS × 長週期景氣羅盤</span></a>
+    </div>
+
+    <p class="src">資料來源：<a href="https://fred.stlouisfed.org/series/T10Y2Y" rel="noopener" target="_blank">FRED｜10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity（T10Y2Y）</a>、<a href="https://fred.stlouisfed.org/series/DGS2" rel="noopener" target="_blank">2 年期殖利率（DGS2）</a>。本頁數據與說明僅供教育參考，不構成任何投資建議。<br />原始數據下載：<a href="/MOMO_FinSphere/data/indicators/yield-curve.json">yield-curve.json</a></p>
+  </main>
+</body>
+</html>
