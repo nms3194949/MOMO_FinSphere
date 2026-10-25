@@ -19,6 +19,9 @@
 
 指標說明頁（定義、近一年走勢、對債券與配息基金的影響）：
 - 美國 10 年期公債殖利率：https://nms3194949.github.io/MOMO_FinSphere/indicators/us10y.html
+- 美國 10 年期減 2 年期公債利差：https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html
+- 美國高收益債利差：https://nms3194949.github.io/MOMO_FinSphere/indicators/hy-spread.html
+- 美國聯邦基金利率與通膨：https://nms3194949.github.io/MOMO_FinSphere/indicators/fed-rate.html
 
 以上為數據狀態描述，不構成投資建議。
 <!-- SNAP:LLMS:END -->
