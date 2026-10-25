@@ -212,7 +212,7 @@ function macroHtml(items, asOf) {
       `${tag ? `<span class="t${tag[1] ? ' warn' : ''}">${esc(tag[0])}</span>` : ''}</div>${m.page ? '</a>' : '</div>'}`;
   }).join('\n');
   return `        <div class="macro" id="macro" aria-labelledby="macro-title">
-          <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">FRED｜<time datetime="${asOf}">${asOf}</time><em>｜▲▼ 與上期比較</em></span></div>
+          <div class="macro-head"><b id="macro-title">經濟數據速覽</b><span id="macro-asof">FRED｜<time datetime="${asOf}">${asOf}</time><em>｜▲▼ 與上期比較</em>｜<a href="indicators/" style="color:inherit;font-weight:700">全部指標 →</a></span></div>
           <div class="macro-grid" id="macro-grid">
 ${cells}
           </div>
@@ -239,7 +239,7 @@ function llmsText(items, mcs, cmp, asOf) {
   if (mcs) out.push(`- MCS 景氣分數（短週期）：${mcs.score} 分，${STAGE_ZH[mcs.stage] || ''}（${mcs.stage}）｜${mcs.asOf || asOf}`);
   out.push(`- 景氣羅盤（長週期模型）：${cmp.season}，綜合評分 ${cmp.score}｜模型位置 ${cmp.label}`);
   if (INDICATORS.length) {
-    out.push('', '指標說明頁（定義、近一年走勢、對債券與配息基金的影響）：');
+    out.push('', `指標說明頁（定義、近一年走勢、對債券與配息基金的影響），總覽：${SITE}indicators/`);
     for (const ind of INDICATORS) out.push(`- ${ind.name}：${SITE}indicators/${ind.slug}.html`);
   }
   out.push('', '以上為數據狀態描述，不構成投資建議。');
@@ -278,6 +278,7 @@ async function snapshot() {
 
   let sm = await readFile(file('sitemap.xml'), 'utf8');
   for (const r of inds) sm = upsertSitemap(sm, SITE + r.page, r.date);
+  if (inds.hub) sm = upsertSitemap(sm, SITE + 'indicators/', inds.hub.date);
   for (const [u, d] of [[SITE, asOf], [SITE + 'tools/cycle.html', cycDate]]) {
     sm = sm.replace(new RegExp(`(<loc>${u.replace(/[.]/g, '\\.')}</loc><lastmod>)[\\d-]+(</lastmod>)`), `$1${d}$2`);
   }
@@ -295,7 +296,7 @@ async function indexNow() {
     host: 'nms3194949.github.io',
     key: INDEXNOW_KEY,
     keyLocation: `${SITE}${INDEXNOW_KEY}.txt`,
-    urlList: [SITE, `${SITE}tools/cycle.html`, `${SITE}llms.txt`, ...INDICATORS.map((i) => `${SITE}indicators/${i.slug}.html`)],
+    urlList: [SITE, `${SITE}tools/cycle.html`, `${SITE}llms.txt`, `${SITE}indicators/`, ...INDICATORS.map((i) => `${SITE}indicators/${i.slug}.html`)],
   };
   const res = await fetch('https://api.indexnow.org/indexnow', {
     method: 'POST',

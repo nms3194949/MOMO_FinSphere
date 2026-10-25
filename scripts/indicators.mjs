@@ -46,6 +46,7 @@ export const INDICATORS = [
         + `近一年最高 ${f(a.hi.v, 2)}%（${fmtDate(a.hi.date)}）、最低 ${f(a.lo.v, 2)}%（${fmtDate(a.lo.date)}）。`;
     },
     stats: (x) => defaultStats(x.DGS10, 2),
+    hub: (x) => ({ value: `${f(x.DGS10.latest.v, 2)}%`, tag: rangeTag(x.DGS10), desc: '全球資產定價的基準利率，影響債券與配息基金淨值。' }),
     chart: { lines: [{ id: 'DGS10', label: '10 年期殖利率' }] },
     table: { cols: [{ th: '月底值', id: 'DGS10', fmt: (v) => `${f(v, 2)}%` }], chg: 'DGS10' },
   },
@@ -71,6 +72,7 @@ export const INDICATORS = [
         card('近一年區間', `${f(a.lo.v, 2)}～${f(a.hi.v, 2)}`, `低 ${md(a.lo.date)}・高 ${md(a.hi.date)}`),
       ];
     },
+    hub: (x) => ({ value: `${f(x.T10Y2Y.latest.v, 2)}`, unit: '個百分點', tag: curveState(x.T10Y2Y.latest.v), warn: x.T10Y2Y.latest.v < 0, desc: '殖利率曲線的斜率，小於 0 代表倒掛，常被視為景氣轉弱的提前訊號。' }),
     chart: { lines: [{ id: 'T10Y2Y', label: '10 年減 2 年利差' }], zero: true },
     table: {
       cols: [
@@ -94,6 +96,7 @@ export const INDICATORS = [
         + `近一年最高 ${f(a.hi.v, 2)}（${fmtDate(a.hi.date)}）、最低 ${f(a.lo.v, 2)}（${fmtDate(a.lo.date)}）。`;
     },
     stats: (x) => defaultStats(x.BAMLH0A0HYM2, 2, ' 個百分點'),
+    hub: (x) => ({ value: `${f(x.BAMLH0A0HYM2.latest.v, 2)}`, unit: '個百分點', tag: `水準${hyState(x.BAMLH0A0HYM2.latest.v)}`, warn: x.BAMLH0A0HYM2.latest.v >= 5, desc: '信用風險的溫度計，利差擴大代表市場越擔心企業違約。' }),
     chart: { lines: [{ id: 'BAMLH0A0HYM2', label: '高收益債利差' }] },
     table: { cols: [{ th: '月底值', id: 'BAMLH0A0HYM2', fmt: (v) => f(v, 2) }], chg: 'BAMLH0A0HYM2' },
   },
@@ -124,6 +127,11 @@ export const INDICATORS = [
         card('近一年調整', `${moves(u)}<small> 次</small>`, '利率目標變動次數'),
       ];
     },
+    hub: (x) => ({
+      value: x.DFEDTARL ? `${f(x.DFEDTARL.latest.v, 2)}–${f(x.DFEDTARU.latest.v, 2)}%` : `${f(x.DFEDTARU.latest.v, 2)}%`,
+      tag: x.CPI_YOY ? `CPI ${f(x.CPI_YOY.latest.v, 1)}%` : '', warn: x.CPI_YOY && x.CPI_YOY.latest.v >= 3,
+      desc: '美國的政策利率，搭配 CPI 年增率觀察升息與降息的方向。',
+    }),
     chart: {
       lines: [
         { id: 'DFEDTARU', label: '聯邦基金利率（上限）' },
@@ -144,6 +152,44 @@ export const INDICATORS = [
     },
   },
 ];
+
+// 目前數值在近一年區間的位置
+function rangeTag(a) {
+  const span = a.hi.v - a.lo.v || 1;
+  const p = (a.latest.v - a.lo.v) / span;
+  return p >= 0.8 ? '近一年高檔' : p <= 0.2 ? '近一年低檔' : '近一年中段';
+}
+
+function sparkline(a, zero) {
+  const W = 240, H = 56, P = 4;
+  const pts = a.year;
+  const vals = pts.map((p) => p.v); if (zero) vals.push(0);
+  const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1;
+  const t0 = ts(pts[0].date), t1 = ts(pts[pts.length - 1].date);
+  const X = (tt) => P + ((tt - t0) / (t1 - t0 || 1)) * (W - 2 * P);
+  const Y = (v) => P + (1 - (v - min) / span) * (H - 2 * P);
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${X(ts(p.date)).toFixed(1)},${Y(p.v).toFixed(1)}`).join('');
+  const z = zero && min < 0 && max > 0 ? `<line x1="${P}" x2="${W - P}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" class="sz"/>` : '';
+  const last = pts[pts.length - 1];
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${z}<path d="${d}"/><circle cx="${X(ts(last.date)).toFixed(1)}" cy="${Y(last.v).toFixed(1)}" r="3"/></svg>`;
+}
+
+function hubHtml(done) {
+  return done.map(({ ind, page, x }) => {
+    const h = ind.hub(x);
+    const main = x[ind.main];
+    const d1m = main.d1m;
+    const chg = d1m == null ? '' : `<span class="chg${d1m > 0 ? ' up' : d1m < 0 ? ' down' : ''}">較上月 ${pp(d1m, ind.dp)}</span>`;
+    return `        <a class="ind" href="${page.replace('indicators/', '')}">
+          <span class="ind-name">${ind.name}</span>
+          <span class="ind-val">${h.value}${h.unit ? `<small> ${h.unit}</small>` : ''}</span>
+          <span class="ind-meta">${chg}${h.tag ? `<span class="tag${h.warn ? ' warn' : ''}">${h.tag}</span>` : ''}</span>
+          ${sparkline(main, ind.chart.zero)}
+          <span class="ind-desc">${h.desc}</span>
+          <span class="ind-foot"><span>資料日期 <time datetime="${main.latest.date}">${fmtDate(main.latest.date)}</time></span><span class="go">看說明 →</span></span>
+        </a>`;
+  }).join('\n');
+}
 
 // ── 共用：分析一條數列 ────────────────────────────────────
 function analyse(all) {
@@ -351,11 +397,23 @@ export async function runIndicators({ file, replaceBetween, setDateModified, key
       html = setDateModified(html, main.latest.date);
       await writeFile(file(page), html);
 
-      done.push({ ind, page, date: main.latest.date });
+      done.push({ ind, page, x, date: main.latest.date });
       console.log(`  ↳ 指標頁 ${ind.short}：${f(main.latest.v, ind.dp)}（${main.latest.date}，近一年 ${main.year.length} 筆）`);
     } catch (err) {
       console.warn(`⚠ 指標頁 ${ind.short} 更新失敗：${err.message}（保留原內容）`);
     }
+  }
+  // 總覽頁：4 個指標都更新成功才改寫，避免少了卡片
+  const hub = 'indicators/index.html';
+  if (existsSync(file(hub)) && done.length === INDICATORS.length) {
+    const latest = done.map((r) => r.date).sort().pop();
+    let html = await readFile(file(hub), 'utf8');
+    html = replaceBetween(html, 'IND_HUB', hubHtml(done));
+    html = html.replace(/<time datetime="[\d-]+" id="indDate">[^<]*<\/time>/, `<time datetime="${latest}" id="indDate">${fmtDate(latest)}</time>`);
+    html = setDateModified(html, latest);
+    await writeFile(file(hub), html);
+    done.hub = { page: hub, date: latest };
+    console.log('  ↳ 指標總覽頁已更新');
   }
   return done;
 }

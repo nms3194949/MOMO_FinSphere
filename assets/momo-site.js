@@ -16,6 +16,7 @@
   var BLOG = '/momo-blog/';
   var TOOLS = '/MOMO_FinSphere/tools/';
   var HOME = '/MOMO_FinSphere/';
+  var INDS = '/MOMO_FinSphere/indicators/';
   var ME = '/MOMO_FinSphere/me/';
   var FRAMED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })(); // 被嵌在其他頁面（例如 cycle.html）
   var PRIVATE = !!window.__momoPrivate; // 自用頁（由 momo-gate.js 標記）：不送 GA、不加公開頁尾
@@ -102,6 +103,7 @@
         '<a class="mf-brand" href="' + HOME + '"><img src="/icon-96.png" alt="" width="28" height="28">MOMO財商智庫</a>' +
         '<div class="mf-links">' +
           '<a href="' + BLOG + '">配置筆記（文章）</a>' +
+          '<a href="' + INDS + '">經濟指標</a>' +
           '<a href="' + TOOLS + '">所有工具</a>' +
           '<a class="mf-line" href="' + utm(LINE, 'footer') + '" target="_blank" rel="noopener">加入官方 LINE</a>' +
           '<a href="' + utm(IG, 'footer') + '" target="_blank" rel="noopener">Instagram</a>' +
@@ -144,6 +146,7 @@
             '</nav>'
           : '<a class="mt-brand" href="' + HOME + '" aria-label="MOMO財商智庫 工具首頁"><img src="/icon-96.png" alt="" width="30" height="30">MOMO財商智庫</a>' +
             '<nav class="mt-nav" aria-label="網站導覽">' +
+              '<a class="mt-hide" href="' + INDS + '">經濟指標</a>' +
               '<a class="mt-hide" href="' + TOOLS + '">所有工具</a>' +
               '<a class="mt-hide" href="' + BLOG + '">文章</a>' +
               '<a class="mt-line" data-loc="topbar" href="' + utm(LINE, 'topbar') + '" target="_blank" rel="noopener">加入 LINE</a>' +
