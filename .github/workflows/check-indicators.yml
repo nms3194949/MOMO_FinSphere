@@ -1,0 +1,22 @@
+# 指標數據檢查：手動執行，只讀取 FRED 數據並列出結果，不修改任何檔案
+name: 指標數據檢查
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 檢查近 1 年數據
+        run: node scripts/check-indicators.mjs
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
