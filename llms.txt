@@ -17,7 +17,7 @@
 - MCS 景氣分數（短週期）：70 分，成長區（Growth）｜2026-10-21
 - 景氣羅盤（長週期模型）：夏｜過熱期，綜合評分 72｜模型位置 2026 Q4
 
-指標說明頁（定義、近一年走勢、對債券與配息基金的影響）：
+指標說明頁（定義、近一年走勢、對債券與配息基金的影響），總覽：https://nms3194949.github.io/MOMO_FinSphere/indicators/
 - 美國 10 年期公債殖利率：https://nms3194949.github.io/MOMO_FinSphere/indicators/us10y.html
 - 美國 10 年期減 2 年期公債利差：https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html
 - 美國高收益債利差：https://nms3194949.github.io/MOMO_FinSphere/indicators/hy-spread.html
