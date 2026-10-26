@@ -11,7 +11,7 @@
   'use strict';
 
   // ▼ 密碼的 SHA-256（計算方式：sha256('momo-gate:' + 密碼)）
-  var HASH = '3b62b60d000992260777b9381ce9e59828ffa7202f65e7f98a0b3975745c74b1';
+  var HASH = '553c74fc6f620b3dd7faa4ed69ed356184386b71acd3f9fc6c677cac5e3d5d0b';
   // ▲
   var SALT = 'momo-gate:';
   var KEY = 'momo_gate_v1';
