@@ -4,862 +4,522 @@
   <!-- 自用工具：密碼頁（需放最前面） -->
   <script src="/MOMO_FinSphere/assets/momo-gate.js"></script>
   <meta name="robots" content="noindex,nofollow">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基金戰情室｜自用</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { 
-            --bg: #0f172a; 
-            --card-bg: #1e293b; 
-            --modal-bg: #1e293b;
-            --text: #f1f5f9; 
-            --red: #ef4444; 
-            --yellow: #eab308; 
-            --green: #10b981; 
-            --blue: #3b82f6;
-            --purple: #a855f7;
-            --orange: #f97316;
-            --gray: #64748b;
-        }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        
-        h1 { text-align: center; font-weight: 800; margin-bottom: 5px; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; color: transparent; font-size: 1.8rem; letter-spacing: -0.5px; }
-        .subtitle { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px; font-weight: 500;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基金戰情室｜自用</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --card-2: #111c33; --line: #334155; --text: #f1f5f9; --text-2: #cbd5e1; --muted: #94a3b8; --dim: #64748b;
+      --red: #ef4444; --yellow: #eab308; --green: #10b981; --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Noto Sans TC', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { text-align: center; font-weight: 800; margin: 4px 0 2px; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 1.7rem; }
+    .subtitle { text-align: center; color: var(--muted); font-size: .85rem; margin: 0 0 12px; }
+    .status-bar { text-align: center; font-size: .8rem; color: var(--dim); margin-bottom: 12px; min-height: 18px; }
 
-        /* 狀態列 */
-        .status-bar { text-align: center; font-size: 0.8rem; color: #64748b; margin-bottom: 15px; min-height: 20px;}
+    /* 摘要＋篩選（同一排，點了就篩選） */
+    .toolbar { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 8px 0 10px; margin: 0 -15px; padding-left: 15px; padding-right: 15px; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex: none; background: rgba(30,41,59,.85); color: var(--muted); border: 1px solid var(--line); padding: 7px 14px; border-radius: 999px; font-size: .88rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .chip b { font-variant-numeric: tabular-nums; margin-left: 4px; color: var(--text); }
+    .chip.on { background: #e2e8f0; color: #0f172a; border-color: #e2e8f0; }
+    .chip.on b { color: #0f172a; }
+    .chip.hit { border-color: rgba(239,68,68,.6); } .chip.hit b { color: #f87171; }
+    .chip.watch { border-color: rgba(234,179,8,.6); } .chip.watch b { color: #facc15; }
+    .chip.on.hit b, .chip.on.watch b { color: #0f172a; }
+    .row2 { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+    .search { flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 8px 12px; font-size: .95rem; }
+    .search:focus { outline: 2px solid rgba(59,130,246,.5); border-color: var(--blue); }
+    .view-switch { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 3px; flex: none; }
+    .view-btn { background: none; color: var(--muted); border: none; padding: 5px 12px; border-radius: 8px; font-size: .85rem; font-weight: 700; cursor: pointer; }
+    .view-btn.active { background: #e2e8f0; color: #0f172a; }
 
-        /* 篩選按鈕列 (Sticky) */
-        .filter-wrapper { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 10px 0; margin: 0 -15px; padding-left: 15px; }
-        .filter-container { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-right: 15px; }
-        .filter-container::-webkit-scrollbar { display: none; }
-        
-        .filter-btn { 
-            background: rgba(30, 41, 59, 0.8); color: #94a3b8; border: 1px solid #334155; backdrop-filter: blur(4px);
-            padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; white-space: nowrap; cursor: pointer; transition: all 0.2s; font-weight: 500;
-        }
-        .filter-btn.active { background: var(--blue); color: white; border-color: var(--blue); font-weight: bold; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); transform: translateY(-1px); }
-        .filter-btn:active { transform: scale(0.95); }
+    #loading { text-align: center; margin-top: 50px; color: var(--muted); display: none; }
+    .empty-state { text-align: center; padding: 40px; color: var(--dim); border-radius: 12px; border: 2px dashed var(--line); }
 
-        /* 網格與卡片 */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; padding-top: 5px; }
-        
-        .fund-card { 
-            background: var(--card-bg); border-radius: 16px; padding: 18px; 
-            border: 1px solid #334155; position: relative; transition: transform 0.2s, box-shadow 0.2s;
-            display: flex; flex-direction: column; gap: 12px; cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .fund-card:active { transform: scale(0.98); }
-        
-        /* 燈號特效 */
-        .status-buy { border-left: 4px solid var(--red); background: linear-gradient(135deg, rgba(239,68,68,0.05) 0%, var(--card-bg) 100%); } 
-        .status-watch { border-left: 4px solid var(--yellow); } 
-        .status-safe { border-left: 4px solid var(--green); opacity: 0.85; } 
+    /* 排行表 */
+    .rank-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: auto; max-height: calc(100vh - 170px); }
+    .rank-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .86rem; font-variant-numeric: tabular-nums; }
+    .rank-table th { position: sticky; top: 0; z-index: 2; background: var(--card-2); color: var(--muted); font-weight: 700; padding: 10px 8px; text-align: right; white-space: nowrap; cursor: pointer; user-select: none; border-bottom: 1px solid var(--line); }
+    .rank-table th.grp { border-left: 1px solid var(--line); }
+    .rank-table td.grp { border-left: 1px solid rgba(51,65,85,.6); }
+    .rank-table th:first-child, .rank-table td:first-child { text-align: left; position: sticky; left: 0; background: var(--card); z-index: 1; }
+    .rank-table th:first-child { z-index: 3; background: var(--card-2); }
+    .rank-table th.sorted { color: var(--text); }
+    .rank-table td { padding: 7px 8px; border-bottom: 1px solid rgba(51,65,85,.6); white-space: nowrap; text-align: right; }
+    .rank-table tr:hover td { background: #24324a; }
+    .rank-table tbody tr { cursor: pointer; }
+    .rank-table tr.stale td { opacity: .5; }
+    .rk-name { max-width: 240px; overflow: hidden; text-overflow: ellipsis; color: #e2e8f0; font-weight: 600; }
+    .rk-name small { display: block; color: var(--dim); font-weight: 500; font-size: .72rem; }
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: var(--green); }
+    .dot.hit { background: var(--red); box-shadow: 0 0 8px rgba(239,68,68,.7); } .dot.watch { background: var(--yellow); }
+    .rk-cell { position: relative; min-width: 78px; }
+    .rk-bar { position: absolute; right: 0; top: 50%; height: 18px; transform: translateY(-50%); border-radius: 4px; opacity: .3; }
+    .rk-val { position: relative; font-weight: 700; }
+    .up { color: #f87171; } .down { color: #34d399; } .na { color: #475569; }
+    .t-hit { color: #f87171; font-weight: 800; } .t-watch { color: #facc15; font-weight: 700; } .t-ok { color: var(--text-2); }
+    .trend { font-size: .78rem; padding: 1px 7px; border-radius: 999px; border: 1px solid; }
+    .trend.bull { color: #bbf7d0; border-color: #22c55e; } .trend.bear { color: #fecaca; border-color: #ef4444; } .trend.neutral { color: #facc15; border-color: #eab308; } .trend.none { color: var(--dim); border-color: var(--line); }
+    .note { color: var(--dim); font-size: .75rem; padding: 10px 4px; line-height: 1.6; }
 
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-        .fund-name { font-weight: 700; font-size: 1.05rem; line-height: 1.4; color: #e2e8f0; flex: 1; margin-right: 4px; }
-        .card-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .strategy-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; background: rgba(0,0,0,0.2); font-weight: 600; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+    /* 卡片 */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .fund-card { background: var(--card); border-radius: 14px; padding: 16px; border: 1px solid var(--line); border-left: 4px solid var(--green); display: flex; flex-direction: column; gap: 10px; cursor: pointer; }
+    .fund-card.hit { border-left-color: var(--red); background: linear-gradient(135deg, rgba(239,68,68,.07), var(--card) 60%); }
+    .fund-card.watch { border-left-color: var(--yellow); }
+    .fund-card.stale { opacity: .55; }
+    .card-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+    .fund-name { font-weight: 700; font-size: 1rem; line-height: 1.4; color: #e2e8f0; }
+    .badge { font-size: .72rem; padding: 2px 8px; border-radius: 6px; white-space: nowrap; font-weight: 700; border: 1px solid; }
+    .badge.hit { color: #f87171; border-color: #ef4444; } .badge.watch { color: #facc15; border-color: #eab308; } .badge.ok { color: #6ee7b7; border-color: #10b981; }
+    .kv { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .kv .l { font-size: .72rem; color: var(--muted); display: block; }
+    .kv .v { font-size: 1.1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .spark { width: 100%; height: 48px; display: block; }
+    .stale-tag { font-size: .72rem; color: #fbbf24; }
 
-        /* 趨勢徽章 */
-        .trend-badge {
-            font-size: 0.7rem;
-            padding: 2px 7px;
-            border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.6);
-            color: #e5e7eb;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .trend-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 999px;
-            background: #9ca3af;
-        }
-        .trend-bull     { border-color: #22c55e; color:#bbf7d0; }
-        .trend-bull .trend-dot { background:#22c55e; }
-        .trend-bear     { border-color: #ef4444; color:#fecaca; }
-        .trend-bear .trend-dot { background:#ef4444; }
-        .trend-neutral { border-color: #eab308; color:#facc15; }
-        .trend-neutral .trend-dot { background:#eab308; }
+    /* 浮動按鈕 */
+    .fab-container { position: fixed; bottom: 22px; right: 22px; display: flex; flex-direction: column; gap: 12px; z-index: 90; }
+    .fab { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,.5); border: none; color: #fff; }
+    .fab-refresh { background: var(--blue); } .fab-update { background: var(--red); }
 
-        /* 缺漏資料警示 ICON */
-        .data-warning {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 4px;
-            font-size: 0.85rem;
-            color: #fbbf24;
-        }
-
-        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .data-item { display: flex; flex-direction: column; }
-        .lbl { font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px; letter-spacing: 0.5px; }
-        .val { font-size: 1.2rem; font-weight: 700; font-family: 'Roboto Mono', monospace; letter-spacing: -0.5px; }
-        .dd-val.alert { color: var(--red); text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-        .dd-val.warn { color: var(--yellow); }
-
-        .target-bar { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .gap-close { color: var(--red); font-weight: bold; animation: pulse 2s infinite; }
-        .gap-far { color: var(--green); font-weight: 500; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        .chart-container { height: 60px; width: 100%; pointer-events: none; }
-
-        /* 懸浮按鈕 */
-        .fab-container { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 90; }
-        .fab { 
-            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); border: none; color: white; transition: transform 0.2s;
-        }
-        .fab:active { transform: scale(0.9); }
-        .fab-refresh { background: var(--blue); }
-        .fab-update { background: var(--red); }
-
-        #loading { text-align: center; margin-top: 50px; color: #94a3b8; display: none; }
-        .empty-state { grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; background: rgba(255,255,255,0.02); border-radius: 12px; border: 2px dashed #334155; }
-
-        /* 通用 Modal 樣式 */
-        .modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
-            z-index: 100; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
-        .modal-backdrop.show { opacity: 1; pointer-events: auto; }
-        
-        .modal-content {
-            background: var(--modal-bg); width: 90%; max-width: 600px; max-height: 90vh;
-            border-radius: 20px; padding: 20px; border: 1px solid #475569;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            display: flex; flex-direction: column; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s ease;
-        }
-        .modal-backdrop.show .modal-content { transform: translateY(0); }
-
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-title { font-size: 1.2rem; font-weight: bold; color: var(--text); display:flex; align-items:center; gap:6px; }
-        .btn-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; padding: 5px; }
-        
-        /* 詳情視窗樣式 */
-        .big-chart-box { height: 300px; width: 100%; margin-bottom: 20px; }
-        .modal-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .modal-info-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; text-align: center; }
-        .modal-lbl { font-size: 0.8rem; color: #94a3b8; display: block; margin-bottom: 5px; }
-        .modal-val { font-size: 1.1rem; font-weight: bold; font-family: 'Roboto Mono'; }
-        .modal-desc { font-size: 0.85rem; color: #94a3b8; line-height: 1.6; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border-left: 3px solid var(--blue); }
-
-        /* 更新報告樣式 */
-        .result-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .r-name { font-weight: bold; color: #e2e8f0; font-size: 0.95rem; }
-        .r-info { text-align: right; }
-        .r-date { font-size: 0.75rem; color: #94a3b8; display: block; }
-        .r-nav { font-family: 'Roboto Mono'; font-weight: bold; color: var(--green); font-size: 1rem; }
-
-
-        /* ===== 報酬排行（1/3/7/14/30 天 NAV 報酬率） ===== */
-        .view-switch { display:flex; gap:6px; justify-content:center; margin: 0 0 12px; }
-        .view-btn { background: rgba(30,41,59,.8); color:#94a3b8; border:1px solid #334155; padding:7px 16px; border-radius:20px; font-size:.9rem; font-weight:600; cursor:pointer; }
-        .view-btn.active { background:#e2e8f0; color:#0f172a; border-color:#e2e8f0; }
-        .rank-wrap { background: var(--card-bg); border:1px solid #334155; border-radius:16px; overflow:auto; max-height: calc(100vh - 150px); }
-        .rank-table { width:100%; border-collapse:separate; border-spacing:0; font-size:.86rem; font-variant-numeric: tabular-nums; }
-        .rank-table th { position:sticky; top:0; z-index:2; background:#111c33; color:#94a3b8; font-weight:700; padding:10px 8px; text-align:right; white-space:nowrap; cursor:pointer; user-select:none; border-bottom:1px solid #334155; }
-        .rank-table th:first-child, .rank-table td:first-child { text-align:left; position:sticky; left:0; background:var(--card-bg); z-index:1; }
-        .rank-table th:first-child { z-index:3; background:#111c33; }
-        .rank-table th.sorted { color:#f1f5f9; }
-        .rank-table th .arr { opacity:.9; margin-left:3px; }
-        .rank-table td { padding:7px 8px; border-bottom:1px solid rgba(51,65,85,.6); white-space:nowrap; }
-        .rank-table tr:hover td { background:#24324a; }
-        .rank-table tr { cursor:pointer; }
-        .rk-name { max-width: 230px; overflow:hidden; text-overflow:ellipsis; color:#e2e8f0; font-weight:600; }
-        .rk-name small { display:block; color:#64748b; font-weight:500; font-size:.72rem; }
-        .rk-cell { position:relative; min-width:84px; text-align:right; }
-        .rk-bar { position:absolute; top:50%; height:18px; transform:translateY(-50%); border-radius:4px; opacity:.32; }
-        .rk-val { position:relative; font-weight:700; }
-        .rk-up { color:#f87171; } .rk-down { color:#34d399; } .rk-na { color:#475569; }
-        .rk-note { color:#64748b; font-size:.75rem; padding:10px 12px; }
-        @media (max-width:600px){ .rk-name{max-width:130px} .rk-cell{min-width:70px} .rank-table{font-size:.8rem} }
-    </style>
-  <!-- MOMO財商智庫：網站圖示、GA4、統一頁尾與免責聲明 -->
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(5px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .modal-backdrop.show { opacity: 1; pointer-events: auto; }
+    .modal-content { background: var(--card); width: 92%; max-width: 640px; max-height: 90vh; border-radius: 18px; padding: 18px; border: 1px solid #475569; display: flex; flex-direction: column; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .modal-title { font-size: 1.1rem; font-weight: 800; }
+    .btn-close { background: none; border: none; color: var(--muted); font-size: 1.6rem; cursor: pointer; padding: 0 4px; }
+    .m-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .m-item { background: rgba(255,255,255,.05); padding: 8px; border-radius: 10px; text-align: center; }
+    .m-item .l { font-size: .74rem; color: var(--muted); display: block; }
+    .m-item .v { font-size: 1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .m-item .s { font-size: .7rem; color: var(--dim); display: block; }
+    .big-chart-box { height: 300px; margin-bottom: 12px; }
+    .m-desc { font-size: .82rem; color: var(--muted); line-height: 1.7; background: rgba(0,0,0,.2); padding: 12px; border-radius: 10px; border-left: 3px solid var(--blue); }
+    .result-item { display: flex; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,.03); border-radius: 8px; }
+    .r-nav { font-weight: 800; color: var(--green); } .r-date { font-size: .75rem; color: var(--muted); display: block; text-align: right; }
+    @media (max-width: 600px) { .rk-name { max-width: 140px; } .rk-cell { min-width: 66px; } .rank-table { font-size: .8rem; } .m-info { grid-template-columns: repeat(2, 1fr); } }
+  </style>
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
 </head>
 <body>
-
 <div class="container">
-    <h1>🎯 基金戰情室 <span style="font-size:0.5em; vertical-align:middle; opacity:0.7; background:#334155; padding:2px 6px; border-radius:4px;">V43 Fix</span></h1>
-    <p class="subtitle">雙核策略監控 • 智能詳情分析</p>
+  <h1>🎯 基金戰情室</h1>
+  <p class="subtitle">近 1 年回撤監控・NAV 報酬排行</p>
+  <div id="status-display" class="status-bar"></div>
 
-    <div id="status-display" class="status-bar"></div>
-
-    <div class="view-switch" role="tablist" aria-label="檢視方式">
-        <button class="view-btn" data-view="rank" onclick="setView('rank')">📊 報酬排行</button>
-        <button class="view-btn" data-view="card" onclick="setView('card')">🗂 訊號卡片</button>
+  <div class="toolbar">
+    <div class="chips" id="chips" role="tablist" aria-label="篩選"></div>
+    <div class="row2">
+      <input id="search" class="search" type="search" placeholder="搜尋基金名稱…" autocomplete="off">
+      <div class="view-switch" role="tablist" aria-label="檢視方式">
+        <button class="view-btn" data-view="rank">排行</button>
+        <button class="view-btn" data-view="card">卡片</button>
+      </div>
     </div>
+  </div>
 
-    <div class="filter-wrapper">
-        <div class="filter-container">
-            <button class="filter-btn active" onclick="setFilter('ALL')">全部</button>
-            <button class="filter-btn" onclick="setFilter('SIGNAL')" style="color:#f87171; border-color:#ef4444">🚨 訊號區</button>
-            <button class="filter-btn" onclick="setFilter('BOND')">🟦 債券 (乖離)</button>
-            <button class="filter-btn" onclick="setFilter('EQUITY')">🟧 股票 (回撤)</button>
-            <button class="filter-btn" onclick="setFilter('BALANCED')">🟪 平衡</button>
-        </div>
-    </div>
-
-    <div id="loading">📡 正在連線資料庫...</div>
-    <div id="dashboard" class="grid"></div>
+  <div id="loading">📡 正在連線資料庫...</div>
+  <div id="dashboard"></div>
 </div>
 
 <div class="fab-container">
-    <button class="fab fab-update" onclick="manualUpdate()" title="觸發後端更新">🚀</button>
-    <button class="fab fab-refresh" onclick="forceReload()" title="強制刷新">↻</button>
+  <button class="fab fab-update" id="btn-update" title="觸發後端更新">🚀</button>
+  <button class="fab fab-refresh" id="btn-refresh" title="強制刷新">↻</button>
 </div>
 
-<div id="detail-modal" class="modal-backdrop" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <div class="modal-title" id="m-title">基金名稱</div>
-            <button class="btn-close" onclick="closeModal()">×</button>
-        </div>
-        <div class="modal-info" id="m-info-box"></div>
-        <div class="big-chart-box">
-            <canvas id="big-chart"></canvas>
-        </div>
-        <div class="modal-desc" id="m-strategy-desc">策略說明...</div>
-    </div>
+<div id="detail-modal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header"><div class="modal-title" id="m-title"></div><button class="btn-close" data-close="detail-modal">×</button></div>
+    <div class="m-info" id="m-info"></div>
+    <div class="big-chart-box"><canvas id="big-chart"></canvas></div>
+    <div class="m-desc" id="m-desc"></div>
+  </div>
 </div>
 
-<div id="update-result-modal" class="modal-backdrop" onclick="closeUpdateModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 80vh;">
-        <div class="modal-header">
-            <div class="modal-title">🚀 更新結果報告</div>
-            <button class="btn-close" onclick="closeUpdateModal()">×</button>
-        </div>
-        <div style="padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; margin-bottom: 15px; color: #10b981; font-size: 0.9rem;" id="update-msg">
-            狀態訊息...
-        </div>
-        <div class="result-list" id="update-list" style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto;">
-            </div>
-        <button onclick="closeUpdateModal()" style="margin-top:20px; width:100%; padding:12px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">確認並刷新</button>
-    </div>
+<div id="update-modal" class="modal-backdrop">
+  <div class="modal-content" style="max-height:80vh">
+    <div class="modal-header"><div class="modal-title">🚀 更新結果</div><button class="btn-close" data-close="update-modal">×</button></div>
+    <div id="update-msg" style="padding:10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;margin-bottom:12px;color:#10b981;font-size:.9rem"></div>
+    <div id="update-list" style="display:flex;flex-direction:column;gap:6px;overflow-y:auto"></div>
+    <button data-close="update-modal" style="margin-top:16px;width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">確認並刷新</button>
+  </div>
 </div>
 
 <script>
-    // ▼▼▼ Google Apps Script 網址 (請確認是否需要更新) ▼▼▼
-    const API_URL = "https://script.google.com/macros/s/AKfycbwYVirIuGO475Kb63z4jTKKgSPINSqy9jM3wPaQPMfa0DXzpdDybCXpoiqfPmeveb7F0g/exec"; 
-    // ▲▲▲▲▲▲▲▲▲▲▲
+(function () {
+  'use strict';
+  // ▼ Google Apps Script 網址
+  const API_URL = "https://script.google.com/macros/s/AKfycbwYVirIuGO475Kb63z4jTKKgSPINSqy9jM3wPaQPMfa0DXzpdDybCXpoiqfPmeveb7F0g/exec";
 
-    const MA_DAYS = 240; 
-    const MA_SHORT_DAYS = 60;
-    
-    // 🔥 【關鍵修改】 更新 Cache Key，強制瀏覽器捨棄舊的錯誤資料
-    const CACHE_KEY = 'fund_radar_v43_fix_data'; 
-    
-    let globalFunds = [];
-    let currentFilter = 'ALL';
-    let bigChartInstance = null; 
+  // ▼ 監控設定（逐檔門檻請改 Google Sheet「監控門檻」分頁；讀不到時用這裡的預設）
+  const HIGH_WINDOW = 250;                 // 近 1 年高點：最近 250 筆 NAV
+  const DEFAULT_TH = { watch: -0.08, target: -0.15 };
+  const STALE_DAYS = 3;                    // 比最新一檔晚超過 3 天 → 資料過期
+  const MA_LONG = 240, MA_SHORT = 60;
+  const RET_PERIODS = [1, 3, 7, 14, 30];
+  const EXCLUDE = ['006208', 'SPY'];
+  const CACHE_KEY = 'fund_radar_v48';
+  const TH_CACHE_KEY = 'fund_radar_th_v1';
 
-    // ===== 報酬排行設定 =====
-    const RET_PERIODS = [1, 3, 7, 14, 30];      // 天數（日曆天）
-    const UP_IS_RED = true;                      // 台灣習慣：漲紅跌綠
-    let currentView = (function(){ try { return localStorage.getItem('fund_radar_view') || 'rank'; } catch(e) { return 'rank'; } })();
-    let rankSort = { key: 7, dir: -1 };          // 預設依 7 天報酬由高到低
+  const $ = (id) => document.getElementById(id);
+  const ls = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const pct = (x, dp = 1, sign = true) => x == null || !isFinite(x) ? '—' : ((sign && x > 0 ? '+' : '') + (x * 100).toFixed(dp) + '%');
+  const DAY = 86400000;
 
+  let funds = [];
+  let thresholds = { def: DEFAULT_TH, funds: {} };
+  let rawCache = null;
+  let state = {
+    filter: 'ALL',
+    q: '',
+    view: ls.get('fund_radar_view') || 'rank',
+    sort: { key: 'gap', dir: 1 }   // 預設：距離達標最近的排最前面
+  };
+  let bigChart = null;
 
-    const STRATEGIES = {
-        BOND: { name: "債券領息", color: "#3b82f6", type: "BOND", useBias: true, watch: -0.04, buy: -0.07, desc: "債券看「年線乖離」。當價格跌破年線一定幅度，通常是超跌，適合領息族進場。" },
-        BALANCED: { name: "平衡穩健", color: "#a855f7", type: "BALANCED", useBias: false, watch: -0.08, buy: -0.15, desc: "平衡型波動適中，採用「波段回撤」策略，抓中型修正波段。" },
-        EQUITY: { name: "股票積極", color: "#f97316", type: "EQUITY", useBias: false, watch: -0.15, buy: -0.25, desc: "股票型波動大，需等待「大幅回撤」至恐慌區間再出手，避免接刀。" }
-    };
+  // ---------- 資料處理 ----------
+  function sma(arr, n) {
+    const out = new Array(arr.length).fill(null);
+    let sum = 0;
+    for (let i = 0; i < arr.length; i++) {
+      sum += arr[i];
+      if (i >= n) sum -= arr[i - n];
+      if (i >= n - 1) out[i] = sum / n;
+    }
+    return out;
+  }
+  function rollingMax(arr, n) {
+    const out = new Array(arr.length);
+    for (let i = 0; i < arr.length; i++) {
+      let m = -Infinity;
+      for (let k = Math.max(0, i - n + 1); k <= i; k++) if (arr[k] > m) m = arr[k];
+      out[i] = m;
+    }
+    return out;
+  }
+  function thFor(name) {
+    const t = thresholds.funds[name] || {};
+    return { watch: t.watch != null ? t.watch : thresholds.def.watch, target: t.target != null ? t.target : thresholds.def.target, custom: !!thresholds.funds[name] };
+  }
 
-    async function init() {
-        document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === currentView));
-        const dashboard = document.getElementById('dashboard');
-        const loading = document.getElementById('loading');
-        const statusDisplay = document.getElementById('status-display');
+  function processData(headers, rows) {
+    const clean = rows.map((r) => { const ts = Date.parse(String(r[0]).replace(/-/g, '/')); return isNaN(ts) ? null : { ts, date: r[0], r }; })
+      .filter(Boolean).sort((a, b) => a.ts - b.ts);
+    const list = [];
+    for (let i = 1; i < headers.length; i++) {
+      const name = String(headers[i] || '').trim();
+      if (!name || EXCLUDE.some((x) => name.includes(x))) continue;
+      const pts = [];
+      clean.forEach((it) => { const v = parseFloat(it.r[i]); if (!isNaN(v) && v > 0) pts.push({ ts: it.ts, date: String(it.date).slice(0, 10), v }); });
+      if (!pts.length) continue;
+      const vals = pts.map((p) => p.v);
+      const last = pts[pts.length - 1];
+      const win = pts.slice(-HIGH_WINDOW);
+      const hi = win.reduce((a, b) => (b.v >= a.v ? b : a), win[0]);
+      const dd = last.v / hi.v - 1;
+      const ma240 = sma(vals, MA_LONG), ma60 = sma(vals, MA_SHORT);
+      const maL = ma240[ma240.length - 1], maS = ma60[ma60.length - 1];
+      const bias = maL ? last.v / maL - 1 : null;
+      let trend = 'none';
+      if (maL && maS) { const d = maS / maL - 1; trend = d >= 0.02 ? 'bull' : d <= -0.02 ? 'bear' : 'neutral'; }
+      const rets = {};
+      RET_PERIODS.forEach((n) => {
+        rets[n] = null;
+        const target = last.ts - n * DAY;
+        for (let k = pts.length - 2; k >= 0; k--) if (pts[k].ts <= target) { rets[n] = last.v / pts[k].v - 1; break; }
+      });
+      const th = thFor(name);
+      const status = dd <= th.target ? 'hit' : dd <= th.watch ? 'watch' : 'ok';
+      list.push({ name, pts, vals, last, hi, dd, bias, trend, ma240, ma60, rets, th, status, gap: dd - th.target, short: pts.length < 30 });
+    }
+    const newest = Math.max(...list.map((f) => f.last.ts));
+    list.forEach((f) => { f.lagDays = Math.round((newest - f.last.ts) / DAY); f.stale = f.lagDays > STALE_DAYS; });
+    funds = list;
+    return newest;
+  }
 
-        const cached = localStorage.getItem(CACHE_KEY);
-        let hasCache = false;
-        
-        if (cached) {
-            try {
-                const json = JSON.parse(cached);
-                if (json.data && json.timestamp) {
-                    processData(json.headers, json.data);
-                    renderDashboard();
-                    hasCache = true;
-                    const minDiff = Math.floor((Date.now() - json.timestamp) / 60000);
-                    statusDisplay.innerHTML = `⚡ 快取資料 (${minDiff}m 前) • <span style="animation:pulse 1s infinite; color:var(--blue)">背景更新中...</span>`;
-                }
-            } catch (e) { console.error("Cache Error", e); }
+  // ---------- 畫面 ----------
+  const TREND_TXT = { bull: '多頭', bear: '空頭', neutral: '中性', none: '資料不足' };
+  const STATUS_TXT = { hit: '已達標', watch: '觀察中', ok: '正常' };
+
+  function filtered() {
+    const q = state.q.trim().toLowerCase();
+    return funds.filter((f) => {
+      if (q && !f.name.toLowerCase().includes(q)) return false;
+      if (state.filter === 'HIT') return f.status === 'hit';
+      if (state.filter === 'WATCH') return f.status === 'watch';
+      if (state.filter === 'STALE') return f.stale;
+      return true;
+    });
+  }
+
+  function renderChips() {
+    const n = (fn) => funds.filter(fn).length;
+    const chips = [
+      ['ALL', '全部', funds.length, ''],
+      ['HIT', '🚨 已達標', n((f) => f.status === 'hit'), 'hit'],
+      ['WATCH', '⚠️ 觀察中', n((f) => f.status === 'watch'), 'watch'],
+      ['STALE', '⏳ 資料過期', n((f) => f.stale), '']
+    ];
+    $('chips').innerHTML = chips.map(([k, t, c, cls]) =>
+      `<button class="chip ${cls} ${state.filter === k ? 'on' : ''}" data-f="${k}">${t}<b>${c}</b></button>`).join('');
+  }
+
+  function render() {
+    renderChips();
+    document.querySelectorAll('.view-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === state.view));
+    const box = $('dashboard');
+    const list = filtered();
+    if (!funds.length) return;
+    if (!list.length) { box.className = ''; box.innerHTML = '<div class="empty-state">📭 沒有符合條件的基金</div>'; return; }
+    if (state.view === 'card') renderCards(box, list); else renderRank(box, list);
+  }
+
+  function sortVal(f, k) {
+    if (k === 'name') return f.name;
+    if (k === 'dd') return f.dd;
+    if (k === 'gap') return f.gap;
+    if (k === 'bias') return f.bias;
+    return f.rets[k];
+  }
+
+  function renderRank(box, list) {
+    const { key, dir } = state.sort;
+    const rows = list.slice().sort((a, b) => {
+      const va = sortVal(a, key), vb = sortVal(b, key);
+      if (key === 'name') return va.localeCompare(vb, 'zh-Hant') * dir;
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+      return (va - vb) * dir;
+    });
+    const maxAbs = {};
+    RET_PERIODS.forEach((n) => { maxAbs[n] = Math.max(0.0001, ...rows.map((f) => Math.abs(f.rets[n] || 0))); });
+    const th = (k, label, cls = '') => `<th class="${cls} ${key === k ? 'sorted' : ''}" data-k="${k}">${label}${key === k ? (dir < 0 ? ' ▼' : ' ▲') : ''}</th>`;
+    const head = '<tr>' + th('name', `基金（${rows.length}）`) + th('dd', '近 1 年回撤', 'grp') + th('gap', '距達標') + th('bias', '年線乖離') +
+      '<th>趨勢</th>' + RET_PERIODS.map((n, i) => th(n, n + ' 天', i === 0 ? 'grp' : '')).join('') + '</tr>';
+    const body = rows.map((f, idx) => {
+      const ddCls = f.status === 'hit' ? 't-hit' : f.status === 'watch' ? 't-watch' : 't-ok';
+      const gapTxt = f.status === 'hit' ? '<span class="t-hit">已達標</span>' : `<span class="t-ok">${(f.gap * 100).toFixed(1)}%</span>`;
+      const cells = RET_PERIODS.map((n, i) => {
+        const v = f.rets[n];
+        if (v == null) return `<td class="rk-cell ${i === 0 ? 'grp' : ''}"><span class="rk-val na">—</span></td>`;
+        const w = Math.min(100, Math.abs(v) / maxAbs[n] * 100);
+        return `<td class="rk-cell ${i === 0 ? 'grp' : ''}"><span class="rk-bar" style="width:${w}%;background:${v >= 0 ? '#ef4444' : '#10b981'}"></span><span class="rk-val ${v >= 0 ? 'up' : 'down'}">${pct(v, 2)}</span></td>`;
+      }).join('');
+      const sub = `NAV ${f.last.v}・${f.last.date}` + (f.stale ? `・晚 ${f.lagDays} 天` : '') + (f.th.custom ? '・自訂門檻' : '');
+      return `<tr data-i="${idx}" class="${f.stale ? 'stale' : ''}"><td class="rk-name" title="${esc(f.name)}"><span class="dot ${f.status}"></span>${esc(f.name)}<small>${esc(sub)}</small></td>` +
+        `<td class="grp ${ddCls}">${pct(f.dd)}</td><td>${gapTxt}</td><td>${f.bias == null ? '<span class="na">不足</span>' : pct(f.bias)}</td>` +
+        `<td><span class="trend ${f.trend}">${TREND_TXT[f.trend]}</span></td>${cells}</tr>`;
+    }).join('');
+    box.className = '';
+    box.innerHTML = `<div class="rank-wrap"><table class="rank-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>` +
+      `<div class="note">● 紅＝已達標、黃＝觀察中、綠＝正常。回撤＝最新 NAV 相對近 1 年（${HIGH_WINDOW} 筆）最高 NAV；預設觀察 ${pct(thresholds.def.watch, 0)}、達標 ${pct(thresholds.def.target, 0)}，可在「監控門檻」分頁逐檔調整。` +
+      `距達標＝回撤還差多少到達標線。報酬率以各基金最新 NAV 往回推 N 個日曆天計算，不含配息；比最新一檔晚超過 ${STALE_DAYS} 天的會反灰。點標題排序，點基金看詳情。</div>`;
+    box.querySelectorAll('th[data-k]').forEach((h) => h.addEventListener('click', () => {
+      const k = isNaN(+h.dataset.k) ? h.dataset.k : +h.dataset.k;
+      if (state.sort.key === k) state.sort.dir *= -1;
+      else state.sort = { key: k, dir: (k === 'name' || k === 'gap' || k === 'dd') ? 1 : -1 };
+      render();
+    }));
+    box.querySelectorAll('tbody tr').forEach((tr) => tr.addEventListener('click', () => openModal(rows[+tr.dataset.i])));
+  }
+
+  function sparkSvg(f) {
+    const pts = f.vals.slice(-120);
+    const hiLine = f.hi.v * (1 + f.th.target);
+    const lo = Math.min(...pts, hiLine), hi = Math.max(...pts);
+    const W = 300, H = 48, pad = 3, span = (hi - lo) || 1;
+    const y = (v) => (pad + (H - 2 * pad) * (1 - (v - lo) / span)).toFixed(1);
+    const x = (i) => (pts.length < 2 ? 0 : (W * i / (pts.length - 1))).toFixed(1);
+    const color = f.status === 'hit' ? '#ef4444' : f.status === 'watch' ? '#eab308' : '#60a5fa';
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">` +
+      `<line x1="0" x2="${W}" y1="${y(hiLine)}" y2="${y(hiLine)}" stroke="#10b981" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>` +
+      `<path d="${pts.map((v, i) => (i ? 'L' : 'M') + x(i) + ',' + y(v)).join('')}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+
+  function renderCards(box, list) {
+    const rows = list.slice().sort((a, b) => a.gap - b.gap);
+    box.className = 'grid';
+    box.innerHTML = rows.map((f, idx) => `
+      <div class="fund-card ${f.status} ${f.stale ? 'stale' : ''}" data-i="${idx}">
+        <div class="card-top"><div class="fund-name">${esc(f.name)}</div><span class="badge ${f.status}">${STATUS_TXT[f.status]}</span></div>
+        <div class="kv">
+          <div><span class="l">近 1 年回撤</span><span class="v ${f.status === 'hit' ? 't-hit' : f.status === 'watch' ? 't-watch' : ''}">${pct(f.dd)}</span></div>
+          <div><span class="l">距達標（${pct(f.th.target, 0)}）</span><span class="v">${f.status === 'hit' ? '—' : (f.gap * 100).toFixed(1) + '%'}</span></div>
+          <div><span class="l">最新 NAV</span><span class="v">${f.last.v}</span></div>
+        </div>
+        ${sparkSvg(f)}
+        <div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--dim)"><span>近 120 筆・虛線＝達標線</span><span>${f.last.date}${f.stale ? ` <span class="stale-tag">晚 ${f.lagDays} 天</span>` : ''}</span></div>
+      </div>`).join('');
+    box.querySelectorAll('.fund-card').forEach((c) => c.addEventListener('click', () => openModal(rows[+c.dataset.i])));
+  }
+
+  // ---------- 詳情 ----------
+  function openModal(f) {
+    $('m-title').textContent = f.name;
+    const item = (l, v, s, color) => `<div class="m-item"><span class="l">${l}</span><span class="v" style="${color ? 'color:' + color : ''}">${v}</span>${s ? `<span class="s">${s}</span>` : ''}</div>`;
+    const stColor = f.status === 'hit' ? '#f87171' : f.status === 'watch' ? '#facc15' : '#6ee7b7';
+    $('m-info').innerHTML =
+      item('最新 NAV', f.last.v, f.last.date + (f.stale ? `（晚 ${f.lagDays} 天）` : '')) +
+      item('近 1 年高點', f.hi.v, f.hi.date) +
+      item('近 1 年回撤', pct(f.dd, 2), STATUS_TXT[f.status], stColor) +
+      item('門檻', `${pct(f.th.watch, 0)} / ${pct(f.th.target, 0)}`, f.th.custom ? '觀察 / 達標（自訂）' : '觀察 / 達標（預設）') +
+      item('年線乖離', f.bias == null ? '資料不足' : pct(f.bias, 2), '對 240 日均線') +
+      item('趨勢', TREND_TXT[f.trend], '60 日 vs 240 日均線');
+    const hiT = f.hi.v * (1 + f.th.target), hiW = f.hi.v * (1 + f.th.watch);
+    $('m-desc').innerHTML = f.status === 'hit'
+      ? `🚨 已跌破達標線：近 1 年高點 ${f.hi.v} 跌 ${Math.abs(f.th.target * 100).toFixed(0)}% ≈ <b>${hiT.toFixed(2)}</b>，目前 NAV ${f.last.v}。<br>門檻可在 Google Sheet「監控門檻」分頁逐檔調整。`
+      : `距離達標還差 <b>${(f.gap * 100).toFixed(1)}%</b>：NAV 跌到約 <b>${hiT.toFixed(2)}</b> 會達標，跌到約 <b>${hiW.toFixed(2)}</b> 進入觀察。` +
+        `<br>門檻可在 Google Sheet「監控門檻」分頁逐檔調整。`;
+    drawBigChart(f);
+    $('detail-modal').classList.add('show');
+  }
+
+  function drawBigChart(f) {
+    if (typeof Chart === 'undefined') return;
+    const n = Math.min(f.pts.length, 250), s = f.pts.length - n;
+    const pts = f.pts.slice(s), vals = f.vals.slice(s);
+    const hiRoll = rollingMax(f.vals, HIGH_WINDOW).slice(s);
+    const ds = (label, data, color, extra) => Object.assign({ label, data, borderColor: color, borderWidth: 1.5, pointRadius: 0, tension: 0.1, spanGaps: true }, extra || {});
+    const datasets = [ds('NAV', vals, '#e2e8f0', { borderWidth: 2 })];
+    if (f.ma60.some((v) => v != null)) datasets.push(ds('60 日均線', f.ma60.slice(s), '#60a5fa'));
+    if (f.ma240.some((v) => v != null)) datasets.push(ds('240 日均線', f.ma240.slice(s), '#a78bfa', { borderDash: [5, 5], borderWidth: 1.2 }));
+    datasets.push(ds(`觀察線 ${pct(f.th.watch, 0)}`, hiRoll.map((h) => h * (1 + f.th.watch)), '#eab308', { borderDash: [3, 3], borderWidth: 1 }));
+    datasets.push(ds(`達標線 ${pct(f.th.target, 0)}`, hiRoll.map((h) => h * (1 + f.th.target)), '#10b981', { borderDash: [6, 4], borderWidth: 1.2 }));
+    if (bigChart) bigChart.destroy();
+    bigChart = new Chart($('big-chart').getContext('2d'), {
+      type: 'line',
+      data: { labels: pts.map((p) => p.date), datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: '#94a3b8', boxWidth: 14, font: { size: 11 } } } },
+        scales: {
+          x: { ticks: { color: '#64748b', maxTicksLimit: 6, maxRotation: 0 }, grid: { display: false } },
+          y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
         }
+      }
+    });
+  }
 
-        if (!hasCache) {
-            loading.style.display = 'block';
-            statusDisplay.innerText = '';
+  // ---------- 載入 ----------
+  async function loadThresholds() {
+    const cached = ls.get(TH_CACHE_KEY);
+    if (cached) { try { applyThresholds(JSON.parse(cached)); } catch (e) {} }
+    try {
+      const res = await fetch(`${API_URL}?op=get_thresholds`);
+      const j = await res.json();
+      if (j && j.default) { applyThresholds(j); ls.set(TH_CACHE_KEY, JSON.stringify(j)); return true; }
+    } catch (e) {}
+    return false;
+  }
+  function applyThresholds(j) {
+    const d = j.default || {};
+    thresholds.def = { watch: d.watch != null ? d.watch : DEFAULT_TH.watch, target: d.target != null ? d.target : DEFAULT_TH.target };
+    thresholds.funds = j.funds || {};
+  }
+
+  function useData(json, label) {
+    const newest = processData(json.headers, json.data);
+    render();
+    return newest;
+  }
+
+  async function init() {
+    const status = $('status-display'), loading = $('loading');
+    let hasCache = false;
+    const thPromise = loadThresholds();
+    const cached = ls.get(CACHE_KEY);
+    if (cached) {
+      try {
+        const j = JSON.parse(cached);
+        if (j.data && j.timestamp) {
+          rawCache = j; useData(j); hasCache = true;
+          status.innerHTML = `⚡ 快取資料（${Math.floor((Date.now() - j.timestamp) / 60000)} 分鐘前）・背景更新中…`;
         }
-
-        try {
-            const res = await fetch(`${API_URL}?op=get_db_monitor`);
-            const json = await res.json();
-            
-            if (json.error) throw new Error(json.error);
-
-            json.timestamp = Date.now();
-            localStorage.setItem(CACHE_KEY, JSON.stringify(json));
-
-            processData(json.headers, json.data);
-            renderDashboard();
-            
-            loading.style.display = 'none';
-            statusDisplay.innerHTML = `✅ 資料已更新 • ${new Date().toLocaleTimeString()}`;
-
-        } catch (err) {
-            loading.style.display = 'none';
-            if (!hasCache) {
-                dashboard.innerHTML = `<div class="empty-state">❌ 連線失敗: ${err.message}</div>`;
-            } else {
-                statusDisplay.innerHTML = `⚠️ 更新失敗 (顯示舊資料) • ${err.message}`;
-            }
-        }
+      } catch (e) {}
     }
+    if (!hasCache) { loading.style.display = 'block'; status.textContent = ''; }
 
-    function processData(headers, rows) {
-        // rows: [ [date, f1, f2, ...], ... ]  (後端已保證給新的，但我們還是防呆處理一下)
-        let cleanRows = rows.map(row => {
-            let ts = Date.parse(row[0]);
-            return isNaN(ts) ? null : { ts: ts, date: row[0], data: row };
-        }).filter(r => r).sort((a, b) => a.ts - b.ts); // 🔥 這裡保證資料由舊到新排序，方便計算 MA
-
-        let tempFunds = [];
-
-        for (let i = 1; i < headers.length; i++) {
-            let name = headers[i];
-            if(name.includes("006208") || name.includes("SPY")) continue; 
-
-            let history = [];
-            let maxNav = 0;
-            let lastDate = null;
-
-            cleanRows.forEach(item => {
-                let val = parseFloat(item.data[i]);
-                if (!isNaN(val)) {
-                    history.push(val);
-                    if (val > maxNav) maxNav = val;
-                    lastDate = item.date;
-                }
-            });
-
-            if (history.length > 0) {
-                let currentNav = history[history.length - 1];
-                let dd = (currentNav - maxNav) / maxNav;
-
-                // 240MA 與乖離
-                let maSeries = [];
-                for(let k=0; k<history.length; k++) {
-                    if(k < MA_DAYS - 1) {
-                        maSeries.push(null);
-                    } else {
-                        let sum = 0;
-                        for(let m=0; m<MA_DAYS; m++) sum += history[k-m];
-                        maSeries.push(sum / MA_DAYS);
-                    }
-                }
-                
-                let maValue = null, bias = null;
-                if (history.length >= MA_DAYS) {
-                    maValue = maSeries[maSeries.length-1];
-                    bias = (currentNav - maValue) / maValue;
-                } else { bias = 0; }
-
-                // 60 日 MA 與短期 MA / LONG MA for 趨勢判斷
-                let ma60Series = [];
-                for(let k=0; k<history.length; k++) {
-                    if(k < MA_SHORT_DAYS - 1) {
-                        ma60Series.push(null);
-                    } else {
-                        let sum = 0;
-                        for(let m=0; m<MA_SHORT_DAYS; m++) sum += history[k-m];
-                        ma60Series.push(sum / MA_SHORT_DAYS);
-                    }
-                }
-
-                let maShort = null;
-                if (history.length >= 5) {
-                    let win = Math.min(MA_SHORT_DAYS, history.length);
-                    let sum = 0;
-                    for(let idx = history.length - win; idx < history.length; idx++) sum += history[idx];
-                    maShort = sum / win;
-                }
-                let maLong = (history.length >= MA_DAYS && maSeries[maSeries.length-1]) ? maSeries[maSeries.length-1] : null;
-
-                let trendLabel = "中性";
-                let trendClass = "trend-neutral";
-                if (maShort && maLong) {
-                    let diff = (maShort - maLong) / maLong;
-                    if (diff >= 0.02) {
-                        trendLabel = "多頭";
-                        trendClass = "trend-bull";
-                    } else if (diff <= -0.02) {
-                        trendLabel = "空頭";
-                        trendClass = "trend-bear";
-                    }
-                }
-
-                // 資料缺漏偵測：歷史點太少 或 超過 7 天沒新 NAV
-                let hasDataIssue = false;
-                let diffDays = null;
-                if (lastDate) {
-                    let lastDateObj = new Date(lastDate.replace(/-/g,"/"));
-                    let today = new Date();
-                    diffDays = Math.floor((today - lastDateObj) / (1000*60*60*24));
-                    if (diffDays > 7) hasDataIssue = true;
-                }
-                if (history.length < 10) hasDataIssue = true;
-
-                // 策略分類
-                let strategy = STRATEGIES.EQUITY;
-                if (name.includes("債") || name.includes("房貸") || name.includes("收益")) strategy = STRATEGIES.BOND;
-                else if (name.includes("多重") || name.includes("平衡")) strategy = STRATEGIES.BALANCED;
-
-                let gap = 0, monitorValue = 0;
-                if (strategy.useBias) {
-                    monitorValue = bias;
-                    gap = bias - strategy.buy; 
-                } else {
-                    monitorValue = dd;
-                    gap = dd - strategy.buy;
-                }
-
-                // ===== 1/3/7/14/30 天 NAV 報酬率 =====
-                let dated = [];
-                cleanRows.forEach(item => { let v = parseFloat(item.data[i]); if (!isNaN(v)) dated.push({ ts: item.ts, v }); });
-                let rets = {};
-                RET_PERIODS.forEach(n => {
-                    rets[n] = null;
-                    if (dated.length < 2) return;
-                    let last = dated[dated.length - 1];
-                    let target = last.ts - n * 86400000;
-                    for (let k = dated.length - 2; k >= 0; k--) {
-                        if (dated[k].ts <= target) { rets[n] = (last.v - dated[k].v) / dated[k].v; break; }
-                    }
-                });
-
-                tempFunds.push({
-                    rets,
-                    name, 
-                    nav: currentNav, 
-                    high: maxNav, 
-                    dd, 
-                    bias, 
-                    monitorValue, 
-                    strategy, 
-                    history: history, 
-                    maSeries: maSeries,         // 240MA
-                    ma60Series: ma60Series,     // 60MA
-                    gap: gap,
-                    maShort,
-                    maLong,
-                    trendLabel,
-                    trendClass,
-                    hasDataIssue,
-                    lastDate,
-                    diffDays
-                });
-            }
-        }
-        tempFunds.sort((a, b) => a.gap - b.gap);
-        globalFunds = tempFunds;
+    let json;
+    try {
+      const res = await fetch(`${API_URL}?op=get_db_monitor`);
+      json = await res.json();
+      if (json.error) throw new Error(json.error);
+      if (!json.headers || !json.data) throw new Error('回傳格式不正確');
+    } catch (err) {
+      loading.style.display = 'none';
+      if (!hasCache) $('dashboard').innerHTML = `<div class="empty-state">❌ 連線失敗：${esc(err.message)}</div>`;
+      else status.textContent = `⚠️ 更新失敗（顯示快取資料）・${err.message}`;
+      return;
     }
+    await thPromise;
+    json.timestamp = Date.now();
+    rawCache = json;
+    const cachedOk = ls.set(CACHE_KEY, JSON.stringify(json));   // 資料太大存不進去也沒關係，只是下次沒有快取
+    const newest = useData(json);
+    loading.style.display = 'none';
+    const d = new Date(newest);
+    status.textContent = `✅ 已更新 ${new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}・最新 NAV ${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}` + (cachedOk ? '' : '・（資料量大，未存快取）');
+  }
 
-
-    function setView(v) {
-        currentView = v;
-        try { localStorage.setItem('fund_radar_view', v); } catch(e) {}
-        document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
-        renderDashboard();
+  async function manualUpdate() {
+    if (!confirm('確定要手動觸發後端更新嗎？\n\n會請後端去抓最新淨值，約需 15～30 秒。')) return;
+    const loading = $('loading'), btn = $('btn-update');
+    loading.style.display = 'block';
+    loading.innerHTML = '📡 正在更新淨值，請稍候…';
+    btn.style.opacity = '.5'; btn.style.pointerEvents = 'none';
+    try {
+      const res = await fetch(`${API_URL}?op=manual_update`);
+      const j = await res.json();
+      if (j.status !== 'success') throw new Error(j.message || '未知錯誤');
+      $('update-msg').textContent = j.message || '更新完成';
+      $('update-list').innerHTML = (j.details && j.details.length)
+        ? j.details.map((it) => `<div class="result-item"><b>${esc(it.name)}</b><span><span class="r-nav">${esc(it.nav)}</span><span class="r-date">${esc(it.date)}</span></span></div>`).join('')
+        : '<div style="text-align:center;color:var(--dim);padding:20px">本次沒有擷取到新資料</div>';
+      $('update-modal').classList.add('show');
+    } catch (err) {
+      alert('❌ 更新失敗：\n' + err.message);
+    } finally {
+      loading.style.display = 'none'; loading.textContent = '📡 正在連線資料庫...';
+      btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
     }
+  }
 
-    function sortRank(key) {
-        if (rankSort.key === key) rankSort.dir *= -1;
-        else rankSort = { key, dir: key === 'name' ? 1 : -1 };
-        renderDashboard();
-    }
+  function forceReload() { ls.del(CACHE_KEY); ls.del(TH_CACHE_KEY); init(); }
 
-    function renderRanking(container, list) {
-        const fmt = x => (x > 0 ? '+' : '') + (x * 100).toFixed(2) + '%';
-        // 每個區間各自的最大絕對值，用來畫比例條
-        const maxAbs = {};
-        RET_PERIODS.forEach(n => { maxAbs[n] = Math.max(0.0001, ...list.map(f => Math.abs(f.rets[n] ?? 0))); });
-        const rows = list.slice().sort((a, b) => {
-            if (rankSort.key === 'name') return a.name.localeCompare(b.name, 'zh-Hant') * rankSort.dir;
-            const va = a.rets[rankSort.key], vb = b.rets[rankSort.key];
-            if (va == null && vb == null) return 0;
-            if (va == null) return 1;            // 沒資料的排最後
-            if (vb == null) return -1;
-            return (va - vb) * rankSort.dir;
-        });
-        const arrow = k => rankSort.key === k ? `<span class="arr">${rankSort.dir < 0 ? '▼' : '▲'}</span>` : '';
-        const head = `<tr><th class="${rankSort.key==='name'?'sorted':''}" onclick="sortRank('name')">基金（${rows.length}）${arrow('name')}</th>` +
-            RET_PERIODS.map(n => `<th class="${rankSort.key===n?'sorted':''}" onclick="sortRank(${n})">${n} 天${arrow(n)}</th>`).join('') + '</tr>';
-        const body = rows.map((f, idx) => {
-            const cells = RET_PERIODS.map(n => {
-                const v = f.rets[n];
-                if (v == null) return `<td class="rk-cell"><span class="rk-val rk-na">—</span></td>`;
-                const up = v >= 0, w = Math.min(100, Math.abs(v) / maxAbs[n] * 100);
-                const color = (up === UP_IS_RED) ? '#ef4444' : '#10b981';
-                const side = up ? `right:0;` : `right:0;`;
-                return `<td class="rk-cell"><span class="rk-bar" style="${side}width:${w}%;background:${color}"></span>` +
-                       `<span class="rk-val ${(up === UP_IS_RED) ? 'rk-up' : 'rk-down'}">${fmt(v)}</span></td>`;
-            }).join('');
-            return `<tr data-idx="${idx}"><td class="rk-name" title="${f.name}">${f.name}<small>${f.strategy.name}・NAV ${f.nav}${f.lastDate ? '・' + f.lastDate : ''}</small></td>${cells}</tr>`;
-        }).join('');
-        container.innerHTML = `<div class="rank-wrap"><table class="rank-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>` +
-            `<div class="rk-note">點欄位標題排序（再點一次反向）；點基金開啟詳情。報酬率以最新 NAV 日期往回推 N 個日曆天，取當天或之前最近一筆 NAV 計算，不含配息。</div>`;
-        container.querySelectorAll('tbody tr').forEach(tr => tr.addEventListener('click', () => openModal(rows[+tr.dataset.idx])));
-    }
+  // ---------- 事件 ----------
+  $('chips').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; state.filter = b.dataset.f; render(); });
+  $('search').addEventListener('input', (e) => { state.q = e.target.value; render(); });
+  document.querySelectorAll('.view-btn').forEach((b) => b.addEventListener('click', () => { state.view = b.dataset.view; ls.set('fund_radar_view', state.view); render(); }));
+  $('btn-update').addEventListener('click', manualUpdate);
+  $('btn-refresh').addEventListener('click', forceReload);
+  document.querySelectorAll('.modal-backdrop').forEach((m) => m.addEventListener('click', (e) => { if (e.target === m) closeModal(m.id); }));
+  document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => closeModal(b.dataset.close)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.show').forEach((m) => closeModal(m.id)); });
+  function closeModal(id) {
+    $(id).classList.remove('show');
+    if (id === 'update-modal') forceReload();
+  }
 
-    function setFilter(type) {
-        currentFilter = type;
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        renderDashboard();
-    }
-
-    function renderDashboard() {
-        const dashboard = document.getElementById('dashboard');
-        dashboard.innerHTML = '';
-
-        let displayFunds = globalFunds.filter(f => {
-            if (currentFilter === 'ALL') return true;
-            if (currentFilter === 'SIGNAL') return f.monitorValue <= f.strategy.watch;
-            return f.strategy.type === currentFilter;
-        });
-
-        if (displayFunds.length === 0) {
-            dashboard.innerHTML = `<div class="empty-state">📭 此分類目前沒有資料</div>`;
-            return;
-        }
-
-        if (currentView === 'rank') { dashboard.className = ''; renderRanking(dashboard, displayFunds); return; }
-        dashboard.className = 'grid';
-        displayFunds.forEach((f) => createCard(dashboard, f));
-    }
-
-    function createCard(container, f) {
-        let ddPct = (f.dd * 100).toFixed(1) + '%';
-        let biasPct = f.bias !== null ? (f.bias * 100).toFixed(1) + '%' : 'N/A';
-        
-        let mainLabel = f.strategy.useBias ? "年線乖離" : "波段回撤";
-        let mainValText = f.strategy.useBias ? biasPct : ddPct;
-        
-        let targetLabel = f.strategy.useBias ? "目標乖離" : "目標回撤";
-        let targetVal = (f.strategy.buy * 100).toFixed(0) + '%';
-        
-        let statusClass = 'status-safe';
-        let msg = `距離 ${Math.abs(f.gap * 100).toFixed(1)}%`;
-        let gapClass = 'gap-far';
-
-        if (f.monitorValue <= f.strategy.buy) {
-            statusClass = 'status-buy';
-            msg = `🚨 已達標！`;
-            gapClass = 'gap-close';
-        } else if (f.monitorValue <= f.strategy.watch) {
-            statusClass = 'status-watch';
-            msg = `⚠️ 觀察中`;
-            gapClass = 'gap-close';
-        }
-
-        let card = document.createElement('div');
-        card.className = `fund-card ${statusClass}`;
-        card.onclick = () => openModal(f);
-
-        let miniChartId = 'chart-' + Math.random().toString(36).substr(2, 9);
-        let miniHistory = f.history.slice(-60);
-
-        const trendText = f.trendLabel || '—';
-        const trendClass = f.trendClass || 'trend-neutral';
-
-        let warningIcon = '';
-        if (f.hasDataIssue) {
-            warningIcon = `<span class="data-warning" title="資料可能有缺漏或超過 7 天未更新">⚠</span>`;
-        }
-
-        card.innerHTML = `
-            <div class="card-top">
-                <div class="fund-name">${f.name}${warningIcon}</div>
-                <div class="card-top-right">
-                    <div class="strategy-tag" style="color:${f.strategy.color}; border-color:${f.strategy.color}">
-                        ${f.strategy.name}
-                    </div>
-                    <div class="trend-badge ${trendClass}">
-                        <span class="trend-dot"></span>
-                        <span>${trendText}</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="data-grid">
-                <div class="data-item">
-                    <span class="lbl" style="color:${f.strategy.color}">${mainLabel}</span>
-                    <span class="val dd-val ${f.monitorValue <= f.strategy.watch ? 'warn' : ''} ${f.monitorValue <= f.strategy.buy ? 'alert' : ''}">${mainValText}</span>
-                </div>
-                <div class="data-item" style="align-items:flex-end">
-                    <span class="lbl">最新淨值</span>
-                    <span class="val" style="font-size:1.1rem; color:#fff">$${f.nav}</span>
-                </div>
-            </div>
-
-            <div class="target-bar">
-                <span style="color:#94a3b8; font-size:0.8rem">${targetLabel}: <b style="color:${f.strategy.color}">${targetVal}</b></span>
-                <span class="${gapClass}">${msg}</span>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="${miniChartId}"></canvas>
-            </div>
-        `;
-        container.appendChild(card);
-        drawMiniChart(miniChartId, miniHistory, f.strategy.color, f.monitorValue <= f.strategy.watch);
-    }
-
-    function drawMiniChart(id, data, color, isAlert) {
-        const ctx = document.getElementById(id).getContext('2d');
-        let lineColor = isAlert ? '#ef4444' : color;
-        let lineWidth = isAlert ? 2.5 : 2;
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: data.map((_, i) => i),
-                datasets: [{ data: data, borderColor: lineColor, borderWidth: lineWidth, pointRadius: 0, fill: false, tension: 0.3 }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, animation: false,
-                plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                scales: { x: { display: false }, y: { display: false } },
-                layout: { padding: 5 }
-            }
-        });
-    }
-
-    // Modal Functions
-    function openModal(f) {
-        const modal = document.getElementById('detail-modal');
-
-        let warningIcon = '';
-        if (f.hasDataIssue) {
-            warningIcon = `<span class="data-warning" title="資料可能有缺漏或超過 7 天未更新">⚠</span>`;
-        }
-
-        document.getElementById('m-title').innerHTML = `${f.name}${warningIcon ? ' ' + warningIcon : ''}`;
-        document.getElementById('m-strategy-desc').innerText = `💡 ${f.strategy.desc} \n目前設定買點：${(f.strategy.buy*100).toFixed(0)}%`;
-
-        let ddPct = (f.dd * 100).toFixed(2) + '%';
-        let biasPct = f.bias !== null ? (f.bias * 100).toFixed(2) + '%' : '-';
-
-        let trendText = f.trendLabel || '中性';
-        let trendColor = '#fde68a';
-        if (f.trendClass === 'trend-bull') trendColor = '#bbf7d0';
-        if (f.trendClass === 'trend-bear') trendColor = '#fecaca';
-
-        let infoHtml = `
-            <div class="modal-info-item">
-                <span class="modal-lbl">最新淨值</span>
-                <span class="modal-val" style="color:white">$${f.nav}</span>
-            </div>
-            <div class="modal-info-item">
-                <span class="modal-lbl">年線乖離</span>
-                <span class="modal-val" style="color:${f.strategy.useBias?f.strategy.color:''}">${biasPct}</span>
-            </div>
-            <div class="modal-info-item">
-                <span class="modal-lbl">波段回撤</span>
-                <span class="modal-val" style="color:${!f.strategy.useBias?f.strategy.color:''}">${ddPct}</span>
-            </div>
-            <div class="modal-info-item">
-                <span class="modal-lbl">趨勢(60 vs 240)</span>
-                <span class="modal-val" style="color:${trendColor}">${trendText}</span>
-            </div>
-        `;
-        document.getElementById('m-info-box').innerHTML = infoHtml;
-        drawBigChart(f);
-        modal.classList.add('show');
-    }
-
-    function closeModal(e) {
-        if(e && e.target !== document.getElementById('detail-modal') && e.target.className !== 'btn-close') return;
-        document.getElementById('detail-modal').classList.remove('show');
-    }
-
-    function drawBigChart(f) {
-        const ctx = document.getElementById('big-chart').getContext('2d');
-        if(bigChartInstance) bigChartInstance.destroy();
-
-        let days = 250;
-        let startIdx = Math.max(0, f.history.length - days);
-        let prices = f.history.slice(startIdx);
-        let ma240 = f.maSeries ? f.maSeries.slice(startIdx) : [];
-        let ma60  = f.ma60Series ? f.ma60Series.slice(startIdx) : [];
-        let labels = prices.map((_,i) => i);
-
-        let datasets = [{
-            label: '淨值',
-            data: prices,
-            borderColor: '#e2e8f0',
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: 0.1
-        }];
-
-        // 60 日均線
-        if (ma60.some(v => v !== null)) {
-            datasets.push({
-                label: '60 日均線',
-                data: ma60,
-                borderColor: '#60a5fa',
-                borderWidth: 1.5,
-                pointRadius: 0,
-                tension: 0.1
-            });
-        }
-
-        // 240 日均線
-        if (ma240.some(v => v !== null)) {
-            datasets.push({
-                label: '240 日均線',
-                data: ma240,
-                borderColor: '#eab308',
-                borderWidth: 1.2,
-                borderDash: [5,5],
-                pointRadius: 0,
-                tension: 0.1
-            });
-        }
-
-        if(f.strategy.useBias) {
-            // 債券：年線 + 買點線
-            let buyTargetLine = ma240.map(v => v ? v * (1 + f.strategy.buy) : null);
-            datasets.push({
-                label: `買點 (${(f.strategy.buy*100).toFixed(0)}%)`,
-                data: buyTargetLine,
-                borderColor: '#10b981',
-                borderWidth: 1,
-                pointRadius: 0
-            });
-        } else {
-            // 股票/平衡：以全期高點計算的目標價
-            let buyTargetLine = prices.map(p => f.high * (1 + f.strategy.buy));
-            datasets.push({
-                label: `目標價 (${(f.strategy.buy*100).toFixed(0)}%)`,
-                data: buyTargetLine,
-                borderColor: '#10b981',
-                borderWidth: 1,
-                borderDash: [5, 5],
-                pointRadius: 0
-            });
-        }
-
-        bigChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: { labels: labels, datasets: datasets },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                plugins: { 
-                    legend: { labels: { color: '#94a3b8' } }, 
-                    tooltip: { mode: 'index', intersect: false } 
-                },
-                scales: { 
-                    x: { display: false }, 
-                    y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } 
-                }
-            }
-        });
-    }
-
-    // 更新結果 Modal Functions
-    function closeUpdateModal(e) {
-        if(e && e.target !== document.getElementById('update-result-modal') && e.target.className !== 'btn-close') return;
-        document.getElementById('update-result-modal').classList.remove('show');
-        forceReload(); 
-    }
-
-    function showUpdateResults(msg, details) {
-        const modal = document.getElementById('update-result-modal');
-        const listContainer = document.getElementById('update-list');
-        const msgBox = document.getElementById('update-msg');
-
-        msgBox.innerText = msg;
-        listContainer.innerHTML = '';
-
-        if (!details || details.length === 0) {
-            listContainer.innerHTML = '<div style="text-align:center; color:#64748b; padding:20px;">本次沒有擷取到新資料</div>';
-        } else {
-            details.forEach(item => {
-                let div = document.createElement('div');
-                div.className = 'result-item';
-                div.innerHTML = `
-                    <div class="r-name">${item.name}</div>
-                    <div class="r-info">
-                        <span class="r-nav">$${item.nav}</span>
-                        <span class="r-date">${item.date}</span>
-                    </div>
-                `;
-                listContainer.appendChild(div);
-            });
-        }
-        modal.classList.add('show');
-    }
-
-    async function manualUpdate() {
-        if(!confirm("⚠️ 確定要手動觸發後端更新嗎？\n\n這會叫喚 Google 爬蟲去抓取最新股價，過程約需 15~30 秒。")) return;
-
-        const loading = document.getElementById('loading');
-        const updateBtn = document.querySelector('.fab-update');
-        
-        loading.style.display = 'block';
-        loading.innerHTML = `<div style="font-size: 1.2rem;">📡 正在連線爬蟲...</div><div style="font-size:0.9rem; color:#94a3b8">請稍候，正在收集最新淨值</div>`;
-        
-        if(updateBtn) { updateBtn.style.opacity = "0.5"; updateBtn.style.pointerEvents = "none"; }
-
-        try {
-            const res = await fetch(`${API_URL}?op=manual_update`);
-            const json = await res.json();
-            loading.style.display = 'none';
-
-            if (json.status === "success") {
-                showUpdateResults(json.message, json.details);
-            } else {
-                throw new Error(json.message || "未知錯誤");
-            }
-
-        } catch (err) {
-            loading.style.display = 'none';
-            alert(`❌ 更新失敗：\n${err.message}`);
-        } finally {
-            if(updateBtn) { updateBtn.style.opacity = "1"; updateBtn.style.pointerEvents = "auto"; }
-        }
-    }
-
-    function forceReload() {
-        localStorage.removeItem(CACHE_KEY); 
-        init();
-    }
-
-    init();
+  init();
+})();
 </script>
-
 </body>
 </html>
