@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <title>每月領 3 萬需要多少本金？本金需求試算｜MOMO財商智庫</title>
+  <meta name="description" content="想每月領 2 萬、3 萬或 5 萬，要準備多少本金？以年化總報酬假設（最高 6%）同時算出「本金不動」「本金分年用完」與「用配息率回推」三種結果，並可加入通膨，看懂配息率不等於報酬率。" />
+  <link rel="canonical" href="https://momowinwin.com/MOMO_FinSphere/monthly-income.html" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="明哲MOMO" />
+  <meta name="theme-color" content="#f6f1e7" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="MOMO財商智庫" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="每月領 3 萬需要多少本金？｜MOMO財商智庫" />
+  <meta property="og:description" content="本金不動、分年用完、用配息率回推，三種算法一次比較，年化總報酬假設最高 6%。" />
+  <meta property="og:url" content="https://momowinwin.com/MOMO_FinSphere/monthly-income.html" />
+  <meta property="og:image" content="https://momowinwin.com/og-default.png" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "本金需求試算：每月想領多少，要準備多少本金",
+      "url": "https://momowinwin.com/MOMO_FinSphere/monthly-income.html",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web Browser",
+      "inLanguage": "zh-Hant-TW",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+      "description": "輸入目標每月現金流與年化總報酬假設（最高 6%），同時試算本金不動、本金分年用完、用配息率回推三種所需本金，可加入 2% 通膨。",
+      "dateModified": "2026-10-27",
+      "isPartOf": { "@id": "https://momowinwin.com/#website" },
+      "author": { "@id": "https://momowinwin.com/momo-blog/about/#person" },
+      "publisher": { "@id": "https://momowinwin.com/momo-blog/about/#person" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "MOMO雙贏策略", "item": "https://momowinwin.com/" },
+        { "@type": "ListItem", "position": 2, "name": "MOMO財商智庫", "item": "https://momowinwin.com/MOMO_FinSphere/" },
+        { "@type": "ListItem", "position": 3, "name": "所有工具", "item": "https://momowinwin.com/MOMO_FinSphere/tools/" },
+        { "@type": "ListItem", "position": 4, "name": "本金需求試算" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "每月領 3 萬，需要多少本金？",
+          "acceptedAnswer": { "@type": "Answer", "text": "以年化總報酬 6% 估算：只花報酬、本金不動，約需 600 萬元；允許本金在 20 年內用完，約需 419 萬元。報酬假設越低，需要的本金越多；以 4% 估算，本金不動約需 900 萬元。實際結果會隨市場變動，可能虧損。" }
+        },
+        {
+          "@type": "Question",
+          "name": "為什麼用配息率回推，會低估需要的本金？",
+          "acceptedAnswer": { "@type": "Answer", "text": "用「每年要領的錢 ÷ 配息率」回推，例如每年 36 萬 ÷ 8% = 450 萬，看起來比較少。但配息率不等於報酬率：如果年化總報酬只有 6%，多配出的 2% 會反映在淨值下跌，以 450 萬計算，20 年後本金約剩 300 萬元，每月配息也會降到約 2 萬元。" }
+        },
+        {
+          "@type": "Question",
+          "name": "本金不動和本金分年用完，差在哪裡？",
+          "acceptedAnswer": { "@type": "Answer", "text": "本金不動是只花報酬，本金一直留著，需要的本金較多，但沒有用完的時間限制；分年用完是每月提領的錢包含一部分本金，到期剛好歸零，需要的本金較少，但要先決定提領多少年。兩種沒有對錯，取決於資金用途與是否需要留下資產。" }
+        },
+        {
+          "@type": "Question",
+          "name": "為什麼年化總報酬假設最高只算 6%？",
+          "acceptedAnswer": { "@type": "Answer", "text": "試算用保守的假設比較能看清楚風險。本工具的年化總報酬假設上限為 6%，並顯示在畫面上；實際結果會隨市場變動，可能更高也可能更低，甚至虧損。" }
+        },
+        {
+          "@type": "Question",
+          "name": "要不要把通膨算進去？",
+          "acceptedAnswer": { "@type": "Answer", "text": "建議一起看。以每年 2% 通膨計算，20 年後要維持現在每月 3 萬元的生活，每月約需 4.46 萬元。開啟通膨後，試算會讓每年提領金額跟著通膨增加，需要的本金也會變多。" }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap" />
+
+  <style>
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf; --line-green: #06c755;
+      --warn: #b4562b; --warn-bg: #f8e6dc;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.8; letter-spacing: .02em; }
+    a { color: inherit; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; }
+    .back { color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .back:hover { color: var(--gold); }
+
+    .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 40px 0 8px; }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1.35; margin: 0 0 10px; }
+    .lead { color: var(--ink-2); margin: 0 0 24px; max-width: 680px; }
+    .answer { margin: 0 0 10px; max-width: 720px; font-size: 16.5px; line-height: 1.85; }
+    .answer b { color: var(--ink); }
+    .updated { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
+    table.ex td:first-child, table.ex th:first-child { text-align: left; font-weight: 700; }
+    table.ex { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .small-note { font-size: 13px; color: var(--muted) !important; margin-top: 8px; }
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+    .faq summary { cursor: pointer; font-weight: 700; }
+    .faq details p { margin: 8px 0 0; }
+    .formula { display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--gold-bg); font-weight: 700; font-size: 15px; }
+
+    .grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+    .panel h2 { font-family: var(--serif); font-size: 20px; margin: 0 0 12px; }
+
+    .field { margin-bottom: 18px; }
+    .field-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .field label { font-weight: 700; font-size: 15px; }
+    .field .val { font-family: var(--serif); font-weight: 800; color: var(--gold); font-size: 18px; font-variant-numeric: tabular-nums; }
+    .field .hint { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    input[type="number"] { width: 100%; margin-top: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); font: 600 17px var(--sans); font-variant-numeric: tabular-nums; }
+    input[type="number"]:focus { outline: 2px solid var(--gold-soft); border-color: var(--gold-soft); }
+    input[type="range"] { width: 100%; margin: 8px 0 0; accent-color: var(--gold); }
+    .seg { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .seg button { flex: 1; min-width: 56px; padding: 8px 0; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink-2); font: 700 14px var(--sans); cursor: pointer; }
+    .seg button.on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+
+    .assume { margin-top: 4px; padding: 12px 14px; border-radius: 10px; background: var(--gold-bg); font-size: 14px; color: var(--ink); line-height: 1.7; }
+    .assume b { font-variant-numeric: tabular-nums; }
+
+    .kv { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 11px 0; border-bottom: 1px dashed var(--line); }
+    .kv:last-of-type { border-bottom: none; }
+    .kv .k { color: var(--ink-2); font-size: 15px; }
+    .kv .v { font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; text-align: right; }
+    .kv.big .v { font-family: var(--serif); font-size: 26px; }
+    .kv .v.neg { color: var(--warn); }
+    .alert { display: none; margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-size: 14px; line-height: 1.7; }
+    .alert.show { display: block; }
+
+    .bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--line); margin: 6px 0 4px; }
+    .bar span { display: block; height: 100%; transition: width .25s; }
+    .bar .b-div { background: var(--gold); }
+    .bar .b-nav { background: var(--ink); }
+    .legend { display: flex; gap: 14px; font-size: 13px; color: var(--ink-2); flex-wrap: wrap; }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+    th, td { padding: 8px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    .table-wrap { overflow-x: auto; margin-top: 8px; }
+
+    .section { margin-top: 28px; }
+    .section h2 { font-family: var(--serif); font-size: 22px; margin: 0 0 10px; }
+    .section p { color: var(--ink-2); }
+    .cta { margin: 28px 0 8px; text-align: center; padding: 24px 18px; background: var(--surface); border: 1.5px solid var(--gold-soft); border-radius: 14px; }
+    .cta h2 { font-family: var(--serif); font-size: 21px; margin: 0 0 6px; }
+    .cta p { margin: 0 0 14px; color: var(--ink-2); font-size: 15px; }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .btn { display: inline-flex; padding: 11px 22px; border-radius: 999px; font-weight: 700; font-size: 15px; text-decoration: none; border: 1.5px solid transparent; }
+    .btn-line { background: var(--line-green); color: #fff; }
+    .btn-ghost { border-color: var(--ink); }
+
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+  <style>
+    .crumbs { font-size: 13px; color: var(--muted); margin: 24px 0 0; }
+    .crumbs a { text-decoration: none; color: var(--ink-2); }
+    .crumbs a:hover { color: var(--gold); }
+    .crumbs + .eyebrow { margin-top: 16px; }
+    .quick { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .quick button { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink-2); font: 700 13.5px var(--sans); cursor: pointer; }
+    .quick button.on { border-color: var(--gold); color: var(--gold); background: var(--gold-bg); }
+    .toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; font-size: 15px; }
+    .toggle input { width: 18px; height: 18px; accent-color: var(--gold); }
+
+    .res { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; background: #fff; }
+    .res .rh { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .res .rt { font-weight: 800; font-size: 15px; }
+    .res .rt i { font-style: normal; display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center; border-radius: 6px; margin-right: 6px; color: #fff; font-size: 13px; }
+    .res .rv { font-family: var(--serif); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .res .rd { font-size: 13.5px; color: var(--ink-2); margin-top: 2px; line-height: 1.65; }
+    .res.c { border-color: var(--line); }
+    .res.c.bad { border-color: var(--warn); background: var(--warn-bg); }
+    .res.c.bad .rd { color: var(--warn); }
+    .ia { background: var(--ink); } .ib { background: var(--gold); } .ic { background: var(--warn); }
+    .infl { font-size: 14px; color: var(--ink-2); margin: 4px 0 10px; display: none; }
+    .infl.show { display: block; }
+
+    .chart { margin-top: 6px; }
+    .chart svg { display: block; width: 100%; height: auto; }
+    .chart .g { stroke: #ece5d6; stroke-width: 1; }
+    .chart .yl { font: 11px var(--sans); fill: var(--muted); text-anchor: end; }
+    .chart .xl { font: 11px var(--sans); fill: var(--muted); text-anchor: middle; }
+    .chart path { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+    .chart .pa { stroke: var(--ink); } .chart .pb { stroke: var(--gold); } .chart .pc { stroke: var(--warn); stroke-dasharray: 6 4; }
+    .chart figcaption { font-size: 12.5px; color: var(--muted); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 12px; }
+    @media (max-width: 760px) { .chart .yl, .chart .xl { font-size: 17px; } }
+
+    .mini-cta { margin-top: 14px; padding: 14px 16px; border-radius: 12px; background: var(--gold-bg); }
+    .mini-cta b { display: block; font-size: 15.5px; margin-bottom: 2px; }
+    .mini-cta p { margin: 0 0 10px; font-size: 14px; color: var(--ink-2); }
+    .mini-cta .btn { padding: 9px 18px; font-size: 14.5px; }
+
+    table.ex td, table.ex th { white-space: nowrap; }
+    .related { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 8px; }
+    .related a { display: block; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; }
+    .related a:hover { border-color: var(--gold-soft); }
+    .related .t { display: block; font-size: 12.5px; color: var(--gold); font-weight: 700; }
+    .related .h { display: block; font-weight: 700; line-height: 1.6; }
+  </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/MOMO_FinSphere/" aria-label="MOMO財商智庫 首頁"><img src="/icon-96.png" alt="" width="32" height="32" />MOMO財商智庫</a>
+      <a class="back" href="/MOMO_FinSphere/tools/">← 所有工具</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="crumbs" aria-label="麵包屑"><a href="/MOMO_FinSphere/">MOMO財商智庫</a> › <a href="/MOMO_FinSphere/tools/">所有工具</a> › 本金需求試算</nav>
+    <p class="eyebrow">本金需求試算</p>
+    <h1>想每月領 3 萬，需要多少本金？</h1>
+    <p class="answer">以年化總報酬 6% 估算：如果<b>只花報酬、本金不動</b>，每月 3 萬約需 <b>600 萬元</b>；如果<b>允許本金在 20 年內用完</b>，約需 <b>419 萬元</b>。很多人用「每年 36 萬 ÷ 配息率」回推，配息率 8% 看起來只要 450 萬，但配息率不等於報酬率：當配息率高於總報酬，差額會從本金支出，20 年後本金約剩 300 萬元、每月配息也降到約 2 萬元。</p>
+    <p class="lead">輸入你想每月領多少，三種算法一次比較，可加入通膨。<span class="updated">最後更新：<time datetime="2026-10-27">2026-10-27</time></span></p>
+
+    <div class="grid" style="margin-top:8px">
+      <!-- 輸入 -->
+      <section class="panel" aria-labelledby="in-title">
+        <h2 id="in-title">1. 輸入</h2>
+
+        <div class="field">
+          <label for="goal">目標每月現金流（元）</label>
+          <input id="goal" type="number" inputmode="numeric" min="0" max="10000000" step="1000" value="30000" />
+          <div class="quick" role="group" aria-label="常用金額">
+            <button type="button" data-m="20000">2 萬</button>
+            <button type="button" data-m="30000" class="on">3 萬</button>
+            <button type="button" data-m="50000">5 萬</button>
+            <button type="button" data-m="100000">10 萬</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-top"><label for="ret">年化總報酬假設</label><span class="val" id="retVal">6.0%</span></div>
+          <input id="ret" type="range" min="0" max="6" step="0.5" value="6" aria-describedby="retHint" />
+          <div class="hint" id="retHint">配息加上淨值變化的總和，上限 6%，可以往下調整。</div>
+        </div>
+
+        <div class="field">
+          <label>規劃年數（算法 B 與走勢圖）</label>
+          <div class="seg" role="group" aria-label="規劃年數">
+            <button type="button" data-y="10">10 年</button>
+            <button type="button" data-y="20" class="on">20 年</button>
+            <button type="button" data-y="30">30 年</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-top"><label for="dist">配息率（算法 C）</label><span class="val" id="distVal">6.0%</span></div>
+          <input id="dist" type="range" min="0" max="10" step="0.5" value="6" aria-describedby="distHint" />
+          <div class="hint" id="distHint">預設和總報酬相同。試著調高看看，本金會怎麼變。</div>
+        </div>
+
+        <div class="field">
+          <label class="toggle"><input type="checkbox" id="infl" />考慮通膨（每年 2%）</label>
+          <div class="hint">開啟後，每年提領金額會跟著通膨增加（算法 A、B）。</div>
+        </div>
+
+        <div class="assume" id="assume"></div>
+      </section>
+
+      <!-- 結果 -->
+      <section class="panel" aria-labelledby="out-title" aria-live="polite">
+        <h2 id="out-title">2. 需要的本金</h2>
+        <p class="infl" id="inflNote"></p>
+
+        <div class="res">
+          <div class="rh"><span class="rt"><i class="ia">A</i>本金不動</span><span class="rv" id="vA">—</span></div>
+          <div class="rd" id="dA">只花報酬，本金一直留著。</div>
+        </div>
+        <div class="res">
+          <div class="rh"><span class="rt"><i class="ib">B</i><span id="tB">本金 20 年用完</span></span><span class="rv" id="vB">—</span></div>
+          <div class="rd" id="dB">每月提領含一部分本金，到期剛好歸零。</div>
+        </div>
+        <div class="res c" id="boxC">
+          <div class="rh"><span class="rt"><i class="ic">C</i>用配息率回推</span><span class="rv" id="vC">—</span></div>
+          <div class="rd" id="dC">—</div>
+        </div>
+
+        <figure class="chart">
+          <svg id="chart" viewBox="0 0 560 220" role="img" aria-label="三種算法的本金逐年變化"></svg>
+          <figcaption><span style="color:var(--ink)">━ A 本金不動</span><span style="color:var(--gold)">━ B 分年用完</span><span style="color:var(--warn)">┅ C 配息率回推</span><span>本金逐年變化（萬元）</span></figcaption>
+        </figure>
+
+        <div class="mini-cta">
+          <b>本金和目標有落差？</b>
+          <p>每個人的資金、年齡和用途都不同。想了解配息與本金之間怎麼取捨，可以傳 LINE 問 MOMO。</p>
+          <a class="btn btn-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="income_result" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">LINE 詢問規劃方向</a>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" aria-labelledby="tb-title">
+      <h2 id="tb-title">對照表：每月想領多少，需要多少本金？</h2>
+      <p>下表以「本金不動」（算法 A）為主，並列出 6% 時「本金 20 年用完」（算法 B）的金額。單位：萬元。</p>
+      <div class="table-wrap">
+        <table class="ex">
+          <thead><tr><th>每月現金流</th><th>A｜報酬 4%</th><th>A｜報酬 5%</th><th>A｜報酬 6%</th><th>B｜6%・20 年用完</th></tr></thead>
+          <tbody>
+            <tr><td>每月 2 萬</td><td>600</td><td>480</td><td>400</td><td>279</td></tr>
+            <tr><td>每月 3 萬</td><td>900</td><td>720</td><td>600</td><td>419</td></tr>
+            <tr><td>每月 5 萬</td><td>1,500</td><td>1,200</td><td>1,000</td><td>698</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small-note">試算假設報酬每年不變、按月提領，未計入通膨、費用、稅負與匯率；實際結果會隨市場變動，可能虧損，僅供教育參考。</p>
+    </section>
+
+    <section class="section">
+      <h2>三種算法，差在哪裡？</h2>
+      <h3>A｜本金不動：只花報酬</h3>
+      <p><span class="formula">所需本金 = 每年提領 ÷ 年化總報酬</span></p>
+      <p>每月 3 萬、一年 36 萬，以 6% 計算：36 萬 ÷ 6% = 600 萬。本金一直留著，沒有用完的時間限制，但需要的本金最多；報酬假設越低，本金需求越高。</p>
+      <h3>B｜分年用完：提領包含一部分本金</h3>
+      <p>每月領的錢一部分來自報酬、一部分來自本金，到期剛好歸零，原理和房貸反過來一樣（年金現值）。以 6% 計算，每月 3 萬領 10 年約需 270 萬、20 年約需 419 萬、30 年約需 500 萬。需要的本金較少，但要先決定領多久。</p>
+      <h3>C｜用配息率回推：最常見，也最容易低估</h3>
+      <p><span class="formula">真實報酬 = 配息 + 淨值變化</span></p>
+      <p>「每年 36 萬 ÷ 配息率 8% = 450 萬」看起來最省，但配息率不等於報酬率。如果年化總報酬只有 6%，多配出的 2% 會反映在淨值下跌：以 450 萬計算，10 年後本金約剩 368 萬、20 年後約剩 300 萬，每月配息也跟著從 3 萬降到約 2 萬。配息可能由本金支出，這就是 C 的風險。</p>
+      <p>想看配息率和淨值變化的逐年明細，可以用<a href="/MOMO_FinSphere/dividend-calculator.html">配息現金流試算</a>；還在累積階段，可以用<a href="/momo-blog/tools/retirement/">定期定額退休試算</a>。</p>
+    </section>
+
+    <section class="section faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">常見問題</h2>
+      <details><summary>每月領 3 萬，需要多少本金？</summary><p>以年化總報酬 6% 估算：只花報酬、本金不動，約需 600 萬元；允許本金在 20 年內用完，約需 419 萬元。報酬假設越低，需要的本金越多；以 4% 估算，本金不動約需 900 萬元。實際結果會隨市場變動，可能虧損。</p></details>
+      <details><summary>為什麼用配息率回推，會低估需要的本金？</summary><p>用「每年要領的錢 ÷ 配息率」回推，例如每年 36 萬 ÷ 8% = 450 萬，看起來比較少。但配息率不等於報酬率：如果年化總報酬只有 6%，多配出的 2% 會反映在淨值下跌，以 450 萬計算，20 年後本金約剩 300 萬元，每月配息也會降到約 2 萬元。</p></details>
+      <details><summary>本金不動和本金分年用完，差在哪裡？</summary><p>本金不動是只花報酬，本金一直留著，需要的本金較多，但沒有用完的時間限制；分年用完是每月提領的錢包含一部分本金，到期剛好歸零，需要的本金較少，但要先決定提領多少年。兩種沒有對錯，取決於資金用途與是否需要留下資產。</p></details>
+      <details><summary>為什麼年化總報酬假設最高只算 6%？</summary><p>試算用保守的假設比較能看清楚風險。本工具的年化總報酬假設上限為 6%，並顯示在畫面上；實際結果會隨市場變動，可能更高也可能更低，甚至虧損。</p></details>
+      <details><summary>要不要把通膨算進去？</summary><p>建議一起看。以每年 2% 通膨計算，20 年後要維持現在每月 3 萬元的生活，每月約需 4.46 萬元。開啟通膨後，試算會讓每年提領金額跟著通膨增加，需要的本金也會變多。</p></details>
+    </section>
+
+    <section class="section">
+      <h2>延伸閱讀</h2>
+      <div class="related">
+        <a href="/MOMO_FinSphere/dividend-calculator.html"><span class="t">工具・試算</span><span class="h">配息現金流試算：配息 + 淨值變化一起算</span></a>
+        <a href="/momo-blog/tools/retirement/"><span class="t">工具・退休規劃</span><span class="h">定期定額退休試算</span></a>
+        <a href="/MOMO_FinSphere/indicators/fed-rate.html"><span class="t">經濟指標・利率</span><span class="h">聯準會利率與通膨</span></a>
+        <a href="/momo-blog/posts/2026-10-post05/"><span class="t">配置筆記・美債與利率</span><span class="h">美債殖利率 5%，還要買月配息基金嗎？</span></a>
+      </div>
+    </section>
+
+    <div class="cta cta-box">
+      <h2>想知道自己的現金流怎麼規劃？</h2>
+      <p>把你的問題傳到官方 LINE，MOMO 用白話說明觀念與方向。</p>
+      <div class="btns">
+        <a class="btn btn-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="cta" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">加入官方 LINE</a>
+        <a class="btn btn-ghost js-utm" data-href="https://www.instagram.com/momo_82786/" data-loc="cta" href="https://www.instagram.com/momo_82786/" target="_blank" rel="noopener">追蹤 Instagram</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+    var $ = function (id) { return document.getElementById(id); };
+    var MAX_RETURN = 6; // 法遵：年化總報酬假設上限 6%
+    var INFL = 0.02;
+    var state = { m: 30000, ret: 6, years: 20, dist: 6, infl: false };
+    var tracked = false;
+    var wan = function (x) {
+      if (!isFinite(x)) return '—';
+      var w = x / 1e4;
+      return (w >= 1000 ? Math.round(w).toLocaleString('en-US') : w >= 100 ? Math.round(w) : w.toFixed(1)) + ' 萬';
+    };
+    var money = function (x) { return '$' + Math.round(x).toLocaleString('en-US'); };
+
+    // 所需本金：按月提領、按年隨通膨調整；years = Infinity 代表本金不動（永續）
+    function need(m, r, years, pi) {
+      var i = r / 12;
+      var a12 = i === 0 ? 12 : (1 - Math.pow(1 + i, -12)) / i;  // 一年內 12 次提領的現值
+      var q = (1 + pi) / Math.pow(1 + i, 12);                   // 下一年相對今年的現值比例
+      if (years === Infinity) return (r <= pi + 1e-9 || q >= 1) ? Infinity : m * a12 / (1 - q);
+      return m * a12 * (q === 1 ? years : (1 - Math.pow(q, years)) / (1 - q));
+    }
+    // 逐年本金（按月模擬）
+    function path(p0, m, r, years, pi) {
+      var i = r / 12, b = p0, w = m, out = [p0];
+      for (var y = 1; y <= years; y++) {
+        for (var k = 0; k < 12; k++) b = b * (1 + i) - w;
+        out.push(Math.max(0, b)); w *= 1 + pi;
+      }
+      return out;
+    }
+
+    function compute(s) {
+      var r = Math.min(s.ret, MAX_RETURN) / 100, pi = s.infl ? INFL : 0, d = s.dist / 100;
+      var A = need(s.m, r, Infinity, pi), B = need(s.m, r, s.years, pi);
+      var C = d > 0 ? s.m * 12 / d : Infinity;
+      var g = r - d, cPath = [];
+      for (var y = 0; y <= s.years; y++) cPath.push(isFinite(C) ? C * Math.pow(1 + g, y) : NaN);
+      return {
+        r: r, d: d, g: g, A: A, B: B, C: C,
+        aPath: isFinite(A) ? path(A, s.m, r, s.years, pi) : null,
+        bPath: path(B, s.m, r, s.years, pi), cPath: isFinite(C) ? cPath : null
+      };
+    }
+
+    function chart(o, years) {
+      var W = 560, H = 220, L = 46, R = 22, T = 12, Bm = 26;
+      var all = [].concat(o.aPath || [], o.bPath, o.cPath || []).filter(isFinite);
+      var max = Math.max.apply(null, all.concat([1])) * 1.08;
+      var step = Math.pow(10, Math.floor(Math.log10(max / 4)));
+      var nice = [1, 2, 2.5, 5, 10].map(function (k) { return k * step; }).find(function (v) { return max / v <= 5; }) || step * 10;
+      var top = Math.ceil(max / nice) * nice;
+      var x = function (t) { return L + (W - L - R) * t / years; };
+      var y = function (v) { return T + (H - T - Bm) * (1 - v / top); };
+      var g = '';
+      for (var v = 0; v <= top + 1e-6; v += nice) {
+        g += '<line class="g" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/>' +
+             '<text class="yl" x="' + (L - 6) + '" y="' + (y(v) + 4).toFixed(1) + '">' + Math.round(v / 1e4).toLocaleString('en-US') + '</text>';
+      }
+      var ticks = years <= 10 ? 2 : 5;
+      for (var t = 0; t <= years; t += ticks) g += '<text class="xl" x="' + x(t).toFixed(1) + '" y="' + (H - 8) + '">' + (t === 0 ? '開始' : t + ' 年') + '</text>';
+      var line = function (p, cls) {
+        if (!p) return '';
+        return '<path class="' + cls + '" d="' + p.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join('') + '"/>';
+      };
+      $('chart').innerHTML = g + line(o.aPath, 'pa') + line(o.bPath, 'pb') + line(o.cPath, 'pc');
+    }
+
+    function render() {
+      var s = state, o = compute(s), N = s.years;
+      $('retVal').textContent = s.ret.toFixed(1) + '%';
+      $('distVal').textContent = s.dist.toFixed(1) + '%';
+      $('tB').textContent = '本金 ' + N + ' 年用完';
+
+      $('vA').textContent = isFinite(o.A) ? wan(o.A) : '無法支應';
+      $('dA').textContent = isFinite(o.A)
+        ? (s.infl ? '只花報酬，提領跟著通膨增加，購買力維持不變。' : '只花報酬，本金一直留著。')
+        : (s.infl ? '報酬假設不高於通膨，只靠報酬無法維持購買力。' : '報酬假設為 0，只靠報酬無法支應。');
+
+      $('vB').textContent = wan(o.B);
+      $('dB').textContent = '每月提領含一部分本金，' + N + ' 年後剛好歸零' + (s.infl ? '（提領跟著通膨增加）' : '') + '。';
+
+      var box = $('boxC');
+      if (!isFinite(o.C)) {
+        $('vC').textContent = '—';
+        $('dC').textContent = '配息率為 0，無法回推。';
+        box.classList.remove('bad');
+      } else {
+        var endP = o.C * Math.pow(1 + o.g, N), endM = endP * o.d / 12;
+        $('vC').textContent = wan(o.C);
+        if (o.g < -1e-9) {
+          box.classList.add('bad');
+          $('dC').innerHTML = '配息率 ' + s.dist.toFixed(1) + '% 高於總報酬 ' + s.ret.toFixed(1) + '%，差額由本金支出：' + N +
+            ' 年後本金約剩 <b>' + wan(endP) + '</b>，每月配息也降到約 <b>' + money(endM) + '</b>。這個本金<b>不足以維持</b>每月 ' + money(s.m) + '。';
+        } else {
+          box.classList.remove('bad');
+          $('dC').innerHTML = '每年 ' + wan(s.m * 12) + ' ÷ 配息率 ' + s.dist.toFixed(1) + '%。配息率' + (o.g > 1e-9 ? '低於' : '等於') +
+            '總報酬時，本金' + (o.g > 1e-9 ? '有機會成長' : '大致維持') + '；配息率一旦高於總報酬，差額會由本金支出。';
+        }
+      }
+
+      var note = $('inflNote');
+      if (s.infl) {
+        note.innerHTML = '以每年 2% 通膨計算，' + N + ' 年後要維持現在每月 ' + money(s.m) + ' 的生活，每月約需 <b>' + money(s.m * Math.pow(1 + INFL, N)) + '</b>。';
+        note.classList.add('show');
+      } else note.classList.remove('show');
+
+      chart(o, N);
+
+      $('assume').innerHTML = '本試算假設：年化總報酬 <b>' + s.ret.toFixed(1) + '%</b>（上限 6%）每年不變、按月提領' +
+        (s.infl ? '、提領每年隨 2% 通膨增加' : '') + '；算法 C 假設配息率 <b>' + s.dist.toFixed(1) +
+        '%</b> 不變、配息領出不再投入。未計入費用、稅負與匯率；實際淨值與配息會隨市場變動，可能虧損，結果僅供教育參考。';
+    }
+
+    function touch() { if (!tracked && window.momoTrack) { window.momoTrack('calculator_use', { tool: 'monthly_income' }); tracked = true; } }
+    function setQuick() {
+      document.querySelectorAll('.quick button').forEach(function (b) { b.classList.toggle('on', +b.getAttribute('data-m') === state.m); });
+    }
+
+    $('goal').addEventListener('input', function () {
+      var v = +this.value; state.m = Number.isFinite(v) ? Math.min(Math.max(v, 0), 1e7) : 0; setQuick(); render(); touch();
+    });
+    document.querySelectorAll('.quick button').forEach(function (b) {
+      b.addEventListener('click', function () { state.m = +b.getAttribute('data-m'); $('goal').value = state.m; setQuick(); render(); touch(); });
+    });
+    $('ret').addEventListener('input', function () { state.ret = Math.min(+this.value, MAX_RETURN); render(); touch(); });
+    $('dist').addEventListener('input', function () { state.dist = +this.value; render(); touch(); });
+    $('infl').addEventListener('change', function () { state.infl = this.checked; render(); touch(); });
+    document.querySelectorAll('.seg button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('.seg button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on'); state.years = +b.getAttribute('data-y'); render(); touch();
+      });
+    });
+
+    function utm() {
+      document.querySelectorAll('a.js-utm').forEach(function (a) {
+        if (window.momoUtm) a.href = window.momoUtm(a.getAttribute('data-href'), a.getAttribute('data-loc') || 'cta');
+      });
+    }
+    render();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', utm); else utm();
+  })();
+  </script>
+</body>
+</html>
