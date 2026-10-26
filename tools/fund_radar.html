@@ -164,6 +164,8 @@
   // ▼ 監控設定（逐檔門檻請改 Google Sheet「監控門檻」分頁；讀不到時用這裡的預設）
   const HIGH_WINDOW = 250;                 // 近 1 年高點：最近 250 筆 NAV
   const DEFAULT_TH = { watch: -0.08, target: -0.15 };
+  const LEVELS = 3;                        // 達標線 3 條：門檻 ×1、×2、×3（例：-15%、-30%、-45%）
+  const CIRCLE = ['', '①', '②', '③'];
   const STALE_DAYS = 3;                    // 比最新一檔晚超過 3 天 → 資料過期
   const MA_LONG = 240, MA_SHORT = 60;
   const RET_PERIODS = [1, 3, 7, 14, 30];
@@ -244,8 +246,12 @@
         for (let k = pts.length - 2; k >= 0; k--) if (pts[k].ts <= target) { rets[n] = last.v / pts[k].v - 1; break; }
       });
       const th = thFor(name);
-      const status = dd <= th.target ? 'hit' : dd <= th.watch ? 'watch' : 'ok';
-      list.push({ name, pts, vals, last, hi, dd, bias, trend, ma240, ma60, rets, th, status, gap: dd - th.target, short: pts.length < 30 });
+      let level = 0;
+      for (let L = LEVELS; L >= 1; L--) if (dd <= th.target * L) { level = L; break; }
+      const status = level ? 'hit' : dd <= th.watch ? 'watch' : 'ok';
+      const next = level < LEVELS ? th.target * (level + 1) : null;      // 下一條達標線
+      const gap = next != null ? dd - next : dd - th.target * LEVELS;   // 距下一條線還差多少
+      list.push({ name, pts, vals, last, hi, dd, bias, trend, ma240, ma60, rets, th, status, level, next, gap, short: pts.length < 30 });
     }
     const newest = Math.max(...list.map((f) => f.last.ts));
     list.forEach((f) => { f.lagDays = Math.round((newest - f.last.ts) / DAY); f.stale = f.lagDays > STALE_DAYS; });
@@ -256,6 +262,8 @@
   // ---------- 畫面 ----------
   const TREND_TXT = { bull: '多頭', bear: '空頭', neutral: '中性', none: '資料不足' };
   const STATUS_TXT = { hit: '已達標', watch: '觀察中', ok: '正常' };
+  const stTxt = (f) => f.level ? `達標${CIRCLE[f.level]}` : STATUS_TXT[f.status];
+  const nextTxt = (f) => f.level >= LEVELS ? '已達第 3 條' : `${(f.gap * 100).toFixed(1)}%`;
 
   function filtered() {
     const q = state.q.trim().toLowerCase();
@@ -293,7 +301,7 @@
   function sortVal(f, k) {
     if (k === 'name') return f.name;
     if (k === 'dd') return f.dd;
-    if (k === 'gap') return f.gap;
+    if (k === 'gap') return (LEVELS - f.level) * 10 + f.gap;   // 先依達標級數（高的在前），再依距下一條線
     if (k === 'bias') return f.bias;
     return f.rets[k];
   }
@@ -311,11 +319,12 @@
     const maxAbs = {};
     RET_PERIODS.forEach((n) => { maxAbs[n] = Math.max(0.0001, ...rows.map((f) => Math.abs(f.rets[n] || 0))); });
     const th = (k, label, cls = '') => `<th class="${cls} ${key === k ? 'sorted' : ''}" data-k="${k}">${label}${key === k ? (dir < 0 ? ' ▼' : ' ▲') : ''}</th>`;
-    const head = '<tr>' + th('name', `基金（${rows.length}）`) + th('dd', '近 1 年回撤', 'grp') + th('gap', '距達標') + th('bias', '年線乖離') +
+    const head = '<tr>' + th('name', `基金（${rows.length}）`) + th('dd', '近 1 年回撤', 'grp') + th('gap', '距下一條線') + th('bias', '年線乖離') +
       '<th>趨勢</th>' + RET_PERIODS.map((n, i) => th(n, n + ' 天', i === 0 ? 'grp' : '')).join('') + '</tr>';
     const body = rows.map((f, idx) => {
       const ddCls = f.status === 'hit' ? 't-hit' : f.status === 'watch' ? 't-watch' : 't-ok';
-      const gapTxt = f.status === 'hit' ? '<span class="t-hit">已達標</span>' : `<span class="t-ok">${(f.gap * 100).toFixed(1)}%</span>`;
+      const gapTxt = f.level >= LEVELS ? '<span class="t-hit">已達第 3 條</span>'
+        : `<span class="t-ok">${(f.gap * 100).toFixed(1)}%</span><small style="display:block;color:var(--dim);font-size:.7rem">到${CIRCLE[f.level + 1]} ${pct(f.next, 0)}</small>`;
       const cells = RET_PERIODS.map((n, i) => {
         const v = f.rets[n];
         if (v == null) return `<td class="rk-cell ${i === 0 ? 'grp' : ''}"><span class="rk-val na">—</span></td>`;
@@ -324,13 +333,13 @@
       }).join('');
       const sub = `NAV ${f.last.v}・${f.last.date}` + (f.stale ? `・晚 ${f.lagDays} 天` : '') + (f.th.custom ? '・自訂門檻' : '');
       return `<tr data-i="${idx}" class="${f.stale ? 'stale' : ''}"><td class="rk-name" title="${esc(f.name)}"><span class="dot ${f.status}"></span>${esc(f.name)}<small>${esc(sub)}</small></td>` +
-        `<td class="grp ${ddCls}">${pct(f.dd)}</td><td>${gapTxt}</td><td>${f.bias == null ? '<span class="na">不足</span>' : pct(f.bias)}</td>` +
+        `<td class="grp ${ddCls}">${pct(f.dd)}${f.level ? ' ' + CIRCLE[f.level] : ''}</td><td>${gapTxt}</td><td>${f.bias == null ? '<span class="na">不足</span>' : pct(f.bias)}</td>` +
         `<td><span class="trend ${f.trend}">${TREND_TXT[f.trend]}</span></td>${cells}</tr>`;
     }).join('');
     box.className = '';
     box.innerHTML = `<div class="rank-wrap"><table class="rank-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>` +
-      `<div class="note">● 紅＝已達標、黃＝觀察中、綠＝正常。回撤＝最新 NAV 相對近 1 年（${HIGH_WINDOW} 筆）最高 NAV；預設觀察 ${pct(thresholds.def.watch, 0)}、達標 ${pct(thresholds.def.target, 0)}，可在「監控門檻」分頁逐檔調整。` +
-      `距達標＝回撤還差多少到達標線。報酬率以各基金最新 NAV 往回推 N 個日曆天計算，不含配息；比最新一檔晚超過 ${STALE_DAYS} 天的會反灰。點標題排序，點基金看詳情。</div>`;
+      `<div class="note">● 紅＝已達標（①②③＝跌破第幾條達標線）、黃＝觀察中、綠＝正常。回撤＝最新 NAV 相對近 1 年（${HIGH_WINDOW} 筆）最高 NAV；預設觀察 ${pct(thresholds.def.watch, 0)}、達標線 ${pct(thresholds.def.target, 0)}／${pct(thresholds.def.target * 2, 0)}／${pct(thresholds.def.target * 3, 0)}，可在「監控門檻」分頁逐檔調整。` +
+      `距下一條線＝回撤還差多少到下一條達標線。報酬率以各基金最新 NAV 往回推 N 個日曆天計算，不含配息；比最新一檔晚超過 ${STALE_DAYS} 天的會反灰。點標題排序，點基金看詳情。</div>`;
     box.querySelectorAll('th[data-k]').forEach((h) => h.addEventListener('click', () => {
       const k = isNaN(+h.dataset.k) ? h.dataset.k : +h.dataset.k;
       if (state.sort.key === k) state.sort.dir *= -1;
@@ -342,26 +351,27 @@
 
   function sparkSvg(f) {
     const pts = f.vals.slice(-120);
-    const hiLine = f.hi.v * (1 + f.th.target);
-    const lo = Math.min(...pts, hiLine), hi = Math.max(...pts);
+    const nShow = Math.min(LEVELS, f.level + 1);                      // 畫到下一條線為止，避免圖被壓扁
+    const lines = []; for (let L = 1; L <= nShow; L++) lines.push(f.hi.v * (1 + f.th.target * L));
+    const lo = Math.min(...pts, ...lines), hi = Math.max(...pts);
     const W = 300, H = 48, pad = 3, span = (hi - lo) || 1;
     const y = (v) => (pad + (H - 2 * pad) * (1 - (v - lo) / span)).toFixed(1);
     const x = (i) => (pts.length < 2 ? 0 : (W * i / (pts.length - 1))).toFixed(1);
     const color = f.status === 'hit' ? '#ef4444' : f.status === 'watch' ? '#eab308' : '#60a5fa';
     return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">` +
-      `<line x1="0" x2="${W}" y1="${y(hiLine)}" y2="${y(hiLine)}" stroke="#10b981" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>` +
+      lines.map((v, i) => `<line x1="0" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#10b981" stroke-opacity="${1 - i * 0.25}" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>`).join('') +
       `<path d="${pts.map((v, i) => (i ? 'L' : 'M') + x(i) + ',' + y(v)).join('')}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
   }
 
   function renderCards(box, list) {
-    const rows = list.slice().sort((a, b) => a.gap - b.gap);
+    const rows = list.slice().sort((a, b) => sortVal(a, 'gap') - sortVal(b, 'gap'));
     box.className = 'grid';
     box.innerHTML = rows.map((f, idx) => `
       <div class="fund-card ${f.status} ${f.stale ? 'stale' : ''}" data-i="${idx}">
-        <div class="card-top"><div class="fund-name">${esc(f.name)}</div><span class="badge ${f.status}">${STATUS_TXT[f.status]}</span></div>
+        <div class="card-top"><div class="fund-name">${esc(f.name)}</div><span class="badge ${f.status}">${stTxt(f)}</span></div>
         <div class="kv">
           <div><span class="l">近 1 年回撤</span><span class="v ${f.status === 'hit' ? 't-hit' : f.status === 'watch' ? 't-watch' : ''}">${pct(f.dd)}</span></div>
-          <div><span class="l">距達標（${pct(f.th.target, 0)}）</span><span class="v">${f.status === 'hit' ? '—' : (f.gap * 100).toFixed(1) + '%'}</span></div>
+          <div><span class="l">${f.level >= LEVELS ? '達標線' : `距${CIRCLE[f.level + 1]}（${pct(f.next, 0)}）`}</span><span class="v">${f.level >= LEVELS ? '③' : (f.gap * 100).toFixed(1) + '%'}</span></div>
           <div><span class="l">最新 NAV</span><span class="v">${f.last.v}</span></div>
         </div>
         ${sparkSvg(f)}
@@ -378,15 +388,15 @@
     $('m-info').innerHTML =
       item('最新 NAV', f.last.v, f.last.date + (f.stale ? `（晚 ${f.lagDays} 天）` : '')) +
       item('近 1 年高點', f.hi.v, f.hi.date) +
-      item('近 1 年回撤', pct(f.dd, 2), STATUS_TXT[f.status], stColor) +
-      item('門檻', `${pct(f.th.watch, 0)} / ${pct(f.th.target, 0)}`, f.th.custom ? '觀察 / 達標（自訂）' : '觀察 / 達標（預設）') +
+      item('近 1 年回撤', pct(f.dd, 2), stTxt(f), stColor) +
+      item('門檻' + (f.th.custom ? '（自訂）' : ''), `${pct(f.th.watch, 0)}｜${pct(f.th.target, 0)}`, `觀察｜達標線 ${pct(f.th.target, 0)}／${pct(f.th.target * 2, 0)}／${pct(f.th.target * 3, 0)}`) +
       item('年線乖離', f.bias == null ? '資料不足' : pct(f.bias, 2), '對 240 日均線') +
       item('趨勢', TREND_TXT[f.trend], '60 日 vs 240 日均線');
-    const hiT = f.hi.v * (1 + f.th.target), hiW = f.hi.v * (1 + f.th.watch);
-    $('m-desc').innerHTML = f.status === 'hit'
-      ? `🚨 已跌破達標線：近 1 年高點 ${f.hi.v} 跌 ${Math.abs(f.th.target * 100).toFixed(0)}% ≈ <b>${hiT.toFixed(2)}</b>，目前 NAV ${f.last.v}。<br>門檻可在 Google Sheet「監控門檻」分頁逐檔調整。`
-      : `距離達標還差 <b>${(f.gap * 100).toFixed(1)}%</b>：NAV 跌到約 <b>${hiT.toFixed(2)}</b> 會達標，跌到約 <b>${hiW.toFixed(2)}</b> 進入觀察。` +
-        `<br>門檻可在 Google Sheet「監控門檻」分頁逐檔調整。`;
+    const lvRows = [['觀察', f.th.watch, f.status !== 'ok']];
+    for (let L = 1; L <= LEVELS; L++) lvRows.push([`達標${CIRCLE[L]}`, f.th.target * L, f.level >= L]);
+    $('m-desc').innerHTML = `近 1 年高點 <b>${f.hi.v}</b>（${f.hi.date}），目前 NAV <b>${f.last.v}</b>：<br>` +
+      lvRows.map(([t, p, hit]) => `${hit ? '✅' : '⬜'} ${t}　${pct(p, 0)} → NAV 約 <b>${(f.hi.v * (1 + p)).toFixed(2)}</b>`).join('<br>') +
+      `<br><span style="color:var(--dim)">門檻可在 Google Sheet「監控門檻」分頁逐檔調整；達標線＝門檻 ×1、×2、×3。</span>`;
     drawBigChart(f);
     $('detail-modal').classList.add('show');
   }
@@ -401,7 +411,10 @@
     if (f.ma60.some((v) => v != null)) datasets.push(ds('60 日均線', f.ma60.slice(s), '#60a5fa'));
     if (f.ma240.some((v) => v != null)) datasets.push(ds('240 日均線', f.ma240.slice(s), '#a78bfa', { borderDash: [5, 5], borderWidth: 1.2 }));
     datasets.push(ds(`觀察線 ${pct(f.th.watch, 0)}`, hiRoll.map((h) => h * (1 + f.th.watch)), '#eab308', { borderDash: [3, 3], borderWidth: 1 }));
-    datasets.push(ds(`達標線 ${pct(f.th.target, 0)}`, hiRoll.map((h) => h * (1 + f.th.target)), '#10b981', { borderDash: [6, 4], borderWidth: 1.2 }));
+    ['#10b981', '#0ea5a4', '#0891b2'].forEach((c, i) => {
+      const p = f.th.target * (i + 1);
+      datasets.push(ds(`達標${CIRCLE[i + 1]} ${pct(p, 0)}`, hiRoll.map((h) => h * (1 + p)), c, { borderDash: [6, 4], borderWidth: 1.2 }));
+    });
     if (bigChart) bigChart.destroy();
     bigChart = new Chart($('big-chart').getContext('2d'), {
       type: 'line',
