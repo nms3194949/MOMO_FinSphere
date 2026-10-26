@@ -101,6 +101,17 @@
     .m-item .v { font-size: 1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
     .m-item .s { font-size: .7rem; color: var(--dim); display: block; }
     .big-chart-box { height: 300px; margin-bottom: 12px; }
+    .m-sec { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; font-size: .86rem; line-height: 1.7; color: var(--text-2); }
+    .m-sec h4 { margin: 0 0 6px; font-size: .9rem; color: var(--text); display: flex; justify-content: space-between; gap: 8px; }
+    .m-sec h4 small { color: var(--dim); font-weight: 500; font-size: .74rem; }
+    .bt { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .84rem; margin-top: 4px; }
+    .bt th, .bt td { padding: 5px 6px; text-align: right; border-bottom: 1px solid rgba(51,65,85,.6); white-space: nowrap; }
+    .bt th:first-child, .bt td:first-child { text-align: left; }
+    .bt th { color: var(--muted); font-weight: 600; font-size: .76rem; }
+    .chk { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+    .chk span small { color: var(--dim); margin-left: 4px; }
+    .stab { font-weight: 800; } .stab.s3 { color: #34d399; } .stab.s2 { color: #facc15; } .stab.s1, .stab.s0 { color: var(--dim); }
+    .meta-line { font-size: .74rem; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
     .m-desc { font-size: .82rem; color: var(--muted); line-height: 1.7; background: rgba(0,0,0,.2); padding: 12px; border-radius: 10px; border-left: 3px solid var(--blue); }
     .result-item { display: flex; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,.03); border-radius: 8px; }
     .r-nav { font-weight: 800; color: var(--green); } .r-date { font-size: .75rem; color: var(--muted); display: block; text-align: right; }
@@ -142,6 +153,7 @@
     <div class="modal-header"><div class="modal-title" id="m-title"></div><button class="btn-close" data-close="detail-modal">×</button></div>
     <div class="m-info" id="m-info"></div>
     <div class="big-chart-box"><canvas id="big-chart"></canvas></div>
+    <div id="m-extra"></div>
     <div class="m-desc" id="m-desc"></div>
   </div>
 </div>
@@ -214,6 +226,69 @@
     }
     return out;
   }
+  function rsiSeries(vals, n) {
+    const out = new Array(vals.length).fill(null);
+    if (vals.length <= n) return out;
+    let g = 0, l = 0;
+    for (let i = 1; i <= n; i++) { const d = vals[i] - vals[i - 1]; if (d > 0) g += d; else l -= d; }
+    g /= n; l /= n;
+    out[n] = l === 0 ? 100 : 100 - 100 / (1 + g / l);
+    for (let i = n + 1; i < vals.length; i++) {
+      const d = vals[i] - vals[i - 1];
+      g = (g * (n - 1) + Math.max(d, 0)) / n; l = (l * (n - 1) + Math.max(-d, 0)) / n;
+      out[i] = l === 0 ? 100 : 100 - 100 / (1 + g / l);
+    }
+    return out;
+  }
+
+  // 1. 歷史回測：過去跌破同一條線之後的表現（用交易筆數當時間：3 個月≈63、6 個月≈126、12 個月≈252）
+  const BT_H = [[3, 63], [6, 126], [12, 252]];
+  function backtest(vals, ddSeries, T) {
+    const n = vals.length, ev = [];
+    let armed = true;
+    for (let i = 1; i < n; i++) {
+      if (armed && ddSeries[i] <= T && ddSeries[i - 1] > T) { ev.push(i); armed = false; }
+      if (!armed && ddSeries[i] > T * 0.5) armed = true;          // 回升到門檻一半以上，才算下一次
+    }
+    const done = ev.filter((i) => i + BT_H[0][1] < n);            // 至少走完 3 個月才列入統計
+    const stats = BT_H.map(([m, h]) => {
+      const r = done.filter((i) => i + h < n).map((i) => vals[i + h] / vals[i] - 1);
+      return { m, n: r.length, up: r.filter((x) => x > 0).length, avg: r.length ? r.reduce((a, b) => a + b, 0) / r.length : null, min: r.length ? Math.min(...r) : null };
+    });
+    const drops = done.map((i) => { let lo = vals[i]; for (let k = i; k <= Math.min(n - 1, i + 252); k++) if (vals[k] < lo) lo = vals[k]; return lo / vals[i] - 1; });
+    return {
+      T, events: ev.length, done: done.length, ongoing: ev.length - done.length, stats,
+      dropAvg: drops.length ? drops.reduce((a, b) => a + b, 0) / drops.length : null, dropMin: drops.length ? Math.min(...drops) : null,
+      dates: done.map((i) => i)
+    };
+  }
+
+  // 2. 止跌訊號
+  function stabilization(vals) {
+    const n = vals.length, last = vals[n - 1];
+    const ma20 = n >= 20 ? vals.slice(-20).reduce((a, b) => a + b, 0) / 20 : null;
+    const w = vals.slice(-60); let li = 0; w.forEach((v, i) => { if (v <= w[li]) li = i; });
+    const low = w[li], since = w.length - 1 - li, reb = last / low - 1;
+    const rsi = rsiSeries(vals, 14), cur = rsi[n - 1];
+    const recent = rsi.slice(-20).filter((x) => x != null), rmin = recent.length ? Math.min(...recent) : null;
+    const checks = [
+      ['站上 20 日均線', ma20 != null && last > ma20, ma20 != null ? `均線 ${ma20.toFixed(2)}` : '資料不足'],
+      ['距 60 日低點反彈 ≥ 3%', reb >= 0.03, `已反彈 ${pct(reb)}`],
+      ['10 個交易日沒創新低', since >= 10, `低點後 ${since} 筆`],
+      ['RSI 從 30 以下回升', rmin != null && rmin < 30 && cur > rmin + 5, cur != null ? `RSI ${cur.toFixed(0)}（近 20 筆最低 ${rmin.toFixed(0)}）` : '資料不足']
+    ];
+    return { score: checks.filter((c) => c[1]).length, checks, low, since, reb };
+  }
+
+  // 3. 大盤：用基準在「同一天」的近 1 年回撤
+  let benches = [];
+  function benchDD(b, ts) {
+    let i = b.pts.length - 1; while (i >= 0 && b.pts[i].ts > ts) i--;
+    if (i < 0) return null;
+    let hi = 0; for (let k = Math.max(0, i - HIGH_WINDOW + 1); k <= i; k++) if (b.pts[k].v > hi) hi = b.pts[k].v;
+    return { dd: b.pts[i].v / hi - 1, date: b.pts[i].date };
+  }
+
   function thFor(name) {
     const t = thresholds.funds[name] || {};
     return { watch: t.watch != null ? t.watch : thresholds.def.watch, target: t.target != null ? t.target : thresholds.def.target, custom: !!thresholds.funds[name] };
@@ -223,12 +298,14 @@
     const clean = rows.map((r) => { const ts = Date.parse(String(r[0]).replace(/-/g, '/')); return isNaN(ts) ? null : { ts, date: r[0], r }; })
       .filter(Boolean).sort((a, b) => a.ts - b.ts);
     const list = [];
+    benches = [];
     for (let i = 1; i < headers.length; i++) {
       const name = String(headers[i] || '').trim();
-      if (!name || EXCLUDE.some((x) => name.includes(x))) continue;
+      if (!name) continue;
       const pts = [];
       clean.forEach((it) => { const v = parseFloat(it.r[i]); if (!isNaN(v) && v > 0) pts.push({ ts: it.ts, date: String(it.date).slice(0, 10), v }); });
       if (!pts.length) continue;
+      if (EXCLUDE.some((x) => name.includes(x))) { benches.push({ name: EXCLUDE.find((x) => name.includes(x)), full: name, pts }); continue; }
       const vals = pts.map((p) => p.v);
       const last = pts[pts.length - 1];
       const win = pts.slice(-HIGH_WINDOW);
@@ -251,7 +328,13 @@
       const status = level ? 'hit' : dd <= th.watch ? 'watch' : 'ok';
       const next = level < LEVELS ? th.target * (level + 1) : null;      // 下一條達標線
       const gap = next != null ? dd - next : dd - th.target * LEVELS;   // 距下一條線還差多少
-      list.push({ name, pts, vals, last, hi, dd, bias, trend, ma240, ma60, rets, th, status, level, next, gap, short: pts.length < 30 });
+      // 歷史位置＋回測＋止跌
+      const rh = rollingMax(vals, HIGH_WINDOW), dds = vals.map((v, k) => v / rh[k] - 1);
+      const pctl = dds.filter((x) => x <= dd + 1e-12).length / dds.length;     // 回撤這麼深（或更深）的日子占多少
+      const maxDD = Math.min(...dds);
+      const bt = backtest(vals, dds, level ? th.target * level : th.target);
+      const stab = stabilization(vals);
+      list.push({ name, pts, vals, last, hi, dd, bias, trend, ma240, ma60, rets, th, status, level, next, gap, short: pts.length < 30, pctl, maxDD, bt, stab, years: (last.ts - pts[0].ts) / (365 * DAY) });
     }
     const newest = Math.max(...list.map((f) => f.last.ts));
     list.forEach((f) => { f.lagDays = Math.round((newest - f.last.ts) / DAY); f.stale = f.lagDays > STALE_DAYS; });
@@ -263,6 +346,7 @@
   const TREND_TXT = { bull: '多頭', bear: '空頭', neutral: '中性', none: '資料不足' };
   const STATUS_TXT = { hit: '已達標', watch: '觀察中', ok: '正常' };
   const stTxt = (f) => f.level ? `達標${CIRCLE[f.level]}` : STATUS_TXT[f.status];
+  const pctlTxt = (f) => f.years < 1 ? '<span class="na">資料短</span>' : f.dd > -0.005 ? '<span class="na">—</span>' : f.pctl < 0.005 ? '<span class="t-hit">史上最深</span>' : `${Math.round(f.pctl * 100)}%`;
   const nextTxt = (f) => f.level >= LEVELS ? '已達第 3 條' : `${(f.gap * 100).toFixed(1)}%`;
 
   function filtered() {
@@ -303,6 +387,8 @@
     if (k === 'dd') return f.dd;
     if (k === 'gap') return (LEVELS - f.level) * 10 + f.gap;   // 先依達標級數（高的在前），再依距下一條線
     if (k === 'bias') return f.bias;
+    if (k === 'stab') return f.stab.score;
+    if (k === 'pctl') return f.pctl;
     return f.rets[k];
   }
 
@@ -319,7 +405,7 @@
     const maxAbs = {};
     RET_PERIODS.forEach((n) => { maxAbs[n] = Math.max(0.0001, ...rows.map((f) => Math.abs(f.rets[n] || 0))); });
     const th = (k, label, cls = '') => `<th class="${cls} ${key === k ? 'sorted' : ''}" data-k="${k}">${label}${key === k ? (dir < 0 ? ' ▼' : ' ▲') : ''}</th>`;
-    const head = '<tr>' + th('name', `基金（${rows.length}）`) + th('dd', '近 1 年回撤', 'grp') + th('gap', '距下一條線') + th('bias', '年線乖離') +
+    const head = '<tr>' + th('name', `基金（${rows.length}）`) + th('dd', '近 1 年回撤', 'grp') + th('gap', '距下一條線') + th('pctl', '歷史深度') + th('stab', '止跌') + th('bias', '年線乖離') +
       '<th>趨勢</th>' + RET_PERIODS.map((n, i) => th(n, n + ' 天', i === 0 ? 'grp' : '')).join('') + '</tr>';
     const body = rows.map((f, idx) => {
       const ddCls = f.status === 'hit' ? 't-hit' : f.status === 'watch' ? 't-watch' : 't-ok';
@@ -333,17 +419,17 @@
       }).join('');
       const sub = `NAV ${f.last.v}・${f.last.date}` + (f.stale ? `・晚 ${f.lagDays} 天` : '') + (f.th.custom ? '・自訂門檻' : '');
       return `<tr data-i="${idx}" class="${f.stale ? 'stale' : ''}"><td class="rk-name" title="${esc(f.name)}"><span class="dot ${f.status}"></span>${esc(f.name)}<small>${esc(sub)}</small></td>` +
-        `<td class="grp ${ddCls}">${pct(f.dd)}${f.level ? ' ' + CIRCLE[f.level] : ''}</td><td>${gapTxt}</td><td>${f.bias == null ? '<span class="na">不足</span>' : pct(f.bias)}</td>` +
+        `<td class="grp ${ddCls}">${pct(f.dd)}${f.level ? ' ' + CIRCLE[f.level] : ''}</td><td>${gapTxt}</td><td>${pctlTxt(f)}</td><td><span class="stab s${f.stab.score}">${f.stab.score}/4</span></td><td>${f.bias == null ? '<span class="na">不足</span>' : pct(f.bias)}</td>` +
         `<td><span class="trend ${f.trend}">${TREND_TXT[f.trend]}</span></td>${cells}</tr>`;
     }).join('');
     box.className = '';
     box.innerHTML = `<div class="rank-wrap"><table class="rank-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>` +
       `<div class="note">● 紅＝已達標（①②③＝跌破第幾條達標線）、黃＝觀察中、綠＝正常。回撤＝最新 NAV 相對近 1 年（${HIGH_WINDOW} 筆）最高 NAV；預設觀察 ${pct(thresholds.def.watch, 0)}、達標線 ${pct(thresholds.def.target, 0)}／${pct(thresholds.def.target * 2, 0)}／${pct(thresholds.def.target * 3, 0)}，可在「監控門檻」分頁逐檔調整。` +
-      `距下一條線＝回撤還差多少到下一條達標線。報酬率以各基金最新 NAV 往回推 N 個日曆天計算，不含配息；比最新一檔晚超過 ${STALE_DAYS} 天的會反灰。點標題排序，點基金看詳情。</div>`;
+      `距下一條線＝回撤還差多少到下一條達標線。歷史深度＝歷史上回撤這麼深（或更深）的日子占多少，越小越少見。止跌＝4 項止跌條件成立幾項。報酬率以各基金最新 NAV 往回推 N 個日曆天計算，不含配息；比最新一檔晚超過 ${STALE_DAYS} 天的會反灰。點標題排序，點基金看詳情。</div>`;
     box.querySelectorAll('th[data-k]').forEach((h) => h.addEventListener('click', () => {
       const k = isNaN(+h.dataset.k) ? h.dataset.k : +h.dataset.k;
       if (state.sort.key === k) state.sort.dir *= -1;
-      else state.sort = { key: k, dir: (k === 'name' || k === 'gap' || k === 'dd') ? 1 : -1 };
+      else state.sort = { key: k, dir: (k === 'name' || k === 'gap' || k === 'dd' || k === 'pctl') ? 1 : -1 };
       render();
     }));
     box.querySelectorAll('tbody tr').forEach((tr) => tr.addEventListener('click', () => openModal(rows[+tr.dataset.i])));
@@ -375,6 +461,7 @@
           <div><span class="l">最新 NAV</span><span class="v">${f.last.v}</span></div>
         </div>
         ${sparkSvg(f)}
+        <div class="meta-line"><span>止跌 <span class="stab s${f.stab.score}">${f.stab.score}/4</span></span>${f.dd <= -0.005 && f.years >= 1 ? `<span>歷史深度 ${f.pctl < 0.005 ? '史上最深' : Math.round(f.pctl * 100) + '%'}</span>` : ''}${f.bt.done ? `<span>回測 ${f.bt.done} 次・12 個月上漲 ${f.bt.stats[2].n ? f.bt.stats[2].up + '/' + f.bt.stats[2].n : '—'}</span>` : ''}</div>
         <div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--dim)"><span>近 120 筆・虛線＝達標線</span><span>${f.last.date}${f.stale ? ` <span class="stale-tag">晚 ${f.lagDays} 天</span>` : ''}</span></div>
       </div>`).join('');
     box.querySelectorAll('.fund-card').forEach((c) => c.addEventListener('click', () => openModal(rows[+c.dataset.i])));
@@ -397,8 +484,46 @@
     $('m-desc').innerHTML = `近 1 年高點 <b>${f.hi.v}</b>（${f.hi.date}），目前 NAV <b>${f.last.v}</b>：<br>` +
       lvRows.map(([t, p, hit]) => `${hit ? '✅' : '⬜'} ${t}　${pct(p, 0)} → NAV 約 <b>${(f.hi.v * (1 + p)).toFixed(2)}</b>`).join('<br>') +
       `<br><span style="color:var(--dim)">門檻可在 Google Sheet「監控門檻」分頁逐檔調整；達標線＝門檻 ×1、×2、×3。</span>`;
+    $('m-extra').innerHTML = extraHtml(f);
     drawBigChart(f);
     $('detail-modal').classList.add('show');
+  }
+
+  function extraHtml(f) {
+    const bt = f.bt;
+    // 1. 歷史回測
+    let h1 = `<div class="m-sec"><h4>📈 歷史回測：跌破 ${pct(bt.T, 0)} 之後<small>資料約 ${f.years.toFixed(1)} 年</small></h4>`;
+    if (!bt.done) {
+      h1 += bt.events ? `這是資料期間內第 ${bt.events} 次跌破，之前沒有走完 3 個月的案例可以統計。` : `資料期間內沒有跌破過 ${pct(bt.T, 0)}，無法回測。`;
+    } else {
+      h1 += `<table class="bt"><thead><tr><th>持有</th><th>樣本</th><th>上漲機率</th><th>平均報酬</th><th>最差</th></tr></thead><tbody>` +
+        bt.stats.map((x) => x.n ? `<tr><td>${x.m} 個月後</td><td>${x.n}</td><td>${x.up}/${x.n}（${Math.round(x.up / x.n * 100)}%）</td><td class="${x.avg >= 0 ? 'up' : 'down'}">${pct(x.avg)}</td><td class="${x.min >= 0 ? 'up' : 'down'}">${pct(x.min)}</td></tr>`
+          : `<tr><td>${x.m} 個月後</td><td colspan="4" class="na">資料還不夠長</td></tr>`).join('') + '</tbody></table>' +
+        `<div style="margin-top:6px">跌破後一年內最多再跌：平均 <b class="down">${pct(bt.dropAvg)}</b>、最深 <b class="down">${pct(bt.dropMin)}</b>` +
+        (bt.done < 5 ? '<br><span style="color:#fbbf24">⚠ 樣本少於 5 次，參考價值有限</span>' : '') + '</div>';
+    }
+    h1 += '<div style="color:var(--dim);font-size:.74rem;margin-top:4px">以這檔基金自己的 NAV 計算，不含配息；回升到門檻一半以上才算下一次跌破。過去表現不代表未來。</div></div>';
+    // 2. 止跌
+    const s = f.stab;
+    const h2 = `<div class="m-sec"><h4>🛑 止跌檢查<small class="stab s${s.score}">${s.score}/4 成立</small></h4><div class="chk">` +
+      s.checks.map(([t, ok, d]) => `<span>${ok ? '✅' : '⬜'} ${t}<small>${d}</small></span>`).join('') + '</div>' +
+      `<div style="color:var(--dim);font-size:.74rem;margin-top:4px">近 60 筆最低 NAV ${s.low}。跌到達標線＋止跌條件成立越多，越不容易買在半山腰。</div></div>`;
+    // 3. 大盤＋4. 歷史位置
+    const rows = benches.map((b) => { const r = benchDD(b, f.last.ts); return r ? `<tr><td>${esc(b.name)}</td><td class="${r.dd < -0.005 ? 'down' : ''}">${pct(r.dd)}</td><td>${r.date}</td></tr>` : ''; }).join('');
+    const spy = benches.find((b) => b.name === 'SPY'), sd = spy ? benchDD(spy, f.last.ts) : null;
+    let judge = '';
+    if (sd) {
+      const diff = f.dd - sd.dd;
+      judge = diff <= -0.1 ? '這檔明顯比大盤跌得深，可能是產業或基金本身的因素，再跌風險較高。'
+        : diff <= -0.03 ? '這檔比大盤跌得深一些。' : '和大盤的回撤差不多，偏向市場整體的修正。';
+    }
+    const h3 = `<div class="m-sec"><h4>🌐 大盤對照與歷史位置</h4>` +
+      (rows ? `<table class="bt"><thead><tr><th>同期</th><th>近 1 年回撤</th><th>資料日期</th></tr></thead><tbody><tr><td>這檔基金</td><td class="${f.dd < -0.005 ? 'down' : ''}">${pct(f.dd)}</td><td>${f.last.date}</td></tr>${rows}</tbody></table>` +
+        (judge ? `<div style="margin-top:6px">${judge}</div>` : '') : '<div class="na">資料中沒有 SPY／006208 可以對照。</div>') +
+      `<div style="margin-top:6px">${f.years < 1 ? '歷史資料不到 1 年，暫不計算歷史位置。'
+        : f.dd > -0.005 ? `目前在近 1 年高點附近。歷史最大回撤 ${pct(f.maxDD)}。`
+        : `目前回撤 ${pct(f.dd)}，${f.pctl < 0.005 ? '是資料期間內<b>最深</b>的一次；' : `歷史上有 <b>${Math.round(f.pctl * 100)}%</b> 的日子跌得這麼深或更深${f.pctl <= 0.1 ? '，相當少見' : ''}；`}歷史最大回撤 ${pct(f.maxDD)}（資料約 ${f.years.toFixed(1)} 年）。`}</div></div>`;
+    return h1 + h2 + h3;
   }
 
   function drawBigChart(f) {
