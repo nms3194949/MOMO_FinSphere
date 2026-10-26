@@ -39,14 +39,5 @@ window.MOMO_TOOLS_CONFIG = [
     desc: "統計各市場長期的月份與季節性表現，觀察歷史規律。",
     href: "/MOMO_FinSphere/tools/seasonality.html",
     showOnHome: true
-  },
-  {
-    id: "etf-dashboard",
-    category: "fund",
-    label: "ETF 數據",
-    title: "台股ETF監控",
-    desc: "整理台股 ETF 的報酬與配息資料，方便橫向比較。",
-    href: "/MOMO_FinSphere/tools/etf-dashboard.html",
-    showOnHome: true
   }
 ];
