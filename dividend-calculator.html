@@ -208,6 +208,13 @@
     .btn-line { background: var(--line-green); color: #fff; }
     .btn-ghost { border-color: var(--ink); }
 
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin: 22px 0 0; max-width: 560px; }
+    .modes a { display: block; text-align: center; padding: 9px 8px; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 15px; color: var(--ink-2); line-height: 1.45; }
+    .modes a:hover { background: var(--gold-bg); }
+    .modes a small { display: block; font-weight: 600; font-size: 12.5px; color: var(--muted); }
+    .modes a[aria-current="page"] { background: var(--ink); color: #fff; }
+    .modes a[aria-current="page"] small { color: #c9cfdb; }
+    .modes + .eyebrow { margin-top: 18px; }
     @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
   </style>
   <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
@@ -221,6 +228,10 @@
   </header>
 
   <main class="wrap">
+    <nav class="modes" aria-label="切換試算">
+      <a href="/MOMO_FinSphere/dividend-calculator.html" aria-current="page">我有本金<small>每月能領多少、本金怎麼變</small></a>
+      <a href="/MOMO_FinSphere/monthly-income.html">我有目標<small>每月想領多少、要多少本金</small></a>
+    </nav>
     <p class="eyebrow">配息現金流試算</p>
     <h1>配息率，不等於報酬率</h1>
     <p class="answer"><b>配息率不等於報酬率。</b>真實報酬 = 配息 + 淨值變化。如果基金一年總報酬 6%、配息率 8%，多配出的 2% 會反映在淨值下跌：100 萬元每月約領 6,667 元，但 5 年後本金約剩 90.4 萬元。下面的試算可以自己調整配息率與總報酬假設（上限 6%）。</p>

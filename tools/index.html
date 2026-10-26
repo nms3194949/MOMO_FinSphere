@@ -105,6 +105,14 @@
     .tool-title { font-family: var(--serif); font-size: 18px; margin: 2px 0 0; line-height: 1.45; }
     .tool-desc { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.7; flex: 1; }
     .tool-go { color: var(--gold); font-weight: 700; font-size: 14px; }
+    .tool-duo { grid-column: 1 / -1; }
+    .tool-duo:hover { transform: none; }
+    .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+    .duo a { display: block; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; text-decoration: none; transition: border-color .15s; }
+    .duo a:hover { border-color: var(--gold); }
+    .duo b { display: block; color: var(--gold); font-size: 15.5px; }
+    .duo span { display: block; font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
+    @media (max-width: 600px) { .duo { grid-template-columns: 1fr; } }
     .note { font-size: 13px; color: var(--muted); }
   </style>
 </head>
@@ -131,18 +139,15 @@
 
     <!-- 工具卡片直接寫在 HTML；分類按鈕只負責顯示／隱藏（data-cat） -->
     <div class="tools-grid" id="tools-grid" aria-live="polite">
-      <a class="tool-card" href="/MOMO_FinSphere/dividend-calculator.html" data-cat="calc">
+      <div class="tool-card tool-duo" data-cat="calc">
         <span class="tool-pill">試算</span>
-        <h3 class="tool-title">配息現金流試算</h3>
-        <p class="tool-desc">輸入本金、配息率與總報酬假設（最高 6%），看每月配息、淨值變化與幾年後的本金。</p>
-        <span class="tool-go">開啟工具 →</span>
-      </a>
-      <a class="tool-card" href="/MOMO_FinSphere/monthly-income.html" data-cat="calc">
-        <span class="tool-pill">試算</span>
-        <h3 class="tool-title">本金需求試算</h3>
-        <p class="tool-desc">每月想領 2 萬、3 萬或 5 萬，要準備多少本金？本金不動、分年用完、配息率回推三種算法一次比較（報酬假設最高 6%）。</p>
-        <span class="tool-go">開啟工具 →</span>
-      </a>
+        <h3 class="tool-title">配息與本金試算</h3>
+        <p class="tool-desc">配息率不等於報酬率。從你現在的情況開始算，年化總報酬假設最高 6%。</p>
+        <div class="duo">
+          <a href="/MOMO_FinSphere/dividend-calculator.html"><b>我有本金 →</b><span>每月能領多少、淨值與本金幾年後怎麼變</span></a>
+          <a href="/MOMO_FinSphere/monthly-income.html"><b>我有目標 →</b><span>每月想領 2 萬、3 萬或 5 萬，需要多少本金</span></a>
+        </div>
+      </div>
       <a class="tool-card" href="/MOMO_FinSphere/tools/cycle.html" data-cat="market">
         <span class="tool-pill">景氣</span>
         <h3 class="tool-title">景氣循環儀表板</h3>

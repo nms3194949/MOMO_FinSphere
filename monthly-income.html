@@ -180,6 +180,13 @@
     .crumbs a { text-decoration: none; color: var(--ink-2); }
     .crumbs a:hover { color: var(--gold); }
     .crumbs + .eyebrow { margin-top: 16px; }
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin: 22px 0 0; max-width: 560px; }
+    .modes a { display: block; text-align: center; padding: 9px 8px; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 15px; color: var(--ink-2); line-height: 1.45; }
+    .modes a:hover { background: var(--gold-bg); }
+    .modes a small { display: block; font-weight: 600; font-size: 12.5px; color: var(--muted); }
+    .modes a[aria-current="page"] { background: var(--ink); color: #fff; }
+    .modes a[aria-current="page"] small { color: #c9cfdb; }
+    .modes + .eyebrow { margin-top: 18px; }
     .quick { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
     .quick button { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink-2); font: 700 13.5px var(--sans); cursor: pointer; }
     .quick button.on { border-color: var(--gold); color: var(--gold); background: var(--gold-bg); }
@@ -233,6 +240,10 @@
 
   <main class="wrap">
     <nav class="crumbs" aria-label="麵包屑"><a href="/MOMO_FinSphere/">MOMO財商智庫</a> › <a href="/MOMO_FinSphere/tools/">所有工具</a> › 本金需求試算</nav>
+    <nav class="modes" aria-label="切換試算">
+      <a href="/MOMO_FinSphere/dividend-calculator.html">我有本金<small>每月能領多少、本金怎麼變</small></a>
+      <a href="/MOMO_FinSphere/monthly-income.html" aria-current="page">我有目標<small>每月想領多少、要多少本金</small></a>
+    </nav>
     <p class="eyebrow">本金需求試算</p>
     <h1>想每月領 3 萬，需要多少本金？</h1>
     <p class="answer">以年化總報酬 6% 估算：如果<b>只花報酬、本金不動</b>，每月 3 萬約需 <b>600 萬元</b>；如果<b>允許本金在 20 年內用完</b>，約需 <b>419 萬元</b>。很多人用「每年 36 萬 ÷ 配息率」回推，配息率 8% 看起來只要 450 萬，但配息率不等於報酬率：當配息率高於總報酬，差額會從本金支出，20 年後本金約剩 300 萬元、每月配息也降到約 2 萬元。</p>
