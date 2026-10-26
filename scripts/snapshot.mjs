@@ -52,10 +52,14 @@ const SERIES = [
   { id: 'M2_YOY', series: 'M2SL', type: 'yoy', name: '美國M2年增', dp: 1, cmp: '月',
     tip: '市場資金水位的變化',
     tag: (v) => (v < 0 ? ['資金收縮', 1] : v < 3 ? ['溫和成長', 0] : ['資金擴張', 0]) },
-  { id: 'BAMLH0A0HYM2', series: 'BAMLH0A0HYM2', type: 'daily', lookbackDays: 30, name: '高收益債利差', dp: 2, cmp: '月', page: 'indicators/hy-spread.html',
-    tip: '信用風險溫度，越高代表市場越擔心違約',
-    tag: (v) => (v >= 5 ? ['風險偏高', 1] : v >= 3.5 ? ['正常區間', 0] : ['風險偏低', 0]) },
+  // 注意：只放 FRED 標示為「Public Domain」的數列。高收益債利差（BAMLH0A0HYM2）版權屬 ICE，需事先授權，不可公開
+  { id: 'UNRATE', series: 'UNRATE', type: 'monthly', name: '美國失業率', dp: 1, cmp: '月', page: 'indicators/fed-rate.html',
+    tip: '美國勞工統計局公布的失業率，聯準會決定利率的重要依據',
+    tag: (v) => (v >= 5 ? ['偏高', 1] : v >= 4 ? ['溫和', 0] : ['偏低', 0]) },
 ];
+
+// FRED API 使用條款要求的註明（https://fred.stlouisfed.org/docs/api/terms_of_use.html）
+const FRED_NOTICE = '資料來源：FRED（聖路易聯邦準備銀行）｜This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.｜<a href="https://fred.stlouisfed.org/legal/#api" target="_blank" rel="noopener" style="color:inherit">FRED® API 使用條款</a>';
 
 const STAGE_ZH = { Recession: '衰退區', Slowdown: '放緩區', Growth: '成長區', Heat: '過熱區' };
 
@@ -84,6 +88,10 @@ async function fetchFred() {
       const obs = (await res.json()).observations
         .filter((o) => o.value !== '.')
         .map((o) => ({ date: o.date, v: Number(o.value) })); // 由新到舊
+      if (s.type === 'monthly') {
+        if (obs.length < 2) return null;
+        return { id: s.id, value: obs[0].v, prev: obs[1].v, date: obs[0].date.slice(0, 7) };
+      }
       if (s.type === 'yoy') {
         if (obs.length < 14) return null;
         const yoy = (k) => (obs[k].v / obs[k + 12].v - 1) * 100;
@@ -216,6 +224,7 @@ function macroHtml(items, asOf) {
           <div class="macro-grid" id="macro-grid">
 ${cells}
           </div>
+          <p style="margin:8px 0 0;font-size:11.5px;line-height:1.6;color:#7a8296">${FRED_NOTICE}</p>
         </div>`;
 }
 
@@ -235,7 +244,7 @@ function llmsText(items, mcs, cmp, asOf) {
     const tag = m.tag ? `，${m.tag(it.value, it.prev)[0]}` : '';
     return `- ${m.name}：${it.value.toFixed(m.dp)}%${diff}${tag}｜資料日期 ${it.date}｜${m.tip}`;
   });
-  const out = [`資料更新：${asOf}（來源：FRED，聖路易聯邦準備銀行）`, '', ...lines, ''];
+  const out = [`資料更新：${asOf}（來源：FRED，聖路易聯邦準備銀行；This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.）`, '', ...lines, ''];
   if (mcs) out.push(`- MCS 景氣分數（短週期）：${mcs.score} 分，${STAGE_ZH[mcs.stage] || ''}（${mcs.stage}）｜${mcs.asOf || asOf}`);
   out.push(`- 景氣羅盤（長週期模型）：${cmp.season}，綜合評分 ${cmp.score}｜模型位置 ${cmp.label}`);
   if (INDICATORS.length) {

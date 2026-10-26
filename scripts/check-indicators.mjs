@@ -7,7 +7,7 @@ const SERIES = [
   ['DGS10',        '美債10年殖利率', 'daily'],
   ['DGS2',         '美債2年殖利率', 'daily'],
   ['T10Y2Y',       '10年−2年利差', 'daily'],
-  ['BAMLH0A0HYM2', '高收益債利差', 'daily'],
+  ['UNRATE',       '美國失業率', 'monthly'],
   ['DFEDTARU',     '聯邦基金利率上限', 'daily'],
   ['DFEDTARL',     '聯邦基金利率下限', 'daily'],
   ['CPIAUCSL',     'CPI（算年增率用）', 'monthly'],

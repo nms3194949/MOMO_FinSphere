@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <title>高收益債利差是什麼？最新數據與近一年走勢｜MOMO財商智庫</title>
-  <meta name="description" content="美國高收益債（非投資等級債）利差最新數值、近一年走勢與月度數據，每天自動更新。白話說明信用利差是什麼、利差擴大或收斂代表什麼，以及對高收益債基金與配息基金淨值的影響。" />
+  <title>高收益債利差是什麼？擴大、收斂代表什麼｜MOMO財商智庫</title>
+  <meta name="description" content="白話說明美國高收益債（非投資等級債）利差是什麼、利差擴大或收斂代表什麼，以及對高收益債基金與配息基金淨值的影響，並附最新數值的官方查詢方式。" />
   <link rel="canonical" href="https://nms3194949.github.io/MOMO_FinSphere/indicators/hy-spread.html" />
   <meta name="robots" content="index,follow" />
   <meta name="author" content="明哲MOMO" />
@@ -18,8 +18,8 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="MOMO財商智庫" />
   <meta property="og:locale" content="zh_TW" />
-  <meta property="og:title" content="高收益債利差：最新數據與近一年走勢｜MOMO財商智庫" />
-  <meta property="og:description" content="高收益債利差每天自動更新，附近一年走勢、月度數據，以及對高收益債基金的影響。" />
+  <meta property="og:title" content="高收益債利差是什麼？擴大、收斂代表什麼｜MOMO財商智庫" />
+  <meta property="og:description" content="信用風險的溫度計：白話說明高收益債利差，以及它對高收益債基金與配息基金的影響。" />
   <meta property="og:url" content="https://nms3194949.github.io/MOMO_FinSphere/indicators/hy-spread.html" />
   <meta property="og:image" content="https://nms3194949.github.io/og-default.png" />
 
@@ -30,7 +30,7 @@
     {
       "@type": "WebPage",
       "@id": "https://nms3194949.github.io/MOMO_FinSphere/indicators/hy-spread.html#webpage",
-      "name": "高收益債利差是什麼？現在多少？",
+      "name": "高收益債利差是什麼？擴大、收斂代表什麼",
       "url": "https://nms3194949.github.io/MOMO_FinSphere/indicators/hy-spread.html",
       "inLanguage": "zh-Hant-TW",
       "dateModified": "2026-10-22",
@@ -53,27 +53,6 @@
           "High Yield Spread",
           "BAMLH0A0HYM2"
         ]
-      }
-    },
-    {
-      "@type": "Dataset",
-      "name": "美國高收益債利差（近一年日資料）",
-      "description": "ICE BofA 美國高收益債指數的選擇權調整後利差（OAS），代表高收益債相對美國公債多給的收益，取自 FRED，每日自動更新。",
-      "url": "https://nms3194949.github.io/MOMO_FinSphere/indicators/hy-spread.html",
-      "isBasedOn": [
-        "https://fred.stlouisfed.org/series/BAMLH0A0HYM2"
-      ],
-      "creator": {
-        "@type": "Organization",
-        "name": "ICE Data Indices, LLC（經由 FRED 發布）"
-      },
-      "variableMeasured": "ICE BofA US High Yield Index Option-Adjusted Spread（百分點）",
-      "temporalCoverage": "2025-10-23/2026-10-22",
-      "dateModified": "2026-10-22",
-      "distribution": {
-        "@type": "DataDownload",
-        "encodingFormat": "application/json",
-        "contentUrl": "https://nms3194949.github.io/MOMO_FinSphere/data/indicators/hy-spread.json"
       }
     },
     {
@@ -127,7 +106,7 @@
           "name": "這頁的數據從哪裡來？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "數據來自 FRED 發布的 ICE BofA 美國高收益債指數「選擇權調整後利差」（OAS），每天自動更新。FRED 上的這組數據只提供近幾年的歷史資料，頁面中較早期的歷史時點來自公開市場紀錄。"
+            "text": "常見的參考數據是 ICE BofA 美國高收益債指數的「選擇權調整後利差」（OAS，代號 BAMLH0A0HYM2），可在 FRED（美國聖路易聯邦準備銀行經濟資料庫）免費查詢。這組數據的版權屬於 ICE Data Indices，需經授權才能轉載，所以本頁只做觀念說明，不轉載數值；頁面中的歷史時點為公開市場紀錄的約略值。"
           }
         }
       ]
@@ -214,6 +193,11 @@
 
     .formula { display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--gold-bg); color: var(--ink); font-weight: 700; font-size: 15px; margin: 2px 0 12px; }
     .timeline li { margin: 8px 0; }
+    .howto { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 12px; padding: 14px 18px; margin: 4px 0 8px; }
+    .howto .k { font-weight: 800; color: var(--ink); margin: 0 0 4px; }
+    .howto .btn { display: inline-block; margin: 2px 0 8px; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 700; font-size: 14.5px; text-decoration: none; }
+    .howto .btn:hover { background: var(--gold); }
+    .howto .note { margin: 0; }
 
     .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
     .faq summary { cursor: pointer; font-weight: 700; }
@@ -249,68 +233,17 @@
   <main class="wrap">
     <nav class="crumbs" aria-label="麵包屑"><a href="/MOMO_FinSphere/">MOMO財商智庫</a> › <a href="/MOMO_FinSphere/indicators/">經濟指標</a> › 高收益債利差</nav>
     <p class="eyebrow">經濟指標｜信用</p>
-    <h1>高收益債利差是什麼？現在多少？</h1>
+    <h1>高收益債利差是什麼？擴大、收斂代表什麼</h1>
 
-    <!-- 以下 SNAP 區塊由每日快照（scripts/indicators.mjs）自動更新，請勿手動修改 -->
-    <!-- SNAP:IND_ANSWER:START -->
-      <p class="answer">截至 <time datetime="2026-10-22">2026/10/22</time>，美國高收益債利差為 <b>3.40 個百分點</b>，較一個月前上升 0.72 個百分點，較一年前上升 0.39 個百分點，以長期歷史來看屬於<b>偏低</b>的水準。近一年最高 3.46（2026/03/30）、最低 2.60（2026/08/28）。</p>
-<!-- SNAP:IND_ANSWER:END -->
-    <p class="updated">資料來源：FRED｜最後更新：<time datetime="2026-10-22" id="indDate">2026/10/22</time>｜每天自動更新</p>
+      <p class="answer">高收益債利差是<b>高收益債比美國公債多給的利息</b>，可以把它想成「信用風險的溫度計」：利差擴大，代表市場越擔心企業違約；利差收斂，代表市場對企業信用比較放心。長期平均大約在 <b>5 個百分點</b>左右。</p>
+    <p class="updated">本頁為觀念說明，不提供即時數值。</p>
 
-    <!-- SNAP:IND_STATS:START -->
-      <div class="stats">
-        <div class="stat main"><div class="k">最新</div><div class="v">3.40<small> 個百分點</small></div><div class="sub">資料日期 2026/10/22</div></div>
-        <div class="stat up"><div class="k">較一個月前</div><div class="v">+0.72<small> 個百分點</small></div><div class="sub">約 30 天</div></div>
-        <div class="stat up"><div class="k">較一年前</div><div class="v">+0.39<small> 個百分點</small></div><div class="sub">約 365 天</div></div>
-        <div class="stat"><div class="k">近一年區間</div><div class="v">2.60～3.46</div><div class="sub">低 8/28・高 3/30</div></div>
-      </div>
-<!-- SNAP:IND_STATS:END -->
-
-    <h2>近一年走勢</h2>
-    <!-- SNAP:IND_CHART:START -->
-      <figure class="chart">
-        <svg viewBox="0 0 960 320" role="img" aria-labelledby="chartTitle chartDesc" preserveAspectRatio="none">
-          <title id="chartTitle">美國高收益債利差近一年走勢</title>
-          <desc id="chartDesc">2025/10/23 至 2026/10/22，最高 3.46（2026/03/30），最低 2.60（2026/08/28），最新 3.40。</desc>
-          <line x1="84" x2="936" y1="276.0" y2="276.0" class="g"/><text x="76" y="280.0" class="yl">2.50</text>
-          <line x1="84" x2="936" y1="225.6" y2="225.6" class="g"/><text x="76" y="229.6" class="yl">2.75</text>
-          <line x1="84" x2="936" y1="175.2" y2="175.2" class="g"/><text x="76" y="179.2" class="yl">3.00</text>
-          <line x1="84" x2="936" y1="124.8" y2="124.8" class="g"/><text x="76" y="128.8" class="yl">3.25</text>
-          <line x1="84" x2="936" y1="74.4" y2="74.4" class="g"/><text x="76" y="78.4" class="yl">3.50</text>
-          <line x1="84" x2="936" y1="24.0" y2="24.0" class="g"/><text x="76" y="28.0" class="yl">3.75</text>
-          <path d="M84.0,183.3L86.3,199.4L93.4,215.5L95.7,211.5L98.0,223.6L100.4,205.4L102.7,187.3L109.7,167.1L112.1,149.0L114.4,165.1L116.8,149.0L119.1,145.0L126.1,171.2L128.5,171.2L130.8,171.2L133.2,157.1L135.5,161.1L142.5,149.0L144.9,134.9L147.2,140.9L149.5,140.9L151.9,136.9L158.9,145.0L161.2,155.0L163.6,175.2L165.9,175.2L168.3,185.3L172.9,191.3L175.3,187.3L177.6,191.3L180.0,197.4L182.3,199.4L184.6,205.4L191.7,197.4L194.0,197.4L196.4,193.3L198.7,199.4L201.0,193.3L208.1,193.3L210.4,179.2L212.7,177.2L215.1,185.3L217.4,195.4L224.4,199.4L226.8,209.5L229.1,207.5L233.8,203.4L240.8,201.4L243.2,207.5L245.5,213.5L250.2,209.5L257.2,213.5L259.5,217.5L261.9,217.5L264.2,223.6L266.6,227.6L273.6,227.6L275.9,225.6L278.3,223.6L280.6,233.7L283.0,245.8L290.0,245.8L292.3,229.6L294.7,237.7L297.0,247.8L299.3,239.7L306.4,237.7L308.7,233.7L311.0,231.6L313.4,221.6L315.7,215.5L318.1,199.4L322.7,213.5L325.1,205.4L327.4,203.4L329.8,181.2L332.1,201.4L339.1,207.5L341.5,203.4L343.8,207.5L346.2,191.3L348.5,185.3L355.5,187.3L357.9,187.3L360.2,203.4L362.5,199.4L364.9,203.4L371.9,185.3L374.2,181.2L376.6,187.3L378.9,179.2L381.3,155.0L383.6,151.0L388.3,169.2L390.6,159.1L393.0,181.2L395.3,175.2L397.6,149.0L404.7,136.9L407.0,163.1L409.4,157.1L411.7,140.9L414.0,118.8L421.1,120.8L423.4,130.8L425.7,134.9L428.1,120.8L430.4,126.8L437.4,136.9L439.8,136.9L442.1,140.9L444.5,132.9L446.8,90.5L453.8,82.5L456.2,118.8L458.5,142.9L460.8,140.9L463.2,149.0L470.2,165.1L472.5,151.0L474.9,187.3L477.2,195.4L479.6,187.3L486.6,185.3L488.9,207.5L491.3,205.4L493.6,203.4L496.0,209.5L503.0,201.4L505.3,205.4L507.7,207.5L510.0,203.4L512.3,203.4L519.4,207.5L521.7,205.4L524.0,211.5L526.4,209.5L528.7,221.6L535.7,219.6L538.1,221.6L540.4,225.6L542.8,217.5L545.1,213.5L552.1,217.5L554.5,211.5L556.8,211.5L559.2,223.6L561.5,215.5L568.5,209.5L570.9,203.4L573.2,215.5L575.5,219.6L577.9,227.6L584.9,227.6L587.2,231.6L589.6,233.7L591.9,231.6L594.3,231.6L598.9,227.6L601.3,231.6L603.6,233.7L606.0,225.6L608.3,227.6L610.6,223.6L617.7,225.6L620.0,219.6L622.4,215.5L624.7,219.6L627.0,233.7L634.1,243.7L636.4,233.7L638.7,249.8L641.1,243.7L643.4,243.7L650.4,245.8L652.8,233.7L655.1,223.6L657.5,219.6L659.8,209.5L666.8,215.5L669.2,225.6L671.5,227.6L673.8,225.6L676.2,227.6L683.2,231.6L685.5,241.7L687.9,235.7L690.2,235.7L692.6,237.7L699.6,237.7L701.9,231.6L704.3,233.7L706.6,233.7L709.0,229.6L716.0,237.7L718.3,237.7L720.7,239.7L723.0,221.6L725.3,217.5L732.4,213.5L734.7,207.5L737.0,201.4L739.4,207.5L741.7,205.4L748.7,219.6L751.1,229.6L753.4,225.6L755.8,233.7L758.1,235.7L765.1,235.7L767.5,231.6L769.8,233.7L772.2,233.7L774.5,241.7L781.5,235.7L783.9,225.6L786.2,229.6L788.5,225.6L790.9,235.7L797.9,237.7L800.2,235.7L802.6,241.7L804.9,249.8L807.3,255.8L814.3,249.8L816.6,245.8L819.0,243.7L821.3,245.8L823.6,239.7L830.7,239.7L833.0,241.7L835.4,233.7L837.7,235.7L840.0,245.8L847.1,233.7L849.4,223.6L851.7,235.7L854.1,235.7L856.4,239.7L863.4,243.7L865.8,239.7L868.1,229.6L870.5,215.5L872.8,189.3L879.8,171.2L882.2,159.1L884.5,151.0L886.8,126.8L889.2,155.0L896.2,151.0L898.5,169.2L900.9,157.1L903.2,145.0L905.6,153.0L912.6,153.0L914.9,142.9L917.3,124.8L919.6,128.8L922.0,112.7L929.0,116.7L931.3,108.7L933.7,120.8L936.0,94.6L936.0,276.0L84.0,276.0Z" class="a"/><path d="M84.0,183.3L86.3,199.4L93.4,215.5L95.7,211.5L98.0,223.6L100.4,205.4L102.7,187.3L109.7,167.1L112.1,149.0L114.4,165.1L116.8,149.0L119.1,145.0L126.1,171.2L128.5,171.2L130.8,171.2L133.2,157.1L135.5,161.1L142.5,149.0L144.9,134.9L147.2,140.9L149.5,140.9L151.9,136.9L158.9,145.0L161.2,155.0L163.6,175.2L165.9,175.2L168.3,185.3L172.9,191.3L175.3,187.3L177.6,191.3L180.0,197.4L182.3,199.4L184.6,205.4L191.7,197.4L194.0,197.4L196.4,193.3L198.7,199.4L201.0,193.3L208.1,193.3L210.4,179.2L212.7,177.2L215.1,185.3L217.4,195.4L224.4,199.4L226.8,209.5L229.1,207.5L233.8,203.4L240.8,201.4L243.2,207.5L245.5,213.5L250.2,209.5L257.2,213.5L259.5,217.5L261.9,217.5L264.2,223.6L266.6,227.6L273.6,227.6L275.9,225.6L278.3,223.6L280.6,233.7L283.0,245.8L290.0,245.8L292.3,229.6L294.7,237.7L297.0,247.8L299.3,239.7L306.4,237.7L308.7,233.7L311.0,231.6L313.4,221.6L315.7,215.5L318.1,199.4L322.7,213.5L325.1,205.4L327.4,203.4L329.8,181.2L332.1,201.4L339.1,207.5L341.5,203.4L343.8,207.5L346.2,191.3L348.5,185.3L355.5,187.3L357.9,187.3L360.2,203.4L362.5,199.4L364.9,203.4L371.9,185.3L374.2,181.2L376.6,187.3L378.9,179.2L381.3,155.0L383.6,151.0L388.3,169.2L390.6,159.1L393.0,181.2L395.3,175.2L397.6,149.0L404.7,136.9L407.0,163.1L409.4,157.1L411.7,140.9L414.0,118.8L421.1,120.8L423.4,130.8L425.7,134.9L428.1,120.8L430.4,126.8L437.4,136.9L439.8,136.9L442.1,140.9L444.5,132.9L446.8,90.5L453.8,82.5L456.2,118.8L458.5,142.9L460.8,140.9L463.2,149.0L470.2,165.1L472.5,151.0L474.9,187.3L477.2,195.4L479.6,187.3L486.6,185.3L488.9,207.5L491.3,205.4L493.6,203.4L496.0,209.5L503.0,201.4L505.3,205.4L507.7,207.5L510.0,203.4L512.3,203.4L519.4,207.5L521.7,205.4L524.0,211.5L526.4,209.5L528.7,221.6L535.7,219.6L538.1,221.6L540.4,225.6L542.8,217.5L545.1,213.5L552.1,217.5L554.5,211.5L556.8,211.5L559.2,223.6L561.5,215.5L568.5,209.5L570.9,203.4L573.2,215.5L575.5,219.6L577.9,227.6L584.9,227.6L587.2,231.6L589.6,233.7L591.9,231.6L594.3,231.6L598.9,227.6L601.3,231.6L603.6,233.7L606.0,225.6L608.3,227.6L610.6,223.6L617.7,225.6L620.0,219.6L622.4,215.5L624.7,219.6L627.0,233.7L634.1,243.7L636.4,233.7L638.7,249.8L641.1,243.7L643.4,243.7L650.4,245.8L652.8,233.7L655.1,223.6L657.5,219.6L659.8,209.5L666.8,215.5L669.2,225.6L671.5,227.6L673.8,225.6L676.2,227.6L683.2,231.6L685.5,241.7L687.9,235.7L690.2,235.7L692.6,237.7L699.6,237.7L701.9,231.6L704.3,233.7L706.6,233.7L709.0,229.6L716.0,237.7L718.3,237.7L720.7,239.7L723.0,221.6L725.3,217.5L732.4,213.5L734.7,207.5L737.0,201.4L739.4,207.5L741.7,205.4L748.7,219.6L751.1,229.6L753.4,225.6L755.8,233.7L758.1,235.7L765.1,235.7L767.5,231.6L769.8,233.7L772.2,233.7L774.5,241.7L781.5,235.7L783.9,225.6L786.2,229.6L788.5,225.6L790.9,235.7L797.9,237.7L800.2,235.7L802.6,241.7L804.9,249.8L807.3,255.8L814.3,249.8L816.6,245.8L819.0,243.7L821.3,245.8L823.6,239.7L830.7,239.7L833.0,241.7L835.4,233.7L837.7,235.7L840.0,245.8L847.1,233.7L849.4,223.6L851.7,235.7L854.1,235.7L856.4,239.7L863.4,243.7L865.8,239.7L868.1,229.6L870.5,215.5L872.8,189.3L879.8,171.2L882.2,159.1L884.5,151.0L886.8,126.8L889.2,155.0L896.2,151.0L898.5,169.2L900.9,157.1L903.2,145.0L905.6,153.0L912.6,153.0L914.9,142.9L917.3,124.8L919.6,128.8L922.0,112.7L929.0,116.7L931.3,108.7L933.7,120.8L936.0,94.6" class="l"/>
-          <circle cx="453.8" cy="82.5" r="3.5" class="hi"/><circle cx="807.3" cy="255.8" r="3.5" class="lo"/>
-          <circle cx="936.0" cy="94.6" r="5" class="last"/>
-          <text x="105.1" y="306" class="xl">11月</text><text x="247.8" y="306" class="xl">2026/1</text><text x="385.9" y="306" class="xl">3月</text><text x="528.7" y="306" class="xl">5月</text><text x="671.5" y="306" class="xl">7月</text><text x="816.6" y="306" class="xl">9月</text>
-        </svg>
-        <figcaption>單位：百分點｜2025/10/23–2026/10/22｜● 最新 3.40　▲ 最高 3.46　▼ 最低 2.60｜資料來源：FRED</figcaption>
-      </figure>
-<!-- SNAP:IND_CHART:END -->
-
-    <h2>近 12 個月數據</h2>
-    <!-- SNAP:IND_TABLE:START -->
-      <div class="table-wrap">
-        <table class="mtable">
-          <caption>美國高收益債利差：近 12 個月月底值（較上月單位：百分點）</caption>
-          <thead><tr><th>月份</th><th>月底值</th><th>較上月</th></tr></thead>
-          <tbody>
-            <tr><td>2026/10（至10/22）</td><td>3.40</td><td class="up">+0.28</td></tr>
-            <tr><td>2026/09</td><td>3.12</td><td class="up">+0.49</td></tr>
-            <tr><td>2026/08</td><td>2.63</td><td class="down">−0.22</td></tr>
-            <tr><td>2026/07</td><td>2.85</td><td class="up">+0.10</td></tr>
-            <tr><td>2026/06</td><td>2.75</td><td class="up">+0.01</td></tr>
-            <tr><td>2026/05</td><td>2.74</td><td class="down">−0.09</td></tr>
-            <tr><td>2026/04</td><td>2.83</td><td class="down">−0.45</td></tr>
-            <tr><td>2026/03</td><td>3.28</td><td class="up">+0.16</td></tr>
-            <tr><td>2026/02</td><td>3.12</td><td class="up">+0.24</td></tr>
-            <tr><td>2026/01</td><td>2.88</td><td class="up">+0.07</td></tr>
-            <tr><td>2025/12</td><td>2.81</td><td class="down">−0.11</td></tr>
-            <tr><td>2025/11</td><td>2.92</td><td class="down">−0.02</td></tr>
-          </tbody>
-        </table>
-      </div>
-<!-- SNAP:IND_TABLE:END -->
-    <p class="note">月底值為該月最後一個交易日的利差（單位：百分點）。</p>
+    <div class="howto">
+      <p class="k">想看最新數值？</p>
+      <p>這組數據的版權屬於 ICE Data Indices，需經授權才能轉載，所以本站不放數值。可以到 FRED 免費查詢最新數據與走勢圖：</p>
+      <a class="btn" href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2" rel="noopener" target="_blank">到 FRED 查看高收益債利差 →</a>
+      <p class="note">FRED 是美國聖路易聯邦準備銀行的經濟資料庫；代號 BAMLH0A0HYM2。</p>
+    </div>
 
     <h2>高收益債利差是什麼？</h2>
     <h3>1. 先用借錢來想：信用比較差，就要多付一點利息</h3>
@@ -349,7 +282,7 @@
       <li><b>2008 年底｜一度超過 20 個百分點</b>：金融海嘯期間，市場極度擔心企業倒閉，利差急速擴大。</li>
       <li><b>2020 年 3 月｜約 10 個百分點以上</b>：新冠疫情衝擊，利差在幾週內大幅擴大，之後隨著央行救市快速回落。</li>
       <li><b>長期平均｜約 5 個百分點左右</b>：可以當作判斷目前水準偏高或偏低的參考。</li>
-      <li><b>近一年</b>：見上方走勢圖與數據表，每天自動更新。</li>
+      <li><b>最新數值</b>：可到 <a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2" rel="noopener" target="_blank">FRED</a> 查詢。</li>
     </ul>
 
     <section class="faq" aria-labelledby="faq-title">
@@ -357,7 +290,7 @@
       <details><summary>高收益債利差擴大代表什麼？</summary><p>代表市場比較擔心企業違約，投資人要求更高的收益才願意持有高收益債。通常出現在景氣轉弱或市場恐慌時，這時高收益債基金的淨值多半會下跌。</p></details>
       <details><summary>利差很低，代表適合買高收益債嗎？</summary><p>不一定。利差低代表市場樂觀，但也代表承擔信用風險換到的額外收益比較少；如果之後利差擴大，淨值下跌的空間也比較大。是否適合，要看資金用途、持有時間與能承受的波動。</p></details>
       <details><summary>高收益債和投資等級債差在哪？</summary><p>差在發行公司的信用評等。投資等級債的發行人信用較好、違約機率較低，利息也比較低；高收益債（非投資等級債）信用較差，所以要給比較高的利息，淨值受景氣和市場情緒的影響也比較大。</p></details>
-      <details><summary>這頁的數據從哪裡來？</summary><p>數據來自 FRED 發布的 ICE BofA 美國高收益債指數「選擇權調整後利差」（OAS），每天自動更新。FRED 上的這組數據只提供近幾年的歷史資料，頁面中較早期的歷史時點來自公開市場紀錄。</p></details>
+      <details><summary>這頁的數據從哪裡來？</summary><p>常見的參考數據是 ICE BofA 美國高收益債指數的「選擇權調整後利差」（OAS，代號 BAMLH0A0HYM2），可在 FRED 免費查詢。這組數據的版權屬於 ICE Data Indices，需經授權才能轉載，所以本頁只做觀念說明，不轉載數值；頁面中的歷史時點為公開市場紀錄的約略值。</p></details>
     </section>
 
     <h2>延伸閱讀</h2>
@@ -368,7 +301,7 @@
       <a href="/MOMO_FinSphere/dividend-calculator.html"><span class="t">工具・試算</span><span class="h">配息現金流試算：配息 + 淨值變化一起算</span></a>
     </div>
 
-    <p class="src">資料來源：<a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2" rel="noopener" target="_blank">FRED｜ICE BofA US High Yield Index Option-Adjusted Spread（BAMLH0A0HYM2）</a>，指數由 ICE Data Indices 編製。本頁數據與說明僅供教育參考，不構成任何投資建議。<br />原始數據下載：<a href="/MOMO_FinSphere/data/indicators/hy-spread.json">hy-spread.json</a></p>
+    <p class="src">延伸查詢：<a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2" rel="noopener" target="_blank">FRED｜ICE BofA US High Yield Index Option-Adjusted Spread（BAMLH0A0HYM2）</a>。指數與數據版權屬 ICE Data Indices, LLC，本頁不轉載其數值。歷史時點為約略值，僅供教育參考，不構成任何投資建議。</p>
   </main>
 </body>
 </html>

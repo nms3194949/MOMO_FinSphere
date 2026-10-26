@@ -654,8 +654,8 @@
                       tag: function (v) { return v >= 3 ? ['高於目標', 1] : v > 2.3 ? ['略高於目標', 0] : ['接近目標', 0]; } },
       M2_YOY:       { name: '美國M2年增', unit: '%', dp: 1, cmp: '月', tip: '市場資金水位的變化',
                       tag: function (v) { return v < 0 ? ['資金收縮', 1] : v < 3 ? ['溫和成長', 0] : ['資金擴張', 0]; } },
-      BAMLH0A0HYM2: { name: '高收益債利差', unit: '%', dp: 2, cmp: '月', tip: '信用風險溫度，越高代表市場越擔心違約',
-                      tag: function (v) { return v >= 5 ? ['風險偏高', 1] : v >= 3.5 ? ['正常區間', 0] : ['風險偏低', 0]; } }
+      UNRATE:       { name: '美國失業率', unit: '%', dp: 1, cmp: '月', tip: '美國勞工統計局公布的失業率，聯準會決定利率的重要依據',
+                      tag: function (v) { return v >= 5 ? ['偏高', 1] : v >= 4 ? ['溫和', 0] : ['偏低', 0]; } }
     };
 
     function renderMacro(data) {
@@ -682,7 +682,7 @@
     function loadMacro() {
       // 已有每日快照寫入的靜態數據，就不再重抓
       if ($('macro-grid').children.length) return;
-      var KEY = 'momo_macro_v1';
+      var KEY = 'momo_macro_v2';
       try { var c = JSON.parse(localStorage.getItem(KEY) || 'null'); if (c) renderMacro(c); } catch (e) {}
       var GAS_URL = 'https://script.google.com/macros/s/AKfycbwZigk7WKYouppEKrx6sAS6sepldPt4qnNHGj4JOaizocceyJ5HR9cV78sW0Db5vTBf4w/exec';
       fetch(GAS_URL + '?api=getMacro')

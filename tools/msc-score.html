@@ -217,7 +217,7 @@
       </div>
       <div class="factor-bar"><div class="factor-bar-fill" id="creditBar"></div></div>
       <div class="factor-meta" id="creditMeta">
-        <span>HY Spread：--</span>
+        <span>信用利差：僅用於計分</span>
       </div>
       <div class="factor-summary" id="creditSummary"></div>
     </div>
@@ -504,7 +504,7 @@
 
     // 內容格式化 (只顯示有意義的數據)
     if (factorKey === 'credit') {
-      metaEl.innerHTML = `<span>HY Spread：${factor.hy_spread?.toFixed(2) ?? '--'}%</span>`;
+      metaEl.innerHTML = `<span>信用利差：僅用於計分</span>`; // 高收益債利差版權屬 ICE，不公開數值
     } else if (factorKey === 'rates') {
       metaEl.innerHTML = `<span>10Y：${factor.us10y?.toFixed(2) ?? '--'}%</span><span>Curve：${factor.ycc?.toFixed(2) ?? '--'}%</span>`;
     } else if (factorKey === 'macro') {
@@ -691,7 +691,7 @@
       if(!data.factors.liquidity) {
         data.factors.liquidity = { score: 16, change: 1.5, net_liq: 6.35, net_liq_note: "資金寬鬆", cu_au: 4.15, cu_au_note: "溫和復甦", permits: 1.52, permits_note: "需求持穩" };
       }
-      if(!data.factors.credit) data.factors.credit = { score: 18, change: 1.2, hy_spread: 3.17, ig_spread: 0.84 };
+      if(!data.factors.credit) data.factors.credit = { score: 18, change: 1.2, hy_spread: null, ig_spread: null };
       if(!data.factors.rates) data.factors.rates = { score: 10, change: -0.2, us10y: 4.12, ycc: 0.54 };
       if(!data.factors.equity) data.factors.equity = { score: 13, change: 2.5, sp500_momo_6m: 0.136, sp500_today: 6642 };
       if(!data.factors.eps) data.factors.eps = { score: 15, change: 0, eps_yoy: 0.11 };

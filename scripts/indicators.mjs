@@ -82,30 +82,13 @@ export const INDICATORS = [
       chg: 'T10Y2Y',
     },
   },
-  {
-    slug: 'hy-spread',
-    name: '美國高收益債利差',
-    short: '高收益債利差',
-    main: 'BAMLH0A0HYM2',
-    fetch: ['BAMLH0A0HYM2'],
-    dp: 2,
-    answer: (x) => {
-      const a = x.BAMLH0A0HYM2;
-      return `截至 ${t(a.latest.date)}，美國高收益債利差為 <b>${f(a.latest.v, 2)} 個百分點</b>`
-        + `，較一個月前${dirText(a.d1m, 2)}，較一年前${dirText(a.d1y, 2)}，以長期歷史來看屬於<b>${hyState(a.latest.v)}</b>的水準。`
-        + `近一年最高 ${f(a.hi.v, 2)}（${fmtDate(a.hi.date)}）、最低 ${f(a.lo.v, 2)}（${fmtDate(a.lo.date)}）。`;
-    },
-    stats: (x) => defaultStats(x.BAMLH0A0HYM2, 2, ' 個百分點'),
-    hub: (x) => ({ value: `${f(x.BAMLH0A0HYM2.latest.v, 2)}`, unit: '個百分點', tag: `水準${hyState(x.BAMLH0A0HYM2.latest.v)}`, warn: x.BAMLH0A0HYM2.latest.v >= 5, desc: '信用風險的溫度計，利差擴大代表市場越擔心企業違約。' }),
-    chart: { lines: [{ id: 'BAMLH0A0HYM2', label: '高收益債利差' }] },
-    table: { cols: [{ th: '月底值', id: 'BAMLH0A0HYM2', fmt: (v) => f(v, 2) }], chg: 'BAMLH0A0HYM2' },
-  },
+  // 高收益債利差（BAMLH0A0HYM2）版權屬 ICE，需事先授權才能公開，所以 hy-spread.html 改為純觀念頁，不自動更新數據
   {
     slug: 'fed-rate',
     name: '美國聯邦基金利率與通膨',
     short: '聯邦基金利率',
     main: 'DFEDTARU',
-    fetch: ['DFEDTARU', 'DFEDTARL', 'CPIAUCSL'],
+    fetch: ['DFEDTARU', 'DFEDTARL', 'CPIAUCSL', 'UNRATE'],
     dp: 2,
     answer: (x) => {
       const u = x.DFEDTARU, l = x.DFEDTARL, c = x.CPI_YOY;
@@ -116,6 +99,7 @@ export const INDICATORS = [
         s += `最新公布的 CPI 年增率為 <b>${f(c.latest.v, 1)}%</b>（${ym(c.latest.date)}），`
           + (Math.abs(gap) < 0.3 ? '接近聯準會約 2% 的長期目標。' : gap > 0 ? '高於聯準會約 2% 的長期目標。' : '低於聯準會約 2% 的長期目標。');
       }
+      if (x.UNRATE) s += `失業率為 <b>${f(x.UNRATE.latest.v, 1)}%</b>（${ym(x.UNRATE.latest.date)}）。`;
       return s;
     },
     stats: (x) => {
@@ -124,7 +108,8 @@ export const INDICATORS = [
         card('目標區間', l ? `${f(l.latest.v, 2)}–${f(u.latest.v, 2)}<small>%</small>` : `${f(u.latest.v, 2)}<small>%</small>`, `資料日期 ${fmtDate(u.latest.date)}`, ' main'),
         card('較一年前', u.d1y == null ? '—' : `${pp(u.d1y, 2)}<small> 個百分點</small>`, '以區間上限計算', cls(u.d1y)),
         card('CPI 年增率', c ? `${f(c.latest.v, 1)}<small>%</small>` : '—', c ? `${ym(c.latest.date)}・目標約 2%` : ''),
-        card('近一年調整', `${moves(u)}<small> 次</small>`, '利率目標變動次數'),
+        x.UNRATE ? card('失業率', `${f(x.UNRATE.latest.v, 1)}<small>%</small>`, `${ym(x.UNRATE.latest.date)}・較上月 ${x.UNRATE.d1m == null ? '—' : pp(x.UNRATE.d1m, 1)}`)
+          : card('近一年調整', `${moves(u)}<small> 次</small>`, '利率目標變動次數'),
       ];
     },
     hub: (x) => ({
@@ -174,6 +159,14 @@ function sparkline(a, zero) {
   return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${z}<path d="${d}"/><circle cx="${X(ts(last.date)).toFixed(1)}" cy="${Y(last.v).toFixed(1)}" r="3"/></svg>`;
 }
 
+const HY_CARD = `        <a class="ind" href="hy-spread.html">
+          <span class="ind-name">美國高收益債利差</span>
+          <span class="ind-val" style="font-size:22px">觀念說明</span>
+          <span class="ind-meta"><span class="tag">信用風險</span></span>
+          <span class="ind-desc">信用風險的溫度計：利差擴大代表市場越擔心企業違約。數據版權屬 ICE，本站提供觀念說明，最新數值請見 FRED。</span>
+          <span class="ind-foot"><span>觀念頁</span><span class="go">看說明 →</span></span>
+        </a>`;
+
 function hubHtml(done) {
   return done.map(({ ind, page, x }) => {
     const h = ind.hub(x);
@@ -188,7 +181,7 @@ function hubHtml(done) {
           <span class="ind-desc">${h.desc}</span>
           <span class="ind-foot"><span>資料日期 <time datetime="${main.latest.date}">${fmtDate(main.latest.date)}</time></span><span class="go">看說明 →</span></span>
         </a>`;
-  }).join('\n');
+  }).join('\n') + '\n' + HY_CARD;
 }
 
 // ── 共用：分析一條數列 ────────────────────────────────────
@@ -309,7 +302,7 @@ function chartSvg(ind, x) {
           <circle cx="${X(t1).toFixed(1)}" cy="${Y(main.latest.v).toFixed(1)}" r="5" class="last"/>
           ${xl.join('')}
         </svg>
-        <figcaption>${legend}單位：${u}｜${fmtDate(main.from)}–${fmtDate(main.latest.date)}｜● 最新 ${f(main.latest.v, ind.dp)}${lines.length === 1 ? `　▲ 最高 ${f(main.hi.v, ind.dp)}　▼ 最低 ${f(main.lo.v, ind.dp)}` : ''}｜資料來源：FRED</figcaption>
+        <figcaption>${legend}單位：${u}｜${fmtDate(main.from)}–${fmtDate(main.latest.date)}｜● 最新 ${f(main.latest.v, ind.dp)}${lines.length === 1 ? `　▲ 最高 ${f(main.hi.v, ind.dp)}　▼ 最低 ${f(main.lo.v, ind.dp)}` : ''}｜資料來源：FRED（This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.）</figcaption>
       </figure>`;
 }
 
@@ -366,6 +359,7 @@ export async function runIndicators({ file, replaceBetween, setDateModified, key
         try {
           const obs = await get(id);
           if (id === 'CPIAUCSL') { const yoy = cpiYoy(obs); if (yoy.length >= 13) x.CPI_YOY = analyse(yoy); continue; }
+          if (id === 'UNRATE') { if (obs.length >= 2) { const a = analyse(obs); a.d1m = obs[obs.length - 1].v - obs[obs.length - 2].v; x.UNRATE = a; } continue; }
           if (obs.length >= 30) x[id] = analyse(obs);
         } catch (err) {
           if (id === ind.main) throw err;
