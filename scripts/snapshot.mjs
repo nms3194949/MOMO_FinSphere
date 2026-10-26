@@ -20,8 +20,8 @@ import { fileURLToPath } from 'node:url';
 import { INDICATORS, runIndicators, upsertSitemap } from './indicators.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SITE = 'https://nms3194949.github.io/MOMO_FinSphere/';
-const BLOG_RSS = 'https://nms3194949.github.io/momo-blog/rss.xml';
+const SITE = 'https://momowinwin.com/MOMO_FinSphere/';
+const BLOG_RSS = 'https://momowinwin.com/momo-blog/rss.xml';
 const MCS_API = 'https://mcs-worker.nms3194949.workers.dev?profile=balanced';
 const INDEXNOW_KEY = '152b46d40afee669f85ae0b1dbe8bdf8';
 
@@ -177,7 +177,7 @@ async function fetchPosts(limit = 4) {
     // 封面圖：讀每篇文章頁的 og:image（部落格把第一張輪播圖轉成 1080px JPEG）
     await Promise.all(posts.map(async (p) => {
       try {
-        const r = await fetch('https://nms3194949.github.io' + p.link);
+        const r = await fetch('https://momowinwin.com' + p.link);
         if (!r.ok) return;
         const page = await r.text();
         const m = page.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/) || page.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/);
@@ -302,7 +302,7 @@ async function snapshot() {
 // ── IndexNow：通知 Bing 等搜尋引擎頁面已更新 ──────────────
 async function indexNow() {
   const body = {
-    host: 'nms3194949.github.io',
+    host: 'momowinwin.com',
     key: INDEXNOW_KEY,
     keyLocation: `${SITE}${INDEXNOW_KEY}.txt`,
     urlList: [SITE, `${SITE}tools/cycle.html`, `${SITE}llms.txt`, `${SITE}indicators/`, ...INDICATORS.map((i) => `${SITE}indicators/${i.slug}.html`)],

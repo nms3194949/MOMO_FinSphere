@@ -1,6 +1,6 @@
-# 注意：搜尋引擎只讀網域根目錄的 robots.txt（https://nms3194949.github.io/robots.txt）
-# 這個檔案只是備份，實際設定請改根目錄 repo（nms3194949.github.io）
+# 注意：搜尋引擎只讀網域根目錄的 robots.txt（https://momowinwin.com/robots.txt）
+# 這個檔案只是備份，實際設定請改根目錄 repo（nms3194949.github.io，網域 momowinwin.com）
 User-agent: *
 Allow: /
 
-Sitemap: https://nms3194949.github.io/MOMO_FinSphere/sitemap.xml
+Sitemap: https://momowinwin.com/MOMO_FinSphere/sitemap.xml

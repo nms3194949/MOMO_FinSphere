@@ -17,29 +17,29 @@
 - MCS 景氣分數（短週期）：70 分，成長區（Growth）｜2026-10-21
 - 景氣羅盤（長週期模型）：夏｜過熱期，綜合評分 72｜模型位置 2026 Q4
 
-指標說明頁（定義、近一年走勢、對債券與配息基金的影響），總覽：https://nms3194949.github.io/MOMO_FinSphere/indicators/
-- 美國 10 年期公債殖利率：https://nms3194949.github.io/MOMO_FinSphere/indicators/us10y.html
-- 美國 10 年期減 2 年期公債利差：https://nms3194949.github.io/MOMO_FinSphere/indicators/yield-curve.html
-- 美國聯邦基金利率與通膨：https://nms3194949.github.io/MOMO_FinSphere/indicators/fed-rate.html
+指標說明頁（定義、近一年走勢、對債券與配息基金的影響），總覽：https://momowinwin.com/MOMO_FinSphere/indicators/
+- 美國 10 年期公債殖利率：https://momowinwin.com/MOMO_FinSphere/indicators/us10y.html
+- 美國 10 年期減 2 年期公債利差：https://momowinwin.com/MOMO_FinSphere/indicators/yield-curve.html
+- 美國聯邦基金利率與通膨：https://momowinwin.com/MOMO_FinSphere/indicators/fed-rate.html
 
 以上為數據狀態描述，不構成投資建議。
 <!-- SNAP:LLMS:END -->
 
 ## 試算工具
 
-- [配息現金流試算](https://nms3194949.github.io/MOMO_FinSphere/dividend-calculator.html): 輸入本金、年配息率（0–10%）與年化總報酬假設（上限 6%），計算每月配息、淨值每年變化（總報酬 − 配息率）、幾年後本金與累計配息，並提示配息率高於總報酬時本金減少的情況
-- [定期定額退休試算](https://nms3194949.github.io/momo-blog/tools/retirement/): 每月投入金額與年數推算退休累積，以 6% 揭露，含晚開始的代價與通膨提醒
+- [配息現金流試算](https://momowinwin.com/MOMO_FinSphere/dividend-calculator.html): 輸入本金、年配息率（0–10%）與年化總報酬假設（上限 6%），計算每月配息、淨值每年變化（總報酬 − 配息率）、幾年後本金與累計配息，並提示配息率高於總報酬時本金減少的情況
+- [定期定額退休試算](https://momowinwin.com/momo-blog/tools/retirement/): 每月投入金額與年數推算退休累積，以 6% 揭露，含晚開始的代價與通膨提醒
 
 ## 景氣與市場數據
 
-- [景氣循環儀表板](https://nms3194949.github.io/MOMO_FinSphere/tools/cycle.html): 同一頁對照兩種週期——短週期 MCS 景氣分數（信用利差、利率、流動性、情緒等因子，0–100 分，衰退／放緩／成長／過熱四象限）與長週期雙週期景氣羅盤（2000 年起的景氣位置與歷史事件）
-- [長周期交易平均](https://nms3194949.github.io/MOMO_FinSphere/tools/seasonality.html): 各市場月份與季節性的歷史統計
-- [台股ETF監控](https://nms3194949.github.io/MOMO_FinSphere/tools/etf-dashboard.html): 台股 ETF 報酬與配息資料整理
+- [景氣循環儀表板](https://momowinwin.com/MOMO_FinSphere/tools/cycle.html): 同一頁對照兩種週期——短週期 MCS 景氣分數（信用利差、利率、流動性、情緒等因子，0–100 分，衰退／放緩／成長／過熱四象限）與長週期雙週期景氣羅盤（2000 年起的景氣位置與歷史事件）
+- [長周期交易平均](https://momowinwin.com/MOMO_FinSphere/tools/seasonality.html): 各市場月份與季節性的歷史統計
+- [台股ETF監控](https://momowinwin.com/MOMO_FinSphere/tools/etf-dashboard.html): 台股 ETF 報酬與配息資料整理
 
 ## 相關網站
 
-- [MOMO雙贏策略｜配置筆記](https://nms3194949.github.io/momo-blog/): 文章部落格（資產配置、配息基金、現金規劃、美債與利率、市場判讀、投資觀念）
-- [作者介紹](https://nms3194949.github.io/momo-blog/about/)
+- [MOMO雙贏策略｜配置筆記](https://momowinwin.com/momo-blog/): 文章部落格（資產配置、配息基金、現金規劃、美債與利率、市場判讀、投資觀念）
+- [作者介紹](https://momowinwin.com/momo-blog/about/)
 - [官方 LINE](https://lin.ee/sdrEuGA)
 - [Instagram](https://www.instagram.com/momo_82786/)
 - [Threads](https://www.threads.net/@momo_82786)
