@@ -313,7 +313,31 @@
       .nav { width: 100%; margin: 0 -10px; }
       .sticky-bar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; gap: 8px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,253,248,.97); border-top: 1px solid var(--line); }
       .sticky-bar .btn { flex: 1; padding: 10px; }
+      .sticky-bar { transition: transform .25s ease; }
+      .sticky-bar.away { transform: translateY(110%); }
       body { padding-bottom: 72px; }
+      /* 配息區手機版：縮小間距、兩個總計並排，一張截圖就能完整收進來 */
+      #dividend { scroll-margin-top: 112px; }
+      #dividend .sec-head { margin-bottom: 12px; }
+      #dividend .sec-head p { margin-top: 2px; }
+      .div-list { padding: 4px 16px; }
+      .div-head { padding: 8px 0 4px; }
+      .div-row { padding: 9px 0; }
+      .div-row .a { font-size: 17px; }
+      .div-wrap { gap: 10px; }
+      .div-sum { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .div-sum > :only-child { grid-column: 1 / -1; }
+      .sum-box { padding: 14px 8px; }
+      .sum-box .k { font-size: 13px; }
+      .sum-box .v { font-size: clamp(22px, 6.4vw, 28px); }
+      #dividend .note { font-size: 12px; line-height: 1.65; margin-top: 10px; }
+      /* 5 筆以上：改成兩欄（左右各一筆），7 筆也能一張截圖收完 */
+      .div-list.many .div-head { display: none; }
+      .div-list.many #div-list-body { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; padding: 4px 0; }
+      .div-list.many .div-row { flex-direction: column; align-items: flex-start; gap: 0; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+      .div-list.many .div-row .d { font-size: 12.5px; color: var(--muted); }
+      .div-list.many .div-row .a { font-size: 17px; line-height: 1.35; }
+      .div-list.many .div-row:nth-last-child(-n+2):nth-child(odd), .div-list.many .div-row:last-child { border-bottom: none; }
     }
 
     /* 經濟數據速覽（Hero 內，精簡一列） */
@@ -640,6 +664,7 @@
             : '<div class="placeholder">本月尚無入帳紀錄</div>';
           var total = data.total || items.reduce(function (s, it) { return s + (Number(it.amount) || 0); }, 0);
           $('div-total').textContent = total ? fmt(total) : '—';
+          body.parentNode.classList.toggle('many', items.length >= 5);
           var ytd = data.ytdTotal || data.yearTotal;
           if (ytd) {
             $('div-ytd').textContent = fmt(ytd);
@@ -705,7 +730,16 @@
         .catch(function () {});
     }
 
-    function boot() { applyUtm(); loadMacro(); loadDividends(); }
+    // 手機：看配息區時先把底部 LINE 列收起來，截圖才不會被擋住
+    function watchDividend() {
+      var bar = document.querySelector('.sticky-bar'), sec = $('dividend');
+      if (!bar || !sec || !('IntersectionObserver' in window)) return;
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) { bar.classList.toggle('away', e.isIntersecting && e.intersectionRatio > 0.25); });
+      }, { threshold: [0, 0.25, 0.5] }).observe(sec);
+    }
+
+    function boot() { applyUtm(); loadMacro(); loadDividends(); watchDividend(); }
     // defer 腳本（momo-site）會在 DOMContentLoaded 之前跑完
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   })();
