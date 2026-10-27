@@ -1,6 +1,6 @@
 {
   "success": true,
-  "asOf": "2026-10-26",
+  "asOf": "2026-10-27",
   "items": [
     {
       "id": "DGS10",
@@ -18,7 +18,7 @@
       "id": "DFEDTARU",
       "value": 4,
       "prev": 3.75,
-      "date": "2026-10-26"
+      "date": "2026-10-27"
     },
     {
       "id": "CPI_YOY",
@@ -28,9 +28,9 @@
     },
     {
       "id": "M2_YOY",
-      "value": 5.66,
-      "prev": 5.41,
-      "date": "2026-08"
+      "value": 5.71,
+      "prev": 5.6,
+      "date": "2026-09"
     },
     {
       "id": "UNRATE",
@@ -40,9 +40,9 @@
     }
   ],
   "mcs": {
-    "score": 65,
+    "score": 66,
     "stage": "Growth",
-    "asOf": "2026-10-23"
+    "asOf": "2026-10-26"
   },
   "compass": {
     "score": 72,
