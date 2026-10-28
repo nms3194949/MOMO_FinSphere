@@ -1,6 +1,6 @@
 {
   "success": true,
-  "asOf": "2026-10-27",
+  "asOf": "2026-10-28",
   "items": [
     {
       "id": "DGS10",
@@ -18,7 +18,7 @@
       "id": "DFEDTARU",
       "value": 4,
       "prev": 3.75,
-      "date": "2026-10-27"
+      "date": "2026-10-28"
     },
     {
       "id": "CPI_YOY",
@@ -40,9 +40,9 @@
     }
   ],
   "mcs": {
-    "score": 68,
+    "score": 67,
     "stage": "Growth",
-    "asOf": ""
+    "asOf": "2026-10-27"
   },
   "compass": {
     "score": 72,
