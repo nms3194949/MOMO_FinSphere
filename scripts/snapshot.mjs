@@ -165,7 +165,7 @@ async function fetchPosts(limit = 4) {
       const d = new Date(pick(b, 'pubDate'));
       return {
         title: pick(b, 'title'),
-        link: pick(b, 'link').replace(/^https?:\/\/nms3194949\.github\.io/, ''),
+        link: pick(b, 'link').replace(/^https?:\/\/(nms3194949\.github\.io|momowinwin\.com)/, ''),
         desc: pick(b, 'description'),
         tag: pick(b, 'category'),
         date: isNaN(d) ? '' : new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' }).format(d),
@@ -181,7 +181,7 @@ async function fetchPosts(limit = 4) {
         if (!r.ok) return;
         const page = await r.text();
         const m = page.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/) || page.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/);
-        if (m && !/og-default/.test(m[1])) p.cover = m[1].replace(/^https?:\/\/nms3194949\.github\.io/, '');
+        if (m && !/og-default/.test(m[1])) p.cover = m[1].replace(/^https?:\/\/(nms3194949\.github\.io|momowinwin\.com)/, '');
       } catch (e) { /* 沒有封面就用文字底圖 */ }
     }));
     return posts;
