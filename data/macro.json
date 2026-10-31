@@ -1,24 +1,24 @@
 {
   "success": true,
-  "asOf": "2026-10-29",
+  "asOf": "2026-10-30",
   "items": [
     {
       "id": "DGS10",
-      "value": 5.05,
-      "prev": 5.24,
-      "date": "2026-10-28"
+      "value": 4.98,
+      "prev": 5.26,
+      "date": "2026-10-29"
     },
     {
       "id": "T10Y2Y",
-      "value": 0.37,
-      "prev": 0.37,
-      "date": "2026-10-29"
+      "value": 0.38,
+      "prev": 0.41,
+      "date": "2026-10-30"
     },
     {
       "id": "DFEDTARU",
       "value": 4,
       "prev": 3.75,
-      "date": "2026-10-29"
+      "date": "2026-10-30"
     },
     {
       "id": "CPI_YOY",
