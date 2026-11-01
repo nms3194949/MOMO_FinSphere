@@ -1,6 +1,6 @@
 {
   "success": true,
-  "asOf": "2026-10-30",
+  "asOf": "2026-10-31",
   "items": [
     {
       "id": "DGS10",
@@ -18,7 +18,7 @@
       "id": "DFEDTARU",
       "value": 4,
       "prev": 3.75,
-      "date": "2026-10-30"
+      "date": "2026-10-31"
     },
     {
       "id": "CPI_YOY",
