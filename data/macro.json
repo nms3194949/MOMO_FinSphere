@@ -1,24 +1,24 @@
 {
   "success": true,
-  "asOf": "2026-11-05",
+  "asOf": "2026-11-06",
   "items": [
     {
       "id": "DGS10",
-      "value": 4.9,
-      "prev": 5.31,
-      "date": "2026-11-04"
+      "value": 4.84,
+      "prev": 5.27,
+      "date": "2026-11-05"
     },
     {
       "id": "T10Y2Y",
-      "value": 0.38,
-      "prev": 0.48,
-      "date": "2026-11-05"
+      "value": 0.35,
+      "prev": 0.51,
+      "date": "2026-11-06"
     },
     {
       "id": "DFEDTARU",
       "value": 4,
       "prev": 3.75,
-      "date": "2026-11-05"
+      "date": "2026-11-06"
     },
     {
       "id": "CPI_YOY",
@@ -34,15 +34,15 @@
     },
     {
       "id": "UNRATE",
-      "value": 4.2,
-      "prev": 4.1,
-      "date": "2026-09"
+      "value": 4.1,
+      "prev": 4.2,
+      "date": "2026-10"
     }
   ],
   "mcs": {
-    "score": 68,
+    "score": 56,
     "stage": "Growth",
-    "asOf": "2026-11-04"
+    "asOf": "2026-11-05"
   },
   "compass": {
     "score": 72,
