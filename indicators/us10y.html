@@ -106,6 +106,11 @@
     .back:hover { color: var(--gold); }
 
     .crumbs { font-size: 13px; color: var(--muted); margin: 24px 0 0; }
+    .toc { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin: 22px 0 4px; padding: 12px 14px; background: var(--surface, #fffdf7); border: 1px solid var(--line); border-radius: 12px; font-size: 14px; }
+    .toc b { color: var(--ink); margin-right: 4px; }
+    .toc a { text-decoration: none; color: var(--ink-2); padding: 3px 10px; border-radius: 999px; background: rgba(176,141,74,.10); }
+    .toc a:hover { color: var(--gold); }
+    h2[id] { scroll-margin-top: 90px; }
     .crumbs a { text-decoration: none; color: var(--ink-2); }
     .crumbs a:hover { color: var(--gold); }
     .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 18px 0 6px; }
@@ -202,7 +207,7 @@
     <!-- SNAP:IND_ANSWER:START -->
       <p class="answer">截至 <time datetime="2026-11-05">2026/11/05</time>，美國 10 年期公債殖利率為 <b>4.84%</b>，較一個月前下降 0.43 個百分點，較一年前上升 0.67 個百分點。近一年最高 5.31%（2026/10/05）、最低 3.97%（2026/02/27）。</p>
 <!-- SNAP:IND_ANSWER:END -->
-    <p class="updated">資料來源：FRED｜最後更新：<time datetime="2026-11-05" id="indDate">2026/11/05</time>｜每天自動更新</p>
+    <p class="updated">今日最新的美債 10 年期殖利率，每天自動更新｜資料來源：FRED｜最後更新：<time datetime="2026-11-05" id="indDate">2026/11/05</time>｜每天自動更新</p>
 
     <!-- SNAP:IND_STATS:START -->
       <div class="stats">
@@ -213,7 +218,11 @@
       </div>
 <!-- SNAP:IND_STATS:END -->
 
-    <h2>近一年走勢</h2>
+    <nav class="toc" aria-label="本頁目錄"><b>本頁目錄</b>
+      <a href="#trend">近一年走勢</a><a href="#data">近 12 個月數據</a><a href="#what">殖利率是什麼</a><a href="#impact">對配息基金的影響</a><a href="#history">歷史時點</a><a href="#faq-title">常見問題</a>
+    </nav>
+
+    <h2 id="trend">近一年走勢</h2>
     <!-- SNAP:IND_CHART:START -->
       <figure class="chart">
         <svg viewBox="0 0 960 320" role="img" aria-labelledby="chartTitle chartDesc" preserveAspectRatio="none">
@@ -236,7 +245,7 @@
       </figure>
 <!-- SNAP:IND_CHART:END -->
 
-    <h2>近 12 個月數據</h2>
+    <h2 id="data">近 12 個月數據</h2>
     <!-- SNAP:IND_TABLE:START -->
       <div class="table-wrap">
         <table class="mtable">
@@ -261,7 +270,7 @@
 <!-- SNAP:IND_TABLE:END -->
     <p class="note">月底值為該月最後一個交易日的殖利率；當月尚未結束時，顯示截至最新資料日的數值。</p>
 
-    <h2>美債 10 年期殖利率是什麼？</h2>
+    <h2 id="what">美債 10 年期殖利率是什麼？</h2>
     <p>美國財政部發行、10 年後到期的公債，在市場上買賣時換算出來的年化收益率，就是 10 年期公債殖利率。它反映市場對未來<b>經濟成長、通膨和聯準會利率路徑</b>的綜合預期。</p>
     <p>因為美國公債規模最大、交易最活躍，10 年期殖利率被當作房貸利率、企業借貸成本和各類資產估值的基準，常被稱為「全球資產定價之錨」。它一動，股票、債券、匯率和黃金通常都會跟著反應。</p>
     <p>殖利率和債券價格是反向的：</p>
@@ -270,7 +279,7 @@
       <li><b>殖利率下降</b>：舊債券的利息相對變得有吸引力，<b>債券價格上漲</b>。</li>
     </ul>
 
-    <h2>殖利率變動，對債券基金和配息基金的影響</h2>
+    <h2 id="impact">殖利率變動，對債券基金和配息基金的影響</h2>
     <h3>1. 先用定存來想：利息變高，舊的就要打折</h3>
     <p>假設你手上有一張<b>年息 4%、鎖 10 年</b>的定存單。隔天銀行推出<b>年息 5%</b> 的新定存，如果你想把舊的轉讓給別人，對方一定要求打折，不然他直接去買新的就好。</p>
     <p>債券也是一樣。殖利率上升，代表市場上新的債券利息變高，手上舊債券的價格就要往下調。而且<b>剩下的年限越長，被較低利息「綁住」越久，要打的折就越多</b>。</p>
@@ -299,7 +308,7 @@
     <h3>4. 股票：高估值資產壓力較大</h3>
     <p>殖利率是計算資產價值時的折現率基準。殖利率上升，未來獲利折算回今天的價值就變低，對估值偏高、獲利集中在未來的成長股影響通常較大。</p>
 
-    <h2>歷史上的重要時點</h2>
+    <h2 id="history">歷史上的重要時點</h2>
     <ul class="timeline">
       <li><b>2020 年 8 月｜約 0.5%</b>：新冠疫情期間，聯準會降息到接近零並大量購買債券，10 年期殖利率跌到歷史低點附近。</li>
       <li><b>2022 年｜約 1.5% → 4.2%</b>：為了對抗通膨，聯準會快速升息，10 年期殖利率在一年內大幅上升，股票和債券同時下跌。</li>
