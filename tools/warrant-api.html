@@ -358,8 +358,65 @@ function mnLabel(type,S,K){const r=type==='call'?(S-K)/K:(K-S)/K;if(r>0.015)retu
 
 /* ===== 篩選器資料載入 ===== */
 const GAS_URL="https://script.google.com/macros/s/AKfycbxtbwd2I9ZElRqtGF5EsieJnFtM-AZuarVDf8merOarSpgzkwwECbTjWwdXzAway5OLqw/exec";
-const CACHE_NAME='momo-warrant-v2',CACHE_TS='momo-ts2',CACHE_EXP=60*60*1000;
+const CACHE_NAME='momo-warrant-v2',CACHE_TS='momo-ts2',CACHE_EXP_AT='momo-exp2';
 const HAS_CACHE=typeof caches!=='undefined';
+
+/* ===== 暫存：依交易時段決定到期時間（台北時間）=====
+   盤中 08:55~13:30 → 30 分鐘
+   13:30~14:40      → 到 14:40（等盤後股價補抓）
+   其他時間         → 到下一個平日 08:55 */
+const TPE=8*3600*1000;
+function tpeAt(baseTs,dayOffset,hh,mm){
+  const d=new Date(baseTs+TPE);
+  return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+dayOffset,hh,mm)-TPE;
+}
+function calcExpiry(ts){
+  const d=new Date(ts+TPE),dow=d.getUTCDay(),hm=d.getUTCHours()*100+d.getUTCMinutes();
+  const weekday=dow>=1&&dow<=5;
+  if(weekday&&hm>=855&&hm<1330)return ts+30*60*1000;
+  if(weekday&&hm>=1330&&hm<1440)return tpeAt(ts,0,14,40);
+  if(weekday&&hm<855)return tpeAt(ts,0,8,55);
+  let add=1;  // 找下一個平日
+  while(true){const w=(dow+add)%7;if(w>=1&&w<=5)break;add++;}
+  return tpeAt(ts,add,8,55);
+}
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){return false;}}
+function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
+function cacheValid(){
+  const exp=parseInt(lsGet(CACHE_EXP_AT)||'NaN');
+  return !isNaN(exp)&&Date.now()<exp;
+}
+
+/* 備援儲存：Cache API 存不進去時改用 IndexedDB */
+function idbOpen(){
+  return new Promise((ok,ng)=>{
+    if(typeof indexedDB==='undefined')return ng(new Error('no idb'));
+    const r=indexedDB.open('momo-warrant',1);
+    r.onupgradeneeded=()=>r.result.createObjectStore('kv');
+    r.onsuccess=()=>ok(r.result);r.onerror=()=>ng(r.error);
+  });
+}
+async function idbPut(k,v){const db=await idbOpen();return new Promise((ok,ng)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>ok(true);t.onerror=()=>ng(t.error);t.onabort=()=>ng(t.error);});}
+async function idbGet(k){const db=await idbOpen();return new Promise((ok,ng)=>{const t=db.transaction('kv','readonly');const q=t.objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ng(q.error);});}
+
+async function saveCache(txt){
+  if(HAS_CACHE){
+    try{
+      const c=await caches.open(CACHE_NAME);
+      await c.put(GAS_URL,new Response(txt,{headers:{'Content-Type':'application/json'}}));
+      if(await c.match(GAS_URL))return true;   // 確認真的存進去
+    }catch(e){}
+  }
+  try{return await idbPut('data',txt);}catch(e){return false;}
+}
+async function readCache(){
+  if(HAS_CACHE){
+    try{const c=await caches.open(CACHE_NAME);const cr=await c.match(GAS_URL);if(cr)return await cr.json();}catch(e){}
+  }
+  try{const t=await idbGet('data');if(t)return JSON.parse(t);}catch(e){}
+  return null;
+}
 let RAW=[],PROC=[],STOCK_MAP={},STOCK_REV={},STOCK_PRICES={};
 let sortKey='s1',sortDir=1;
 let mobSortDir=-1; // 手機版預設降序（大到小）
@@ -488,16 +545,18 @@ async function loadData(force=false){
   $('#sp1Mob').style.display='inline-block';$('#btnTextMob').textContent=force?'更新中...':'載入中...';
   try{
     const now=Date.now();
-    const ts=parseInt(localStorage.getItem(CACHE_TS)||'NaN');
-    const valid=!isNaN(ts)&&(now-ts<CACHE_EXP);
-    let json,usedCache=false;
-    if(!force&&valid&&HAS_CACHE){
-      try{const c=await caches.open(CACHE_NAME);const cr=await c.match(GAS_URL);if(cr){json=await cr.json();usedCache=true;}}catch(e){}
+    let json=null,usedCache=false,saved=false;
+    if(!force&&cacheValid()){
+      json=await readCache();
+      if(json&&!json.error)usedCache=true;else json=null;
     }
     if(!json){
       const res=await fetch(GAS_URL);const txt=await res.text();json=JSON.parse(txt);
-      if(!json.error&&HAS_CACHE){try{const c=await caches.open(CACHE_NAME);await c.put(GAS_URL,new Response(txt,{headers:{'Content-Type':'application/json'}}));}catch(e){}}
-      localStorage.setItem(CACHE_TS,now.toString());
+      if(!json.error){
+        saved=await saveCache(txt);
+        if(saved){lsSet(CACHE_TS,now.toString());lsSet(CACHE_EXP_AT,calcExpiry(now).toString());}
+        else{lsDel(CACHE_EXP_AT);lsSet(CACHE_TS,now.toString());}  // 沒存成功就不標記暫存，下次會重抓
+      }
     }
     if(json.error)throw new Error(json.error);
     STOCK_MAP=json.map||{};
@@ -506,10 +565,17 @@ async function loadData(force=false){
     const wb=XLSX.read(json.csv,{type:"string",codepage:65001});
     RAW=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
     preprocess();
-    const ft=new Date(parseInt(localStorage.getItem(CACHE_TS))).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+    const tsShow=parseInt(lsGet(CACHE_TS)||now);
+    const ft=new Date(tsShow).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false});
+    const expAt=parseInt(lsGet(CACHE_EXP_AT)||'NaN');
+    let expNote='';
+    if(!isNaN(expAt)&&expAt>Date.now()){
+      const ed=new Date(expAt),sameDay=ed.toDateString()===new Date().toDateString();
+      expNote=`，暫存至${sameDay?'':(ed.getMonth()+1)+'/'+ed.getDate()+' '}${ed.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false})}`;
+    }else if(!usedCache){expNote='，此裝置無法暫存';}
     const priceCount=Object.keys(STOCK_PRICES).length;
     const priceNote=priceCount>0?` <span style="color:var(--green);font-size:11px">📈 ${priceCount}支股價</span>`:' <span style="color:var(--amber);font-size:11px">⚠ 無股價資料</span>';
-    $('#topStatus').innerHTML=`<span class="count-badge">${RAW.length.toLocaleString()}</span> 筆 <span style="color:${usedCache?'var(--green)':'var(--gold-soft)'}">　${usedCache?'⚡ 暫存':'🔄 最新'} (${ft})</span>${priceNote}`;
+    $('#topStatus').innerHTML=`<span class="count-badge">${RAW.length.toLocaleString()}</span> 筆 <span style="color:${usedCache?'var(--green)':'var(--gold-soft)'}">　${usedCache?'⚡ 暫存':'🔄 最新'} (${ft}${expNote})</span>${priceNote}`;
     renderAll();
   }catch(e){alert('載入失敗：'+e.message);}
   finally{$('#btnFetch').disabled=false;$('#btnForce').disabled=false;$('#sp1').style.display='none';$('#btnText').textContent='載入權證資料';
@@ -524,8 +590,7 @@ $('#btnReset').addEventListener('click',()=>{
   render();
 });
 window.addEventListener('DOMContentLoaded',()=>{
-  const ts=parseInt(localStorage.getItem(CACHE_TS)||'NaN');
-  if(!isNaN(ts)&&Date.now()-ts<CACHE_EXP)loadData(false);
+  if(cacheValid())loadData(false);
 });
 
 function filterSort(){
