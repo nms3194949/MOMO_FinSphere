@@ -524,6 +524,11 @@
         if (window.momoUtm) a.href = window.momoUtm(a.getAttribute('data-href'), a.getAttribute('data-loc') || 'cta');
       });
     }
+    // 從其他頁帶入每月金額：monthly-income.html?m=30000
+    (function () {
+      var m = parseInt(new URLSearchParams(location.search).get('m'), 10);
+      if (m > 0 && m <= 1e7) { state.m = m; $('goal').value = m; setQuick(); }
+    })();
     render();
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', utm); else utm();
   })();

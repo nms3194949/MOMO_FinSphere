@@ -106,6 +106,9 @@
     .tool-desc { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.7; flex: 1; }
     .tool-go { color: var(--gold); font-weight: 700; font-size: 14px; }
     .tool-duo { grid-column: 1 / -1; }
+    .tool-quiz { grid-column: 1 / -1; background: linear-gradient(120deg, #fff4dc 0%, #ffe3d6 55%, #e9e2ff 100%); border-color: #f3c9a8; }
+    .tool-quiz .tool-title { font-size: 1.25em; }
+    .tool-quiz .tool-pill { background: #ff6b4a; color: #fff; }
     .tool-duo:hover { transform: none; }
     .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
     .duo a { display: block; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; text-decoration: none; transition: border-color .15s; }
@@ -139,6 +142,12 @@
 
     <!-- 工具卡片直接寫在 HTML；分類按鈕只負責顯示／隱藏（data-cat） -->
     <div class="tools-grid" id="tools-grid" aria-live="polite">
+      <a class="tool-card tool-quiz" href="/MOMO_FinSphere/money-map.html" data-cat="calc">
+        <span class="tool-pill">測驗</span>
+        <h3 class="tool-title">🗺️ 現金流人生地圖</h3>
+        <p class="tool-desc">8 題情境小測驗、約 2 分鐘，找出你是哪一種現金流人，拿一張專屬人物卡和你的本金數字。</p>
+        <span class="tool-go">開始測驗 →</span>
+      </a>
       <div class="tool-card tool-duo" data-cat="calc">
         <span class="tool-pill">試算</span>
         <h3 class="tool-title">配息與本金試算</h3>
