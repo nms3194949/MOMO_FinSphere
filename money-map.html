@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>現金流人生地圖｜2 分鐘找到你的配息規劃類型｜MOMO財商智庫</title>
+  <meta name="description" content="8 題情境小測驗，2 分鐘找出你的現金流規劃類型：細水長流、守本優先、成長累積、雙軌平衡或起步探索。拿到專屬人物卡、你的本金數字與該注意的事，可存圖分享。教育性自我探索，不是正式風險屬性評估。" />
+  <link rel="canonical" href="https://momowinwin.com/MOMO_FinSphere/money-map.html" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="明哲MOMO" />
+  <meta name="theme-color" content="#fff4dc" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="MOMO財商智庫" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="你是哪一種現金流人？2 分鐘小測驗｜MOMO財商智庫" />
+  <meta property="og:description" content="8 題情境題，找出你的配息規劃類型，拿一張專屬人物卡。" />
+  <meta property="og:url" content="https://momowinwin.com/MOMO_FinSphere/money-map.html" />
+  <meta property="og:image" content="https://momowinwin.com/og-default.png" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "現金流人生地圖：配息規劃類型小測驗",
+      "url": "https://momowinwin.com/MOMO_FinSphere/money-map.html",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web Browser",
+      "inLanguage": "zh-Hant-TW",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+      "description": "8 題情境小測驗，依目的、時間、每月現金流需求、面對下跌的反應與最在意的事，歸納出 5 種現金流規劃類型，並提供該注意的事與本金估算（年化報酬假設 6%）。教育性自我探索，不是正式風險屬性評估。",
+      "isPartOf": { "@id": "https://momowinwin.com/#website" },
+      "author": { "@id": "https://momowinwin.com/momo-blog/about/#person" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "MOMO雙贏策略", "item": "https://momowinwin.com/" },
+        { "@type": "ListItem", "position": 2, "name": "MOMO財商智庫", "item": "https://momowinwin.com/MOMO_FinSphere/" },
+        { "@type": "ListItem", "position": 3, "name": "現金流人生地圖" }
+      ]
+    }
+  ]
+}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" />
+  <style>
+    :root {
+      --bg: #fff4dc; --ink: #1d1a33; --ink-2: #4a4766; --muted: #8a87a3; --card: #ffffff; --line: #efe3c6;
+      --pop: #ff6b4a; --pop-2: #ffb547; --mint: #2ec4a0; --sky: #4d8dff; --grape: #8b5cf6; --line-green: #06c755;
+      --radius: 22px; --shadow: 0 10px 30px -12px rgba(60, 40, 10, .25);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; color: var(--ink); background: var(--bg);
+      background-image: radial-gradient(circle at 10% 10%, #ffe0b8 0 120px, transparent 121px), radial-gradient(circle at 92% 30%, #d9f5ea 0 90px, transparent 91px), radial-gradient(circle at 80% 95%, #e6dcff 0 140px, transparent 141px);
+      background-attachment: fixed; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    .app { max-width: 560px; margin: 0 auto; padding: 18px 16px 60px; min-height: 100vh; display: flex; flex-direction: column; }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font-weight: 900; font-size: 15px; }
+    .brand img { width: 30px; height: 30px; border-radius: 50%; }
+    .step-txt { font-size: 13px; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .bar { height: 10px; background: rgba(29,26,51,.08); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
+    .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--pop-2), var(--pop)); border-radius: 999px; transition: width .4s cubic-bezier(.3,1.4,.6,1); }
+
+    .screen { animation: in .45s cubic-bezier(.2,1.2,.4,1) both; }
+    @keyframes in { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+    .screen.out { animation: out .22s ease both; }
+    @keyframes out { to { opacity: 0; transform: translateX(-30px); } }
+
+    /* 開場 */
+    .hero { text-align: center; padding: 18px 4px 6px; }
+    .hero .big { font-size: 64px; line-height: 1; display: inline-block; animation: bob 2.4s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(-8px) rotate(-4deg); } }
+    .hero h1 { font-size: clamp(28px, 7.5vw, 38px); font-weight: 900; line-height: 1.3; margin: 14px 0 8px; }
+    .hero h1 span { background: linear-gradient(transparent 62%, #ffd27a 62%); }
+    .hero p { color: var(--ink-2); font-size: 16px; line-height: 1.7; margin: 0 0 18px; }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 22px; }
+    .pills span { background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13.5px; font-weight: 700; }
+    .types { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0 24px; }
+    .types div { background: #fff; border-radius: 16px; padding: 10px 2px; text-align: center; font-size: 26px; box-shadow: var(--shadow); }
+    .types small { display: block; font-size: 10.5px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px 20px; border-radius: 18px; border: none;
+      font: 900 17px "Noto Sans TC", sans-serif; cursor: pointer; text-decoration: none; transition: transform .12s, box-shadow .12s; }
+    .btn:active { transform: translateY(2px) scale(.99); }
+    .btn-go { background: var(--ink); color: #fff; box-shadow: 0 6px 0 #000; }
+    .btn-go:active { box-shadow: 0 2px 0 #000; }
+    .btn-line { background: var(--line-green); color: #fff; box-shadow: 0 6px 0 #049a42; }
+    .btn-line:active { box-shadow: 0 2px 0 #049a42; }
+    .btn-soft { background: #fff; color: var(--ink); border: 2px solid var(--ink); box-shadow: 0 5px 0 var(--ink); }
+    .btn[disabled] { opacity: .35; pointer-events: none; }
+    .fine { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.7; margin-top: 14px; }
+
+    /* 題目 */
+    .q-emoji { font-size: 44px; line-height: 1; }
+    .q-title { font-size: clamp(22px, 6vw, 27px); font-weight: 900; line-height: 1.4; margin: 10px 0 6px; }
+    .q-sub { color: var(--ink-2); font-size: 15px; margin: 0 0 18px; line-height: 1.6; }
+    .opts { display: grid; gap: 10px; }
+    .opts.grid2 { grid-template-columns: 1fr 1fr; }
+    .opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--card); border: 2.5px solid transparent; border-radius: 18px; padding: 15px 16px;
+      font: 700 16px "Noto Sans TC", sans-serif; color: var(--ink); cursor: pointer; box-shadow: var(--shadow); transition: transform .15s, border-color .15s, background .15s; }
+    .opt:hover { transform: translateY(-2px); }
+    .opt .e { font-size: 28px; flex: none; }
+    .opt small { display: block; font-weight: 500; font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .grid2 .opt { flex-direction: column; text-align: center; padding: 18px 10px; gap: 6px; }
+    .grid2 .opt .e { font-size: 38px; }
+    .opt.on { border-color: var(--pop); background: #fff6f3; transform: scale(1.02); }
+    .opt.on .e { animation: pop .4s cubic-bezier(.3,1.8,.5,1); }
+    @keyframes pop { 40% { transform: scale(1.35) rotate(-8deg); } }
+    .multi-hint { font-size: 13px; color: var(--pop); font-weight: 700; margin: -8px 0 12px; }
+
+    .slider-card { background: #fff; border-radius: var(--radius); padding: 22px 18px; box-shadow: var(--shadow); text-align: center; }
+    .slider-val { font-size: 44px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--pop); line-height: 1.1; }
+    .slider-val small { font-size: 18px; color: var(--ink); }
+    .slider-sub { font-size: 14px; color: var(--ink-2); margin: 6px 0 16px; min-height: 22px; }
+    input[type=range] { width: 100%; height: 34px; accent-color: var(--pop); cursor: pointer; }
+    .ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-weight: 700; }
+    .quick { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+    .quick button { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px; font: 700 13px "Noto Sans TC", sans-serif; cursor: pointer; }
+
+    .nav { display: flex; gap: 10px; margin-top: 20px; }
+    .nav .back { flex: 0 0 auto; width: auto; padding: 16px 18px; }
+    .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-weight: 700; font-size: 14.5px;
+      opacity: 0; transition: .3s; pointer-events: none; white-space: nowrap; z-index: 50; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis; }
+    .toast.show { opacity: 1; transform: translateX(-50%); }
+
+    /* 結果 */
+    .reveal { text-align: center; color: var(--ink-2); font-weight: 700; margin: 4px 0 12px; }
+    .pcard { position: relative; border-radius: 28px; padding: 26px 22px 22px; color: #fff; overflow: hidden; box-shadow: 0 20px 40px -18px rgba(0,0,0,.45);
+      animation: flip .7s cubic-bezier(.2,1.3,.4,1) both; }
+    @keyframes flip { from { transform: rotateY(80deg) scale(.8); opacity: 0; } }
+    .pcard::before, .pcard::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.14); }
+    .pcard::before { width: 220px; height: 220px; right: -70px; top: -70px; }
+    .pcard::after { width: 140px; height: 140px; left: -50px; bottom: -50px; }
+    .pcard > * { position: relative; }
+    .p-tag { display: inline-block; background: rgba(255,255,255,.22); padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; letter-spacing: .05em; }
+    .p-emoji { font-size: 76px; line-height: 1; margin: 14px 0 6px; }
+    .p-name { font-size: 34px; font-weight: 900; margin: 0; }
+    .p-line { font-size: 16.5px; font-weight: 700; opacity: .95; margin: 6px 0 14px; line-height: 1.6; }
+    .p-traits { display: flex; flex-wrap: wrap; gap: 6px; }
+    .p-traits span { background: rgba(255,255,255,.2); border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 700; }
+    .p-site { margin-top: 16px; font-size: 12px; opacity: .8; font-weight: 700; }
+
+    .sec { background: #fff; border-radius: var(--radius); padding: 18px; margin-top: 14px; box-shadow: var(--shadow); }
+    .sec h2 { font-size: 18px; margin: 0 0 10px; font-weight: 900; }
+    .sec p { margin: 0 0 8px; line-height: 1.75; color: var(--ink-2); font-size: 15px; }
+    .sec ul { margin: 0; padding-left: 1.2em; }
+    .sec li { margin: 7px 0; line-height: 1.7; font-size: 15px; }
+    .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 8px; }
+    .nums div { background: var(--bg); border-radius: 16px; padding: 12px; text-align: center; }
+    .nums b { display: block; font-size: 24px; font-weight: 900; color: var(--pop); font-variant-numeric: tabular-nums; }
+    .nums small { font-size: 12.5px; color: var(--ink-2); font-weight: 700; }
+    .links { display: grid; gap: 8px; }
+    .links a { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--bg); text-decoration: none; color: var(--ink); font-weight: 700; font-size: 15px; }
+    .links a::after { content: '→'; color: var(--pop); }
+
+    .cta { background: linear-gradient(160deg, #fff 0%, #f0fff7 100%); border: 2.5px dashed var(--line-green); }
+    .steps { display: grid; gap: 12px; margin-top: 8px; }
+    .stepbox { display: flex; gap: 12px; align-items: flex-start; }
+    .stepbox .n { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--line-green); color: #fff; font-weight: 900; display: grid; place-items: center; }
+    .stepbox .n.done { background: var(--ink); }
+    .stepbox > div { flex: 1; }
+    .stepbox b { display: block; margin-bottom: 6px; font-size: 15.5px; }
+
+    details.more { margin-top: 12px; }
+    details.more summary { cursor: pointer; font-weight: 700; color: var(--ink-2); font-size: 14.5px; list-style: none; }
+    details.more summary::before { content: '＋ '; color: var(--pop); }
+    details.more[open] summary::before { content: '－ '; }
+    .form { display: grid; gap: 10px; margin-top: 12px; }
+    .form label { font-size: 13.5px; font-weight: 700; color: var(--ink-2); display: grid; gap: 4px; }
+    .form input, .form select { font: 500 16px "Noto Sans TC", sans-serif; padding: 11px 12px; border-radius: 12px; border: 2px solid var(--line); background: #fff; color: var(--ink); }
+    .form input:focus, .form select:focus { outline: none; border-color: var(--pop); }
+    .form .agree { display: flex; gap: 8px; align-items: flex-start; font-weight: 500; font-size: 12.5px; line-height: 1.6; }
+    .form .agree input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--pop); }
+    .ok-msg { display: none; background: #e9fbf2; color: #067a3d; border-radius: 12px; padding: 10px 12px; font-weight: 700; font-size: 14.5px; }
+
+    .row-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .row-btns .btn { padding: 13px 10px; font-size: 15px; }
+    .disc { font-size: 12px; color: var(--muted); line-height: 1.7; margin-top: 16px; }
+    .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+    .confetti i { position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 3px; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+</head>
+<body>
+<div class="app">
+  <div class="top site-header">
+    <a class="brand" href="/MOMO_FinSphere/" aria-label="MOMO財商智庫 首頁"><img src="/icon-96.png" alt="" width="30" height="30" />MOMO財商智庫</a>
+    <span class="step-txt" id="stepTxt"></span>
+  </div>
+  <div class="bar" id="barWrap" hidden><i id="bar"></i></div>
+  <main id="stage" aria-live="polite"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  // ▼ 部署 GAS 後，把網址貼在這裡（留空＝不送出資料，其他功能照常）
+  const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbyqUBOqlh2eqvI9X7D08PuXxEtXmGeoWXO__2xmIn5frR9yPrSHjSD48HTLfXmK6GQd/exec';
+  const LINE_ADD = 'https://lin.ee/sdrEuGA';
+  const LINE_ID = '@028tuwbk';
+  const RATE = 0.06;   // 年化報酬假設上限 6%
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const money = (n) => n >= 10000 ? (n / 10000).toLocaleString('zh-TW', { maximumFractionDigits: 1 }) + ' 萬' : n.toLocaleString('zh-TW');
+  const track = (e, p) => { try { window.momoTrack && window.momoTrack(e, p || {}); } catch (_) {} };
+  const utm = (u, loc) => (window.momoUtm ? window.momoUtm(u, loc) : u);
+  const toast = (t) => { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('show'), 1600); };
+
+  // ===== 題目 =====
+  const Q = [
+    { id: 'goal', emoji: '🎯', title: '這筆錢，你最想用來做什麼？', sub: '選一個最接近的', layout: 'grid2', opts: [
+      ['retire', '🏖️', '退休生活費'], ['passive', '💸', '多一份被動收入'], ['edu', '🎓', '子女教育金'], ['legacy', '🏛️', '留給下一代'], ['unsure', '🤔', '還沒想清楚'], ['grow', '📈', '讓資產變大'] ],
+      cheer: { retire: '提早想退休的人，選擇會比較多 👍', passive: '被動收入，很多人的第一個目標！', edu: '為孩子準備，時間是最好的朋友 ⏳', legacy: '想得很遠，給你按個讚', unsure: '沒關係，做完就會比較清楚了', grow: '先把雪球滾大，也是好策略' } },
+    { id: 'when', emoji: '⏰', title: '大概什麼時候會開始用到這筆錢？', sub: '時間長短，會影響能承受多少波動', opts: [
+      ['lt3', '🏃', '3 年內', '很快就要用'], ['3to10', '🚶', '3～10 年', '中期規劃'], ['10to20', '🧘', '10～20 年', '還有一段時間'], ['gt20', '🌳', '20 年以上', '慢慢來'] ],
+      cheer: { lt3: '時間短，流動性要先顧好', '3to10': '中期規劃，彈性很重要', '10to20': '時間站在你這邊', gt20: '時間是複利最好的燃料 🔥' } },
+    { id: 'monthly', emoji: '💰', title: '理想中，每月想多領多少？', sub: '拉拉看，不用很精準', type: 'slider', min: 5000, max: 200000, step: 5000, def: 30000 },
+    { id: 'capital', emoji: '🧺', title: '大概可以拿多少出來規劃？', sub: '選區間就好，不用說精確數字', opts: [
+      ['lt100', '🌱', '100 萬以下'], ['100to300', '🌿', '100～300 萬'], ['300to1000', '🌳', '300～1,000 萬'], ['gt1000', '🏔️', '1,000 萬以上'], ['secret', '🤫', '先不說'] ],
+      cheer: { lt100: '從小開始，重點是開始 💪', '100to300': '已經有一個不錯的起點', '300to1000': '這個規模，配置更顯重要', gt1000: '規模大，分散與現金流規劃更關鍵', secret: '沒問題，保有一點神秘感 😉' } },
+    { id: 'drop', emoji: '🎢', title: '你放了 100 萬，三個月後帳上變 85 萬，你會？', sub: '憑直覺選，沒有標準答案', layout: 'grid2', opts: [
+      ['sell', '😱', '全部賣掉', '睡不著'], ['half', '😟', '先賣一半', '降低壓力'], ['hold', '😐', '先不動', '再觀察'], ['buy', '😎', '再買一點', '覺得變便宜'] ],
+      cheer: { sell: '很誠實！知道自己的極限很重要', half: '想控制風險，很正常的反應', hold: '穩得住，這是很重要的能力', buy: '心臟很大顆，但也別忘了分散 😎' } },
+    { id: 'exp', emoji: '🧭', title: '你目前的投資經驗？', sub: '選最接近的', opts: [
+      ['none', '🐣', '還沒開始', '一切從零'], ['stock', '📊', '存股、ETF', '有在定期買'], ['fund', '🧩', '買過基金', '含配息型基金'], ['all', '🦉', '股票、基金、債券都有', '算是老手'] ],
+      cheer: { none: '現在開始一點都不晚 🐣', stock: '已經有紀律，很棒', fund: '那你一定也遇過淨值和配息的問題', all: '老手來了！那你應該更在意整體配置' } },
+    { id: 'care', emoji: '❤️', title: '下面四個，你最在意哪一個？', sub: '只能選一個，逼自己選選看', layout: 'grid2', opts: [
+      ['income', '📬', '每月有錢入帳'], ['principal', '🛡️', '本金不要縮水'], ['liquid', '🔓', '需要時能動用'], ['growth', '🚀', '長期資產變大'] ],
+      cheer: { income: '現金流派！', principal: '守住本金，是很多人的底線', liquid: '彈性很重要，人生總有意外', growth: '眼光放長遠 🚀' } },
+    { id: 'pain', emoji: '😮‍💨', title: '目前有沒有這些困擾？', sub: '可以複選', multi: true, opts: [
+      ['shrink', '📉', '配息越領越少'], ['unknown', '❓', '不知道自己買了什麼'], ['timing', '⛰️', '怕買在高點'], ['notime', '⌛', '沒時間研究'], ['start', '🚪', '不知道從哪開始'], ['fine', '😌', '目前都還好'] ] }
+  ];
+
+  // ===== 類型 =====
+  const P = {
+    stream: { emoji: '🌱', name: '細水長流型', color: ['#16b38a', '#0e8f8f'], line: '你要的不是一夕暴富，而是每個月都有錢流進來的安心感。',
+      traits: ['重視現金流', '耐得住波動', '長期派'],
+      watch: ['配息率不等於報酬率，要一起看淨值變化，確認配息不是在吃本金', '不要只挑配息率最高的，分散在不同類型的資產', '預留一筆緊急預備金，避免市場下跌時被迫賣出'] },
+    guard: { emoji: '🛡️', name: '守本優先型', color: ['#4d8dff', '#3b5bdb'], line: '先守住，再談賺。對你來說，睡得好比報酬高更重要。',
+      traits: ['重視本金', '偏好低波動', '謹慎派'],
+      watch: ['低波動也有代價：報酬期待要放低，留意通膨侵蝕購買力', '債券類資產也會因利率變動而漲跌，不是完全沒有風險', '把要用的錢依時間分層，短期要用的不要放在波動大的地方'] },
+    grow: { emoji: '🚀', name: '成長累積型', color: ['#ff6b4a', '#e8458b'], line: '你有時間、也耐得住波動，先讓雪球滾大，現金流之後再說。',
+      traits: ['時間長', '能承受波動', '成長派'],
+      watch: ['定期定額＋紀律，比猜高低點重要', '越接近要用錢的時間，越要逐步降低波動', '分散產業與地區，避免集中在單一熱門題材'] },
+    balance: { emoji: '⚖️', name: '雙軌平衡型', color: ['#8b5cf6', '#6d28d9'], line: '現金流和成長你都想要，用「核心＋衛星」兼顧兩邊。',
+      traits: ['兩者兼顧', '中等風險', '配置派'],
+      watch: ['先決定核心部位和衛星部位各自的任務，再挑工具', '定期再平衡：漲多的減一點、跌多的補一點', '一起看配息和淨值，用「真實報酬＝配息＋淨值變化」檢查成果'] },
+    explore: { emoji: '🧭', name: '起步探索型', color: ['#ffb547', '#f08c00'], line: '你正站在起點：先搞懂規則，再出發，會走得更穩。',
+      traits: ['剛起步', '想先搞懂', '學習派'],
+      watch: ['先存好 3～6 個月的生活費當緊急預備金', '從看得懂的工具開始，不懂的不要買', '先學會看配息、淨值、費用這三個數字'] }
+  };
+
+  function classify(a) {
+    const risk = { sell: 0, half: 1, hold: 2, buy: 3 }[a.drop] ?? 1;
+    const exp = { none: 0, stock: 1, fund: 2, all: 3 }[a.exp] ?? 1;
+    if (exp === 0 && risk <= 1) return 'explore';
+    if (a.goal === 'unsure' && exp <= 1) return 'explore';
+    if (a.care === 'principal' || risk === 0 || (a.care === 'liquid' && risk <= 1)) return 'guard';
+    if ((a.care === 'growth' || a.goal === 'grow' || a.goal === 'edu') && risk >= 2 && (a.when === '10to20' || a.when === 'gt20')) return 'grow';
+    if (a.care === 'income' && risk <= 2) return 'stream';
+    if ((a.goal === 'retire' || a.goal === 'passive') && risk <= 1) return 'stream';
+    return 'balance';
+  }
+
+  // ===== 狀態 =====
+  const S = { i: -1, a: { monthly: 30000, pain: [] }, sid: (Date.now().toString(36) + Math.random().toString(36).slice(2, 7)), sent: false };
+  const label = (qid, v) => { const q = Q.find((x) => x.id === qid); const o = q && q.opts && q.opts.find((x) => x[0] === v); return o ? o[2] : v; };
+
+  function swap(html, after) {
+    const st = $('stage');
+    const cur = st.firstElementChild;
+    const go = () => { st.innerHTML = html; window.scrollTo({ top: 0, behavior: 'smooth' }); after && after(); };
+    if (cur) { cur.classList.add('out'); setTimeout(go, 200); } else go();
+  }
+  function progress() {
+    const shown = S.i >= 0 && S.i < Q.length;
+    $('barWrap').hidden = !shown;
+    $('stepTxt').textContent = shown ? `${S.i + 1} / ${Q.length}` : '';
+    $('bar').style.width = shown ? ((S.i + 1) / Q.length * 100) + '%' : '0';
+  }
+
+  // ===== 開場 =====
+  function intro() {
+    S.i = -1; progress();
+    swap(`<section class="screen hero">
+      <div class="big">🗺️</div>
+      <h1>你是哪一種<br><span>現金流人</span>？</h1>
+      <p>8 題情境題、大約 2 分鐘，找出你的規劃類型，<br>拿一張專屬人物卡，還有你該注意的事。</p>
+      <div class="types">${Object.values(P).map((p) => `<div>${p.emoji}<small>${p.name.replace('型', '')}</small></div>`).join('')}</div>
+      <div class="pills"><span>⏱️ 約 2 分鐘</span><span>🙈 不用填真實姓名</span><span>🎴 可存圖分享</span></div>
+      <button class="btn btn-go" id="start">開始探索 →</button>
+      <p class="fine">教育性的自我探索小測驗，不是正式的風險屬性評估，也不構成任何投資建議。</p>
+    </section>`, () => $('start').onclick = () => { track('quiz_start', { tool: 'money_map' }); S.i = 0; ask(); });
+  }
+
+  // ===== 題目 =====
+  function ask() {
+    progress();
+    const q = Q[S.i];
+    let body = '';
+    if (q.type === 'slider') {
+      body = `<div class="slider-card">
+        <div class="slider-val"><span id="sv"></span><small> 元／月</small></div>
+        <div class="slider-sub" id="ss"></div>
+        <input type="range" id="sl" min="${q.min}" max="${q.max}" step="${q.step}" value="${S.a.monthly}" aria-label="每月想多領的金額">
+        <div class="ticks"><span>5 千</span><span>10 萬</span><span>20 萬</span></div>
+        <div class="quick">${[20000, 30000, 50000, 100000].map((v) => `<button type="button" data-v="${v}">${money(v)}</button>`).join('')}</div>
+      </div>`;
+    } else {
+      const multi = q.multi;
+      body = (multi ? '<div class="multi-hint">✔ 可以複選，選完按「下一題」</div>' : '') +
+        `<div class="opts ${q.layout || ''}">${q.opts.map(([v, e, t, s]) => {
+          const on = multi ? S.a[q.id].includes(v) : S.a[q.id] === v;
+          return `<button type="button" class="opt ${on ? 'on' : ''}" data-v="${v}"><span class="e">${e}</span><span>${t}${s ? `<small>${s}</small>` : ''}</span></button>`;
+        }).join('')}</div>`;
+    }
+    const needNext = q.type === 'slider' || q.multi;
+    swap(`<section class="screen">
+      <div class="q-emoji">${q.emoji}</div>
+      <h2 class="q-title">${q.title}</h2>
+      <p class="q-sub">${q.sub}</p>
+      ${body}
+      <div class="nav">
+        ${S.i > 0 ? '<button class="btn btn-soft back" id="back" aria-label="上一題">←</button>' : ''}
+        ${needNext ? `<button class="btn btn-go" id="next" ${q.multi && !S.a.pain.length ? 'disabled' : ''}>${S.i === Q.length - 1 ? '看我的結果 🎉' : '下一題 →'}</button>` : ''}
+      </div>
+    </section>`, () => bind(q));
+  }
+
+  function bind(q) {
+    const back = $('back'); if (back) back.onclick = () => { S.i--; ask(); };
+    const next = $('next'); if (next) next.onclick = advance;
+    if (q.type === 'slider') {
+      const sl = $('sl');
+      const upd = () => {
+        const v = +sl.value; S.a.monthly = v;
+        $('sv').textContent = v.toLocaleString('zh-TW');
+        $('ss').textContent = `一年 ${money(v * 12)}｜只花報酬、本金不動，以 6% 估算約需 ${money(Math.round(v * 12 / RATE))}`;
+      };
+      sl.oninput = upd; upd();
+      document.querySelectorAll('.quick button').forEach((b) => b.onclick = () => { sl.value = b.dataset.v; upd(); });
+      return;
+    }
+    document.querySelectorAll('.opt').forEach((b) => b.onclick = () => {
+      const v = b.dataset.v;
+      if (q.multi) {
+        let arr = S.a.pain;
+        if (v === 'fine') arr = arr.includes('fine') ? [] : ['fine'];
+        else { arr = arr.filter((x) => x !== 'fine'); arr = arr.includes(v) ? arr.filter((x) => x !== v) : arr.concat(v); }
+        S.a.pain = arr;
+        document.querySelectorAll('.opt').forEach((x) => x.classList.toggle('on', arr.includes(x.dataset.v)));
+        $('next').disabled = !arr.length;
+        return;
+      }
+      S.a[q.id] = v;
+      document.querySelectorAll('.opt').forEach((x) => x.classList.toggle('on', x === b));
+      if (q.cheer && q.cheer[v]) toast(q.cheer[v]);
+      setTimeout(advance, 520);
+    });
+  }
+
+  function advance() {
+    if (S.i < Q.length - 1) { S.i++; ask(); }
+    else result();
+  }
+
+  // ===== 結果 =====
+  function annuity(m, r, years) { const i = r / 12, n = years * 12; return m * (1 - Math.pow(1 + i, -n)) / i; }
+
+  function summaryText(p) {
+    const a = S.a;
+    return [
+      `【現金流人生地圖】我的類型：${p.emoji} ${p.name}`,
+      `目的：${label('goal', a.goal)}`,
+      `用錢時間：${label('when', a.when)}`,
+      `每月想多領：${a.monthly.toLocaleString('zh-TW')} 元`,
+      `可規劃資金：${label('capital', a.capital)}`,
+      `下跌 15% 會：${label('drop', a.drop)}`,
+      `投資經驗：${label('exp', a.exp)}`,
+      `最在意：${label('care', a.care)}`,
+      `困擾：${a.pain.map((v) => label('pain', v)).join('、')}`,
+      '想跟 MOMO 聊聊怎麼規劃！'
+    ].join('\n');
+  }
+
+  function send(extra) {
+    if (!SUBMIT_URL) return Promise.resolve(false);
+    const p = P[S.key];
+    const payload = Object.assign({ sid: S.sid, type: p.name, goal: label('goal', S.a.goal), when: label('when', S.a.when), monthly: S.a.monthly,
+      capital: label('capital', S.a.capital), drop: label('drop', S.a.drop), exp: label('exp', S.a.exp), care: label('care', S.a.care),
+      pain: S.a.pain.map((v) => label('pain', v)).join('、'), ref: document.referrer || '', ua: navigator.userAgent.slice(0, 120) }, extra || {});
+    // text/plain 避免 CORS 預檢；GAS 端用 e.postData.contents 解析
+    return fetch(SUBMIT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
+      .then(() => true).catch(() => false);
+  }
+
+  function confetti(colors) {
+    const box = document.createElement('div'); box.className = 'confetti';
+    for (let k = 0; k < 70; k++) {
+      const i = document.createElement('i');
+      i.style.left = Math.random() * 100 + '%';
+      i.style.background = [colors[0], colors[1], '#ffd27a', '#fff'][k % 4];
+      i.style.animationDuration = (1.8 + Math.random() * 1.6) + 's';
+      i.style.animationDelay = (Math.random() * .5) + 's';
+      box.appendChild(i);
+    }
+    document.body.appendChild(box); setTimeout(() => box.remove(), 4200);
+  }
+
+  function result() {
+    S.i = Q.length; progress();
+    const key = classify(S.a); S.key = key;
+    const p = P[key], a = S.a;
+    const grad = `linear-gradient(145deg, ${p.color[0]}, ${p.color[1]})`;
+    const perm = Math.round(a.monthly * 12 / RATE), ann = Math.round(annuity(a.monthly, RATE, 20));
+    const lineMsg = `https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(summaryText(p))}`;
+    track('quiz_complete', { tool: 'money_map', persona: key });
+    if (!S.sent) { S.sent = true; send(); }
+    swap(`<section class="screen">
+      <p class="reveal">🎉 你的現金流類型是…</p>
+      <div class="pcard" style="background:${grad}">
+        <span class="p-tag">現金流人生地圖</span>
+        <div class="p-emoji">${p.emoji}</div>
+        <h1 class="p-name">${p.name}</h1>
+        <p class="p-line">${p.line}</p>
+        <div class="p-traits">${p.traits.map((t) => `<span>#${t}</span>`).join('')}<span>#${label('goal', a.goal)}</span></div>
+        <div class="p-site">momowinwin.com｜MOMO財商智庫</div>
+      </div>
+
+      <div class="row-btns">
+        <button class="btn btn-soft" id="saveImg">📸 存成圖片</button>
+        <button class="btn btn-soft" id="retry">🔄 再玩一次</button>
+      </div>
+
+      <div class="sec">
+        <h2>👀 你最該注意的 3 件事</h2>
+        <ul>${p.watch.map((w) => `<li>${w}</li>`).join('')}</ul>
+      </div>
+
+      <div class="sec">
+        <h2>🔢 你的數字：每月多領 ${a.monthly.toLocaleString('zh-TW')} 元</h2>
+        <div class="nums">
+          <div><b>${money(perm)}</b><small>只花報酬、本金不動</small></div>
+          <div><b>${money(ann)}</b><small>本金 20 年用完</small></div>
+        </div>
+        <p style="font-size:13px">以年化總報酬 6% 估算（上限），未計通膨、費用與稅；實際結果會隨市場變動，可能虧損。</p>
+        <div class="links"><a href="/MOMO_FinSphere/monthly-income.html?m=${a.monthly}">用本金需求試算算得更細</a></div>
+      </div>
+
+      <div class="sec">
+        <h2>📚 延伸看看</h2>
+        <div class="links">
+          <a href="/MOMO_FinSphere/dividend-calculator.html">配息現金流試算：配息 + 淨值一起看</a>
+          <a href="/MOMO_FinSphere/indicators/">經濟指標：利率與殖利率怎麼影響配息基金</a>
+          <a href="/momo-blog/">MOMO雙贏策略｜配置筆記</a>
+        </div>
+      </div>
+
+      <div class="sec cta">
+        <h2>💬 想聊聊你的規劃？兩步驟就好</h2>
+        <div class="steps">
+          <div class="stepbox"><span class="n" id="n1">1</span><div><b>加入 MOMO 官方 LINE</b>
+            <a class="btn btn-line" id="addLine" href="${utm(LINE_ADD, 'money_map_add')}" target="_blank" rel="noopener">＋ 加入好友</a></div></div>
+          <div class="stepbox"><span class="n" id="n2">2</span><div><b>把結果傳給 MOMO</b>
+            <a class="btn btn-go" id="sendLine" href="${lineMsg}" target="_blank" rel="noopener">📨 一鍵傳送我的結果</a>
+            <p class="fine" style="text-align:left;margin-top:8px">會打開 LINE，訊息已經幫你填好，按送出就可以。</p></div></div>
+        </div>
+        <details class="more" id="more">
+          <summary>不方便用 LINE？留個聯絡方式也可以（不強制）</summary>
+          <form class="form" id="contactForm" novalidate>
+            <label>怎麼稱呼你<input name="name" maxlength="30" placeholder="例如：王小姐、阿明" autocomplete="nickname"></label>
+            <label>聯絡方式（手機或 LINE ID）<input name="contact" maxlength="60" placeholder="0912-345-678 或 LINE ID" autocomplete="tel"></label>
+            <label>方便聯絡的時段
+              <select name="time"><option value="">都可以</option><option>平日白天</option><option>平日晚上</option><option>週末</option></select></label>
+            <label class="agree"><input type="checkbox" name="agree" required><span>我同意 MOMO 使用以上資料與測驗結果，僅用於聯繫我、說明規劃觀念，不會提供給第三方；我可以隨時要求刪除。</span></label>
+            <button class="btn btn-go" type="submit">送出</button>
+            <div class="ok-msg" id="okMsg">收到了！MOMO 會盡快跟你聯繫 🙌</div>
+          </form>
+        </details>
+      </div>
+
+      <p class="disc">本測驗為教育性的自我探索，依你的作答歸納出常見的規劃類型，不是正式的風險屬性評估（KYC），不構成任何投資建議或商品推介。本金估算以年化總報酬 6% 為假設，實際淨值與配息會隨市場變動，可能虧損，配息可能由本金支出。作答內容會以匿名方式記錄，用於了解大家的需求。</p>
+    </section>`, () => {
+      confetti(p.color);
+      $('retry').onclick = () => { S.a = { monthly: 30000, pain: [] }; S.sent = false; S.sid = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); intro(); };
+      $('saveImg').onclick = () => saveCard(p);
+      $('addLine').onclick = () => { track('line_click', { link_location: 'money_map_add' }); $('n1').classList.add('done'); $('n1').textContent = '✓'; };
+      $('sendLine').onclick = () => { track('line_click', { link_location: 'money_map_send', persona: key }); send({ action: 'line_send' }); $('n2').classList.add('done'); $('n2').textContent = '✓'; };
+      $('contactForm').onsubmit = (e) => {
+        e.preventDefault();
+        const f = e.target;
+        if (!f.contact.value.trim()) { toast('留個聯絡方式，MOMO 才找得到你喔'); f.contact.focus(); return; }
+        if (!f.agree.checked) { toast('請先勾選同意'); return; }
+        send({ action: 'contact', name: f.name.value.trim(), contact: f.contact.value.trim(), time: f.time.value });
+        track('generate_lead', { tool: 'money_map', persona: key });
+        $('okMsg').style.display = 'block';
+        f.querySelector('button[type=submit]').disabled = true;
+      };
+    });
+  }
+
+  // ===== 存成圖片（1080×1350，適合 IG 貼文／限動） =====
+  function wrap(ctx, text, maxW) {
+    const out = []; let line = '';
+    for (const ch of text) { if (ctx.measureText(line + ch).width > maxW) { out.push(line); line = ch; } else line += ch; }
+    if (line) out.push(line); return out;
+  }
+  function saveCard(p) {
+    const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, p.color[0]); g.addColorStop(1, p.color[1]);
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    x.fillStyle = 'rgba(255,255,255,.14)';
+    x.beginPath(); x.arc(W - 80, 120, 300, 0, Math.PI * 2); x.fill();
+    x.beginPath(); x.arc(60, H - 60, 220, 0, Math.PI * 2); x.fill();
+    const F = '"Noto Sans TC", "PingFang TC", sans-serif';
+    x.fillStyle = '#fff'; x.textAlign = 'left';
+    x.font = `700 36px ${F}`; x.fillText('現金流人生地圖｜我的類型', 90, 150);
+    x.font = `200px ${F}`; x.fillText(p.emoji, 80, 420);
+    x.font = `900 120px ${F}`; x.fillText(p.name, 90, 580);
+    x.font = `700 44px ${F}`;
+    wrap(x, p.line, W - 180).forEach((l, k) => x.fillText(l, 90, 680 + k * 66));
+    let tx = 90, ty = 900; x.font = `700 38px ${F}`;
+    p.traits.concat(label('goal', S.a.goal)).forEach((t) => {
+      const s = '#' + t, w = x.measureText(s).width + 56;
+      if (tx + w > W - 90) { tx = 90; ty += 92; }
+      x.fillStyle = 'rgba(255,255,255,.22)'; roundRect(x, tx, ty - 50, w, 72, 36); x.fill();
+      x.fillStyle = '#fff'; x.fillText(s, tx + 28, ty); tx += w + 18;
+    });
+    x.font = `700 40px ${F}`; x.fillStyle = 'rgba(255,255,255,.9)';
+    x.fillText('你是哪一種？測測看 👉 momowinwin.com/map', 90, H - 110);
+    c.toBlob((blob) => {
+      if (!blob) return toast('存圖失敗，請直接截圖');
+      const file = new File([blob], `現金流類型-${p.name}.png`, { type: 'image/png' });
+      track('quiz_share', { tool: 'money_map', persona: S.key });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: `我是${p.name}`, text: '你是哪一種現金流人？' }).catch(() => {});
+      } else {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('圖片已下載 📸');
+      }
+    }, 'image/png');
+  }
+  function roundRect(x, l, t, w, h, r) { x.beginPath(); x.moveTo(l + r, t); x.arcTo(l + w, t, l + w, t + h, r); x.arcTo(l + w, t + h, l, t + h, r); x.arcTo(l, t + h, l, t, r); x.arcTo(l, t, l + w, t, r); x.closePath(); }
+
+  intro();
+})();
+</script>
+</body>
+</html>
