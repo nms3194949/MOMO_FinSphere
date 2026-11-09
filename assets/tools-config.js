@@ -27,7 +27,7 @@ window.MOMO_TOOLS_CONFIG = [
     category: "market",
     label: "景氣",
     title: "景氣循環儀表板",
-    desc: "短週期看 MCS 景氣分數，長週期看雙週期景氣羅盤，同一頁對照目前位置。",
+    desc: "短週期看 MCS 景氣分數，長週期看康波階段，同一頁對照目前位置。",
     href: "/MOMO_FinSphere/tools/cycle.html",
     showOnHome: true
   },

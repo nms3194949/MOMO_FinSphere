@@ -1,7 +1,7 @@
 // ============================================================
 // MOMO財商智庫｜每日數據快照  scripts/snapshot.mjs
 // 由 GitHub Actions（.github/workflows/snapshot.yml）每天執行：
-//   1. 從 FRED 抓 6 個經濟指標、從 MCS Worker 抓景氣分數、計算景氣羅盤位置
+//   1. 從 FRED 抓 6 個經濟指標、從 MCS Worker 抓景氣分數、判斷康波長週期階段
 //   2. 寫成靜態 HTML／文字，讓搜尋引擎與 AI 爬蟲（不執行 JavaScript）也讀得到：
 //      index.html（SNAP:MACRO）、tools/cycle.html（SNAP:CYCLE）、llms.txt（SNAP:LLMS）
 //      data/macro.json、sitemap.xml 的 lastmod、各頁 dateModified
@@ -124,24 +124,27 @@ async function fetchMcs() {
   }
 }
 
-// ── 3. 景氣羅盤（和 tools/Macro-Compass.html 的模型相同） ──
+// ── 3. 康波長週期（周金濤架構，和 tools/Macro-Compass.html 相同） ──
+//   第五次康波：回升 1982–1991、繁榮 1991–2004、衰退 2004–2015、蕭條 2015–2025；之後為第六次康波回升期（推估）
 function compassNow() {
   const [y, m] = twToday().split('-').map(Number);
   const q = Math.floor((m - 1) / 3);
   const year = y + q / 4;
-  const konAngle = (((year - 2005) / 60) % 1) * 360;
-  const ecm = Math.sin(((year - 2020) / 10) * Math.PI * 2);
-  const base = (Math.sin((konAngle * Math.PI) / 180) + 1) * 50;
-  const score = Math.round(Math.min(98, Math.max(2, base * 0.8 + (ecm + 1) * 50 * 0.2)));
-  const a = ((konAngle % 360) + 360) % 360;
-  const season = a < 90 ? '春｜復甦期' : a < 180 ? '夏｜過熱期' : a < 270 ? '秋｜滯脹期' : '冬｜衰退期';
-  return { score, season, label: `${y} Q${q + 1}` };
+  const label = `${y} Q${q + 1}`;
+  if (year >= 2003.5 && year < 2004.5) return { label, trend: 'turn', season: '夏末秋初｜轉換期', phase: '第五次康波繁榮期尾聲 → 衰退期' };
+  if (year >= 2014.5 && year < 2015.5) return { label, trend: 'turn', season: '秋末冬初｜轉換期', phase: '第五次康波衰退期尾聲 → 蕭條期' };
+  if (year >= 2024 && year < 2028) return { label, trend: 'turn', season: '冬末春初｜轉換期', phase: '第五次康波蕭條期尾聲 → 第六次康波回升期' };
+  if (year < 2004) return { label, trend: 'up', season: '夏｜繁榮期', phase: '第五次康波繁榮期' };
+  if (year < 2015) return { label, trend: 'down', season: '秋｜衰退期', phase: '第五次康波衰退期' };
+  if (year < 2025) return { label, trend: 'down', season: '冬｜蕭條期', phase: '第五次康波蕭條期' };
+  return { label, trend: 'up', season: '春｜回升期', phase: '第六次康波回升期（推估）' };
 }
 
 function compareText(mcs, cmp) {
   if (!mcs) return '';
   const shortUp = mcs.stage === 'Growth' || mcs.stage === 'Heat';
-  const longUp = cmp.score >= 55;
+  if (cmp.trend === 'turn') return shortUp ? '短期景氣偏暖，長期處在新舊週期交接，方向還沒明確。' : '短期景氣降溫，長期處在新舊週期交接，波動容易放大。';
+  const longUp = cmp.trend === 'up';
   if (shortUp && longUp) return '兩個週期同向偏擴張。';
   if (!shortUp && !longUp) return '兩個週期同向偏收縮。';
   if (shortUp) return '短期偏熱、長期偏冷，兩個週期方向分歧。';
@@ -232,7 +235,7 @@ function cycleHtml(mcs, cmp, date) {
   const mcsTxt = mcs
     ? `截至 ${mcs.asOf || date}，<b>短週期 MCS 景氣分數為 ${mcs.score}（${STAGE_ZH[mcs.stage] || ''} ${mcs.stage}）</b>；`
     : '';
-  return `    <p class="answer">${mcsTxt}<b>長週期景氣羅盤位於${cmp.season.replace('｜', '・')}</b>（模型位置 ${cmp.label}，綜合評分 ${cmp.score}）。${compareText(mcs, cmp)}MCS 綜合 7 個經濟與市場因子衡量接下來幾個月的景氣溫度（0–100 分，分為衰退、放緩、成長、過熱）；景氣羅盤描述在十年、數十年大週期中的位置。</p>`;
+  return `    <p class="answer">${mcsTxt}<b>長週期康波位於${cmp.season.replace('｜', '・')}</b>（${cmp.phase}，${cmp.label}）。${compareText(mcs, cmp)}MCS 綜合 7 個經濟與市場因子衡量接下來幾個月的景氣溫度（0–100 分，分為衰退、放緩、成長、過熱）；康波長週期採周金濤的分期架構，描述在數十年大週期中的位置。</p>`;
 }
 
 function llmsText(items, mcs, cmp, asOf) {
@@ -246,7 +249,7 @@ function llmsText(items, mcs, cmp, asOf) {
   });
   const out = [`資料更新：${asOf}（來源：FRED，聖路易聯邦準備銀行；This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.）`, '', ...lines, ''];
   if (mcs) out.push(`- MCS 景氣分數（短週期）：${mcs.score} 分，${STAGE_ZH[mcs.stage] || ''}（${mcs.stage}）｜${mcs.asOf || asOf}`);
-  out.push(`- 景氣羅盤（長週期模型）：${cmp.season}，綜合評分 ${cmp.score}｜模型位置 ${cmp.label}`);
+  out.push(`- 康波長週期（周金濤架構）：${cmp.season}，${cmp.phase}｜${cmp.label}（第五次康波蕭條期約 2015–2025，轉入下一輪的時點各家說法不一）`);
   if (INDICATORS.length) {
     out.push('', `指標說明頁（定義、近一年走勢、對債券與配息基金的影響），總覽：${SITE}indicators/`);
     for (const ind of INDICATORS) out.push(`- ${ind.name}：${SITE}indicators/${ind.slug}.html`);
@@ -294,7 +297,7 @@ async function snapshot() {
   await writeFile(file('sitemap.xml'), sm);
 
   console.log(`✅ 快照完成：${items.length} 個指標（${asOf}）`
-    + `${mcs ? `、MCS ${mcs.score} ${mcs.stage}` : '、MCS 未取得'}、羅盤 ${cmp.season} ${cmp.score}`
+    + `${mcs ? `、MCS ${mcs.score} ${mcs.stage}` : '、MCS 未取得'}、康波 ${cmp.season}`
     + `${posts ? `、文章 ${posts.length} 篇（封面 ${posts.filter((p) => p.cover).length} 張）` : '、文章未更新'}`
     + `、指標頁 ${inds.length}/${INDICATORS.length}`);
 }
