@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>現金流人生地圖｜2 分鐘找到你的配息規劃類型｜MOMO財商智庫</title>
-  <meta name="description" content="8 題情境小測驗，2 分鐘找出你的現金流規劃類型：細水長流、守本優先、成長累積、雙軌平衡或起步探索。拿到專屬人物卡、你的本金數字與該注意的事，可存圖分享。教育性自我探索，不是正式風險屬性評估。" />
+  <title>理財動物測驗｜2 分鐘測出你是哪一種理財小動物｜MOMO財商智庫</title>
+  <meta name="description" content="理財動物測驗：8 題情境題，2 分鐘測出你是細水獺、穩穩龜、囤囤鼠、兩好鷹還是探路狐，對應 5 種現金流規劃類型。拿到專屬動物卡、你的本金數字與該注意的事，可存圖分享。教育性自我探索，不是正式風險屬性評估。" />
   <link rel="canonical" href="https://momowinwin.com/MOMO_FinSphere/money-map.html" />
   <meta name="robots" content="index,follow" />
   <meta name="author" content="明哲MOMO" />
@@ -15,8 +15,8 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="MOMO財商智庫" />
   <meta property="og:locale" content="zh_TW" />
-  <meta property="og:title" content="你是哪一種現金流人？2 分鐘小測驗｜MOMO財商智庫" />
-  <meta property="og:description" content="8 題情境題，找出你的配息規劃類型，拿一張專屬人物卡。" />
+  <meta property="og:title" content="你是哪一種理財小動物？理財動物測驗｜MOMO財商智庫" />
+  <meta property="og:description" content="8 題情境題，測出你是細水獺、穩穩龜、囤囤鼠、兩好鷹還是探路狐，拿一張專屬動物卡。" />
   <meta property="og:url" content="https://momowinwin.com/MOMO_FinSphere/money-map.html" />
   <meta property="og:image" content="https://momowinwin.com/og-default.png" />
   <script type="application/ld+json">
@@ -25,7 +25,7 @@
   "@graph": [
     {
       "@type": "WebApplication",
-      "name": "現金流人生地圖：配息規劃類型小測驗",
+      "name": "理財動物測驗：配息規劃類型小測驗",
       "url": "https://momowinwin.com/MOMO_FinSphere/money-map.html",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web Browser",
@@ -41,7 +41,7 @@
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "MOMO雙贏策略", "item": "https://momowinwin.com/" },
         { "@type": "ListItem", "position": 2, "name": "MOMO財商智庫", "item": "https://momowinwin.com/MOMO_FinSphere/" },
-        { "@type": "ListItem", "position": 3, "name": "現金流人生地圖" }
+        { "@type": "ListItem", "position": 3, "name": "理財動物測驗" }
       ]
     },
     {
@@ -121,7 +121,8 @@
     .pills span { background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13.5px; font-weight: 700; }
     .types { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0 24px; }
     .types div { background: #fff; border-radius: 16px; padding: 12px 2px 10px; text-align: center; box-shadow: var(--shadow); }
-    .types small { display: block; font-size: 10.5px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
+    .kicker { display: inline-block; margin: 0; font-size: 13px; font-weight: 900; letter-spacing: .12em; color: var(--pop); background: #fff; padding: 5px 14px; border-radius: 999px; box-shadow: var(--shadow); }
+    .types small { display: block; font-size: 11.5px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px 20px; border-radius: 18px; border: none;
       font: 900 17px "Noto Sans TC", sans-serif; cursor: pointer; text-decoration: none; transition: transform .12s, box-shadow .12s; }
@@ -138,7 +139,7 @@
     .ic { display: inline-block; vertical-align: middle; flex: none; }
     .q-icon { width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; color: #fff; background: linear-gradient(145deg, var(--pop-2), var(--pop)); box-shadow: 0 8px 18px -8px rgba(255,107,74,.7); }
     .hi { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; background: #fff1ec; color: var(--pop); margin-right: 8px; vertical-align: -6px; }
-    .tb { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; color: #fff; margin: 0 auto 6px; }
+    .tb { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; color: #fff; margin: 0 auto 6px; }
     .pills span { display: inline-flex; align-items: center; gap: 6px; }
     .btn .ic { margin-right: 2px; }
     .q-title { font-size: clamp(22px, 6vw, 27px); font-weight: 900; line-height: 1.4; margin: 10px 0 6px; }
@@ -184,8 +185,10 @@
     .pcard::after { width: 140px; height: 140px; left: -50px; bottom: -50px; }
     .pcard > * { position: relative; }
     .p-tag { display: inline-block; background: rgba(255,255,255,.22); padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; letter-spacing: .05em; }
-    .p-badge { width: 96px; height: 96px; border-radius: 28px; display: grid; place-items: center; background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.4); margin: 16px 0 12px; }
-    .p-name { font-size: 34px; font-weight: 900; margin: 0; }
+    .p-badge { width: 136px; height: 136px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.93); box-shadow: 0 12px 28px -10px rgba(0,0,0,.25); margin: 16px 0 12px; animation: bob 2.6s ease-in-out infinite; }
+    .p-sub { margin: 6px 0 0; font-size: 14px; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+    .p-sub span { background: rgba(255,255,255,.24); border-radius: 999px; padding: 3px 10px; font-size: 12.5px; }
+    .p-name { font-size: 40px; letter-spacing: .04em; font-weight: 900; margin: 0; }
     .p-line { font-size: 16.5px; font-weight: 700; opacity: .95; margin: 6px 0 14px; line-height: 1.6; }
     .p-traits { display: flex; flex-wrap: wrap; gap: 6px; }
     .p-traits span { background: rgba(255,255,255,.2); border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 700; }
@@ -279,15 +282,15 @@
 
   <!-- 給讀者與搜尋引擎的說明（只在開場畫面顯示） -->
   <section class="about" id="about" aria-labelledby="about-h">
-    <h2 id="about-h">現金流人生地圖是什麼？</h2>
-    <p>一個 8 題、約 2 分鐘的情境小測驗。依你的資金用途、用錢時間、每月想多領的金額、面對下跌的反應與最在意的事，歸納出 5 種常見的<b>現金流規劃類型</b>，並告訴你該注意的事、需要多少本金，以及用定期定額花 5～20 年存到的每月金額。本金估算一律以年化總報酬 6% 為假設。</p>
-    <h3>5 種現金流規劃類型</h3>
+    <h2 id="about-h">理財動物測驗是什麼？</h2>
+    <p>一個 8 題、約 2 分鐘的情境小測驗。依你的資金用途、用錢時間、每月想多領的金額、面對下跌的反應與最在意的事，歸納出 5 種常見的<b>現金流規劃類型</b>，每一型都有一隻代表動物，並告訴你該注意的事、需要多少本金，以及用定期定額花 5～20 年存到的每月金額。本金估算一律以年化總報酬 6% 為假設。</p>
+    <h3>5 種理財動物</h3>
     <dl class="tlist">
-      <div><dt>細水長流型</dt><dd>重視每月入帳、耐得住一般波動、偏長期。<br><span>要注意：配息率不等於報酬率，要一起看淨值變化；不只挑配息率最高的；預留緊急預備金。</span></dd></div>
-      <div><dt>守本優先型</dt><dd>最在意本金不縮水，偏好低波動。<br><span>要注意：低波動的代價是報酬期待較低，要留意通膨；債券類資產也會因利率漲跌；把要用的錢依時間分層。</span></dd></div>
-      <div><dt>成長累積型</dt><dd>時間長、能承受波動，先讓資產變大，現金流之後再說。<br><span>要注意：定期定額與紀律比猜高低點重要；越接近用錢時間越要降低波動；分散產業與地區。</span></dd></div>
-      <div><dt>雙軌平衡型</dt><dd>現金流和成長都想要，用核心＋衛星兼顧。<br><span>要注意：先決定核心與衛星各自的任務；定期再平衡；用「真實報酬＝配息＋淨值變化」檢查成果。</span></dd></div>
-      <div><dt>起步探索型</dt><dd>剛開始接觸投資，想先搞懂規則。<br><span>要注意：先存 3～6 個月生活費當預備金；從看得懂的工具開始；先學會看配息、淨值、費用三個數字。</span></dd></div>
+      <div><dt>細水獺｜細水長流型</dt><dd>重視每月入帳、耐得住一般波動、偏長期。<br><span>要注意：配息率不等於報酬率，要一起看淨值變化；不只挑配息率最高的；預留緊急預備金。</span></dd></div>
+      <div><dt>穩穩龜｜守本優先型</dt><dd>最在意本金不縮水，偏好低波動。<br><span>要注意：低波動的代價是報酬期待較低，要留意通膨；債券類資產也會因利率漲跌；把要用的錢依時間分層。</span></dd></div>
+      <div><dt>囤囤鼠｜成長累積型</dt><dd>時間長、能承受波動，先讓資產變大，現金流之後再說。<br><span>要注意：定期定額與紀律比猜高低點重要；越接近用錢時間越要降低波動；分散產業與地區。</span></dd></div>
+      <div><dt>兩好鷹｜雙軌平衡型</dt><dd>現金流和成長都想要，用核心＋衛星兼顧。<br><span>要注意：先決定核心與衛星各自的任務；定期再平衡；用「真實報酬＝配息＋淨值變化」檢查成果。</span></dd></div>
+      <div><dt>探路狐｜起步探索型</dt><dd>剛開始接觸投資，想先搞懂規則。<br><span>要注意：先存 3～6 個月生活費當預備金；從看得懂的工具開始；先學會看配息、淨值、費用三個數字。</span></dd></div>
     </dl>
     <h3>常見問題</h3>
     <details><summary>這個測驗在測什麼？</summary><p>依你的資金用途、用錢時間、每月想多領的金額、可規劃資金、面對下跌的反應、投資經驗、最在意的事與目前困擾，共 8 題，歸納出 5 種常見的現金流規劃類型，並列出該注意的事與本金估算。它是教育性的自我探索，不是正式的風險屬性評估（KYC），也不推薦任何商品。</p></details>
@@ -310,6 +313,74 @@
   const RATE = 0.06;   // 年化報酬假設上限 6%
 
   // ===== 線條圖示（24×24，跟著文字顏色） =====
+  // ===== 原創動物角色（viewBox 0 0 200 200） =====
+const EYE=(x,y,r=7)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#2b1d16"/><circle cx="${x+2.4}" cy="${y-2.6}" r="${r*0.36}" fill="#fff"/>`;
+const BLUSH=(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="9" ry="5.5" fill="#ff8a8a" opacity=".45"/>`;
+const ANIMAL={
+stream:`<g>
+ <circle cx="60" cy="62" r="15" fill="#6e4329"/><circle cx="60" cy="63" r="7" fill="#c99067"/>
+ <circle cx="140" cy="62" r="15" fill="#6e4329"/><circle cx="140" cy="63" r="7" fill="#c99067"/>
+ <ellipse cx="100" cy="104" rx="64" ry="57" fill="#8b5a3c"/>
+ <ellipse cx="100" cy="124" rx="42" ry="31" fill="#f0d9b8"/>
+ ${EYE(77,98)}${EYE(123,98)}${BLUSH(64,118)}${BLUSH(136,118)}
+ <ellipse cx="100" cy="114" rx="10" ry="7" fill="#3b2418"/>
+ <path d="M90 125q10 9 10-2q0 11 10 2" fill="none" stroke="#3b2418" stroke-width="3" stroke-linecap="round"/>
+ <path d="M70 120h-22M70 128l-20 5M130 120h22M130 128l20 5" stroke="#6e4329" stroke-width="2.4" stroke-linecap="round"/>
+ <path d="M100 140c-14 18-21 29-21 39a21 21 0 0 0 42 0c0-10-7-21-21-39z" fill="#55c4e6" stroke="#fff" stroke-width="4"/>
+ <path d="M91 178a9 9 0 0 0 7 9" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+ <ellipse cx="78" cy="170" rx="13" ry="10" fill="#6e4329"/><ellipse cx="122" cy="170" rx="13" ry="10" fill="#6e4329"/>
+</g>`,
+guard:`<g>
+ <ellipse cx="62" cy="160" rx="14" ry="10" fill="#8fcb76"/><ellipse cx="128" cy="160" rx="14" ry="10" fill="#8fcb76"/>
+ <path d="M28 142Q28 58 96 56Q164 58 164 142Z" fill="#3e9b63"/>
+ <path d="M96 80l20 12v24l-20 12-20-12V92z" fill="#5fbf85"/>
+ <path d="M56 98l16 8v20l-16 8-12-6V106zM136 98l-16 8v20l16 8 12-6V106z" fill="#5fbf85"/>
+ <path d="M86 103l7 8 13-15" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+ <rect x="20" y="136" width="152" height="16" rx="8" fill="#2c7a4c"/>
+ <circle cx="166" cy="104" r="30" fill="#a6d98a"/>
+ ${EYE(170,98,6.5)}${BLUSH(176,114)}
+ <path d="M160 116q8 6 16 0" fill="none" stroke="#2b1d16" stroke-width="3" stroke-linecap="round"/>
+</g>`,
+grow:`<g>
+ <path d="M70 168C20 170 18 110 40 84c18-22 52-18 54 6 2 18-20 22-24 10" fill="#c4672b"/>
+ <path d="M50 96c8-10 24-8 26 2" fill="none" stroke="#e89a5f" stroke-width="6" stroke-linecap="round"/>
+ <ellipse cx="114" cy="142" rx="38" ry="40" fill="#e58a45"/>
+ <ellipse cx="114" cy="150" rx="24" ry="28" fill="#f8d9b2"/>
+ <path d="M86 62l-6-28 22 18zM142 62l6-28-22 18z" fill="#e58a45"/><path d="M84 40l-6-10M144 40l6-10" stroke="#c4672b" stroke-width="5" stroke-linecap="round"/>
+ <circle cx="114" cy="84" r="38" fill="#e58a45"/>
+ <ellipse cx="114" cy="96" rx="22" ry="17" fill="#f8d9b2"/>
+ ${EYE(100,80,6.5)}${EYE(128,80,6.5)}${BLUSH(90,96)}${BLUSH(138,96)}
+ <ellipse cx="114" cy="92" rx="6" ry="4.5" fill="#3b2418"/>
+ <path d="M107 100q7 6 14 0" fill="none" stroke="#3b2418" stroke-width="2.6" stroke-linecap="round"/>
+ <ellipse cx="114" cy="146" rx="15" ry="17" fill="#b5793f"/><path d="M97 138q17-16 34 0z" fill="#6b4423"/><path d="M114 124v-6" stroke="#6b4423" stroke-width="4" stroke-linecap="round"/>
+ <ellipse cx="99" cy="148" rx="8" ry="7" fill="#c4672b"/><ellipse cx="129" cy="148" rx="8" ry="7" fill="#c4672b"/>
+</g>`,
+balance:`<g>
+ <path d="M58 58l8 26-22-8zM142 58l-8 26 22-8z" fill="#7a5a3e"/>
+ <ellipse cx="100" cy="116" rx="60" ry="66" fill="#9b7451"/>
+ <ellipse cx="100" cy="142" rx="36" ry="36" fill="#e9d2b0"/>
+ <path d="M86 132l6 6 6-6M102 132l6 6 6-6M94 150l6 6 6-6" fill="none" stroke="#b08a63" stroke-width="3" stroke-linecap="round"/>
+ <path d="M42 120q-6 34 18 52q-2-30-18-52zM158 120q6 34-18 52q2-30 18-52z" fill="#7a5a3e"/>
+ <circle cx="76" cy="96" r="25" fill="#f4e4c8"/><circle cx="124" cy="96" r="25" fill="#f4e4c8"/>
+ <circle cx="76" cy="96" r="13" fill="#2b1d16"/><circle cx="80" cy="91" r="4.5" fill="#fff"/>
+ <circle cx="124" cy="96" r="13" fill="#2b1d16"/><circle cx="128" cy="91" r="4.5" fill="#fff"/>
+ <path d="M92 112l8 13 8-13z" fill="#f3a53b"/>
+ ${BLUSH(62,120)}${BLUSH(138,120)}
+ <ellipse cx="84" cy="182" rx="9" ry="5" fill="#f3a53b"/><ellipse cx="116" cy="182" rx="9" ry="5" fill="#f3a53b"/>
+</g>`,
+explore:`<g>
+ <path d="M44 40l18 58-44-6zM156 40l-18 58 44-6z" fill="#f08a3c"/>
+ <path d="M44 40l10 32-18-2zM156 40l-10 32 18-2z" fill="#3b2418"/>
+ <path d="M28 96Q34 160 100 172Q166 160 172 96Q140 70 100 72Q60 70 28 96Z" fill="#f08a3c"/>
+ <path d="M40 118Q60 116 100 150Q140 116 160 118Q150 160 100 172Q50 160 40 118Z" fill="#fff6ea"/>
+ ${EYE(74,112)}${EYE(126,112)}${BLUSH(60,132)}${BLUSH(140,132)}
+ <ellipse cx="100" cy="150" rx="9" ry="6.5" fill="#2b1d16"/>
+ <path d="M92 160q8 6 16 0" fill="none" stroke="#2b1d16" stroke-width="3" stroke-linecap="round"/>
+ <circle cx="160" cy="166" r="20" fill="#fff" stroke="#3b2418" stroke-width="4"/>
+ <path d="M168 158l-5 13-11 3 5-13z" fill="#e8463c"/>
+</g>`};
+  const ani = (k, size) => `<svg viewBox="0 0 200 200" width="${size}" height="${size}" aria-hidden="true">${ANIMAL[k]}</svg>`;
+
   const ICON = {
     target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -397,19 +468,19 @@
 
   // ===== 類型 =====
   const P = {
-    stream: { icon: 'drop', name: '細水長流型', color: ['#16b38a', '#0e8f8f'], line: '你要的不是一夕暴富，而是每個月都有錢流進來的安心感。',
+    stream: { icon: 'drop', key: 'stream', nick: '細水獺', sub: '細水長流，每個月都有收穫', name: '細水長流型', color: ['#16b38a', '#0e8f8f'], line: '你要的不是一夕暴富，而是每個月都有錢流進來的安心感。',
       traits: ['重視現金流', '耐得住波動', '長期派'],
       watch: ['配息率不等於報酬率，要一起看淨值變化，確認配息不是在吃本金', '不要只挑配息率最高的，分散在不同類型的資產', '預留一筆緊急預備金，避免市場下跌時被迫賣出'] },
-    guard: { icon: 'shieldCheck', name: '守本優先型', color: ['#4d8dff', '#3b5bdb'], line: '先守住，再談賺。對你來說，睡得好比報酬高更重要。',
+    guard: { icon: 'shieldCheck', key: 'guard', nick: '穩穩龜', sub: '殼最硬，走得慢但走得穩', name: '守本優先型', color: ['#4d8dff', '#3b5bdb'], line: '先守住，再談賺。對你來說，睡得好比報酬高更重要。',
       traits: ['重視本金', '偏好低波動', '謹慎派'],
       watch: ['低波動也有代價：報酬期待要放低，留意通膨侵蝕購買力', '債券類資產也會因利率變動而漲跌，不是完全沒有風險', '把要用的錢依時間分層，短期要用的不要放在波動大的地方'] },
-    grow: { icon: 'up', name: '成長累積型', color: ['#ff6b4a', '#e8458b'], line: '你有時間、也耐得住波動，先讓雪球滾大，現金流之後再說。',
+    grow: { icon: 'up', key: 'grow', nick: '囤囤鼠', sub: '一顆一顆囤，讓雪球越滾越大', name: '成長累積型', color: ['#ff6b4a', '#e8458b'], line: '你有時間、也耐得住波動，先讓雪球滾大，現金流之後再說。',
       traits: ['時間長', '能承受波動', '成長派'],
       watch: ['定期定額＋紀律，比猜高低點重要', '越接近要用錢的時間，越要逐步降低波動', '分散產業與地區，避免集中在單一熱門題材'] },
-    balance: { icon: 'scale', name: '雙軌平衡型', color: ['#8b5cf6', '#6d28d9'], line: '現金流和成長你都想要，用「核心＋衛星」兼顧兩邊。',
+    balance: { icon: 'scale', key: 'balance', nick: '兩好鷹', sub: '現金流和成長，兩邊都要看清楚', name: '雙軌平衡型', color: ['#8b5cf6', '#6d28d9'], line: '現金流和成長你都想要，用「核心＋衛星」兼顧兩邊。',
       traits: ['兩者兼顧', '中等風險', '配置派'],
       watch: ['先決定核心部位和衛星部位各自的任務，再挑工具', '定期再平衡：漲多的減一點、跌多的補一點', '一起看配息和淨值，用「真實報酬＝配息＋淨值變化」檢查成果'] },
-    explore: { icon: 'compass', name: '起步探索型', color: ['#ffb547', '#f08c00'], line: '你正站在起點：先搞懂規則，再出發，會走得更穩。',
+    explore: { icon: 'compass', key: 'explore', nick: '探路狐', sub: '先看懂地圖，再出發', name: '起步探索型', color: ['#ffb547', '#f08c00'], line: '你正站在起點：先搞懂規則，再出發，會走得更穩。',
       traits: ['剛起步', '想先搞懂', '學習派'],
       watch: ['先存好 3～6 個月的生活費當緊急預備金', '從看得懂的工具開始，不懂的不要買', '先學會看配息、淨值、費用這三個數字'] }
   };
@@ -447,10 +518,10 @@
   function intro() {
     S.i = -1; progress(); $('about').hidden = false;
     swap(`<section class="screen hero">
-      <div class="big">${ic('map', 44, 1.6)}</div>
-      <h1>你是哪一種<br><span>現金流人</span>？</h1>
-      <p>8 題情境題、大約 2 分鐘，找出你的規劃類型，<br>拿一張專屬人物卡，還有你該注意的事。</p>
-      <div class="types">${Object.values(P).map((p) => `<div><span class="tb" style="background:linear-gradient(145deg,${p.color[0]},${p.color[1]})">${ic(p.icon, 22, 2)}</span><small>${p.name.replace('型', '')}</small></div>`).join('')}</div>
+            <p class="kicker">理財動物測驗</p>
+      <h1>你是哪一種<br><span>理財小動物</span>？</h1>
+      <p>8 題情境題、大約 2 分鐘，測出你的現金流規劃類型，拿一張專屬動物卡，還有你該注意的事。</p>
+      <div class="types">${Object.values(P).map((p) => `<div><span class="tb" style="background:linear-gradient(145deg,${p.color[0]},${p.color[1]})">${ani(p.key, 60)}</span><small>${p.nick}</small></div>`).join('')}</div>
       <div class="pills"><span>${ic('clock', 16, 2)}約 2 分鐘</span><span>${ic('eyeOff', 16, 2)}不用填真實姓名</span><span>${ic('image', 16, 2)}可存圖分享</span></div>
       <button class="btn btn-go" id="start">開始探索 →</button>
       <p class="fine">教育性的自我探索小測驗，不是正式的風險屬性評估，也不構成任何投資建議。</p>
@@ -572,7 +643,7 @@
   function summaryText(p) {
     const a = S.a;
     return [
-      `【現金流人生地圖】我的類型：${p.name}`,
+      `【理財動物測驗】我是${p.nick}（${p.name}）`,
       `目的：${label('goal', a.goal)}`,
       `用錢時間：${label('when', a.when)}`,
       `每月想多領：${a.monthly.toLocaleString('zh-TW')} 元`,
@@ -620,11 +691,12 @@
     track('quiz_complete', { tool: 'money_map', persona: key });
     if (!S.sent) { S.sent = true; send(); }
     swap(`<section class="screen">
-      <p class="reveal">你的現金流類型是</p>
+      <p class="reveal">你的理財動物是</p>
       <div class="pcard" style="background:${grad}">
-        <span class="p-tag">現金流人生地圖</span>
-        <div class="p-badge">${ic(p.icon, 54, 1.6)}</div>
-        <h1 class="p-name">${p.name}</h1>
+        <span class="p-tag">理財動物測驗</span>
+        <div class="p-badge">${ani(p.key, 118)}</div>
+        <h1 class="p-name">${p.nick}</h1>
+        <p class="p-sub"><span>${p.name}</span>${p.sub}</p>
         <p class="p-line">${p.line}</p>
         <div class="p-traits">${p.traits.map((t) => `<span>#${t}</span>`).join('')}<span>#${label('goal', a.goal)}</span></div>
         <div class="p-site">momowinwin.com｜MOMO財商智庫</div>
@@ -704,7 +776,7 @@
       $('planYears').onclick = (e) => { const b = e.target.closest('button'); if (b) { S.plan.years = +b.dataset.y; renderPlan(); } };
       $('planPv').onclick = (e) => { const b = e.target.closest('button'); if (b) { S.plan.pv = +b.dataset.v; renderPlan(); } };
       renderPlan();
-      S.badgeImg = null; iconImg(p.icon, '#ffffff').then((im) => { S.badgeImg = im; });
+      S.badgeImg = null; animalImg(p.key).then((im) => { S.badgeImg = im; });
       $('retry').onclick = () => { S.planTxt = ''; S.a = { monthly: 30000, pain: [] }; S.sent = false; S.sid = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); intro(); };
       $('saveImg').onclick = () => saveCard(p);
       $('addLine').onclick = () => { track('line_click', { link_location: 'money_map_add' }); $('n1').classList.add('done'); $('n1').innerHTML = ic('check', 18, 2.4); };
@@ -732,6 +804,10 @@
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICON[name]}</svg>`;
     return new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); });
   }
+  function animalImg(k) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 200 200">${ANIMAL[k]}</svg>`;
+    return new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); });
+  }
   function saveCard(p) {
     const badge = S.badgeImg;   // 結果頁出現時就先載好，按下去才能同步叫出分享（iPhone 需要）
     const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
@@ -743,23 +819,26 @@
     x.beginPath(); x.arc(60, H - 60, 220, 0, Math.PI * 2); x.fill();
     const F = '"Noto Sans TC", "PingFang TC", sans-serif';
     x.fillStyle = '#fff'; x.textAlign = 'left';
-    x.font = `700 36px ${F}`; x.fillText('現金流人生地圖｜我的類型', 90, 150);
-    x.fillStyle = 'rgba(255,255,255,.18)'; roundRect(x, 90, 210, 220, 220, 60); x.fill();
-    x.strokeStyle = 'rgba(255,255,255,.45)'; x.lineWidth = 3; x.stroke();
-    if (badge) x.drawImage(badge, 120, 240, 160, 160);
+    x.font = `700 36px ${F}`; x.fillText('理財動物測驗｜我是…', 90, 150);
+    x.save(); x.shadowColor = 'rgba(0,0,0,.18)'; x.shadowBlur = 40; x.shadowOffsetY = 14;
+    x.fillStyle = 'rgba(255,255,255,.94)'; x.beginPath(); x.arc(250, 360, 170, 0, Math.PI * 2); x.fill(); x.restore();
+    if (badge) x.drawImage(badge, 100, 210, 300, 300);
     x.fillStyle = '#fff';
-    x.font = `900 120px ${F}`; x.fillText(p.name, 90, 580);
+    x.font = `900 124px ${F}`; x.fillText(p.nick, 90, 680);
+    x.font = `700 36px ${F}`; const tw = x.measureText(p.name).width + 48;
+    x.fillStyle = 'rgba(255,255,255,.24)'; roundRect(x, 90, 712, tw, 62, 31); x.fill();
+    x.fillStyle = '#fff'; x.fillText(p.name, 114, 755); x.fillText(p.sub, 90 + tw + 22, 755);
     x.font = `700 44px ${F}`;
-    wrap(x, p.line, W - 180).forEach((l, k) => x.fillText(l, 90, 680 + k * 66));
-    let tx = 90, ty = 900; x.font = `700 38px ${F}`;
+    wrap(x, p.line, W - 180).forEach((l, k) => x.fillText(l, 90, 860 + k * 64));
+    let tx = 90, ty = 1060; x.font = `700 38px ${F}`;
     p.traits.concat(label('goal', S.a.goal)).forEach((t) => {
       const s = '#' + t, w = x.measureText(s).width + 56;
       if (tx + w > W - 90) { tx = 90; ty += 92; }
       x.fillStyle = 'rgba(255,255,255,.22)'; roundRect(x, tx, ty - 50, w, 72, 36); x.fill();
       x.fillStyle = '#fff'; x.fillText(s, tx + 28, ty); tx += w + 18;
     });
-    x.font = `700 40px ${F}`; x.fillStyle = 'rgba(255,255,255,.9)';
-    x.fillText('你是哪一種？測測看：momowinwin.com/map', 90, H - 110);
+    x.font = `700 36px ${F}`; x.fillStyle = 'rgba(255,255,255,.9)';
+    x.fillText('你是哪一種理財動物？測測看：momowinwin.com/map', 90, H - 90);
     let blob = null;
     try {   // 同步轉檔，避免 iPhone 因為非同步而擋掉分享
       const bin = atob(c.toDataURL('image/png').split(',')[1]); const u8 = new Uint8Array(bin.length);
@@ -767,10 +846,10 @@
       blob = new Blob([u8], { type: 'image/png' });
     } catch (_) {}
     if (!blob) return toast('存圖失敗，請直接截圖');
-    const file = new File([blob], `現金流類型-${p.name}.png`, { type: 'image/png' });
+    const file = new File([blob], `理財動物-${p.nick}.png`, { type: 'image/png' });
     track('quiz_share', { tool: 'money_map', persona: S.key });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: `我是${p.name}`, text: '你是哪一種現金流人？' }).catch(() => {});
+      navigator.share({ files: [file], title: `我是${p.nick}`, text: '你是哪一種理財小動物？momowinwin.com/map' }).catch(() => {});
     } else {
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('圖片已下載');
