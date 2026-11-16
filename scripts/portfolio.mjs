@@ -193,7 +193,7 @@ function render(d) {
     core: ['核心｜收息現金流', '以多重資產等收益型配置為主，把收益來源分散在股、債與其他資產，目標是每個月都有現金流入帳，生活支出不必靠賣出資產。'],
     sat: ['衛星｜成長動能', '用股票部位追求長期成長、拉高整體總報酬；比例刻意控制在少數，市場波動時不影響核心的現金流。']
   };
-  const arch = d.groups.map((g) => `<div class="grp ${g.key}"><div class="grp-top"><b>${GROUP[g.key][0]}</b><span>${(g.w * 100).toFixed(0)}%</span></div><p>${GROUP[g.key][1]}</p><ul>${g.markets.map((m) => `<li>${esc(m.market)}<i>${(m.w * 100).toFixed(0)}%</i></li>`).join('')}</ul>${g.yield != null && g.yield >= 0.05 ? `<small>這一塊的加權配息率約 ${g.yield.toFixed(1)}%</small>` : ''}</div>`).join('');
+  const arch = d.groups.map((g) => `<div class="grp ${g.key}"><div class="grp-top"><b>${GROUP[g.key][0]}</b><span>${(g.w * 100).toFixed(0)}%</span></div><p>${GROUP[g.key][1]}</p><ul>${g.markets.map((m) => `<li>${esc(m.market)}<i>${(m.w * 100).toFixed(0)}%</i></li>`).join('')}</ul></div>`).join('');
   const _u = d.groups.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
   const ds = {
     '@context': 'https://schema.org', '@type': 'Dataset',
