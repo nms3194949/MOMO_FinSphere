@@ -158,7 +158,7 @@ function lineChart(c, bmLabel) {
   const ticks = [];
   // 刻度取整數百分比（含 0%，也就是起點 100）
   const step = [1, 2, 5, 10, 20, 25, 50, 100].find((st) => (hi - lo) / st <= 6) || 100;
-  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) { const pc = v - 100; ticks.push(`<line x1="${L}" x2="${W - Rr}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#e4dccb"/><text x="${L - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v.toFixed(0)}</text><text class="pc" x="${W - Rr + 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="start">${(pc >= 0 ? '+' : '') + pc.toFixed(0)}%</text>`); }
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) { const pc = v - 100; ticks.push(`<line x1="${L}" x2="${W - Rr}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#e4dccb"/><text x="${L - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v.toFixed(0)}</text><text class="pc${pc > 0.001 ? ' up' : pc < -0.001 ? ' dn' : ''}" x="${W - Rr + 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="start">${(pc >= 0 ? '+' : '') + pc.toFixed(0)}%</text>`); }
   const months = [];
   c.dates.forEach((d, i) => { if (i && d.slice(5, 7) !== c.dates[i - 1].slice(5, 7) && +d.slice(5, 7) % 3 === 1) months.push(`<text x="${x(i).toFixed(1)}" y="${Hh - 8}" text-anchor="middle">${d.slice(0, 7).replace('-', '/')}</text>`); });
   const base = `<line x1="${L}" x2="${W - Rr}" y1="${y(100).toFixed(1)}" y2="${y(100).toFixed(1)}" stroke="#7a8296" stroke-dasharray="3 4"/>`;

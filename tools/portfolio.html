@@ -92,7 +92,8 @@
     .chart { margin: 0 0 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 10px 10px; }
     .chart svg { width: 100%; height: auto; display: block; }
     .chart .ax text { font-size: 12px; fill: var(--muted); }
-    .chart .ax text.pc { fill: var(--gold); font-weight: 600; }
+    .chart .ax text.pc { fill: var(--muted); font-weight: 600; }
+    .chart .ax text.pc.up { fill: var(--up); } .chart .ax text.pc.dn { fill: var(--dn); }
     @media (max-width: 520px) { .chart .ax text { font-size: 20px; } .kpis { grid-template-columns: 1fr 1fr; } .kpis b { font-size: 23px; } }
     .chart figcaption { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); padding: 6px 6px 0; }
     .chart figcaption i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
