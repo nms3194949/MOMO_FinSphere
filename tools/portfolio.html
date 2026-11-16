@@ -6,7 +6,7 @@
   <title>MOMO 目前怎麼配置？配置策略與同期表現｜MOMO財商智庫</title>
   <meta name="description" content="明哲MOMO 自己的基金配置：佈局在哪些市場、各類別比例、加權配息率，以及近 1 個月到 1 年的本金與含息總報酬，並和 S&P 500 指數基金同期比較。每日自動更新，過去績效不代表未來。" />
   <link rel="canonical" href="https://momowinwin.com/MOMO_FinSphere/tools/portfolio.html" />
-  <meta name="robots" content="noindex,follow" />
+  <meta name="robots" content="index,follow" />
   <meta name="author" content="明哲MOMO" />
   <meta name="theme-color" content="#f6f1e7" />
   <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -135,7 +135,36 @@
 
     <section aria-label="配置與表現">
       <!-- SNAP:PF:START -->
-      <p class="answer">資料整理中，每天自動更新。</p>
+      <p class="answer" id="pf-lead">截至 2026-11-13，MOMO 的配置分布在 4 個市場類別、6 檔基金，加權配息率約 0.1%；近 1 年含息總報酬 +13.6%、本金（只看淨值）+5.2%。</p>
+      <div class="kpis">
+        <div><span>加權配息率</span><b>0.1%</b><small>依目前比例加權</small></div>
+        <div><span>近 1 年含息總報酬</span><b class="up">+13.6%</b><small>淨值變化＋配息</small></div>
+        <div><span>本金年化報酬</span><b class="up">+5.2%</b><small>只看淨值、配息領出｜2025-11-13 起</small></div>
+        <div><span>同期 S&amp;P 500 指數基金</span><b>—</b><small>近 1 年</small></div>
+      </div>
+
+      <h2 id="alloc">佈局在哪些市場？</h2>
+      <div class="alloc"><svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="市場分布"><path d="M90.00,20.00A70,70 0 1,1 20.55,81.23L46.35,84.49A44,44 0 1,0 90.00,46.00Z" fill="#0c152a" fill-rule="evenodd"/><path d="M20.55,81.23A70,70 0 0,1 38.97,42.08L57.93,59.88A44,44 0 0,0 46.35,84.49Z" fill="#a88a3d" fill-rule="evenodd"/><path d="M38.97,42.08A70,70 0 0,1 64.23,24.92L73.80,49.09A44,44 0 0,0 57.93,59.88Z" fill="#4f7cac" fill-rule="evenodd"/><path d="M64.23,24.92A70,70 0 0,1 90.00,20.00L90.00,46.00A44,44 0 0,0 73.80,49.09Z" fill="#7a9e7e" fill-rule="evenodd"/></svg><ul class="legend"><li><i style="background:#0c152a"></i>多重資產<b>77%</b></li><li><i style="background:#a88a3d"></i>全球股票<b>10%</b></li><li><i style="background:#4f7cac"></i>台灣股票<b>7%</b></li><li><i style="background:#7a9e7e"></i>歐洲股票<b>6%</b></li></ul></div>
+
+      <h2 id="perf">同期表現比較</h2>
+      <figure class="chart"><svg viewBox="0 0 720 260" role="img" aria-label="近 1 年走勢，起點為 100">
+<g class="ax"><line x1="44" x2="708" y1="230.0" y2="230.0" stroke="#e4dccb"/><text x="38" y="234.0" text-anchor="end">96</text><line x1="44" x2="708" y1="176.0" y2="176.0" stroke="#e4dccb"/><text x="38" y="180.0" text-anchor="end">102</text><line x1="44" x2="708" y1="122.0" y2="122.0" stroke="#e4dccb"/><text x="38" y="126.0" text-anchor="end">108</text><line x1="44" x2="708" y1="68.0" y2="68.0" stroke="#e4dccb"/><text x="38" y="72.0" text-anchor="end">114</text><line x1="44" x2="708" y1="14.0" y2="14.0" stroke="#e4dccb"/><text x="38" y="18.0" text-anchor="end">120</text><text x="131.7" y="252" text-anchor="middle">2026/01</text><text x="294.6" y="252" text-anchor="middle">2026/04</text><text x="457.4" y="252" text-anchor="middle">2026/07</text><text x="620.3" y="252" text-anchor="middle">2026/10</text></g><line x1="44" x2="708" y1="198.0" y2="198.0" stroke="#7a8296" stroke-dasharray="3 4"/>
+<path d="" fill="none" stroke="#9aa3b5" stroke-width="2"/>
+<path d="M44.0,198.0L56.5,215.1L69.1,201.3L81.6,204.1L94.1,199.1L106.6,209.3L119.2,196.0L131.7,194.0L144.2,189.4L156.8,180.7L169.3,177.2L181.8,166.6L194.3,183.5L206.9,164.5L219.4,165.7L231.9,152.5L244.5,183.6L257.0,192.3L269.5,191.4L282.0,200.9L294.6,203.9L307.1,173.3L319.6,147.8L332.2,138.5L344.7,130.4L357.2,105.0L369.7,102.4L382.3,110.2L394.8,88.5L407.3,89.8L419.8,114.8L432.4,82.1L444.9,89.7L457.4,88.3L470.0,99.8L482.5,106.4L495.0,116.1L507.5,141.9L520.1,105.3L532.6,89.3L545.1,100.5L557.7,91.8L570.2,103.0L582.7,108.5L595.2,112.8L607.8,103.0L620.3,115.7L632.8,108.2L645.4,122.8L657.9,130.2L670.4,123.6L682.9,163.9L695.5,152.1L708.0,150.8" fill="none" stroke="#a88a3d" stroke-width="2" stroke-dasharray="6 4"/>
+<path d="M44.0,198.0L56.5,214.8L69.1,200.9L81.6,197.8L94.1,192.7L106.6,202.6L119.2,189.3L131.7,187.3L144.2,176.7L156.8,167.5L169.3,164.0L181.8,153.3L194.3,164.4L206.9,145.0L219.4,145.9L231.9,132.6L244.5,158.3L257.0,167.3L269.5,166.3L282.0,176.0L294.6,172.8L307.1,141.5L319.6,114.9L332.2,105.4L344.7,97.3L357.2,65.1L369.7,62.3L382.3,70.0L394.8,47.7L407.3,42.8L419.8,68.8L432.4,34.8L444.9,42.8L457.4,35.2L470.0,46.9L482.5,53.4L495.0,63.4L507.5,89.7L520.1,45.5L532.6,28.9L545.1,40.4L557.7,31.3L570.2,36.8L582.7,43.0L595.2,47.0L607.8,37.3L620.3,44.5L632.8,36.6L645.4,51.2L657.9,58.8L670.4,51.8L682.9,87.2L695.5,74.8L708.0,73.7" fill="none" stroke="#0c152a" stroke-width="2.6"/></svg>
+<figcaption><span><i class="k1"></i>MOMO 配置・含息總報酬</span><span><i class="k2"></i>MOMO 配置・本金（只看淨值）</span><span><i class="k3"></i>S&amp;P 500 指數基金</span><span>起點＝100</span></figcaption></figure>
+      <div class="table-wrap"><table class="pf">
+        <thead><tr><th>期間</th><th>含息總報酬</th><th>本金</th><th>S&amp;P 500</th></tr></thead>
+        <tbody><tr><th scope="row">近 1 個月</th><td class="dn">-2.4%</td><td class="dn">-3.1%</td><td class="dn">-2.8%</td></tr><tr><th scope="row">近 3 個月</th><td class="dn">-3.7%</td><td class="dn">-5.6%</td><td class="dn">-2.7%</td></tr><tr><th scope="row">近 6 個月</th><td class="dn">-0.2%</td><td class="dn">-4.2%</td><td class="up">+1.9%</td></tr><tr><th scope="row">今年以來</th><td class="up">+12.0%</td><td class="up">+4.3%</td><td class="up">+10.6%</td></tr><tr><th scope="row">近 1 年</th><td class="up">+13.6%</td><td class="up">+5.2%</td><td>—</td></tr></tbody>
+      </table></div>
+      
+
+      <h2 id="holdings">目前持有的基金</h2>
+      <div class="table-wrap"><table class="pf hold">
+        <thead><tr><th>基金（部分打碼）</th><th>比例</th><th>配息率</th><th>近 3 月</th><th>近 1 年</th><th>近 1 年含息</th></tr></thead>
+        <tbody><tr><th scope="row">瀚亞●●●●基金<small>多重資產</small></th><td>77%</td><td>0.1%</td><td class="dn">-6.3%</td><td class="dn">-3.8%</td><td class="up">+6.6%</td></tr><tr><th scope="row">貝萊德●●●●基金<small>全球股票</small></th><td>10%</td><td>0.0%</td><td class="dn">-1.2%</td><td class="up">+12.8%</td><td class="up">+12.8%</td></tr><tr><th scope="row">安聯●●●●基金<small>歐洲股票</small></th><td>6%</td><td>0.1%</td><td class="up">+2.7%</td><td class="up">+15.7%</td><td class="up">+24.4%</td></tr><tr><th scope="row">元大●●●●基金<small>台灣股票</small></th><td>3%</td><td>0.0%</td><td class="dn">-13.2%</td><td class="up">+106.8%</td><td class="up">+106.8%</td></tr><tr><th scope="row">路博邁●●●●基金<small>台灣股票</small></th><td>3%</td><td>0.0%</td><td class="dn">-13.8%</td><td class="up">+68.7%</td><td class="up">+68.7%</td></tr><tr><th scope="row">元大●●●●基金<small>台灣股票</small></th><td>1%</td><td>0.0%</td><td class="dn">-5.2%</td><td class="up">+59.6%</td><td class="up">+59.6%</td></tr></tbody>
+      </table></div>
+      <p class="note">資料日期：2026-11-13｜「近 3 月」「近 1 年」為淨值報酬，不含配息；「含息」為淨值變化加上配息。配息率為年化配息率，配息可能由本金支出。</p>
       <!-- SNAP:PF:END -->
     </section>
 
