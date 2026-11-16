@@ -85,7 +85,7 @@
           <label for="l">保單借款本息</label>
           <div class="in"><input id="l" type="text" inputmode="numeric" value="2,000,000" /><em>元</em></div>
           <label for="d">抗損 <span>基金市值可承受的跌幅</span></label>
-          <div class="in"><input id="d" type="number" inputmode="decimal" value="10" min="1" max="99" step="any" /><em>%</em></div>
+          <div class="in"><input id="d" type="number" inputmode="decimal" value="15" min="1" max="99" step="any" /><em>%</em></div>
           <input id="cut" type="hidden" value="90" />
           <input id="ref" type="hidden" value="60" />
         </section>
@@ -226,7 +226,7 @@
     FIELDS.forEach(function (id) { $(id).addEventListener('input', save); $(id).addEventListener('change', save); });
     $('reset').addEventListener('click', function () {
       try { localStorage.removeItem(KEY); } catch (e) {}
-      $('v').value = '5,000,000'; $('f').value = '3,000,000'; $('l').value = '2,000,000'; $('d').value = '10'; calc();
+      $('v').value = '5,000,000'; $('f').value = '3,000,000'; $('l').value = '2,000,000'; $('d').value = '15'; calc();
     });
     ['v', 'f', 'l', 'rp'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
     $('rp').addEventListener('input', function () { lastRepay = 'amt'; calc(); });
