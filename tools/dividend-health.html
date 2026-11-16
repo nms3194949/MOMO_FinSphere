@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>配息基金健康度報告：配息會吃本金嗎？近一年調降與淨值變化｜MOMO財商智庫</title>
+  <meta name="description" content="MOMO 每月整理追蹤中的配息基金：各類型的平均配息率、近一年調降配息的比例、淨值變化與含息總報酬，用數據回答「配息會吃本金嗎」。不點名基金，過去績效不代表未來。" />
+  <link rel="canonical" href="https://momowinwin.com/MOMO_FinSphere/tools/dividend-health.html" />
+  <meta name="robots" content="noindex,follow" />
+  <meta name="author" content="明哲MOMO" />
+  <meta name="theme-color" content="#f6f1e7" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="MOMO財商智庫" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="配息基金健康度報告：配息會吃本金嗎？｜MOMO財商智庫" />
+  <meta property="og:description" content="各類配息基金的配息率、近一年調降比例、淨值變化與含息總報酬，每月更新。" />
+  <meta property="og:url" content="https://momowinwin.com/MOMO_FinSphere/tools/dividend-health.html" />
+  <meta property="og:image" content="https://momowinwin.com/og-default.png" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "配息基金健康度報告",
+      "url": "https://momowinwin.com/MOMO_FinSphere/tools/dividend-health.html",
+      "inLanguage": "zh-Hant-TW",
+      "description": "依類別統計配息基金的配息率、近一年配息調降比例、淨值變化與含息總報酬。",
+      "dateModified": "2026-11-17",
+      "isPartOf": { "@id": "https://momowinwin.com/#website" },
+      "author": { "@id": "https://momowinwin.com/momo-blog/about/#person" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "MOMO雙贏策略", "item": "https://momowinwin.com/" },
+        { "@type": "ListItem", "position": 2, "name": "MOMO財商智庫", "item": "https://momowinwin.com/MOMO_FinSphere/" },
+        { "@type": "ListItem", "position": 3, "name": "配息基金健康度報告" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "配息會吃本金嗎？", "acceptedAnswer": { "@type": "Answer", "text": "要看配息率和含息總報酬誰比較高。含息總報酬高於配息率，淨值大致能維持；配息率高於含息總報酬，多配出去的部分就會反映在淨值下跌，等於領回自己的本金。這頁每月整理各類配息基金的實際數據。" } },
+        { "@type": "Question", "name": "配息調降代表基金不好嗎？", "acceptedAnswer": { "@type": "Answer", "text": "不一定。基金公司常在利率或收益下降時調降配息，讓配息更貼近實際收益、減少淨值被侵蝕。調降本身不代表績效差，但要留意調降後的配息率是否還高於含息總報酬。" } },
+        { "@type": "Question", "name": "配息率越高越好嗎？", "acceptedAnswer": { "@type": "Answer", "text": "不是。配息率高只代表每次發得多，不代表賺得多。真正的報酬是配息加上淨值變化，配息率明顯高於同類基金時，要特別確認淨值是否長期下滑。" } },
+        { "@type": "Question", "name": "這份報告的資料怎麼來的？", "acceptedAnswer": { "@type": "Answer", "text": "MOMO 自建的基金資料庫每天記錄淨值、調整後淨值與每次配息，依類別統計後每月更新。統計範圍是 MOMO 追蹤中的配息基金，不代表整體市場，也不構成推薦。" } }
+      ]
+    }
+  ]
+}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap" />
+  <style>
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf; --line-green: #06c755;
+      --up: #e03f19; --dn: #208306;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.8; letter-spacing: .02em; }
+    a { color: inherit; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; }
+    .back { color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 40px 0 8px; }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1.35; margin: 0 0 12px; }
+    h2 { font-family: var(--serif); font-size: 22px; margin: 36px 0 12px; scroll-margin-top: 80px; }
+    .answer { margin: 0 0 18px; max-width: 760px; font-size: 16.5px; line-height: 1.85; }
+    .notice { background: var(--gold-bg); border-radius: 12px; padding: 12px 16px; font-size: 14px; color: var(--ink-2); line-height: 1.75; margin: 0 0 22px; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .kpis div { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+    .kpis span { display: block; font-size: 13.5px; color: var(--ink-2); font-weight: 600; }
+    .kpis b { display: block; font-family: var(--serif); font-size: 28px; line-height: 1.3; margin: 2px 0; font-variant-numeric: tabular-nums; }
+    .kpis small { color: var(--muted); font-size: 12.5px; }
+    .up { color: var(--up); } .dn { color: var(--dn); }
+    .alloc { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+    .alloc .legend { list-style: none; margin: 0; padding: 0; flex: 1; min-width: 220px; }
+    .alloc .legend li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
+    .alloc .legend li:last-child { border-bottom: 0; }
+    .alloc .legend i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+    .alloc .legend b { margin-left: auto; font-variant-numeric: tabular-nums; }
+    .chart { margin: 0 0 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 10px 10px; }
+    .chart svg { width: 100%; height: auto; display: block; }
+    .chart .ax text { font-size: 12px; fill: var(--muted); }
+    .chart .ax text.pc { fill: var(--muted); font-weight: 600; }
+    .chart .ax text.pc.up { fill: var(--up); } .chart .ax text.pc.dn { fill: var(--dn); }
+    @media (max-width: 520px) { .chart .ax text { font-size: 20px; } .kpis { grid-template-columns: 1fr 1fr; } .kpis b { font-size: 23px; } }
+    .chart figcaption { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); padding: 6px 6px 0; }
+    .chart figcaption i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
+    .k1 { border-color: #ff5a14 !important; } .k2 { border-color: var(--gold) !important; border-top-style: dashed !important; } .k3 { border-color: #3b82f6 !important; }
+    table { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+    .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+    th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    tbody th { font-weight: 700; }
+    .hold tbody th small { display: block; font-weight: 500; color: var(--muted); font-size: 12.5px; }
+    .arch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 860px) { .arch { grid-template-columns: 1fr; } }
+    .grp.mk { border-top-color: var(--gold-soft); display: flex; flex-direction: column; }
+    .grp .donut { width: 100%; max-width: 200px; height: auto; margin: 10px auto 4px; display: block; }
+    .grp .mk-note { margin: 4px 0 0; text-align: center; font-size: 12.5px; color: var(--muted); }
+    .grp li em { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 8px; flex: none; align-self: center; }
+    .grp li { align-items: center; }
+    .grp li i { margin-left: auto; }
+    .grp { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; border-top: 4px solid #bddaf5; }
+    .grp.sat { border-top-color: #e99aab; }
+    .grp-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .grp-top b { font-size: 17px; }
+    .grp-top span { font-family: var(--serif); font-size: 26px; font-weight: 800; }
+    .grp p { margin: 6px 0 10px; color: var(--ink-2); font-size: 14.5px; line-height: 1.75; }
+    .grp ul { list-style: none; margin: 0; padding: 0; }
+    .grp li { display: flex; justify-content: space-between; padding: 5px 0; border-top: 1px dashed var(--line); font-size: 14.5px; }
+    .grp li i { font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .grp small { display: block; margin-top: 8px; color: var(--muted); font-size: 12.5px; }
+    .ask { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 14px; padding: 16px 18px; background: var(--gold-bg); border-radius: 14px; }
+    .ask div { flex: 1; min-width: 220px; }
+    .ask b { display: block; font-size: 16px; }
+    .ask span { font-size: 14px; color: var(--ink-2); }
+    .note { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+    .section p { color: var(--ink-2); }
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+    .faq summary { cursor: pointer; font-weight: 700; }
+    .faq details p { margin: 8px 0 0; color: var(--ink-2); }
+    .cta { margin: 32px 0 8px; text-align: center; padding: 24px 18px; background: var(--surface); border: 1.5px solid var(--gold-soft); border-radius: 14px; }
+    .cta h2 { margin: 0 0 6px; font-size: 21px; }
+    .cta p { margin: 0 0 14px; color: var(--ink-2); font-size: 15px; }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .btn { display: inline-flex; padding: 11px 22px; border-radius: 999px; font-weight: 700; font-size: 15px; text-decoration: none; border: 1.5px solid transparent; }
+    .btn-line { background: var(--line-green); color: #fff; }
+    .btn-ghost { border-color: var(--ink); }
+    @media (max-width: 520px) { .alloc { justify-content: center; } th, td { padding: 9px 10px; } }
+    .bars { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+    .bars .row { display: grid; grid-template-columns: 7.5em 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+    .bars .row:last-of-type { border-bottom: 0; }
+    .bars .lab { font-weight: 700; font-size: 14.5px; }
+    .bars .lab small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+    .bars .b { position: relative; height: 14px; margin: 3px 0; border-radius: 4px; background: #f1ece0; }
+    .bars .b i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+    .bars .b span { position: absolute; top: -2px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .bars .b.y i { background: #fad291; } .bars .b.t i { background: #bddaf5; } .bars .b.t i.neg { background: #f3b4a6; }
+    .bars .key { display: flex; gap: 16px; font-size: 13px; color: var(--ink-2); padding-top: 8px; }
+    .bars .key i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+    .section h2 { scroll-margin-top: 80px; }
+    .pf tbody th small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+    .bars { overflow: hidden; }
+    @media (max-width: 520px) { .bars .row { grid-template-columns: 5.6em 1fr; } .bars .b span { font-size: 11px; } }
+  </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/MOMO_FinSphere/" aria-label="MOMO財商智庫 首頁"><img src="/icon-96.png" alt="" width="32" height="32" />MOMO財商智庫</a>
+      <a class="back" href="/MOMO_FinSphere/tools/">← 所有工具</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="eyebrow">MOMO 原創數據・每月更新</p>
+    <h1>配息基金健康度報告</h1>
+    <p class="notice">統計範圍是 MOMO 基金資料庫中追蹤的配息基金，依類別彙整、<b>不點名個別基金</b>，同一檔基金只取一個級別（以美元、存續較久者為主）。<b>過去績效不代表未來表現</b>，內容僅供了解配息的運作方式，不構成投資建議。</p>
+
+    <section aria-label="統計結果">
+      <!-- SNAP:DH:START -->
+      <p class="answer">資料整理中，每月自動更新。</p>
+      <!-- SNAP:DH:END -->
+    </section>
+
+    <section class="section faq">
+      <h2 id="faq">常見問題</h2>
+      <details><summary>配息會吃本金嗎？</summary><p>要看配息率和含息總報酬誰比較高。含息總報酬高於配息率，淨值大致能維持；配息率高於含息總報酬，多配出去的部分就會反映在淨值下跌，等於領回自己的本金。想用自己的數字算，可以用<a href="/MOMO_FinSphere/dividend-calculator.html">配息現金流試算</a>。</p></details>
+      <details><summary>配息調降代表基金不好嗎？</summary><p>不一定。基金公司常在利率或收益下降時調降配息，讓配息更貼近實際收益、減少淨值被侵蝕。調降本身不代表績效差，但要留意調降後的配息率是否還高於含息總報酬。</p></details>
+      <details><summary>配息率越高越好嗎？</summary><p>不是。配息率高只代表每次發得多，不代表賺得多。真正的報酬是配息加上淨值變化，配息率明顯高於同類基金時，要特別確認淨值是否長期下滑。</p></details>
+      <details><summary>這份報告的資料怎麼來的？</summary><p>MOMO 自建的基金資料庫每天記錄淨值、調整後淨值與每次配息，依類別統計後每月更新。統計範圍是 MOMO 追蹤中的配息基金，不代表整體市場，也不構成推薦。</p></details>
+    </section>
+
+    <div class="cta">
+      <h2>想知道自己手上的配息基金健不健康？</h2>
+      <p>把你的基金和配息情況傳到官方 LINE，MOMO 幫你一起看配息有沒有在吃本金。</p>
+      <div class="btns">
+        <a class="btn btn-ghost" href="/MOMO_FinSphere/dividend-calculator.html">配息現金流試算</a>
+        <a class="btn btn-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="dividend_health" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">加入官方 LINE</a>
+      </div>
+    </div>
+  </main>
+  <script>
+    (function () {
+      function utm() { document.querySelectorAll('a.js-utm').forEach(function (a) { if (window.momoUtm) a.href = window.momoUtm(a.getAttribute('data-href'), a.getAttribute('data-loc') || 'cta'); }); }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', utm); else utm();
+    })();
+  </script>
+</body>
+</html>

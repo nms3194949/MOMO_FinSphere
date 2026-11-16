@@ -36,6 +36,10 @@ jobs:
         continue-on-error: true   # 公開配置還沒設定或 API 暫時失敗，不影響其他數據
         run: node scripts/portfolio.mjs
 
+      - name: 配息基金健康度快照
+        continue-on-error: true
+        run: node scripts/dividend-health.mjs
+
       - name: 有變動才提交
         id: commit
         run: |
