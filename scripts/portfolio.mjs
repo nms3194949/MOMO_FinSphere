@@ -129,7 +129,7 @@ function main(api) {
 }
 
 // ── HTML ──────────────────────────────────────────────
-const COLORS = ['#0c152a', '#a88a3d', '#4f7cac', '#7a9e7e', '#c0714f', '#8a6fb0', '#b7a57a', '#5b8f95', '#9a9a9a'];
+const COLORS = ['#bddaf5', '#e99aab', '#9acf84', '#fad291', '#e4c5ff', '#dbf4c2', '#f6c1a4', '#b9e3df', '#d9d2c3'];
 
 function donut(markets) {
   const R = 70, r = 44, C = 90;
@@ -141,7 +141,7 @@ function donut(markets) {
       ? `M${C - R},${C}a${R},${R} 0 1,0 ${2 * R},0a${R},${R} 0 1,0 -${2 * R},0M${C - r},${C}a${r},${r} 0 1,1 ${2 * r},0a${r},${r} 0 1,1 -${2 * r},0`
       : `M${p(R, a0)}A${R},${R} 0 ${large},1 ${p(R, a1)}L${p(r, a1)}A${r},${r} 0 ${large},0 ${p(r, a0)}Z`;
     a0 = a1;
-    return `<path d="${d}" fill="${COLORS[i % COLORS.length]}" fill-rule="evenodd"/>`;
+    return `<path d="${d}" fill="${COLORS[i % COLORS.length]}" fill-rule="evenodd" stroke="#fffdf8" stroke-width="2.5" stroke-linejoin="round"/>`;
   }).join('');
   const legend = markets.map((m, i) => `<li><i style="background:${COLORS[i % COLORS.length]}"></i>${esc(m.market)}<b>${(m.w * 100).toFixed(0)}%</b></li>`).join('');
   return `<div class="alloc"><svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="市場分布">${segs}</svg><ul class="legend">${legend}</ul></div>`;
