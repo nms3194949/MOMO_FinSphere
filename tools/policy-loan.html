@@ -108,17 +108,32 @@
         <section class="card">
           <h2 id="fix-h">② 回到抗損的兩種方式</h2>
           <div class="opt">
-            <div class="opt-h"><b>方式一｜自有資金還款</b><span>手上有閒錢</span></div>
+            <div class="opt-h"><b>方式一｜手上現金還款</b><span>保單價值不變</span></div>
             <div class="kv big"><span class="k">需還款</span><span class="v" id="a-r">—</span></div>
             <div class="kv"><span class="k">還款後借款成數</span><span class="v" id="a-lr">—</span></div>
           </div>
           <div class="opt">
-            <div class="opt-h"><b>方式二｜基金出場還款</b><span>不用另外準備資金</span></div>
+            <div class="opt-h"><b>方式二｜基金出場</b><span>轉回貨幣帳戶</span></div>
             <div class="kv big"><span class="k">需基金出場</span><span class="v" id="b-x">—</span></div>
-            <div class="kv" id="b-c-row"><span class="k">另用貨幣帳戶還款</span><span class="v" id="b-c">—</span></div>
-            <div class="kv"><span class="k">還款後借款成數</span><span class="v" id="b-lr">—</span></div>
+            <div class="kv"><span class="k">基金最多留在場內</span><span class="v" id="b-max">—</span></div>
           </div>
           <div id="fix-msg"></div>
+        </section>
+
+        <section class="card">
+          <h2>③ 現金還款試算 <small>兩格互相換算</small></h2>
+          <div class="row2">
+            <div>
+              <label for="rp">還款金額</label>
+              <div class="in"><input id="rp" type="text" inputmode="numeric" placeholder="輸入金額" /><em>元</em></div>
+            </div>
+            <div>
+              <label for="rt">還款後借款成數</label>
+              <div class="in"><input id="rt" type="number" inputmode="decimal" placeholder="輸入成數" min="0" step="any" /><em>%</em></div>
+            </div>
+          </div>
+          <div class="kv"><span class="k">還款後基金可再跌</span><span class="v" id="rp-dd">—</span></div>
+          <div id="rp-msg"></div>
         </section>
       </div>
     </div>
@@ -168,16 +183,26 @@
         var Ra = L - cut * (V - F * d);              // L − R = cut ×（V − F × d）
         $('a-r').textContent = yuan(Ra);
         $('a-lr').textContent = pc((L - Ra) / V);
-        // 方式二 用保單裡的錢還款：先用貨幣帳戶，不夠再基金出場（V、L 同時減少）
-        var k = 1 / cut - 1, Rb = (L / cut - V + F * d) / k, useC, x;
-        if (Rb <= C) { useC = Rb; x = 0; }
-        else { Rb = (L / cut - V * (1 - d)) / (k + d); useC = C; x = Rb - C; }
-        $('b-x').textContent = yuan(x);
-        $('b-c').textContent = yuan(useC);
-        $('b-c-row').style.display = useC > 0 ? '' : 'none';
-        $('b-lr').textContent = pc((L - Rb) / (V - Rb));
+        // 方式二 基金出場轉回貨幣帳戶：保單價值、借款都不變，只降低基金部位
+        var Fkeep = Math.max(0, (V - L / cut) / d);   // 基金最多留在場內
+        $('b-x').textContent = yuan(Math.max(0, F - Fkeep));
+        $('b-max').textContent = yuan(Fkeep);
         msg('fix-msg');
       }
+
+      // ③ 現金還款試算（保單價值不變）
+      var Rc;
+      if (lastRepay === 'amt') {
+        Rc = num('rp');
+        $('rt').value = $('rp').value === '' || V <= 0 ? '' : +(((L - Rc) / V) * 100).toFixed(2);
+      } else {
+        Rc = L - (num('rt') / 100) * V;
+        $('rp').value = $('rt').value === '' ? '' : Math.round(Rc).toLocaleString('zh-TW');
+      }
+      if ($('rp').value === '') { $('rp-dd').textContent = '—'; msg('rp-msg'); }
+      else if (Rc <= 0) { $('rp-dd').textContent = '—'; msg('rp-msg', 'warn', '目標成數高於目前成數，不需要還款。'); }
+      else if (Rc > L) { $('rp-dd').textContent = '—'; msg('rp-msg', 'warn', '還款金額超過借款本息。'); }
+      else { var tc = tol(V, F, L - Rc, cut); $('rp-dd').textContent = tolTxt(tc); msg('rp-msg', tc >= d ? 'ok' : 'info', '借款成數由 ' + pc(r) + ' 降到 <b>' + pc((L - Rc) / V) + '</b>' + (tc >= d ? '，已達抗損 ' + pc(d, 0) + '。' : '，還沒達到抗損 ' + pc(d, 0) + '。')); }
 
       // 水位條
       var pos = function (x) { return Math.max(0, Math.min(100, x * 100)); };
@@ -199,7 +224,9 @@
       try { localStorage.removeItem(KEY); } catch (e) {}
       $('v').value = '5,000,000'; $('f').value = '3,000,000'; $('l').value = '2,000,000'; $('d').value = '10'; calc();
     });
-    ['v', 'f', 'l'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
+    ['v', 'f', 'l', 'rp'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
+    $('rp').addEventListener('input', function () { lastRepay = 'amt'; calc(); });
+    $('rt').addEventListener('input', function () { lastRepay = 'pct'; calc(); });
     ['v', 'f', 'l', 'd'].forEach(function (id) { $(id).addEventListener('input', calc); });
     calc();
   })();
