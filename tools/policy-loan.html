@@ -62,6 +62,8 @@
     .opt-h b { font-size: 15.5px; }
     .opt-h span { font-size: 12.5px; color: var(--muted); }
     .opt .kv.big .v { font-size: 24px; }
+    mark.dd { background: #ffe08a; color: var(--ink); padding: 0 6px; border-radius: 6px; font-weight: 800; }
+    h2 mark.dd { font-family: var(--sans); font-size: .9em; }
     .note { font-size: 13px; color: var(--muted); margin: 8px 0 0; line-height: 1.7; }
     .formula { font-size: 13px; color: var(--ink-2); background: var(--gold-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; line-height: 1.8; }
   </style>
@@ -98,7 +100,7 @@
       </div>
 
       <div>
-        <section class="card">
+        <section class="card" id="e-card">
           <h2>① 可進場金額 <small>貨幣帳戶轉入基金</small></h2>
           <div class="kv big"><span class="k">還可以進場</span><span class="v" id="e">—</span></div>
           <div class="kv"><span class="k">進場後基金可再跌</span><span class="v" id="e-dd">—</span></div>
@@ -132,7 +134,7 @@
               <div class="in"><input id="rt" type="number" inputmode="decimal" placeholder="輸入成數" min="0" step="any" /><em>%</em></div>
             </div>
           </div>
-          <div class="kv"><span class="k">還款後基金可再跌</span><span class="v" id="rp-dd">—</span></div>
+          <div class="kv"><span class="k">還款後基金可抗跌</span><span class="v" id="rp-dd">—</span></div>
           <div id="rp-msg"></div>
         </section>
       </div>
@@ -149,6 +151,7 @@
     var pc = function (x, dp) { return isFinite(x) ? (x * 100).toFixed(dp == null ? 1 : dp) + '%' : '—'; };
     var fmt = function (el) { var v = num(el.id); if (el.value !== '') el.value = Math.round(v).toLocaleString('zh-TW'); };
     var lastRepay = 'amt';
+    var tag = function (x) { return '<mark class="dd">' + pc(x, 0) + '</mark>'; };
     function msg(el, cls, html) { $(el).innerHTML = html ? '<div class="msg ' + cls + '">' + html + '</div>' : ''; }
     // 基金再跌多少會斷頭：L = cut ×（V − F × x）
     function tol(V, F, L, cut) { if (L >= cut * V) return 0; if (F <= 0) return Infinity; return (V - L / cut) / F; }
@@ -167,18 +170,19 @@
       var Fmax = d > 0 ? (V - L / cut) / d : 0;
       var E = Math.min(C, Math.max(0, Fmax - F));
       var tE = tol(V, F + E, L, cut);
+      document.querySelectorAll('#e-card .kv').forEach(function (el) { el.style.display = E > 0 ? '' : 'none'; });
       $('e').textContent = yuan(E);
       $('e-dd').textContent = E > 0 ? tolTxt(tE) : tolTxt(tNow);
       if (E > 0 && E >= C) msg('e-msg', 'info', '貨幣帳戶可以全部進場，進場後基金仍可再跌 ' + tolTxt(tE) + '。');
-      else if (E > 0) msg('e-msg', 'info', '再進場 <b>' + yuan(E) + '</b> 後，基金跌超過 <b>' + pc(d, 0) + '</b> 就會碰到斷頭線；貨幣帳戶還剩 ' + yuan(C - E) + '。');
-      else msg('e-msg', 'warn', tNow < d ? '目前基金' + (tNow === 0 ? '已達斷頭線' : '只能再跌 ' + pc(tNow)) + '，低於抗損 ' + pc(d, 0) + '，不建議再進場。' : '貨幣帳戶沒有可進場的資金。');
+      else if (E > 0) msg('e-msg', 'info', '再進場 <b>' + yuan(E) + '</b> 後，基金跌超過 ' + tag(d) + ' 就會碰到斷頭線；貨幣帳戶還剩 ' + yuan(C - E) + '。');
+      else msg('e-msg', 'warn', tNow < d ? '目前基金' + (tNow === 0 ? '已達斷頭線' : '只能再跌 ' + pc(tNow)) + '，低於抗損 ' + tag(d) + '，不建議再進場。' : '貨幣帳戶沒有可進場的資金。');
 
       // ② 回到抗損：方式一 自有資金還款（保單價值不變）
-      $('fix-h').textContent = '② 回到抗損 ' + pc(d, 0) + ' 的兩種方式';
+      $('fix-h').innerHTML = '② 回到抗損 ' + tag(d) + ' 的兩種方式';
       var need = tNow < d;
       document.querySelectorAll('.opt').forEach(function (el) { el.style.display = need ? '' : 'none'; });
       if (!need) {
-        msg('fix-msg', 'ok', '目前基金' + (tNow >= 1 ? '歸零也不會斷頭' : '可再跌 ' + pc(tNow)) + '，已達抗損 ' + pc(d, 0) + '，不需要還款或出場。');
+        msg('fix-msg', 'ok', '目前基金' + (tNow >= 1 ? '歸零也不會斷頭' : '可再跌 ' + pc(tNow)) + '，已達抗損 ' + tag(d) + '，不需要還款或出場。');
       } else {
         var Ra = L - cut * (V - F * d);              // L − R = cut ×（V − F × d）
         $('a-r').textContent = yuan(Ra);
@@ -202,7 +206,7 @@
       if ($('rp').value === '') { $('rp-dd').textContent = '—'; msg('rp-msg'); }
       else if (Rc <= 0) { $('rp-dd').textContent = '—'; msg('rp-msg', 'warn', '目標成數高於目前成數，不需要還款。'); }
       else if (Rc > L) { $('rp-dd').textContent = '—'; msg('rp-msg', 'warn', '還款金額超過借款本息。'); }
-      else { var tc = tol(V, F, L - Rc, cut); $('rp-dd').textContent = tolTxt(tc); msg('rp-msg', tc >= d ? 'ok' : 'info', '借款成數由 ' + pc(r) + ' 降到 <b>' + pc((L - Rc) / V) + '</b>' + (tc >= d ? '，已達抗損 ' + pc(d, 0) + '。' : '，還沒達到抗損 ' + pc(d, 0) + '。')); }
+      else { var tc = tol(V, F, L - Rc, cut); $('rp-dd').textContent = tolTxt(tc); msg('rp-msg', tc >= d ? 'ok' : 'info', '借款成數由 ' + pc(r) + ' 降到 <b>' + pc((L - Rc) / V) + '</b>' + (tc >= d ? '，已達抗損 ' + tag(d) + '。' : '，還沒達到抗損 ' + tag(d) + '。')); }
 
       // 水位條
       var pos = function (x) { return Math.max(0, Math.min(100, x * 100)); };
