@@ -69,7 +69,7 @@ function main(api) {
   });
   const asofT = Math.min(...H.map((h) => toT(h.nav[h.nav.length - 1][0])));
   const asof = toD(asofT);
-  const bm = api.benchmark && api.benchmark.nav && api.benchmark.nav.length > 20 ? { label: api.benchmark.label, at: lookup(api.benchmark.nav) } : null;
+  const bm = api.benchmark && api.benchmark.nav && api.benchmark.nav.length > 20 ? { label: api.benchmark.label, at: lookup(api.benchmark.nav), first: api.benchmark.nav[0][0] } : null;
 
   const back = (months) => { const d = new Date(asofT); d.setUTCMonth(d.getUTCMonth() - months); return d.getTime(); };
   const ytd = Date.UTC(new Date(asofT).getUTCFullYear() - 1, 11, 31);
@@ -110,14 +110,22 @@ function main(api) {
   const idx = (key) => pts.map((t) => { let s = 0, w = 0; H.forEach((h) => { const a = h[key](c0), b = h[key](t); if (a && b) { s += h.w * b / a; w += h.w; } }); return w ? 100 * s / w : null; });
   const chart = {
     dates: pts.map(toD), tr: idx('trAt'), nav: idx('navAt'),
-    bm: bm ? pts.map((t) => { const a = bm.at(c0), b = bm.at(t); return a && b ? 100 * b / a : null; }) : null
+    bm: null
   };
+  if (bm) {
+    // 比較基準資料若晚於圖表起點，從它第一筆開始畫，起點對齊當時 MOMO 含息總報酬的位置
+    const k0 = pts.findIndex((t) => bm.at(t));
+    if (k0 >= 0) {
+      const a = bm.at(pts[k0]), base = chart.tr[k0] || 100;
+      chart.bm = pts.map((t, k) => (k < k0 ? null : base * bm.at(t) / a));
+    }
+  }
 
   const holdings = H.slice().sort((a, b) => b.w - a.w).map((h) => ({
     label: h.label, market: h.market, w: h.w, yield: h.yield,
     r1m: ret(h.navAt, back(1)), r3m: ret(h.navAt, back(3)), r1y: ret(h.navAt, back(12)), tr1y: h.hasTR ? ret(h.trAt, back(12)) : null
   }));
-  return { asof, generated: api.generated, bmLabel: bm ? bm.label : null, yieldW, periods, annual, markets, holdings, chart };
+  return { asof, generated: api.generated, bmLabel: bm ? bm.label : null, bmFirst: bm ? bm.first : null, yieldW, periods, annual, markets, holdings, chart };
 }
 
 // ── HTML ──────────────────────────────────────────────
@@ -166,7 +174,7 @@ function render(d) {
   const lead = `截至 ${d.asof}，MOMO 的配置分布在 ${d.markets.length} 個市場類別、${d.holdings.length} 檔基金，加權配息率約 ${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(p1y && p1y.tr)}、本金（只看淨值）${pct(p1y && p1y.nav)}${d.bmLabel && p1y && p1y.bm != null ? `，同期 ${esc(d.bmLabel)} ${pct(p1y.bm)}` : ''}。`;
   const rows = d.periods.map((p) => `<tr><th scope="row">${p.label}</th><td${cls(p.tr)}>${pct(p.tr)}</td><td${cls(p.nav)}>${pct(p.nav)}</td>${d.bmLabel ? `<td${cls(p.bm)}>${pct(p.bm)}</td>` : ''}</tr>`).join('');
   const a = d.annual;
-  const hold = d.holdings.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td>${h.yield == null ? '—' : h.yield.toFixed(1) + '%'}</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
+  const hold = d.holdings.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td>${h.yield == null ? '—' : h.yield < 0.05 ? '不配息' : h.yield.toFixed(1) + '%'}</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
   return `
       <p class="answer" id="pf-lead">${lead}</p>
       <div class="kpis">
@@ -185,7 +193,7 @@ function render(d) {
         <thead><tr><th>期間</th><th>含息總報酬</th><th>本金</th>${d.bmLabel ? '<th>S&amp;P 500</th>' : ''}</tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
-      ${d.bmLabel ? '' : '<p class="note">比較基準尚未設定，設定後會自動加入同期比較。</p>'}
+      ${d.bmLabel ? (d.bmFirst > d.periods.find((p) => p.key === '1y').from ? `<p class="note">${esc(d.bmLabel)} 的資料從 ${d.bmFirst} 開始，早於這天的期間不做比較（顯示「—」）；走勢圖中它的起點對齊當天 MOMO 的位置。</p>` : '') : '<p class="note">比較基準尚未設定，設定後會自動加入同期比較。</p>'}
 
       <h2 id="holdings">目前持有的基金</h2>
       <div class="table-wrap"><table class="pf hold">
