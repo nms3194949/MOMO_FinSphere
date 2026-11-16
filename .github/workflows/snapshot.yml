@@ -32,6 +32,10 @@ jobs:
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
+      - name: MOMO 配置策略快照
+        continue-on-error: true   # 公開配置還沒設定或 API 暫時失敗，不影響其他數據
+        run: node scripts/portfolio.mjs
+
       - name: 有變動才提交
         id: commit
         run: |
