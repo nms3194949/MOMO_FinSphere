@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <!-- 自用工具：密碼頁（需放最前面） -->
-  <script src="/MOMO_FinSphere/assets/momo-gate.js"></script>
-  <meta name="robots" content="noindex,nofollow">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>基金超級工具箱｜自用</title>
+  <title>MOMO 基金超級工具箱</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -651,7 +648,7 @@ $('#sourceFile').addEventListener('change', async function(){
             row.className = 'fund-code-row';
             row.innerHTML = `
                 <div class="fund-tag"><i class="fa-solid fa-file-invoice"></i> <span>${sheet}</span></div>
-                <input type="text" id="srcFundCode-${idx}" data-fundname="${sheet}" placeholder="若為新基金：貼上 MoneyDJ 連結或代號（如 shzb0）">
+                <input type="text" id="srcFundCode-${idx}" data-fundname="${sheet}" placeholder="Config 沒有這檔時：貼上 MoneyDJ 連結或代號（如 shzb0）">
             `;
             tagsContainer.appendChild(row);
         });
@@ -728,7 +725,7 @@ function reportWriteResult(stats, logEl){
         const { added, skipped } = stats.configSync;
         if(added && added.length > 0){
             added.forEach(item => {
-                logMsg(logEl, `📌 Config 已新增：${item.name}（代號 ${item.code}）`, "ok");
+                logMsg(logEl, `📌 Config 已新增：${item.name}（代號 ${item.code}，第 ${item.row} 列）`, "ok");
             });
         }
         if(skipped && skipped.length > 0){
@@ -764,10 +761,11 @@ async function previewUpdate(){
 
         logMsg(logEl, "送出預覽請求...", "warn");
 
+        const previewCodes = collectSourceFundCodes();
         const resp = await fetch(gasUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'updateDatabase', mode, threshold, sourceData, dryRun: true })
+            body: JSON.stringify({ action: 'updateDatabase', mode, threshold, sourceData, newFundCodes: previewCodes, dryRun: true })
         });
 
         const result = await resp.json();
@@ -819,6 +817,17 @@ async function previewUpdate(){
             if(isNew.length) verdict += `同時新增 ${isNew.length} 支基金欄位。`;
         }
 
+        // ---- Config 檢查（Database 已有的基金也會檢查）----
+        const cfgMissing = (stats.configCheck && stats.configCheck.missing) || [];
+        const cfgNoCode  = cfgMissing.filter(m => !m.code);
+        const cfgWithCode = cfgMissing.filter(m => m.code);
+        if(cfgMissing.length){
+            if(stats.add === 0 && stats.update === 0 && cfgWithCode.length){
+                vIcon = '📌'; vColor = 'var(--gold2)';
+                verdict = `淨值資料不需異動，但有 <b>${cfgWithCode.length}</b> 支基金 Config 還沒有，按確認後會補進 Config。`;
+            }
+        }
+
         // ---- 組畫面 ----
         let html = '';
         html += `<div class="verdict-box" style="border-left-color:${vColor};">
@@ -832,6 +841,16 @@ async function previewUpdate(){
         if(stats.newFunds && stats.newFunds.length > 0){
             html += `<br>・將新增基金欄位：<b style="color:var(--gold2)">${stats.newFunds.join('、')}</b>`;
             html += `<br><span style="font-size:12px; color:var(--muted);">記得到上方「偵測到的基金」欄位填代號，確認寫入時會一併加進 Config</span>`;
+        }
+
+        if(cfgMissing.length){
+            html += `<br><br><b style="color:var(--gold2)">📌 Config 缺少 ${cfgMissing.length} 支基金</b>`;
+            cfgWithCode.forEach(m => {
+                html += `<br><span style="font-size:12px;">✅ ${m.name}（代號 ${m.code}，寫入時會補上）</span>`;
+            });
+            cfgNoCode.forEach(m => {
+                html += `<br><span style="font-size:12px; color:var(--danger);">⚠️ ${m.name}：還沒填代號，到上方「偵測到的基金」填好後再按一次預覽</span>`;
+            });
         }
 
         // ---- 比對細節 ----
