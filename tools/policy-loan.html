@@ -29,6 +29,8 @@
     @media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
     .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
     .card h2 { font-family: var(--serif); font-size: 19px; margin: 0 0 12px; }
+    .card h2 { display: flex; align-items: baseline; gap: 6px; }
+    .reset { margin-left: auto; border: 1px solid var(--line); background: #fff; color: var(--ink-2); border-radius: 999px; padding: 3px 12px; font: 600 13px var(--sans); cursor: pointer; }
     .card h2 small { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--muted); margin-left: 6px; }
     label { display: block; font-weight: 700; font-size: 14.5px; margin: 12px 0 4px; }
     label span { font-weight: 500; color: var(--muted); font-size: 13px; }
@@ -73,7 +75,7 @@
     <div class="grid">
       <div>
         <section class="card">
-          <h2>基本資料 <small>單位：元</small></h2>
+          <h2>基本資料 <small>單位：元｜自動記住上次輸入</small><button type="button" id="reset" class="reset">清除</button></h2>
           <label for="v">保單價值 <span>含貨幣帳戶與基金</span></label>
           <div class="in"><input id="v" type="text" inputmode="numeric" value="5,000,000" /><em>元</em></div>
           <label for="f">已進場基金金額 <span>目前在基金裡的市值</span></label>
@@ -183,6 +185,20 @@
       $('bar').innerHTML = '<i style="left:' + pos(r) + '%"></i><b style="left:' + pos(r) + '%' + (near ? ';top:-20px' : '') + '">目前 ' + pc(r, 0) + '</b><b style="left:' + pos(cut) + '%">斷頭 ' + pc(cut, 0) + '</b>';
     }
 
+    // 記住上次輸入（存在這台裝置的瀏覽器）
+    var KEY = 'momo_policy_loan_v1', FIELDS = ['v', 'f', 'l', 'd'];
+    try {
+      var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (saved) FIELDS.forEach(function (id) { if (saved[id] != null && saved[id] !== '') $(id).value = saved[id]; });
+    } catch (e) {}
+    function save() {
+      try { var o = {}; FIELDS.forEach(function (id) { o[id] = $(id).value; }); localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+    }
+    FIELDS.forEach(function (id) { $(id).addEventListener('input', save); $(id).addEventListener('change', save); });
+    $('reset').addEventListener('click', function () {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      $('v').value = '5,000,000'; $('f').value = '3,000,000'; $('l').value = '2,000,000'; $('d').value = '10'; calc();
+    });
     ['v', 'f', 'l'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
     ['v', 'f', 'l', 'd'].forEach(function (id) { $(id).addEventListener('input', calc); });
     calc();
