@@ -164,8 +164,11 @@ function lineChart(c, bmLabel) {
   const base = `<line x1="${L}" x2="${W - Rr}" y1="${y(100).toFixed(1)}" y2="${y(100).toFixed(1)}" stroke="#7a8296" stroke-dasharray="3 4"/>`;
   return `<figure class="chart"><svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="近 1 年走勢，起點為 100">
 <g class="ax">${ticks.join('')}${months.join('')}</g>${base}
-${c.bm ? `<path d="${path(c.bm)}" fill="none" stroke="#9aa3b5" stroke-width="2"/>` : ''}
-<path d="${path(c.tr)}" fill="none" stroke="#0c152a" stroke-width="2.6"/></svg>
+<defs><linearGradient id="pfArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6a1f" stop-opacity=".22"/><stop offset="1" stop-color="#ff6a1f" stop-opacity="0"/></linearGradient></defs>
+<path d="${path(c.tr)}L${x(c.tr.length - 1).toFixed(1)},${(Hh - B).toFixed(1)}L${L},${(Hh - B).toFixed(1)}Z" fill="url(#pfArea)"/>
+${c.bm ? `<path d="${path(c.bm)}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-opacity=".85"/>` : ''}
+<path d="${path(c.tr)}" fill="none" stroke="#ff5a14" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="${x(c.tr.length - 1).toFixed(1)}" cy="${y(c.tr[c.tr.length - 1]).toFixed(1)}" r="4.5" fill="#ff5a14" stroke="#fff" stroke-width="2"/></svg>
 <figcaption><span><i class="k1"></i>MOMO 配置・含息總報酬</span>${c.bm ? `<span><i class="k3"></i>${esc(bmLabel)}</span>` : ''}<span>左軸：起點＝100｜右軸：累積報酬率</span></figcaption></figure>`;
 }
 
