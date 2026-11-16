@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>保單借款抗損試算｜MOMO財商智庫</title>
+  <meta name="description" content="輸入保單價值與借款本息，依抗損設定算出可進場金額、還款或出場多少能回到目標水位。" />
+  <meta name="theme-color" content="#f6f1e7" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap" />
+  <style>
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf;
+      --up: #e03f19; --dn: #208306; --warn: #b42318; --warn-bg: #fdecea; --ok-bg: #e9f5e4;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.75; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 48px; }
+    header { display: flex; justify-content: space-between; align-items: center; height: 58px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+    header a { text-decoration: none; color: var(--ink-2); font-weight: 700; font-size: 14px; }
+    h1 { font-family: var(--serif); font-size: clamp(26px, 5.5vw, 36px); margin: 26px 0 6px; }
+    .sub { color: var(--ink-2); margin: 0 0 18px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 14px; align-items: start; }
+    @media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+    .card h2 { font-family: var(--serif); font-size: 19px; margin: 0 0 12px; }
+    .card h2 small { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--muted); margin-left: 6px; }
+    label { display: block; font-weight: 700; font-size: 14.5px; margin: 12px 0 4px; }
+    label span { font-weight: 500; color: var(--muted); font-size: 13px; }
+    .in { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .in:focus-within { outline: 2px solid var(--gold-soft); }
+    .in input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 10px 12px; font: 700 18px var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; outline: none; }
+    .in em { font-style: normal; color: var(--muted); padding-right: 12px; font-size: 14px; }
+    .row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+    .kv { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+    .kv:last-child { border-bottom: 0; }
+    .kv .k { color: var(--ink-2); font-size: 14.5px; }
+    .kv .v { font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; text-align: right; }
+    .kv.big .v { font-family: var(--serif); font-size: 28px; color: var(--gold); }
+    .bar { position: relative; height: 14px; border-radius: 999px; background: linear-gradient(90deg, #cfe8c4 0%, #f7e3a8 60%, #f5b5a6 85%, #e98f7c 100%); margin: 6px 0 22px; }
+    .bar i { position: absolute; top: -5px; width: 4px; height: 24px; border-radius: 2px; background: var(--ink); transform: translateX(-2px); }
+    .bar i.after { background: var(--gold); }
+    .bar b { position: absolute; top: 18px; font-size: 11.5px; color: var(--muted); transform: translateX(-50%); font-weight: 600; white-space: nowrap; }
+    .msg { margin-top: 10px; padding: 10px 12px; border-radius: 10px; font-size: 14px; line-height: 1.7; }
+    .msg.warn { background: var(--warn-bg); color: var(--warn); }
+    .msg.ok { background: var(--ok-bg); color: var(--dn); }
+    .msg.info { background: var(--gold-bg); color: var(--ink); }
+    table { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+    th, td { padding: 8px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    .hit { color: var(--warn); font-weight: 800; }
+    .note { font-size: 13px; color: var(--muted); margin: 8px 0 0; line-height: 1.7; }
+    .formula { font-size: 13px; color: var(--ink-2); background: var(--gold-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; line-height: 1.8; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header><a href="/MOMO_FinSphere/me/">← MOMO 專用工具</a><a href="/MOMO_FinSphere/">MOMO財商智庫</a></header>
+    <h1>保單借款抗損試算</h1>
+    <p class="sub">借出來的錢投回同一張保單。輸入保單價值與借款本息，算出依抗損設定可進場的金額，以及還款或出場多少能回到目標水位。</p>
+
+    <div class="grid">
+      <div>
+        <section class="card">
+          <h2>基本資料 <small>單位：萬元</small></h2>
+          <label for="v">保單價值</label>
+          <div class="in"><input id="v" type="number" inputmode="decimal" value="500" min="0" step="any" /><em>萬</em></div>
+          <label for="l">保單借款本息</label>
+          <div class="in"><input id="l" type="number" inputmode="decimal" value="100" min="0" step="any" /><em>萬</em></div>
+          <div class="row2">
+            <div>
+              <label for="d">抗損 <span>保單價值可承受跌幅</span></label>
+              <div class="in"><input id="d" type="number" inputmode="decimal" value="10" min="0" max="99" step="any" /><em>%</em></div>
+            </div>
+            <div>
+              <label for="cut">斷頭線 <span>借款成數</span></label>
+              <div class="in"><input id="cut" type="number" inputmode="decimal" value="90" min="1" max="100" step="any" /><em>%</em></div>
+            </div>
+          </div>
+          <label for="ref">常用借款成數 <span>參考用</span></label>
+          <div class="in"><input id="ref" type="number" inputmode="decimal" value="60" min="0" max="99" step="any" /><em>%</em></div>
+        </section>
+
+        <section class="card">
+          <h2>目前水位</h2>
+          <div class="kv"><span class="k">目前借款成數</span><span class="v" id="o-r">—</span></div>
+          <div class="kv"><span class="k">保單價值再跌多少會斷頭</span><span class="v" id="o-dd">—</span></div>
+          <div class="kv"><span class="k">斷頭時的保單價值</span><span class="v" id="o-vcut">—</span></div>
+          <div class="bar" id="bar"></div>
+        </section>
+      </div>
+
+      <div>
+        <section class="card">
+          <h2>① 可進場金額 <small>依抗損設定</small></h2>
+          <div class="kv big"><span class="k">建議進場金額（再借款投入）</span><span class="v" id="e">—</span></div>
+          <div class="kv"><span class="k">進場後保單價值／借款本息</span><span class="v" id="e-vl">—</span></div>
+          <div class="kv"><span class="k">進場後借款成數</span><span class="v" id="e-r">—</span></div>
+          <div class="kv"><span class="k">進場後再跌多少會斷頭</span><span class="v" id="e-dd">—</span></div>
+          <div id="e-msg"></div>
+          <div class="formula" id="e-ref"></div>
+        </section>
+
+        <section class="card">
+          <h2>② 還款降水位 <small>兩格互相換算</small></h2>
+          <div class="row2">
+            <div>
+              <label for="rp">還款金額</label>
+              <div class="in"><input id="rp" type="number" inputmode="decimal" placeholder="例：20" min="0" step="any" /><em>萬</em></div>
+            </div>
+            <div>
+              <label for="rt">還款後借款成數</label>
+              <div class="in"><input id="rt" type="number" inputmode="decimal" placeholder="例：15" min="0" step="any" /><em>%</em></div>
+            </div>
+          </div>
+          <div class="kv"><span class="k">還款後借款本息</span><span class="v" id="rp-l">—</span></div>
+          <div class="kv"><span class="k">還款後再跌多少會斷頭</span><span class="v" id="rp-dd">—</span></div>
+          <div id="rp-msg"></div>
+        </section>
+
+        <section class="card">
+          <h2>③ 基金出場還款 <small>回到目標抗損</small></h2>
+          <div class="kv big"><span class="k">需出場並還款的金額</span><span class="v" id="x">—</span></div>
+          <div class="kv"><span class="k">出場後保單價值／借款本息</span><span class="v" id="x-vl">—</span></div>
+          <div class="kv"><span class="k">出場後借款成數</span><span class="v" id="x-r">—</span></div>
+          <div id="x-msg"></div>
+          <p class="note">指從保單裡贖回基金、所得全部拿去還保單借款。只贖回不還款，借款成數反而會升高。</p>
+        </section>
+
+        <section class="card">
+          <h2>④ 下跌情境 <small>以目前水位</small></h2>
+          <table>
+            <thead><tr><th>保單價值跌幅</th><th>保單價值</th><th>借款成數</th><th>狀態</th></tr></thead>
+            <tbody id="sc"></tbody>
+          </table>
+        </section>
+      </div>
+    </div>
+
+    <p class="note">計算假設：借出來的錢全部投回同一張保單；抗損以「整張保單價值」的跌幅計算；未計入借款利息隨時間增加、匯率、費用與保險成本。實際可借成數、斷頭（強制還款或停效）規則以保險公司條款為準。結果僅供試算參考，不構成任何投資或借款建議。</p>
+  </div>
+
+  <script>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+    var wan = function (x) { return (x < 0 ? '-' : '') + Math.abs(x).toLocaleString('zh-TW', { maximumFractionDigits: 1 }) + ' 萬'; };
+    var pc = function (x, dp) { return isFinite(x) ? (x * 100).toFixed(dp == null ? 1 : dp) + '%' : '—'; };
+    var lastRepay = 'amt';
+
+    function msg(el, cls, html) { $(el).innerHTML = html ? '<div class="msg ' + cls + '">' + html + '</div>' : ''; }
+
+    function calc() {
+      var V = num('v'), L = num('l'), d = num('d') / 100, cut = num('cut') / 100, ref = num('ref') / 100;
+      var r = V > 0 ? L / V : NaN;
+      var ddNow = 1 - r / cut;                       // 保單價值再跌多少會斷頭
+      var tgt = cut * (1 - d);                        // 抗損 d 對應的目標借款成數
+
+      // 目前水位
+      $('o-r').textContent = pc(r);
+      $('o-dd').textContent = r >= cut ? '已達斷頭線' : pc(ddNow);
+      $('o-dd').className = 'v' + (ddNow < d ? ' hit' : '');
+      $('o-vcut').textContent = cut > 0 ? wan(L / cut) : '—';
+
+      // ① 可進場金額：(L+E)/(V+E) = tgt
+      var E = (tgt * V - L) / (1 - tgt);
+      if (E > 0) {
+        $('e').textContent = wan(E);
+        $('e-vl').textContent = wan(V + E) + '／' + wan(L + E);
+        $('e-r').textContent = pc((L + E) / (V + E));
+        $('e-dd').textContent = pc(d);
+        msg('e-msg', 'info', '進場後保單價值只要跌超過 <b>' + pc(d, 0) + '</b>，借款成數就會碰到 ' + pc(cut, 0) + ' 斷頭線。');
+      } else {
+        $('e').textContent = '0 萬';
+        $('e-vl').textContent = wan(V) + '／' + wan(L);
+        $('e-r').textContent = pc(r);
+        $('e-dd').textContent = r >= cut ? '已達斷頭線' : pc(ddNow);
+        msg('e-msg', 'warn', '目前借款成數 ' + pc(r) + ' 已高於抗損 ' + pc(d, 0) + ' 對應的 ' + pc(tgt) + '，不建議再進場；可參考下方「還款」或「基金出場」回到目標水位。');
+      }
+      // 參考：借到常用成數
+      var E60 = (ref * V - L) / (1 - ref);
+      $('e-ref').innerHTML = '參考：借到 <b>' + pc(ref, 0) + '</b> 時，進場金額約 <b>' + (E60 > 0 ? wan(E60) : '0 萬（已超過）') + '</b>，進場後可承受保單價值下跌 <b>' + pc(1 - ref / cut) + '</b>。<br>抗損 ' + pc(d, 0) + ' 對應的借款成數是 ' + pc(tgt) + '（＝' + pc(cut, 0) + ' ×（1 − ' + pc(d, 0) + '））。';
+
+      // ② 還款：兩格互算
+      var R;
+      if (lastRepay === 'amt') {
+        R = num('rp');
+        if ($('rp').value !== '') $('rt').value = V > 0 ? (+(((L - R) / V) * 100).toFixed(2)) : '';
+        else $('rt').value = '';
+      } else {
+        var t = num('rt') / 100;
+        R = L - t * V;
+        if ($('rt').value !== '') $('rp').value = +R.toFixed(2); else $('rp').value = '';
+      }
+      if ($('rp').value === '') {
+        $('rp-l').textContent = '—'; $('rp-dd').textContent = '—'; msg('rp-msg');
+      } else {
+        var L2 = L - R, r2 = L2 / V;
+        $('rp-l').textContent = wan(L2);
+        $('rp-dd').textContent = r2 >= cut ? '已達斷頭線' : pc(1 - r2 / cut);
+        if (R < 0) msg('rp-msg', 'warn', '目標成數高於目前成數，不需要還款。');
+        else if (L2 < 0) msg('rp-msg', 'warn', '還款金額超過借款本息。');
+        else msg('rp-msg', 'ok', '還款 <b>' + wan(R) + '</b> 後，借款成數由 ' + pc(r) + ' 降到 <b>' + pc(r2) + '</b>，可承受保單價值下跌 ' + pc(1 - r2 / cut) + '。');
+      }
+
+      // ③ 基金出場還款：(L-S)/(V-S) = tgt
+      var S = (L - tgt * V) / (1 - tgt);
+      if (S > 0) {
+        $('x').textContent = wan(S);
+        $('x-vl').textContent = wan(V - S) + '／' + wan(L - S);
+        $('x-r').textContent = pc((L - S) / (V - S));
+        msg('x-msg', 'warn', '目前水位低於抗損 ' + pc(d, 0) + '，需從保單贖回約 <b>' + wan(S) + '</b> 並全數還款，才能回到可承受下跌 ' + pc(d, 0) + ' 的水位。');
+      } else {
+        $('x').textContent = '0 萬';
+        $('x-vl').textContent = wan(V) + '／' + wan(L);
+        $('x-r').textContent = pc(r);
+        msg('x-msg', 'ok', '目前已可承受保單價值下跌 ' + (r >= cut ? '0%' : pc(ddNow)) + '，高於抗損 ' + pc(d, 0) + '，不需要出場。');
+      }
+
+      // ④ 下跌情境
+      var rows = '';
+      [0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5].forEach(function (k) {
+        var v2 = V * (1 - k), rr = v2 > 0 ? L / v2 : Infinity, hit = rr >= cut;
+        rows += '<tr><td>' + (k ? '-' + (k * 100).toFixed(0) + '%' : '目前') + '</td><td>' + wan(v2) + '</td><td class="' + (hit ? 'hit' : '') + '">' + pc(rr) + '</td><td class="' + (hit ? 'hit' : '') + '">' + (hit ? '斷頭' : rr >= tgt ? '接近警戒' : '安全') + '</td></tr>';
+      });
+      $('sc').innerHTML = rows;
+
+      // 水位條
+      var pos = function (x) { return Math.max(0, Math.min(100, x * 100)); };
+      var after = E > 0 ? (L + E) / (V + E) : null;
+      $('bar').innerHTML = '<i style="left:' + pos(r) + '%"></i><b style="left:' + pos(r) + '%">目前 ' + pc(r, 0) + '</b>' +
+        (after ? '<i class="after" style="left:' + pos(after) + '%"></i><b style="left:' + pos(after) + '%;top:-20px">進場後 ' + pc(after, 0) + '</b>' : '') +
+        '<b style="left:' + pos(cut) + '%">斷頭 ' + pc(cut, 0) + '</b>';
+    }
+
+    ['v', 'l', 'd', 'cut', 'ref'].forEach(function (id) { $(id).addEventListener('input', calc); });
+    $('rp').addEventListener('input', function () { lastRepay = 'amt'; calc(); });
+    $('rt').addEventListener('input', function () { lastRepay = 'pct'; calc(); });
+    calc();
+  })();
+  </script>
+</body>
+</html>
