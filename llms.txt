@@ -35,7 +35,7 @@
 ## 景氣與市場數據
 
 <!-- SNAP:PFLLMS:START -->
-- [MOMO 配置策略](https://momowinwin.com/MOMO_FinSphere/tools/portfolio.html)：明哲MOMO 自己的基金配置（名稱部分打碼）：市場分布、比例、加權配息率，本金報酬與含息總報酬，並和 S&P 500 指數基金同期比較；每日更新，過去績效不代表未來，不構成投資建議。
+- [MOMO 配置策略](https://momowinwin.com/MOMO_FinSphere/tools/portfolio.html)：明哲MOMO 自己的基金配置（名稱部分打碼，每日更新）。截至 2026-11-13：市場分布 多重資產 77%、全球股票 10%、台灣股票 7%、歐洲股票 6%；加權配息率約 8.4%；近 1 年含息總報酬 +13.6%；今年以來含息總報酬 +12.0%，同期 S&P 500 指數基金 +10.6%。以目前配置比例回算，過去績效不代表未來表現，不構成投資建議。
 <!-- SNAP:PFLLMS:END -->
 - [景氣循環儀表板](https://momowinwin.com/MOMO_FinSphere/tools/cycle.html): 同一頁對照兩種週期——短週期 MCS 景氣分數（信用利差、利率、流動性、情緒等因子，0–100 分，衰退／放緩／成長／過熱四象限）與長週期康波（採周金濤分期：第五次康波回升 1982–1991、繁榮 1991–2004、衰退 2004–2015、蕭條 2015–2025，目前處在轉入第六次康波回升期的轉換期；附各階段特徵、要注意的事與 2000 年起的歷史事件）
 - [長周期交易平均](https://momowinwin.com/MOMO_FinSphere/tools/seasonality.html): 各市場月份與季節性的歷史統計
