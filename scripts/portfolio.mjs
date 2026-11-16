@@ -59,6 +59,8 @@ function main(api) {
   if (!H.length) throw new Error('公開配置沒有可用的持倉');
   const wSum = H.reduce((a, h) => a + h.weight, 0);
   H.forEach((h) => {
+    // Config 的配息率若是百分比格式，GAS 會讀成小數（0.1043＝10.43%）
+    if (h.yield != null && Math.abs(h.yield) <= 1) h.yield = h.yield * 100;
     h.w = h.weight / wSum;
     h.navAt = lookup(h.nav);
     const tr = totalSeries(h.nav, h.adj);
