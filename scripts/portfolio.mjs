@@ -153,8 +153,7 @@ function donut(markets) {
     a0 = a1;
     return `<path d="${d}" fill="${COLORS[i % COLORS.length]}" fill-rule="evenodd" stroke="#fffdf8" stroke-width="2.5" stroke-linejoin="round"/>`;
   }).join('');
-  const legend = markets.map((m, i) => `<li><i style="background:${COLORS[i % COLORS.length]}"></i>${esc(m.market)}<b>${(m.w * 100).toFixed(0)}%</b></li>`).join('');
-  return `<div class="alloc"><svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="市場分布">${segs}</svg><ul class="legend">${legend}</ul></div>`;
+  return `<div class="grp mk"><div class="grp-top"><b>市場分布</b><span>${markets.length} 類</span></div><svg class="donut" viewBox="0 0 180 180" role="img" aria-label="市場分布：${markets.map((m) => esc(m.market) + ' ' + (m.w * 100).toFixed(0) + '%').join('、')}">${segs}</svg><p class="mk-note">顏色對應核心與衛星卡片中的市場</p></div>`;
 }
 
 function lineChart(c, bmLabel) {
@@ -193,7 +192,7 @@ function render(d) {
     core: ['核心｜收息現金流', '以多重資產等收益型配置為主，把收益來源分散在股、債與其他資產，目標是每個月都有現金流入帳，生活支出不必靠賣出資產。'],
     sat: ['衛星｜成長動能', '用股票部位追求長期成長、拉高整體總報酬；比例刻意控制在少數，市場波動時不影響核心的現金流。']
   };
-  const arch = d.groups.map((g) => `<div class="grp ${g.key}"><div class="grp-top"><b>${GROUP[g.key][0]}</b><span>${(g.w * 100).toFixed(0)}%</span></div><p>${GROUP[g.key][1]}</p><ul>${g.markets.map((m) => `<li>${esc(m.market)}<i>${(m.w * 100).toFixed(0)}%</i></li>`).join('')}</ul></div>`).join('');
+  const arch = d.groups.map((g) => `<div class="grp ${g.key}"><div class="grp-top"><b>${GROUP[g.key][0]}</b><span>${(g.w * 100).toFixed(0)}%</span></div><p>${GROUP[g.key][1]}</p><ul>${g.markets.map((m) => `<li><em style="background:${COLORS[d.markets.findIndex((x) => x.market === m.market) % COLORS.length]}"></em>${esc(m.market)}<i>${(m.w * 100).toFixed(0)}%</i></li>`).join('')}</ul></div>`).join('');
   const _u = d.groups.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
   const ds = {
     '@context': 'https://schema.org', '@type': 'Dataset',
@@ -217,9 +216,6 @@ function render(d) {
         ${d.bmLabel ? `<div><span>同期 ${esc(d.bmLabel)}</span><b${cls(pB && pB.bm)}>${pct(pB && pB.bm)}</b><small>${pB ? pB.label : ''}｜MOMO 含息同期 ${pct(pB && pB.tr)}</small></div>` : ''}
       </div>
 
-      <h2 id="alloc">佈局在哪些市場？</h2>
-      ${donut(d.markets)}
-
       <h2 id="perf">同期表現比較</h2>
       ${lineChart(d.chart, d.bmLabel)}
       <div class="table-wrap"><table class="pf">
@@ -228,8 +224,8 @@ function render(d) {
       </table></div>
       ${d.bmLabel ? (d.bmFirst > d.periods.find((p) => p.key === '1y').from ? `<p class="note">${esc(d.bmLabel)} 的資料從 ${d.bmFirst} 開始，早於這天的期間不做比較（顯示「—」）；走勢圖中它的起點對齊當天 MOMO 的位置。</p>` : '') : '<p class="note">比較基準尚未設定，設定後會自動加入同期比較。</p>'}
 
-      <h2 id="arch">配置架構：核心＋衛星</h2>
-      <div class="arch">${arch}</div>
+      <h2 id="arch">佈局在哪些市場？核心＋衛星配置</h2>
+      <div class="arch">${donut(d.markets)}${arch}</div>
       <div class="ask">
         <div><b>想知道 MOMO 實際用哪些基金、為什麼這樣搭配？</b><span>每個人的現金流需求不同，適合的比例也不一樣。歡迎到官方 LINE 聊聊你的情況。</span></div>
         <a class="btn btn-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="portfolio_arch" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">加入官方 LINE 詢問</a>
