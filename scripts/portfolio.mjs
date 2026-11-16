@@ -1,7 +1,7 @@
 // ============================================================
 // MOMO財商智庫｜MOMO 配置策略快照  scripts/portfolio.mjs
 // 由 GitHub Actions（每日數據快照）執行：
-//   1. 從 moneydjAPI（GAS）讀「公開配置」：打碼名稱、市場類別、比例、配息率、NAV 與調整後 NAV
+//   1. 從 moneyDJ爬蟲整合（GAS）讀「公開配置」：打碼名稱、市場類別、比例、配息率、NAV 與調整後 NAV
 //      ※ 基金全名不會離開 GAS，這裡拿到的已經是「投信●●●●基金」
 //   2. 計算組合的本金報酬（只看淨值）、含息總報酬（調整後淨值）、加權配息率，
 //      並和比較基準（S&P 500 指數基金）做同期比較
@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const API = 'https://script.google.com/macros/s/AKfycbwYVirIuGO475Kb63z4jTKKgSPINSqy9jM3wPaQPMfa0DXzpdDybCXpoiqfPmeveb7F0g/exec?op=get_public_portfolio';
+const API = 'https://script.google.com/macros/s/AKfycbwUk4wagt8SSchnpz8oqj1XkgfGM2--9M41WBlZGUpsT29dtdv1wV55nowk37ClEmlxyw/exec?op=get_public_portfolio';
 const PAGE = path.join(ROOT, 'tools/portfolio.html');
 
 const DAY = 864e5;
@@ -54,7 +54,7 @@ function totalSeries(nav, adj) {
 }
 
 function main(api) {
-  if (!api.ok) throw new Error(api.error || ('API 沒有回傳配置資料（moneydjAPI 可能還沒加上 get_public_portfolio 或還沒部署新版本）：' + JSON.stringify(api).slice(0, 200)));
+  if (!api.ok) throw new Error(api.error || ('API 沒有回傳配置資料（moneyDJ爬蟲整合 可能還沒加上 get_public_portfolio 或還沒部署新版本）：' + JSON.stringify(api).slice(0, 200)));
   const H = api.holdings.filter((h) => h.nav && h.nav.length > 20);
   if (!H.length) throw new Error('公開配置沒有可用的持倉');
   const wSum = H.reduce((a, h) => a + h.weight, 0);
