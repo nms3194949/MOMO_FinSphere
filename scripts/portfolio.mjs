@@ -172,11 +172,25 @@ ${c.bm ? `<path d="${path(c.bm)}" fill="none" stroke="#9aa3b5" stroke-width="2"/
 function render(d) {
   const p1y = d.periods.find((p) => p.key === '1y');
   const pB = p1y && p1y.bm != null ? p1y : d.periods.find((p) => p.key === 'ytd');
-  const lead = `截至 ${d.asof}，MOMO 的配置分布在 ${d.markets.length} 個市場類別、${d.holdings.length} 檔基金，加權配息率約 ${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(p1y && p1y.tr)}、本金（只看淨值）${pct(p1y && p1y.nav)}${d.bmLabel && pB && pB.bm != null ? `；${pB.label}含息總報酬 ${pct(pB.tr)}，同期 ${esc(d.bmLabel)} ${pct(pB.bm)}` : ''}。`;
+  const bmTxt = d.bmLabel && pB && pB.bm != null;
+  const lead = `截至 ${d.asof}，MOMO 的配置分布在 ${d.markets.length} 個市場類別、${d.holdings.length} 檔基金，加權配息率約 ${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(p1y && p1y.tr)}${bmTxt && pB.key === '1y' ? `（同期 ${esc(d.bmLabel)} ${pct(pB.bm)}）` : ''}、本金（只看淨值）${pct(p1y && p1y.nav)}${bmTxt && pB.key !== '1y' ? `；${pB.label}含息總報酬 ${pct(pB.tr)}，同期 ${esc(d.bmLabel)} ${pct(pB.bm)}` : ''}（以目前配置比例回算，過去績效不代表未來表現，不構成投資建議）。`;
   const rows = d.periods.map((p) => `<tr><th scope="row">${p.label}</th><td${cls(p.tr)}>${pct(p.tr)}</td>${d.bmLabel ? `<td${cls(p.bm)}>${pct(p.bm)}</td>` : ''}</tr>`).join('');
   const a = d.annual;
   const hold = d.holdings.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
+  const ds = {
+    '@context': 'https://schema.org', '@type': 'Dataset',
+    name: 'MOMO 配置策略：市場分布、加權配息率與同期報酬',
+    description: lead.replace(/<[^>]+>/g, ''),
+    url: 'https://momowinwin.com/MOMO_FinSphere/tools/portfolio.html',
+    creator: { '@id': 'https://momowinwin.com/momo-blog/about/#person' },
+    dateModified: d.asof,
+    temporalCoverage: `${d.chart.dates[0]}/${d.asof}`,
+    isAccessibleForFree: true,
+    variableMeasured: ['市場類別配置比例', '加權配息率', '含息總報酬', '本金年化報酬', 'S&P 500 指數基金同期報酬'],
+    measurementTechnique: '以基金每日淨值與調整後淨值，依目前配置比例加權計算；配息領出不再投入'
+  };
   return `
+      <script type="application/ld+json">${JSON.stringify(ds).replace(/</g, '\\u003c')}</script>
       <p class="answer" id="pf-lead">${lead}</p>
       <div class="kpis">
         <div><span>加權配息率</span><b>${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}</b><small>依目前比例加權</small></div>
@@ -214,4 +228,21 @@ if (!re.test(html)) throw new Error('找不到 SNAP:PF 標記');
 html = html.replace(re, `$1${render(data)}\n      $2`).replace(/("dateModified": ")[^"]*(")/, `$1${data.asof}$2`)
   .replace('<meta name="robots" content="noindex,follow" />', '<meta name="robots" content="index,follow" />');
 await writeFile(PAGE, html);
+// sitemap 更新日期
+const smFile = path.join(ROOT, 'sitemap.xml');
+let sm = await readFile(smFile, 'utf8');
+sm = sm.replace(/(<loc>https:\/\/momowinwin\.com\/MOMO_FinSphere\/tools\/portfolio\.html<\/loc><lastmod>)[\d-]+(<\/lastmod>)/, `$1${data.asof}$2`);
+await writeFile(smFile, sm);
+// llms.txt：每天寫入最新數字（含警語）
+const lf = path.join(ROOT, 'llms.txt');
+let llms = await readFile(lf, 'utf8');
+const lre = /(<!-- SNAP:PFLLMS:START -->)[\s\S]*?(<!-- SNAP:PFLLMS:END -->)/;
+if (lre.test(llms)) {
+  const y1 = data.periods.find((p) => p.key === '1y');
+  const pB = y1 && y1.bm != null ? y1 : data.periods.find((p) => p.key === 'ytd');
+  const mk = data.markets.map((m) => `${m.market} ${(m.w * 100).toFixed(0)}%`).join('、');
+  const line = `- [MOMO 配置策略](https://momowinwin.com/MOMO_FinSphere/tools/portfolio.html)：明哲MOMO 自己的基金配置（名稱部分打碼，每日更新）。截至 ${data.asof}：市場分布 ${mk}；加權配息率約 ${data.yieldW == null ? '—' : data.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(y1 && y1.tr)}${data.bmLabel && pB && pB.bm != null ? (pB.key === '1y' ? `，同期 ${data.bmLabel} ${pct(pB.bm)}` : `；${pB.label}含息總報酬 ${pct(pB.tr)}，同期 ${data.bmLabel} ${pct(pB.bm)}`) : ''}。${'以目前配置比例回算，過去績效不代表未來表現，不構成投資建議'}。`;
+  llms = llms.replace(lre, `$1\n${line}\n$2`);
+  await writeFile(lf, llms);
+}
 console.log(`配置策略快照：${data.asof}｜${data.holdings.length} 檔｜加權配息率 ${data.yieldW?.toFixed(2)}%`);
