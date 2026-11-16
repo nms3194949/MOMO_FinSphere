@@ -42,7 +42,7 @@
     .kv .k { color: var(--ink-2); font-size: 14.5px; }
     .kv .v { font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; text-align: right; }
     .kv.big .v { font-family: var(--serif); font-size: 28px; color: var(--gold); }
-    .bar { position: relative; height: 14px; border-radius: 999px; background: linear-gradient(90deg, #cfe8c4 0%, #f7e3a8 60%, #f5b5a6 85%, #e98f7c 100%); margin: 6px 0 22px; }
+    .bar { position: relative; height: 14px; border-radius: 999px; margin-top: 26px !important; background: linear-gradient(90deg, #cfe8c4 0%, #f7e3a8 60%, #f5b5a6 85%, #e98f7c 100%); margin: 6px 0 22px; }
     .bar i { position: absolute; top: -5px; width: 4px; height: 24px; border-radius: 2px; background: var(--ink); transform: translateX(-2px); }
     .bar i.after { background: var(--gold); }
     .bar b { position: absolute; top: 18px; font-size: 11.5px; color: var(--muted); transform: translateX(-50%); font-weight: 600; white-space: nowrap; }
@@ -55,6 +55,11 @@
     th:first-child, td:first-child { text-align: left; }
     thead th { color: var(--muted); font-weight: 600; font-size: 13px; }
     .hit { color: var(--warn); font-weight: 800; }
+    .opt { border: 1px solid var(--line); border-radius: 12px; padding: 4px 14px 2px; margin-top: 10px; background: #fff; }
+    .opt-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 10px 0 2px; }
+    .opt-h b { font-size: 15.5px; }
+    .opt-h span { font-size: 12.5px; color: var(--muted); }
+    .opt .kv.big .v { font-size: 24px; }
     .note { font-size: 13px; color: var(--muted); margin: 8px 0 0; line-height: 1.7; }
     .formula { font-size: 13px; color: var(--ink-2); background: var(--gold-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; line-height: 1.8; }
   </style>
@@ -99,21 +104,19 @@
         </section>
 
         <section class="card">
-          <h2>② 降水位 <small>還款：先用貨幣帳戶，不夠再基金出場</small></h2>
-          <div class="row2">
-            <div>
-              <label for="rp">還款金額</label>
-              <div class="in"><input id="rp" type="text" inputmode="numeric" placeholder="輸入金額" /><em>元</em></div>
-            </div>
-            <div>
-              <label for="rt">還款後借款成數</label>
-              <div class="in"><input id="rt" type="number" inputmode="decimal" placeholder="輸入成數" min="0" step="any" /><em>%</em></div>
-            </div>
+          <h2 id="fix-h">② 回到抗損的兩種方式</h2>
+          <div class="opt">
+            <div class="opt-h"><b>方式一｜自有資金還款</b><span>手上有閒錢</span></div>
+            <div class="kv big"><span class="k">需還款</span><span class="v" id="a-r">—</span></div>
+            <div class="kv"><span class="k">還款後借款成數</span><span class="v" id="a-lr">—</span></div>
           </div>
-          <div class="kv"><span class="k">貨幣帳戶／基金出場</span><span class="v" id="rp-src">—</span></div>
-          <div class="kv"><span class="k">還款後基金可再跌</span><span class="v" id="rp-dd">—</span></div>
-          <div id="rp-msg"></div>
-          <div class="formula" id="tg"></div>
+          <div class="opt">
+            <div class="opt-h"><b>方式二｜基金出場還款</b><span>不用另外準備資金</span></div>
+            <div class="kv big"><span class="k">需基金出場</span><span class="v" id="b-x">—</span></div>
+            <div class="kv" id="b-c-row"><span class="k">另用貨幣帳戶還款</span><span class="v" id="b-c">—</span></div>
+            <div class="kv"><span class="k">還款後借款成數</span><span class="v" id="b-lr">—</span></div>
+          </div>
+          <div id="fix-msg"></div>
         </section>
       </div>
     </div>
@@ -153,41 +156,35 @@
       else if (E > 0) msg('e-msg', 'info', '再進場 <b>' + yuan(E) + '</b> 後，基金跌超過 <b>' + pc(d, 0) + '</b> 就會碰到斷頭線；貨幣帳戶還剩 ' + yuan(C - E) + '。');
       else msg('e-msg', 'warn', tNow < d ? '目前基金' + (tNow === 0 ? '已達斷頭線' : '只能再跌 ' + pc(tNow)) + '，低於抗損 ' + pc(d, 0) + '，不建議再進場。' : '貨幣帳戶沒有可進場的資金。');
 
-      // ② 還款：貨幣帳戶先還，不夠再基金出場
-      function after(R) { var x = Math.max(0, R - C); return { V: V - R, L: L - R, F: F - x, c: Math.min(R, C), x: x }; }
-      var R;
-      if (lastRepay === 'amt') {
-        R = num('rp');
-        $('rt').value = $('rp').value === '' ? '' : (V - R > 0 ? +(((L - R) / (V - R)) * 100).toFixed(2) : '');
+      // ② 回到抗損：方式一 自有資金還款（保單價值不變）
+      $('fix-h').textContent = '② 回到抗損 ' + pc(d, 0) + ' 的兩種方式';
+      var need = tNow < d;
+      document.querySelectorAll('.opt').forEach(function (el) { el.style.display = need ? '' : 'none'; });
+      if (!need) {
+        msg('fix-msg', 'ok', '目前基金' + (tNow >= 1 ? '歸零也不會斷頭' : '可再跌 ' + pc(tNow)) + '，已達抗損 ' + pc(d, 0) + '，不需要還款或出場。');
       } else {
-        var t = num('rt') / 100;                    // (L − R)/(V − R) = t
-        R = t < 1 ? (L - t * V) / (1 - t) : 0;
-        $('rp').value = $('rt').value === '' ? '' : Math.round(R).toLocaleString('zh-TW');
+        var Ra = L - cut * (V - F * d);              // L − R = cut ×（V − F × d）
+        $('a-r').textContent = yuan(Ra);
+        $('a-lr').textContent = pc((L - Ra) / V);
+        // 方式二 用保單裡的錢還款：先用貨幣帳戶，不夠再基金出場（V、L 同時減少）
+        var k = 1 / cut - 1, Rb = (L / cut - V + F * d) / k, useC, x;
+        if (Rb <= C) { useC = Rb; x = 0; }
+        else { Rb = (L / cut - V * (1 - d)) / (k + d); useC = C; x = Rb - C; }
+        $('b-x').textContent = yuan(x);
+        $('b-c').textContent = yuan(useC);
+        $('b-c-row').style.display = useC > 0 ? '' : 'none';
+        $('b-lr').textContent = pc((L - Rb) / (V - Rb));
+        msg('fix-msg');
       }
-      if ($('rp').value === '') { ['rp-src', 'rp-dd'].forEach(function (k) { $(k).textContent = '—'; }); msg('rp-msg'); }
-      else if (R <= 0) { ['rp-src', 'rp-dd'].forEach(function (k) { $(k).textContent = '—'; }); msg('rp-msg', 'warn', '目標成數高於目前成數，不需要還款。'); }
-      else if (R > L) { msg('rp-msg', 'warn', '還款金額超過借款本息。'); }
-      else {
-        var a = after(R), ta = tol(a.V, a.F, a.L, cut);
-        $('rp-src').textContent = Math.round(a.c / 1e4).toLocaleString('zh-TW') + ' 萬／' + Math.round(a.x / 1e4).toLocaleString('zh-TW') + ' 萬'; $('rp-dd').textContent = tolTxt(ta);
-        msg('rp-msg');
-      }
-
-      // 回到目標抗損需還款多少
-      var k = 1 / cut - 1, Rt = (L / cut - V + F * d) / k;   // 只用貨幣帳戶
-      if (Rt > C) Rt = (L / cut - V * (1 - d)) / (k + d);    // 貨幣帳戶不夠，加上基金出場
-      if (tNow >= d) $('tg').innerHTML = (tNow >= 1 ? '目前基金歸零也不會斷頭' : '目前基金可再跌 ' + pc(tNow)) + '，已達抗損 ' + pc(d, 0) + '，不需要還款。';
-      else { var at = after(Rt); $('tg').innerHTML = '回到抗損 ' + pc(d, 0) + '：需還款 <b>' + yuan(Rt) + '</b>' + (at.x > 0 ? '（含基金出場 ' + yuan(at.x) + '）' : '') + '。'; }
 
       // 水位條
       var pos = function (x) { return Math.max(0, Math.min(100, x * 100)); };
-      $('bar').innerHTML = '<i style="left:' + pos(r) + '%"></i><b style="left:' + pos(r) + '%">目前 ' + pc(r, 0) + '</b><b style="left:' + pos(cut) + '%">斷頭 ' + pc(cut, 0) + '</b>';
+      var near = Math.abs(r - cut) < 0.14;
+      $('bar').innerHTML = '<i style="left:' + pos(r) + '%"></i><b style="left:' + pos(r) + '%' + (near ? ';top:-20px' : '') + '">目前 ' + pc(r, 0) + '</b><b style="left:' + pos(cut) + '%">斷頭 ' + pc(cut, 0) + '</b>';
     }
 
-    ['v', 'f', 'l', 'rp'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
+    ['v', 'f', 'l'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
     ['v', 'f', 'l', 'd'].forEach(function (id) { $(id).addEventListener('input', calc); });
-    $('rp').addEventListener('input', function () { lastRepay = 'amt'; calc(); });
-    $('rt').addEventListener('input', function () { lastRepay = 'pct'; calc(); });
     calc();
   })();
   </script>
