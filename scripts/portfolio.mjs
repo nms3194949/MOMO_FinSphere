@@ -148,40 +148,41 @@ function donut(markets) {
 }
 
 function lineChart(c, bmLabel) {
-  const W = 720, Hh = 260, L = 44, Rr = 12, T = 14, B = 30;
-  const all = [...c.tr, ...c.nav, ...(c.bm || [])].filter((v) => v != null);
+  const W = 720, Hh = 260, L = 44, Rr = 52, T = 14, B = 30;
+  const all = [...c.tr, ...(c.bm || [])].filter((v) => v != null);
   let lo = Math.min(...all), hi = Math.max(...all);
   const pad = (hi - lo) * 0.08 || 2; lo -= pad; hi += pad;
   const x = (i) => L + (i / (c.dates.length - 1)) * (W - L - Rr);
   const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (Hh - T - B);
   const path = (arr) => arr.map((v, i) => (v == null ? '' : `${i && arr[i - 1] != null ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`)).join('');
   const ticks = [];
-  const step = (hi - lo) / 4;
-  for (let k = 0; k <= 4; k++) { const v = lo + step * k; ticks.push(`<line x1="${L}" x2="${W - Rr}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#e4dccb"/><text x="${L - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v.toFixed(0)}</text>`); }
+  // 刻度取整數百分比（含 0%，也就是起點 100）
+  const step = [1, 2, 5, 10, 20, 25, 50, 100].find((st) => (hi - lo) / st <= 6) || 100;
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) { const pc = v - 100; ticks.push(`<line x1="${L}" x2="${W - Rr}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#e4dccb"/><text x="${L - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v.toFixed(0)}</text><text class="pc" x="${W - Rr + 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="start">${(pc >= 0 ? '+' : '') + pc.toFixed(0)}%</text>`); }
   const months = [];
   c.dates.forEach((d, i) => { if (i && d.slice(5, 7) !== c.dates[i - 1].slice(5, 7) && +d.slice(5, 7) % 3 === 1) months.push(`<text x="${x(i).toFixed(1)}" y="${Hh - 8}" text-anchor="middle">${d.slice(0, 7).replace('-', '/')}</text>`); });
   const base = `<line x1="${L}" x2="${W - Rr}" y1="${y(100).toFixed(1)}" y2="${y(100).toFixed(1)}" stroke="#7a8296" stroke-dasharray="3 4"/>`;
   return `<figure class="chart"><svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="近 1 年走勢，起點為 100">
 <g class="ax">${ticks.join('')}${months.join('')}</g>${base}
 ${c.bm ? `<path d="${path(c.bm)}" fill="none" stroke="#9aa3b5" stroke-width="2"/>` : ''}
-<path d="${path(c.nav)}" fill="none" stroke="#a88a3d" stroke-width="2" stroke-dasharray="6 4"/>
 <path d="${path(c.tr)}" fill="none" stroke="#0c152a" stroke-width="2.6"/></svg>
-<figcaption><span><i class="k1"></i>MOMO 配置・含息總報酬</span><span><i class="k2"></i>MOMO 配置・本金（只看淨值）</span>${c.bm ? `<span><i class="k3"></i>${esc(bmLabel)}</span>` : ''}<span>起點＝100</span></figcaption></figure>`;
+<figcaption><span><i class="k1"></i>MOMO 配置・含息總報酬</span>${c.bm ? `<span><i class="k3"></i>${esc(bmLabel)}</span>` : ''}<span>左軸：起點＝100｜右軸：累積報酬率</span></figcaption></figure>`;
 }
 
 function render(d) {
   const p1y = d.periods.find((p) => p.key === '1y');
-  const lead = `截至 ${d.asof}，MOMO 的配置分布在 ${d.markets.length} 個市場類別、${d.holdings.length} 檔基金，加權配息率約 ${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(p1y && p1y.tr)}、本金（只看淨值）${pct(p1y && p1y.nav)}${d.bmLabel && p1y && p1y.bm != null ? `，同期 ${esc(d.bmLabel)} ${pct(p1y.bm)}` : ''}。`;
-  const rows = d.periods.map((p) => `<tr><th scope="row">${p.label}</th><td${cls(p.tr)}>${pct(p.tr)}</td><td${cls(p.nav)}>${pct(p.nav)}</td>${d.bmLabel ? `<td${cls(p.bm)}>${pct(p.bm)}</td>` : ''}</tr>`).join('');
+  const pB = p1y && p1y.bm != null ? p1y : d.periods.find((p) => p.key === 'ytd');
+  const lead = `截至 ${d.asof}，MOMO 的配置分布在 ${d.markets.length} 個市場類別、${d.holdings.length} 檔基金，加權配息率約 ${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(p1y && p1y.tr)}、本金（只看淨值）${pct(p1y && p1y.nav)}${d.bmLabel && pB && pB.bm != null ? `；${pB.label}含息總報酬 ${pct(pB.tr)}，同期 ${esc(d.bmLabel)} ${pct(pB.bm)}` : ''}。`;
+  const rows = d.periods.map((p) => `<tr><th scope="row">${p.label}</th><td${cls(p.tr)}>${pct(p.tr)}</td>${d.bmLabel ? `<td${cls(p.bm)}>${pct(p.bm)}</td>` : ''}</tr>`).join('');
   const a = d.annual;
-  const hold = d.holdings.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td>${h.yield == null ? '—' : h.yield < 0.05 ? '不配息' : h.yield.toFixed(1) + '%'}</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
+  const hold = d.holdings.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
   return `
       <p class="answer" id="pf-lead">${lead}</p>
       <div class="kpis">
         <div><span>加權配息率</span><b>${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}</b><small>依目前比例加權</small></div>
         <div><span>近 1 年含息總報酬</span><b${cls(p1y && p1y.tr)}>${pct(p1y && p1y.tr)}</b><small>淨值變化＋配息</small></div>
         <div><span>本金年化報酬</span><b${cls(a.nav)}>${pct(a.nav)}</b><small>只看淨值、配息領出｜${a.from} 起</small></div>
-        ${d.bmLabel ? `<div><span>同期 ${esc(d.bmLabel)}</span><b${cls(p1y && p1y.bm)}>${pct(p1y && p1y.bm)}</b><small>近 1 年</small></div>` : ''}
+        ${d.bmLabel ? `<div><span>同期 ${esc(d.bmLabel)}</span><b${cls(pB && pB.bm)}>${pct(pB && pB.bm)}</b><small>${pB ? pB.label : ''}｜MOMO 含息同期 ${pct(pB && pB.tr)}</small></div>` : ''}
       </div>
 
       <h2 id="alloc">佈局在哪些市場？</h2>
@@ -190,17 +191,17 @@ function render(d) {
       <h2 id="perf">同期表現比較</h2>
       ${lineChart(d.chart, d.bmLabel)}
       <div class="table-wrap"><table class="pf">
-        <thead><tr><th>期間</th><th>含息總報酬</th><th>本金</th>${d.bmLabel ? '<th>S&amp;P 500</th>' : ''}</tr></thead>
+        <thead><tr><th>期間</th><th>MOMO 含息總報酬</th>${d.bmLabel ? '<th>S&amp;P 500</th>' : ''}</tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
       ${d.bmLabel ? (d.bmFirst > d.periods.find((p) => p.key === '1y').from ? `<p class="note">${esc(d.bmLabel)} 的資料從 ${d.bmFirst} 開始，早於這天的期間不做比較（顯示「—」）；走勢圖中它的起點對齊當天 MOMO 的位置。</p>` : '') : '<p class="note">比較基準尚未設定，設定後會自動加入同期比較。</p>'}
 
       <h2 id="holdings">目前持有的基金</h2>
       <div class="table-wrap"><table class="pf hold">
-        <thead><tr><th>基金（部分打碼）</th><th>比例</th><th>配息率</th><th>近 3 月</th><th>近 1 年</th><th>近 1 年含息</th></tr></thead>
+        <thead><tr><th>基金（部分打碼）</th><th>比例</th><th>近 3 月</th><th>近 1 年</th><th>近 1 年含息</th></tr></thead>
         <tbody>${hold}</tbody>
       </table></div>
-      <p class="note">資料日期：${d.asof}｜「近 3 月」「近 1 年」為淨值報酬，不含配息；「含息」為淨值變化加上配息。配息率為年化配息率，配息可能由本金支出。</p>`;
+      <p class="note">資料日期：${d.asof}｜「近 3 月」「近 1 年」為淨值報酬，不含配息；「含息」為淨值變化加上配息。加權配息率為年化配息率，配息可能由本金支出。</p>`;
 }
 
 const api = await load();
