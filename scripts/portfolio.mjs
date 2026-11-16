@@ -121,11 +121,21 @@ function main(api) {
     }
   }
 
+  // 核心（收息）／衛星（成長）：股票類為衛星，其餘為核心
+  const isGrowth = (m) => /股票/.test(m);
+  const groups = ['core', 'sat'].map((g) => {
+    const ms = markets.filter((m) => (g === 'sat') === isGrowth(m.market));
+    const gw = ms.reduce((a, m) => a + m.w, 0);
+    const gH = H.filter((h) => (g === 'sat') === isGrowth(h.market));
+    const gy = gH.filter((h) => h.yield != null);
+    return { key: g, w: gw, markets: ms, yield: gy.length && gw ? gy.reduce((a, h) => a + h.w * h.yield, 0) / gy.reduce((a, h) => a + h.w, 0) : null };
+  }).filter((g) => g.w > 0);
+  const nFunds = H.length;
   const holdings = H.slice().sort((a, b) => b.w - a.w).map((h) => ({
     label: h.label, market: h.market, w: h.w, yield: h.yield,
     r1m: ret(h.navAt, back(1)), r3m: ret(h.navAt, back(3)), r1y: ret(h.navAt, back(12)), tr1y: h.hasTR ? ret(h.trAt, back(12)) : null
   }));
-  return { asof, generated: api.generated, bmLabel: bm ? bm.label : null, bmFirst: bm ? bm.first : null, yieldW, periods, annual, markets, holdings, chart };
+  return { asof, generated: api.generated, bmLabel: bm ? bm.label : null, bmFirst: bm ? bm.first : null, yieldW, periods, annual, markets, groups, nFunds, chart, _holdings: holdings };
 }
 
 // ── HTML ──────────────────────────────────────────────
@@ -176,10 +186,15 @@ function render(d) {
   const p1y = d.periods.find((p) => p.key === '1y');
   const pB = p1y && p1y.bm != null ? p1y : d.periods.find((p) => p.key === 'ytd');
   const bmTxt = d.bmLabel && pB && pB.bm != null;
-  const lead = `截至 ${d.asof}，MOMO 的配置分布在 ${d.markets.length} 個市場類別、${d.holdings.length} 檔基金，加權配息率約 ${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(p1y && p1y.tr)}${bmTxt && pB.key === '1y' ? `（同期 ${esc(d.bmLabel)} ${pct(pB.bm)}）` : ''}、本金（只看淨值）${pct(p1y && p1y.nav)}${bmTxt && pB.key !== '1y' ? `；${pB.label}含息總報酬 ${pct(pB.tr)}，同期 ${esc(d.bmLabel)} ${pct(pB.bm)}` : ''}（以目前配置比例回算，過去績效不代表未來表現，不構成投資建議）。`;
+  const lead = `截至 ${d.asof}，MOMO 的配置分布在 ${d.markets.length} 個市場類別、${d.nFunds} 檔基金，加權配息率約 ${d.yieldW == null ? '—' : d.yieldW.toFixed(1) + '%'}；近 1 年含息總報酬 ${pct(p1y && p1y.tr)}${bmTxt && pB.key === '1y' ? `（同期 ${esc(d.bmLabel)} ${pct(pB.bm)}）` : ''}、本金（只看淨值）${pct(p1y && p1y.nav)}${bmTxt && pB.key !== '1y' ? `；${pB.label}含息總報酬 ${pct(pB.tr)}，同期 ${esc(d.bmLabel)} ${pct(pB.bm)}` : ''}（以目前配置比例回算，過去績效不代表未來表現，不構成投資建議）。`;
   const rows = d.periods.map((p) => `<tr><th scope="row">${p.label}</th><td${cls(p.tr)}>${pct(p.tr)}</td>${d.bmLabel ? `<td${cls(p.bm)}>${pct(p.bm)}</td>` : ''}</tr>`).join('');
   const a = d.annual;
-  const hold = d.holdings.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
+  const GROUP = {
+    core: ['核心｜收息現金流', '以多重資產等收益型配置為主，把收益來源分散在股、債與其他資產，目標是每個月都有現金流入帳，生活支出不必靠賣出資產。'],
+    sat: ['衛星｜成長動能', '用股票部位追求長期成長、拉高整體總報酬；比例刻意控制在少數，市場波動時不影響核心的現金流。']
+  };
+  const arch = d.groups.map((g) => `<div class="grp ${g.key}"><div class="grp-top"><b>${GROUP[g.key][0]}</b><span>${(g.w * 100).toFixed(0)}%</span></div><p>${GROUP[g.key][1]}</p><ul>${g.markets.map((m) => `<li>${esc(m.market)}<i>${(m.w * 100).toFixed(0)}%</i></li>`).join('')}</ul>${g.yield != null && g.yield >= 0.05 ? `<small>這一塊的加權配息率約 ${g.yield.toFixed(1)}%</small>` : ''}</div>`).join('');
+  const _u = d.groups.map((h) => `<tr><th scope="row">${esc(h.label)}<small>${esc(h.market)}</small></th><td>${(h.w * 100).toFixed(0)}%</td><td${cls(h.r3m)}>${pct(h.r3m)}</td><td${cls(h.r1y)}>${pct(h.r1y)}</td><td${cls(h.tr1y)}>${pct(h.tr1y)}</td></tr>`).join('');
   const ds = {
     '@context': 'https://schema.org', '@type': 'Dataset',
     name: 'MOMO 配置策略：市場分布、加權配息率與同期報酬',
@@ -213,18 +228,19 @@ function render(d) {
       </table></div>
       ${d.bmLabel ? (d.bmFirst > d.periods.find((p) => p.key === '1y').from ? `<p class="note">${esc(d.bmLabel)} 的資料從 ${d.bmFirst} 開始，早於這天的期間不做比較（顯示「—」）；走勢圖中它的起點對齊當天 MOMO 的位置。</p>` : '') : '<p class="note">比較基準尚未設定，設定後會自動加入同期比較。</p>'}
 
-      <h2 id="holdings">目前持有的基金</h2>
-      <div class="table-wrap"><table class="pf hold">
-        <thead><tr><th>基金（部分打碼）</th><th>比例</th><th>近 3 月</th><th>近 1 年</th><th>近 1 年含息</th></tr></thead>
-        <tbody>${hold}</tbody>
-      </table></div>
-      <p class="note">資料日期：${d.asof}｜「近 3 月」「近 1 年」為淨值報酬，不含配息；「含息」為淨值變化加上配息。加權配息率為年化配息率，配息可能由本金支出。</p>`;
+      <h2 id="arch">配置架構：核心＋衛星</h2>
+      <div class="arch">${arch}</div>
+      <div class="ask">
+        <div><b>想知道 MOMO 實際用哪些基金、為什麼這樣搭配？</b><span>每個人的現金流需求不同，適合的比例也不一樣。歡迎到官方 LINE 聊聊你的情況。</span></div>
+        <a class="btn btn-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="portfolio_arch" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">加入官方 LINE 詢問</a>
+      </div>
+      <p class="note">資料日期：${d.asof}｜含息總報酬＝淨值變化加上配息；加權配息率為年化配息率，配息可能由本金支出。</p>`;
 }
 
 const api = await load();
 const data = main(api);
 await mkdir(path.join(ROOT, 'data'), { recursive: true });
-await writeFile(path.join(ROOT, 'data/portfolio.json'), JSON.stringify(data, null, 1));
+await writeFile(path.join(ROOT, 'data/portfolio.json'), JSON.stringify({ ...data, _holdings: undefined }, null, 1));
 let html = await readFile(PAGE, 'utf8');
 const re = /(<!-- SNAP:PF:START -->)[\s\S]*?(<!-- SNAP:PF:END -->)/;
 if (!re.test(html)) throw new Error('找不到 SNAP:PF 標記');
@@ -248,4 +264,4 @@ if (lre.test(llms)) {
   llms = llms.replace(lre, `$1\n${line}\n$2`);
   await writeFile(lf, llms);
 }
-console.log(`配置策略快照：${data.asof}｜${data.holdings.length} 檔｜加權配息率 ${data.yieldW?.toFixed(2)}%`);
+console.log(`配置策略快照：${data.asof}｜${data.nFunds} 檔｜加權配息率 ${data.yieldW?.toFixed(2)}%`);

@@ -44,7 +44,7 @@
     {
       "@type": "FAQPage",
       "mainEntity": [
-        { "@type": "Question", "name": "為什麼基金名稱要打碼？", "acceptedAnswer": { "@type": "Answer", "text": "這頁是分享 MOMO 自己的配置思路與市場佈局，不是推薦特定基金。每個人的資金用途、時間與風險承受度不同，適合的標的也不同，所以只顯示投信名稱與市場類別。" } },
+        { "@type": "Question", "name": "為什麼不公開具體持有哪些基金？", "acceptedAnswer": { "@type": "Answer", "text": "這頁是分享 MOMO 自己的配置思路與市場佈局，不是推薦特定基金。每個人的資金用途、時間與風險承受度不同，適合的標的也不同，所以這裡只公開市場配置與整體表現。想了解自己適合怎麼配，可以到官方 LINE 討論。" } },
         { "@type": "Question", "name": "本金報酬和含息總報酬差在哪？", "acceptedAnswer": { "@type": "Answer", "text": "本金報酬只看淨值變化，相當於配息全部領出、不再投入時，本金漲跌了多少；含息總報酬是淨值變化加上配息。配息率高的組合，兩者差距會比較大。" } },
         { "@type": "Question", "name": "為什麼拿 S&P 500 指數基金來比？", "acceptedAnswer": { "@type": "Answer", "text": "S&P 500 是最多人熟悉的市場代表，用來對照同一段時間市場整體表現。MOMO 的配置有股有債、重視配息現金流，和純股票指數的風險與用途不同，比較結果只是參考，不代表哪一種比較好。" } },
         { "@type": "Question", "name": "這些數字多久更新一次？", "acceptedAnswer": { "@type": "Answer", "text": "每天自動更新一次。報酬以目前的配置比例計算，持倉調整時會一起更新；過去績效不代表未來表現。" } }
@@ -106,6 +106,21 @@
     thead th { color: var(--muted); font-weight: 600; font-size: 13px; }
     tbody th { font-weight: 700; }
     .hold tbody th small { display: block; font-weight: 500; color: var(--muted); font-size: 12.5px; }
+    .arch { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .grp { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; border-top: 4px solid #bddaf5; }
+    .grp.sat { border-top-color: #e99aab; }
+    .grp-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .grp-top b { font-size: 17px; }
+    .grp-top span { font-family: var(--serif); font-size: 26px; font-weight: 800; }
+    .grp p { margin: 6px 0 10px; color: var(--ink-2); font-size: 14.5px; line-height: 1.75; }
+    .grp ul { list-style: none; margin: 0; padding: 0; }
+    .grp li { display: flex; justify-content: space-between; padding: 5px 0; border-top: 1px dashed var(--line); font-size: 14.5px; }
+    .grp li i { font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .grp small { display: block; margin-top: 8px; color: var(--muted); font-size: 12.5px; }
+    .ask { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 14px; padding: 16px 18px; background: var(--gold-bg); border-radius: 14px; }
+    .ask div { flex: 1; min-width: 220px; }
+    .ask b { display: block; font-size: 16px; }
+    .ask span { font-size: 14px; color: var(--ink-2); }
     .note { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
     .section p { color: var(--ink-2); }
     .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
@@ -133,7 +148,7 @@
   <main class="wrap">
     <p class="eyebrow">MOMO 配置策略・每日更新</p>
     <h1>MOMO 目前怎麼配置？</h1>
-    <p class="notice">這裡公開的是 MOMO 自己的基金配置，用來分享佈局思路與市場觀點，<b>不是投資建議，也不推薦特定基金</b>，所以基金名稱只顯示投信與類別。報酬以目前配置比例回算，<b>過去績效不代表未來表現</b>；每個人的資金用途與風險承受度不同，請勿直接照抄。</p>
+    <p class="notice">這裡公開的是 MOMO 自己的基金配置，用來分享佈局思路與市場觀點，<b>不是投資建議，也不推薦特定基金</b>，所以只公開市場配置與整體表現，不列出個別基金。報酬以目前配置比例回算，<b>過去績效不代表未來表現</b>；每個人的資金用途與風險承受度不同，請勿直接照抄。</p>
 
     <section aria-label="配置與表現">
       <!-- SNAP:PF:START -->
@@ -181,7 +196,7 @@
 
     <section class="section faq">
       <h2 id="faq">常見問題</h2>
-      <details><summary>為什麼基金名稱要打碼？</summary><p>這頁是分享 MOMO 自己的配置思路與市場佈局，不是推薦特定基金。每個人的資金用途、時間與風險承受度不同，適合的標的也不同，所以只顯示投信名稱與市場類別。</p></details>
+      <details><summary>為什麼不公開具體持有哪些基金？</summary><p>這頁是分享 MOMO 自己的配置思路與市場佈局，不是推薦特定基金。每個人的資金用途、時間與風險承受度不同，適合的標的也不同，所以這裡只公開市場配置與整體表現。想了解自己適合怎麼配，可以到官方 LINE 討論。</p></details>
       <details><summary>本金報酬和含息總報酬差在哪？</summary><p>本金報酬只看淨值變化，相當於配息全部領出、不再投入時，本金漲跌了多少；含息總報酬是淨值變化加上配息。配息率高的組合，兩者差距會比較大。</p></details>
       <details><summary>為什麼拿 S&amp;P 500 指數基金來比？</summary><p>S&amp;P 500 是最多人熟悉的市場代表，用來對照同一段時間市場整體表現。MOMO 的配置有股有債、重視配息現金流，和純股票指數的風險與用途不同，比較結果只是參考，不代表哪一種比較好。</p></details>
       <details><summary>這些數字多久更新一次？</summary><p>每天自動更新一次。報酬以目前的配置比例計算，持倉調整時會一起更新；過去績效不代表未來表現。</p></details>
