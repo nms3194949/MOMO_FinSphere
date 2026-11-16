@@ -54,7 +54,7 @@ function totalSeries(nav, adj) {
 }
 
 function main(api) {
-  if (!api.ok) throw new Error(api.error || 'API 回傳失敗');
+  if (!api.ok) throw new Error(api.error || ('API 沒有回傳配置資料（moneydjAPI 可能還沒加上 get_public_portfolio 或還沒部署新版本）：' + JSON.stringify(api).slice(0, 200)));
   const H = api.holdings.filter((h) => h.nav && h.nav.length > 20);
   if (!H.length) throw new Error('公開配置沒有可用的持倉');
   const wSum = H.reduce((a, h) => a + h.weight, 0);
