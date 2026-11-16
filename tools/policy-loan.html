@@ -79,11 +79,11 @@
         <section class="card">
           <h2>基本資料 <small>單位：元｜自動記住上次輸入</small><button type="button" id="reset" class="reset">清除</button></h2>
           <label for="v">保單價值 <span>含貨幣帳戶與基金</span></label>
-          <div class="in"><input id="v" type="text" inputmode="numeric" value="5,000,000" /><em>元</em></div>
+          <div class="in"><input id="v" type="text" inputmode="numeric" placeholder="例：1,000,000" /><em>元</em></div>
           <label for="f">已進場基金金額 <span>目前在基金裡的市值</span></label>
-          <div class="in"><input id="f" type="text" inputmode="numeric" value="3,000,000" /><em>元</em></div>
+          <div class="in"><input id="f" type="text" inputmode="numeric" placeholder="例：300,000" /><em>元</em></div>
           <label for="l">保單借款本息</label>
-          <div class="in"><input id="l" type="text" inputmode="numeric" value="2,000,000" /><em>元</em></div>
+          <div class="in"><input id="l" type="text" inputmode="numeric" placeholder="例：800,000" /><em>元</em></div>
           <label for="d">抗損 <span>基金市值可承受的跌幅</span></label>
           <div class="in"><input id="d" type="number" inputmode="decimal" value="15" min="1" max="99" step="any" /><em>%</em></div>
           <input id="cut" type="hidden" value="90" />
@@ -159,6 +159,14 @@
 
     function calc() {
       var V = num('v'), F = Math.min(num('f'), V), L = num('l'), d = num('d') / 100, cut = num('cut') / 100;
+      if (!(V > 0) || $('l').value === '') {
+        ['o-r', 'o-c', 'o-dd', 'e', 'e-dd', 'rp-dd'].forEach(function (k) { $(k).textContent = '—'; });
+        document.querySelectorAll('#e-card .kv, .opt').forEach(function (el) { el.style.display = 'none'; });
+        $('fix-h').innerHTML = '② 回到抗損 ' + tag(d) + ' 的兩種方式';
+        msg('e-msg', 'info', '請先輸入保單價值、已進場基金金額與借款本息。'); msg('fix-msg'); msg('rp-msg');
+        $('bar').innerHTML = '';
+        return;
+      }
       var C = V - F, r = V > 0 ? L / V : NaN, tNow = tol(V, F, L, cut), tgt = cut * (1 - d);
 
       $('o-r').textContent = pc(r);
@@ -226,7 +234,7 @@
     FIELDS.forEach(function (id) { $(id).addEventListener('input', save); $(id).addEventListener('change', save); });
     $('reset').addEventListener('click', function () {
       try { localStorage.removeItem(KEY); } catch (e) {}
-      $('v').value = '5,000,000'; $('f').value = '3,000,000'; $('l').value = '2,000,000'; $('d').value = '15'; calc();
+      $('v').value = ''; $('f').value = ''; $('l').value = ''; $('rp').value = ''; $('rt').value = ''; $('d').value = '15'; calc();
     });
     ['v', 'f', 'l', 'rp'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
     $('rp').addEventListener('input', function () { lastRepay = 'amt'; calc(); });
