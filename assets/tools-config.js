@@ -30,14 +30,5 @@ window.MOMO_TOOLS_CONFIG = [
     desc: "短週期看 MCS 景氣分數，長週期看康波階段，同一頁對照目前位置。",
     href: "/MOMO_FinSphere/tools/cycle.html",
     showOnHome: true
-  },
-  {
-    id: "seasonality",
-    category: "market",
-    label: "季節性",
-    title: "長周期交易平均",
-    desc: "統計各市場長期的月份與季節性表現，觀察歷史規律。",
-    href: "/MOMO_FinSphere/tools/seasonality.html",
-    showOnHome: true
   }
 ];
