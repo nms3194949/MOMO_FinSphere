@@ -66,6 +66,16 @@
     h2 mark.dd { font-family: var(--sans); font-size: .9em; }
     .note { font-size: 13px; color: var(--muted); margin: 8px 0 0; line-height: 1.7; }
     .formula { font-size: 13px; color: var(--ink-2); background: var(--gold-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; line-height: 1.8; }
+    .pk-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px dashed var(--gold); background: var(--gold-bg); color: var(--ink); border-radius: 999px; padding: 5px 14px; font: 700 13.5px var(--sans); cursor: pointer; }
+    .pk { margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .pk-row { display: flex; gap: 8px; }
+    .pk-row .in { flex: 1; }
+    .pk-row button { border: 0; background: var(--ink); color: #fff; border-radius: 10px; padding: 0 16px; font: 700 15px var(--sans); cursor: pointer; white-space: nowrap; }
+    .pk-row button:disabled { opacity: .5; }
+    .pk select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font: 700 16px var(--sans); color: var(--ink); }
+    .pk-info { font-size: 13px; color: var(--ink-2); margin: 8px 0 0; line-height: 1.7; }
+    .pk-info.err { color: var(--warn); }
+    .pk-lock { border: 0; background: none; color: var(--muted); font: 600 12.5px var(--sans); text-decoration: underline; cursor: pointer; padding: 0; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -78,6 +88,20 @@
       <div>
         <section class="card">
           <h2>基本資料 <small>單位：元｜自動記住上次輸入</small><button type="button" id="reset" class="reset">清除</button></h2>
+          <button type="button" id="pk-open" class="pk-btn" aria-expanded="false">🔒 帶入客戶保單</button>
+          <div class="pk" id="pk" hidden>
+            <div id="pk-login">
+              <div class="pk-row">
+                <div class="in"><input id="pk-pw" type="password" autocomplete="current-password" placeholder="輸入密碼" style="font-size:16px" /></div>
+                <button type="button" id="pk-go">解鎖</button>
+              </div>
+            </div>
+            <div id="pk-pick" hidden>
+              <select id="pk-s" aria-label="選擇客戶保單"></select>
+              <button type="button" class="pk-lock" id="pk-reload">重新讀取</button>　<button type="button" class="pk-lock" id="pk-out">鎖定</button>
+            </div>
+            <p class="pk-info" id="pk-info">輸入密碼後，可直接帶入客戶的保單價值與已進場金額。</p>
+          </div>
           <label for="v">保單價值 <span>含貨幣帳戶與基金</span></label>
           <div class="in"><input id="v" type="text" inputmode="numeric" placeholder="例：1,000,000" /><em>元</em></div>
           <label for="f">已進場基金金額 <span>目前在基金裡的市值</span></label>
@@ -240,6 +264,53 @@
     $('rp').addEventListener('input', function () { lastRepay = 'amt'; calc(); });
     $('rt').addEventListener('input', function () { lastRepay = 'pct'; calc(); });
     ['v', 'f', 'l', 'd'].forEach(function (id) { $(id).addEventListener('input', calc); });
+
+    // ===== 帶入客戶保單（密碼在伺服器端檢查；網頁本身不含任何客戶資料）=====
+    var PL_API = '';   // 部署 PolicyLoanAPI.gs 後填入網頁應用程式網址
+    var PW_KEY = 'momo_pl_pw', list = null;
+    function info(t, err) { $('pk-info').textContent = t; $('pk-info').className = 'pk-info' + (err ? ' err' : ''); }
+    function showPick(on) { $('pk-login').hidden = on; $('pk-pick').hidden = !on; }
+    function load(pw) {
+      if (!PL_API) { info('客戶資料連線尚未設定。', true); return; }
+      $('pk-go').disabled = true; info('讀取中…');
+      fetch(PL_API + '?pw=' + encodeURIComponent(pw), { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          $('pk-go').disabled = false;
+          if (!j.ok) { try { sessionStorage.removeItem(PW_KEY); } catch (e) {} showPick(false); info(j.error || '讀取失敗', true); return; }
+          try { sessionStorage.setItem(PW_KEY, pw); } catch (e) {}
+          list = j.policies || []; fill(); showPick(true);
+          info('共 ' + list.length + ' 張保單，選擇後會帶入保單價值與已進場金額，再輸入借款本息即可。');
+        })
+        .catch(function () { $('pk-go').disabled = false; info('連線失敗，請稍後再試。', true); });
+    }
+    function fill() {
+      var s = $('pk-s'), groups = {}, order = [];
+      s.innerHTML = '<option value="">選擇客戶保單…</option>';
+      list.forEach(function (o, i) { if (!groups[o.client]) { groups[o.client] = []; order.push(o.client); } groups[o.client].push(i); });
+      order.forEach(function (c) {
+        var g = document.createElement('optgroup'); g.label = c;
+        groups[c].forEach(function (i) { var op = document.createElement('option'); op.value = i; op.textContent = list[i].policy + '｜' + Math.round(list[i].value / 10000).toLocaleString('zh-TW') + ' 萬'; g.appendChild(op); });
+        s.appendChild(g);
+      });
+    }
+    $('pk-open').addEventListener('click', function () {
+      var open = $('pk').hidden; $('pk').hidden = !open; this.setAttribute('aria-expanded', open);
+      if (open && !list) { var pw = ''; try { pw = sessionStorage.getItem(PW_KEY) || ''; } catch (e) {} if (pw) load(pw); else $('pk-pw').focus(); }
+    });
+    $('pk-go').addEventListener('click', function () { var pw = $('pk-pw').value.trim(); if (pw) load(pw); });
+    $('pk-pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('pk-go').click(); } });
+    $('pk-reload').addEventListener('click', function () { var pw = ''; try { pw = sessionStorage.getItem(PW_KEY) || ''; } catch (e) {} if (pw) load(pw); else showPick(false); });
+    $('pk-out').addEventListener('click', function () { try { sessionStorage.removeItem(PW_KEY); } catch (e) {} list = null; $('pk-pw').value = ''; showPick(false); info('已鎖定。'); });
+    $('pk-s').addEventListener('change', function () {
+      var o = list && list[this.value]; if (!o) return;
+      $('v').value = o.value.toLocaleString('zh-TW');
+      $('f').value = o.funds.toLocaleString('zh-TW');
+      $('l').value = ''; $('rp').value = ''; $('rt').value = '';
+      save(); calc();
+      info(o.client + '・' + o.policy + '｜資料日期 ' + (o.date || '—') + '｜貨幣帳戶 ' + o.money.toLocaleString('zh-TW') + ' 元。請輸入借款本息。');
+      $('l').focus();
+    });
     calc();
   })();
   </script>
