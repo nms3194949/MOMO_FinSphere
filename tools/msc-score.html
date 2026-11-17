@@ -299,66 +299,6 @@
 
   </div>
 
-  <section class="alloc-section">
-    <div class="alloc-header">
-      <span class="main">模型參考配比（試算）</span>
-      <div class="profile-toggle-group">
-        <button class="profile-toggle" data-profile="conservative">保守型</button>
-        <button class="profile-toggle active" data-profile="balanced">平衡型</button>
-        <button class="profile-toggle" data-profile="aggressive">積極型</button>
-      </div>
-    </div>
-
-    <div class="alloc-chip-row">
-      <span class="chip">即時 MCS × 資產配置引擎</span>
-      <span class="chip" id="allocProfileLabel">屬性：平衡型</span>
-      <span class="chip" id="allocStageChip">Stage：--</span>
-    </div>
-
-    <div class="alloc-detail-list">
-      <div class="alloc-item-row">
-        <div class="alloc-item-label">
-          <span>股票型 / 成長型基金</span>
-          <span class="sub">大盤、主題、科技、成長股基金等</span>
-        </div>
-        <div class="alloc-item-bottom">
-          <div class="alloc-bar-track">
-            <div class="alloc-bar-fill" id="allocEquityBar"></div>
-          </div>
-          <div class="alloc-item-value" id="allocEquityText">--%</div>
-        </div>
-      </div>
-      <div class="alloc-item-row">
-        <div class="alloc-item-label">
-          <span>收益 / 多重資產基金</span>
-          <span class="sub">股債平衡、多重收益、配息策略</span>
-        </div>
-        <div class="alloc-item-bottom">
-          <div class="alloc-bar-track">
-            <div class="alloc-bar-fill" id="allocIncomeBar"></div>
-          </div>
-          <div class="alloc-item-value" id="allocIncomeText">--%</div>
-        </div>
-      </div>
-      <div class="alloc-item-row">
-        <div class="alloc-item-label">
-          <span>防禦 / 現金等部位</span>
-          <span class="sub">投資級債、短債、貨幣市場、現金</span>
-        </div>
-        <div class="alloc-item-bottom">
-          <div class="alloc-bar-track">
-            <div class="alloc-bar-fill" id="allocDefensiveBar"></div>
-          </div>
-          <div class="alloc-item-value" id="allocDefensiveText">--%</div>
-        </div>
-      </div>
-    </div>
-
-    <p class="footnote">
-      此配比為系統依當前 MCS 景氣分數與階段推估之「策略參考區間」，實際投組仍需搭配個人風險承受度與既有部位調整。
-    </p>
-  </section>
-
   <section class="history-section">
     <div class="history-header">
       <span class="main">MCS 180D 歷史回測</span>
@@ -711,15 +651,6 @@
       updateFactorCard('eps',       f.eps);
       updateFactorCard('sentiment', f.sentiment);
       updateFactorCard('liquidity', f.liquidity);
-
-      const alloc = data.allocation || {};
-      document.getElementById('allocEquityText').textContent    = formatPctPlain(alloc.equity ?? null, 0);
-      document.getElementById('allocIncomeText').textContent    = formatPctPlain(alloc.income ?? null, 0);
-      document.getElementById('allocDefensiveText').textContent = formatPctPlain(alloc.defensive ?? null, 0);
-
-      setAllocBar('allocEquityBar',    alloc.equity);
-      setAllocBar('allocIncomeBar',    alloc.income);
-      setAllocBar('allocDefensiveBar', alloc.defensive);
 
       updateAiSummary(data);
 
