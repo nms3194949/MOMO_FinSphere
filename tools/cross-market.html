@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<script src="/MOMO_FinSphere/assets/momo-gate.js"></script>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>跨市場基金監控｜自用</title>
+<meta name="theme-color" content="#f6f1e7" />
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<style>
+  :root {
+    --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+    --line: #e4dccb; --gold: #a88a3d; --gold-bg: #f1e8cf; --up: #e03f19; --dn: #208306;
+    --g: #208306; --g-bg: #e9f5e4; --y: #9a7400; --y-bg: #fbf1d3; --r: #c23a3a; --r-bg: #fdecea; --na: #7a8296; --na-bg: #efece5;
+    --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.7; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 48px; }
+  header { display: flex; justify-content: space-between; align-items: center; height: 56px; border-bottom: 1px solid var(--line); }
+  header a { text-decoration: none; color: var(--ink-2); font-weight: 700; font-size: 14px; }
+  h1 { font-size: clamp(22px, 4.6vw, 30px); margin: 22px 0 4px; }
+  .sub { color: var(--ink-2); margin: 0 0 14px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .chip { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 13px; color: var(--ink-2); }
+  .chip b { color: var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; align-items: start; }
+  .mk { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; cursor: pointer; transition: box-shadow .15s; }
+  .mk:hover { box-shadow: 0 6px 18px rgba(12,21,42,.06); }
+  .mk.G { border-left: 5px solid var(--g); } .mk.Y { border-left: 5px solid #e0b84a; } .mk.R { border-left: 5px solid var(--r); } .mk.NA { border-left: 5px solid #cfc9bc; }
+  .mk-h { display: flex; align-items: center; gap: 8px; }
+  .mk-h h2 { font-size: 18px; margin: 0; }
+  .mk-h .role { font-size: 12px; color: var(--muted); }
+  .mk-h .sc { margin-left: auto; text-align: right; line-height: 1.1; }
+  .mk-h .sc b { font-size: 26px; font-variant-numeric: tabular-nums; }
+  .mk-h .sc small { display: block; font-size: 11px; color: var(--muted); }
+  .why { font-size: 13.5px; margin: 6px 0 8px; color: var(--ink-2); }
+  .mods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .mod { border-radius: 8px; padding: 5px 6px; text-align: center; font-size: 12px; font-weight: 700; }
+  .mod span { display: block; font-weight: 600; font-size: 11px; opacity: .85; }
+  .G .lt, .mod.G { background: var(--g-bg); color: var(--g); } .mod.Y { background: var(--y-bg); color: var(--y); }
+  .mod.R { background: var(--r-bg); color: var(--r); } .mod.NA { background: var(--na-bg); color: var(--na); }
+  .det { display: none; margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; font-size: 13px; color: var(--ink-2); }
+  .mk.open .det { display: block; }
+  .det p { margin: 4px 0; }
+  .det b { color: var(--ink); }
+  .fund { margin: 6px 0 0; padding: 6px 8px; background: #fbf7ee; border-radius: 8px; }
+  .fund .fn { font-weight: 700; color: var(--ink); font-size: 12.5px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-top: 18px; font-size: 13.5px; color: var(--ink-2); }
+  .card h3 { margin: 0 0 6px; color: var(--ink); font-size: 15px; }
+  .card ul { margin: 4px 0; padding-left: 1.2em; }
+  .err { background: var(--r-bg); color: var(--r); padding: 10px 12px; border-radius: 10px; }
+  .loading { color: var(--muted); padding: 30px 0; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><a href="/MOMO_FinSphere/me/">← MOMO 專用工具</a><a href="/MOMO_FinSphere/">MOMO財商智庫</a></header>
+  <h1>跨市場基金監控</h1>
+  <p class="sub">避開 AI 集中風險：匯率 × 股票資金流 × 股市相對強弱 × 基金淨值，四項一起看。點市場卡片看細節。</p>
+  <div class="meta" id="meta"></div>
+  <div id="app" class="loading">讀取中…</div>
+
+  <section class="card">
+    <h3>燈號規則</h3>
+    <ul>
+      <li><b>綜合 🟢</b>：匯率、資金流、股市三項都轉綠，綜合分數 ≥ 75，且基金淨值沒有轉弱 → 優先研究分批進場。</li>
+      <li><b>綜合 🔴</b>：三項同時轉弱，或分數 &lt; 50 → 暫緩新增。其餘為 🟡 觀察、不追價。</li>
+      <li><b>A 匯率</b>：當地幣對美元 1 個月、3 個月都升值才綠；若升值幅度沒有超過美元指數的走弱，降為黃（只是美元弱）。醫療、股息、能源為多幣別，以美元指數反向代理。</li>
+      <li><b>B 資金流</b>：iShares 市場 ETF 流通份額的週變化，近 4 週 ≥3 週淨申購為綠、≥3 週淨贖回為紅。屬代理指標，需累積 28 天資料才會開始判斷。</li>
+      <li><b>C 股市</b>：市場 ETF 含息 20／60 日報酬，兩段都贏 Nasdaq 100 與 ACWI 且為正才綠；兩個一起跌只是「相對抗跌」。</li>
+      <li><b>D 基金</b>：淨值站上 20／60 日均線、距一年高點不到 10%、1 年為正為綠；跌破均線且距高點逾 15% 為紅（不含息淨值）。</li>
+      <li>分數權重：匯率 20、資金流 25、股市 20、基金 20，換算成 100 分；資料不足的項目不計分並降低可信度。AI 曝險與估值暫未納入。</li>
+    </ul>
+    <p>燈號有實質變化（轉綠、由綠轉弱、轉紅、基金跌勢擴大）才會寄信。分數只代表研究優先度，不是買賣指令。</p>
+  </section>
+</div>
+<script>
+(function () {
+  var API = 'GAS_URL_HERE';
+  var $ = function (id) { return document.getElementById(id); };
+  var pc = function (x) { return x == null || !isFinite(x) ? 'N/A' : (x >= 0 ? '+' : '') + (x * 100).toFixed(1) + '%'; };
+  var cls = function (l) { return l === '🟢' ? 'G' : l === '🟡' ? 'Y' : l === '🔴' ? 'R' : 'NA'; };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var rank = { '🟢': 0, '🟡': 1, '⚪': 2, '🔴': 3 };
+
+  function mod(k, label, m) { return '<div class="mod ' + cls(m.light) + '">' + m.light + ' ' + label + '<span>' + k + '</span></div>'; }
+  function render(d) {
+    var b = d.bench || {};
+    $('meta').innerHTML = '<span class="chip">更新 <b>' + esc(d.updated) + '</b></span>'
+      + '<span class="chip">Nasdaq100 20日 <b>' + pc(b.ndx20) + '</b>／60日 <b>' + pc(b.ndx60) + '</b></span>'
+      + '<span class="chip">ACWI 20日 <b>' + pc(b.acwi20) + '</b>／60日 <b>' + pc(b.acwi60) + '</b></span>'
+      + '<span class="chip">美元指數 1M <b>' + pc(b.dxy1m) + '</b>／3M <b>' + pc(b.dxy3m) + '</b></span>'
+      + '<span class="chip">資金流資料 <b>' + (d.flowDays >= 28 ? '已啟用' : '累積中 ' + (d.flowDays || 0) + '/28 天') + '</b></span>';
+    var list = (d.markets || []).slice().sort(function (x, y) { return (rank[x.light] - rank[y.light]) || ((y.score || 0) - (x.score || 0)); });
+    $('app').className = 'grid';
+    $('app').innerHTML = list.map(function (m) {
+      var funds = (m.D.funds || []).map(function (f) { return '<div class="fund"><span class="fn">' + f.light + ' ' + esc(f.name) + '</span><br>' + esc(f.text) + '</div>'; }).join('');
+      return '<article class="mk ' + cls(m.light) + '">'
+        + '<div class="mk-h"><h2>' + m.light + ' ' + esc(m.name) + '</h2><span class="role">' + esc(m.role) + '｜' + esc(m.etf) + '</span>'
+        + '<div class="sc"><b>' + (m.score == null ? '—' : m.score) + '</b><small>分｜可信度 ' + esc(m.conf) + '</small></div></div>'
+        + '<p class="why">' + esc(m.why) + '</p>'
+        + '<div class="mods">' + mod('A', '匯率', m.A) + mod('B', '資金流', m.B) + mod('C', '股市', m.C) + mod('D', '基金', m.D) + '</div>'
+        + '<div class="det"><p><b>匯率</b>：' + esc(m.A.text) + '</p><p><b>資金流</b>：' + esc(m.B.text) + '</p><p><b>股市</b>：' + esc(m.C.text) + '</p><p><b>基金</b>：' + esc(m.D.text) + '</p>' + funds + '</div>'
+        + '</article>';
+    }).join('');
+    document.querySelectorAll('.mk').forEach(function (el) { el.addEventListener('click', function () { el.classList.toggle('open'); }); });
+  }
+  if (API.indexOf('http') !== 0) { $('app').innerHTML = '<div class="err">資料連線尚未設定。</div>'; return; }
+  fetch(API, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+    if (d.error) { $('app').innerHTML = '<div class="err">' + esc(d.error) + '</div>'; return; }
+    render(d);
+  }).catch(function () { $('app').innerHTML = '<div class="err">讀取失敗，請稍後再試。</div>'; });
+})();
+</script>
+</body>
+</html>
