@@ -6,11 +6,11 @@
   <title>康波長週期｜MOMO財商智庫</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* ========= 康波長週期：與 MCS／景氣循環頁同一套配色（深藍＋香檳金） ========= */
+    /* ========= 康波長週期：與 MCS／景氣循環頁同一套配色（米白＋香檳金） ========= */
     :root {
-      --bg: #0a1221; --card: #0c152a; --card-2: #111b30;
-      --line: rgba(233,209,138,.18); --line-2: rgba(233,209,138,.10);
-      --gold: #d2c696; --gold-2: #e9d18a; --ink: #edeff5; --ink-2: #aab2bf; --muted: #7a8296;
+      --bg: #f6f1e7; --card: #fffdf8; --card-2: #fbf7ee;
+      --line: #e4dccb; --line-2: #ece5d6;
+      --gold: #a88a3d; --gold-2: #8a6d24; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
       --spring: #5fb3a1; --summer: #e9d18a; --autumn: #e8a07a; --winter: #8fa8d6;
     }
     * { box-sizing: border-box; }
@@ -28,7 +28,7 @@
     .tm input { flex: 1; min-width: 0; accent-color: var(--gold); cursor: pointer; }
     .tm-year { font-size: 14px; font-weight: 800; min-width: 64px; font-variant-numeric: tabular-nums; }
     .btn-now { border: 1px solid var(--gold); background: transparent; color: var(--gold); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-    .btn-now:hover { background: rgba(210,198,150,.12); }
+    .btn-now:hover { background: #f1e8cf; }
 
     .now { background: var(--card-2); border: 1px solid var(--line-2); border-left: 4px solid var(--accent, var(--gold)); border-radius: 14px; padding: 18px 20px; }
     .now-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -40,15 +40,15 @@
     .tl { margin: 34px 0 4px; position: relative; }
     .tl-bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; }
     .tl-seg { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #0a1221; white-space: nowrap; overflow: hidden; transition: opacity .2s; }
-    .tl-seg.est { background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgba(10,18,33,.28) 6px 9px); }
+    .tl-seg.est { background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgba(255,255,255,.45) 6px 9px); }
     .tl-seg.dim { opacity: .35; }
     .tl-ticks { position: relative; height: 18px; margin-top: 4px; }
     .tl-ticks span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
     .tl-ticks span:first-child { transform: none; } .tl-ticks span:last-child { transform: translateX(-100%); }
     .tl-mark { position: absolute; top: -8px; width: 0; transition: left .2s; }
-    .tl-mark::before { content: ''; position: absolute; left: -7px; top: 0; border: 7px solid transparent; border-top-color: #fff; }
-    .tl-mark::after { content: ''; position: absolute; left: -1px; top: 10px; width: 2px; height: 30px; background: #fff; box-shadow: 0 0 6px rgba(255,255,255,.7); }
-    .tl-mark b { position: absolute; top: -24px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 12px; color: #fff; background: rgba(255,255,255,.14); padding: 1px 8px; border-radius: 999px; }
+    .tl-mark::before { content: ''; position: absolute; left: -7px; top: 0; border: 7px solid transparent; border-top-color: var(--ink); }
+    .tl-mark::after { content: ''; position: absolute; left: -1px; top: 10px; width: 2px; height: 30px; background: var(--ink); }
+    .tl-mark b { position: absolute; top: -24px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 12px; color: #fff; background: var(--ink); padding: 1px 8px; border-radius: 999px; }
     .tl-legend { display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 6px; }
 
     .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
@@ -58,8 +58,8 @@
     .box ul { margin: 0; padding-left: 1.2em; }
     .box li { margin: 6px 0; font-size: 14.5px; line-height: 1.7; }
     .box li b { color: var(--gold-2); }
-    .box.watch { border-color: rgba(232,160,122,.35); }
-    .box.watch h3 { color: var(--autumn); }
+    .box.watch { border-color: rgba(232,160,122,.55); }
+    .box.watch h3 { color: #c06a3a; }
 
     .tbl-wrap { overflow-x: auto; margin-top: 14px; border-radius: 14px; border: 1px solid var(--line-2); }
     table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 13.5px; line-height: 1.6; background: var(--card-2); }
@@ -68,7 +68,7 @@
     tr:last-child td { border-bottom: none; }
     td.ph { white-space: nowrap; font-weight: 800; }
     td.yr { white-space: nowrap; font-variant-numeric: tabular-nums; }
-    tr.cur td { background: rgba(233,209,138,.08); }
+    tr.cur td { background: #f1e8cf; }
     tr.cur td.ph::after { content: ' ← 現在'; color: var(--gold-2); font-size: 12px; }
 
     @media (max-width: 760px) {
@@ -77,7 +77,7 @@
       tbody tr { display: block; padding: 10px 14px; border-bottom: 1px solid var(--line-2); }
       tbody tr:last-child { border-bottom: none; }
       tbody td { display: block; padding: 2px 0; border: none; }
-      tbody tr.cur { background: rgba(233,209,138,.08); } tbody tr.cur td { background: none; }
+      tbody tr.cur { background: #f1e8cf; } tbody tr.cur td { background: none; }
       td.ph br { display: none; } td.ph small { margin-left: 6px; }
       td.yr { color: var(--ink-2); font-size: 12.5px; }
       tbody td:nth-child(4)::before { content: '相對有表現：'; color: var(--gold); font-weight: 700; }
