@@ -34,6 +34,12 @@
     .card h2 small { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--muted); margin-left: 6px; }
     label { display: block; font-weight: 700; font-size: 14.5px; margin: 12px 0 4px; }
     label span { font-weight: 500; color: var(--muted); font-size: 13px; }
+    .lrow { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+    .lrow label { flex: 1; }
+    .chk { display: inline-flex; align-items: center; gap: 5px; margin: 12px 0 4px; font: 700 13.5px var(--sans); color: var(--ink); white-space: nowrap; cursor: pointer; }
+    .chk input { width: 17px; height: 17px; accent-color: var(--ink); margin: 0; }
+    .in.off { background: #f3efe6; }
+    .in.off input { color: var(--ink-2); }
     .in { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
     .in:focus-within { outline: 2px solid var(--gold-soft); }
     .in input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 10px 12px; font: 700 18px var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; outline: none; }
@@ -104,8 +110,8 @@
           </div>
           <label for="v">保單價值 <span>含貨幣帳戶與基金</span></label>
           <div class="in"><input id="v" type="text" inputmode="numeric" placeholder="例：1,000,000" /><em>元</em></div>
-          <label for="f">已進場基金金額 <span>目前在基金裡的市值</span></label>
-          <div class="in"><input id="f" type="text" inputmode="numeric" placeholder="例：300,000" /><em>元</em></div>
+          <div class="lrow"><label for="f">已進場基金金額 <span>基金市值</span></label><label class="chk" for="fall"><input type="checkbox" id="fall" /> 全部進場</label></div>
+          <div class="in" id="f-box"><input id="f" type="text" inputmode="numeric" placeholder="例：300,000" /><em>元</em></div>
           <label for="l">保單借款本息</label>
           <div class="in"><input id="l" type="text" inputmode="numeric" placeholder="例：800,000" /><em>元</em></div>
           <label for="d">抗損 <span>基金市值可承受的跌幅</span></label>
@@ -252,13 +258,24 @@
       var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
       if (saved) FIELDS.forEach(function (id) { if (saved[id] != null && saved[id] !== '') $(id).value = saved[id]; });
     } catch (e) {}
-    function save() {
-      try { var o = {}; FIELDS.forEach(function (id) { o[id] = $(id).value; }); localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+    // 全部進場：已進場金額 = 保單價值
+    function syncAll() {
+      var on = $('fall').checked;
+      $('f').readOnly = on; $('f-box').classList.toggle('off', on);
+      if (on) $('f').value = $('v').value;
     }
+    try { if (saved && saved.all) $('fall').checked = true; } catch (e) {}
+    syncAll();
+    function save() {
+      try { var o = {}; FIELDS.forEach(function (id) { o[id] = $(id).value; }); o.all = $('fall').checked; localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+    }
+    $('fall').addEventListener('change', function () { syncAll(); save(); calc(); });
+    $('v').addEventListener('input', function () { if ($('fall').checked) $('f').value = $('v').value; });
+    $('v').addEventListener('blur', function () { if ($('fall').checked) $('f').value = $('v').value; });
     FIELDS.forEach(function (id) { $(id).addEventListener('input', save); $(id).addEventListener('change', save); });
     $('reset').addEventListener('click', function () {
       try { localStorage.removeItem(KEY); } catch (e) {}
-      $('v').value = ''; $('f').value = ''; $('l').value = ''; $('rp').value = ''; $('rt').value = ''; $('d').value = '15'; calc();
+      $('v').value = ''; $('f').value = ''; $('l').value = ''; $('rp').value = ''; $('rt').value = ''; $('d').value = '15'; $('fall').checked = false; syncAll(); calc();
     });
     ['v', 'f', 'l', 'rp'].forEach(function (id) { $(id).addEventListener('blur', function () { fmt(this); }); });
     $('rp').addEventListener('input', function () { lastRepay = 'amt'; calc(); });
@@ -309,6 +326,7 @@
     $('pk-s').addEventListener('change', function () {
       var o = list && list[this.value]; if (!o) return;
       $('v').value = o.value.toLocaleString('zh-TW');
+      $('fall').checked = false; syncAll();
       $('f').value = o.funds.toLocaleString('zh-TW');
       $('l').value = ''; $('rp').value = ''; $('rt').value = '';
       save(); calc();
