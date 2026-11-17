@@ -73,12 +73,12 @@
       <li><b>D 基金</b>：淨值站上 20／60 日均線、距一年高點不到 10%、1 年為正為綠；跌破均線且距高點逾 15% 為紅（不含息淨值）。</li>
       <li>分數權重：匯率 20、資金流 25、股市 20、基金 20，換算成 100 分；資料不足的項目不計分並降低可信度。AI 曝險與估值暫未納入。</li>
     </ul>
-    <p>燈號有實質變化（轉綠、由綠轉弱、轉紅、基金跌勢擴大）才會寄信。分數只代表研究優先度，不是買賣指令。</p>
+    <p>燈號有實質變化（轉綠、由綠轉弱、轉紅、基金跌勢擴大）會即時寄信；另外每週六 09:00 固定寄一份週報，含距離綠燈還差什麼與門檻鬆緊檢查。分數只代表研究優先度，不是買賣指令。</p>
   </section>
 </div>
 <script>
 (function () {
-  var API = 'GAS_URL_HERE';
+  var API = 'https://script.google.com/macros/s/AKfycbxFJrkVx4AQCjWHvPxKy_JeUH3YdI90RboL41LU028dRsIdSZadU9fiyCfVlnvnat_NTQ/exec';
   var $ = function (id) { return document.getElementById(id); };
   var pc = function (x) { return x == null || !isFinite(x) ? 'N/A' : (x >= 0 ? '+' : '') + (x * 100).toFixed(1) + '%'; };
   var cls = function (l) { return l === '🟢' ? 'G' : l === '🟡' ? 'Y' : l === '🔴' ? 'R' : 'NA'; };
