@@ -267,23 +267,27 @@
 
     // ===== 帶入客戶保單（密碼在伺服器端檢查；網頁本身不含任何客戶資料）=====
     var PL_API = 'https://script.google.com/macros/s/AKfycbx9mwMnR9whFAKT79DIHn_7q_AdfhL9wtoFhVvV_tFqLtJUbJuDCxJ8olxbq6a5D4KhTA/exec';
-    var PW_KEY = 'momo_pl_pw', list = null;
+    var TK_KEY = 'momo_pl_token', list = null;
+    var getTk = function () { try { return localStorage.getItem(TK_KEY) || ''; } catch (e) { return ''; } };
+    var setTk = function (t) { try { t ? localStorage.setItem(TK_KEY, t) : localStorage.removeItem(TK_KEY); } catch (e) {} };
     function info(t, err) { $('pk-info').textContent = t; $('pk-info').className = 'pk-info' + (err ? ' err' : ''); }
     function showPick(on) { $('pk-login').hidden = on; $('pk-pick').hidden = !on; }
-    function load(pw) {
+    // 用密碼或「信任裝置鑰匙」讀取；鑰匙不受密碼錯誤鎖定影響
+    function load(q) {
       if (!PL_API) { info('客戶資料連線尚未設定。', true); return; }
       $('pk-go').disabled = true; info('讀取中…');
-      fetch(PL_API + '?pw=' + encodeURIComponent(pw), { cache: 'no-store' })
+      fetch(PL_API + '?' + q, { cache: 'no-store' })
         .then(function (r) { return r.json(); })
         .then(function (j) {
           $('pk-go').disabled = false;
-          if (!j.ok) { try { sessionStorage.removeItem(PW_KEY); } catch (e) {} showPick(false); info(j.error || '讀取失敗', true); return; }
-          try { sessionStorage.setItem(PW_KEY, pw); } catch (e) {}
+          if (!j.ok) { if (j.relogin) setTk(''); showPick(false); info(j.error || '讀取失敗', true); return; }
+          if (j.token) setTk(j.token);
           list = j.policies || []; fill(); showPick(true);
-          info('共 ' + list.length + ' 張保單，選擇後會帶入保單價值與已進場金額，再輸入借款本息即可。');
+          info('共 ' + list.length + ' 張保單，選擇後會帶入保單價值與已進場金額，再輸入借款本息即可。這台裝置已記住授權。');
         })
         .catch(function () { $('pk-go').disabled = false; info('連線失敗，請稍後再試。', true); });
     }
+    function loadTk() { var t = getTk(); if (t) load('t=' + encodeURIComponent(t)); else { showPick(false); $('pk-pw').focus(); } }
     function fill() {
       var s = $('pk-s'), groups = {}, order = [];
       s.innerHTML = '<option value="">選擇客戶保單…</option>';
@@ -296,12 +300,12 @@
     }
     $('pk-open').addEventListener('click', function () {
       var open = $('pk').hidden; $('pk').hidden = !open; this.setAttribute('aria-expanded', open);
-      if (open && !list) { var pw = ''; try { pw = sessionStorage.getItem(PW_KEY) || ''; } catch (e) {} if (pw) load(pw); else $('pk-pw').focus(); }
+      if (open && !list) loadTk();
     });
-    $('pk-go').addEventListener('click', function () { var pw = $('pk-pw').value.trim(); if (pw) load(pw); });
+    $('pk-go').addEventListener('click', function () { var pw = $('pk-pw').value.trim(); if (pw) load('pw=' + encodeURIComponent(pw)); });
     $('pk-pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('pk-go').click(); } });
-    $('pk-reload').addEventListener('click', function () { var pw = ''; try { pw = sessionStorage.getItem(PW_KEY) || ''; } catch (e) {} if (pw) load(pw); else showPick(false); });
-    $('pk-out').addEventListener('click', function () { try { sessionStorage.removeItem(PW_KEY); } catch (e) {} list = null; $('pk-pw').value = ''; showPick(false); info('已鎖定。'); });
+    $('pk-reload').addEventListener('click', loadTk);
+    $('pk-out').addEventListener('click', function () { setTk(''); list = null; $('pk-pw').value = ''; showPick(false); info('已鎖定，這台裝置需要重新輸入密碼。'); });
     $('pk-s').addEventListener('change', function () {
       var o = list && list[this.value]; if (!o) return;
       $('v').value = o.value.toLocaleString('zh-TW');
