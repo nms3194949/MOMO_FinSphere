@@ -34,7 +34,7 @@
     .card h2 small { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--muted); margin-left: 6px; }
     label { display: block; font-weight: 700; font-size: 14.5px; margin: 12px 0 4px; }
     label span { font-weight: 500; color: var(--muted); font-size: 13px; }
-    .lrow { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+    .lrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .lrow label { flex: 1; }
     .chk { display: inline-flex; align-items: center; gap: 5px; margin: 12px 0 4px; font: 700 13.5px var(--sans); color: var(--ink); white-space: nowrap; cursor: pointer; }
     .chk input { width: 17px; height: 17px; accent-color: var(--ink); margin: 0; }
@@ -110,7 +110,7 @@
           </div>
           <label for="v">保單價值 <span>含貨幣帳戶與基金</span></label>
           <div class="in"><input id="v" type="text" inputmode="numeric" placeholder="例：1,000,000" /><em>元</em></div>
-          <div class="lrow"><label for="f">已進場基金金額 <span>基金市值</span></label><label class="chk" for="fall"><input type="checkbox" id="fall" /> 全部進場</label></div>
+          <div class="lrow"><label for="f">已進場基金金額</label><label class="chk" for="fall"><input type="checkbox" id="fall" /> 全部進場</label></div>
           <div class="in" id="f-box"><input id="f" type="text" inputmode="numeric" placeholder="例：300,000" /><em>元</em></div>
           <label for="l">保單借款本息</label>
           <div class="in"><input id="l" type="text" inputmode="numeric" placeholder="例：800,000" /><em>元</em></div>
