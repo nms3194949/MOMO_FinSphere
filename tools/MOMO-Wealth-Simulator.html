@@ -325,6 +325,16 @@
                 <input type="text" id="config-gid" value="1114691785" style="font-size:11px;" />
               </div>
             </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <div style="flex:1;">
+                <label style="font-size:10px;color:#aaa;">全委淨值 GID</label>
+                <input type="text" id="trust-nav-gid" value="578001153" style="font-size:11px;" />
+              </div>
+              <div style="flex:1;">
+                <label style="font-size:10px;color:#aaa;">全委撥回 GID</label>
+                <input type="text" id="trust-div-gid" value="76247830" style="font-size:11px;" />
+              </div>
+            </div>
           </div>
           <button class="btn-action btn-load" id="btn-load" type="button" style="font-size:12px;padding:12px;margin-top:8px;">
             🚀 讀取資料 &amp; Config
@@ -754,6 +764,8 @@
       const sheetId = $('sheet-id').value.trim();
       const navGid  = $('sheet-gid').value.trim();
       const cfgGid  = $('config-gid').value.trim();
+      const tNavGid = $('trust-nav-gid').value.trim();
+      const tDivGid = $('trust-div-gid').value.trim();
       if (!sheetId){ alert("請輸入 Google Sheet ID"); return; }
 
       const btn = $('btn-load'), oldText = btn.innerHTML;
@@ -761,26 +773,41 @@
       setLed('nav', 'loading', '讀取中…');
       setLed('cfg', 'loading', '讀取中…');
 
-      const [navR, cfgR] = await Promise.allSettled([
+      const [navR, cfgR, tNavR, tDivR] = await Promise.allSettled([
         navGid ? fetchRows(sheetId, navGid) : Promise.reject(new Error("未填淨值 GID")),
-        cfgGid ? fetchRows(sheetId, cfgGid) : Promise.reject(new Error("未填 Config GID"))
+        cfgGid ? fetchRows(sheetId, cfgGid) : Promise.reject(new Error("未填 Config GID")),
+        tNavGid ? fetchRows(sheetId, tNavGid) : Promise.reject(new Error("未填全委淨值 GID")),
+        tDivGid ? fetchRows(sheetId, tDivGid) : Promise.reject(new Error("未填全委撥回 GID"))
       ]);
 
       // 先讀 Config，淨值處理時配息率才算得出來
       const cfgOk = cfgR.status === 'fulfilled';
       if (cfgOk) parseConfigYields(cfgR.value);
-      else console.warn("Config 讀取失敗：", cfgR.reason);
+      else { state.yieldMap.clear(); console.warn("Config 讀取失敗：", cfgR.reason); }
 
-      const navOk = navR.status === 'fulfilled';
+      // 全委：撥回率補進配息率（Config 有的以 Config 為準）
+      const tNavOk = tNavR.status === 'fulfilled';
+      if (tDivR.status === 'fulfilled') parseTrustYields(tDivR.value);
+      else if (tDivGid) console.warn("全委撥回讀取失敗：", tDivR.reason);
+      if (!tNavOk && tNavGid) console.warn("全委淨值讀取失敗：", tNavR.reason);
+
+      let navOk = navR.status === 'fulfilled';
+      let navRows = navOk ? navR.value : null;
+      state.trustCount = 0;
+      if (tNavOk){
+        const merged = mergeNavRows(navRows, tNavR.value);
+        navRows = merged.rows; state.trustCount = merged.added;
+        navOk = true;
+      }
       if (navOk){
-        processRawSheetData(navR.value);
+        processRawSheetData(navRows);
         $('selector-ui').style.display = 'block';
       } else {
         console.error("淨值讀取失敗：", navR.reason);
       }
       if (cfgOk && !navOk){ calcWeightedYield('momo'); calcWeightedYield('bench'); scheduleUpdate(); }
 
-      setLed('nav', navOk ? 'ok' : 'fail', navOk ? `淨值 ${state.rawData.length} 筆` : '淨值 ✗');
+      setLed('nav', navOk ? 'ok' : 'fail', navOk ? `淨值 ${state.rawData.length} 筆${state.trustCount ? `（含全委 ${state.trustCount} 支）` : (tNavGid ? '（全委 ✗）' : '')}` : '淨值 ✗');
       setLed('cfg', cfgOk ? 'ok' : (cfgGid ? 'fail' : ''), cfgOk ? `Config ${state.yieldMap.size} 支` : (cfgGid ? 'Config ✗' : 'Config —'));
 
       btn.innerHTML = oldText; btn.disabled = false;
@@ -801,6 +828,59 @@
         if (val < 1) val *= 100; // 0.064 → 6.4
         state.yieldMap.set(name, val);
       }
+    }
+
+    // 全委撥回：依表頭找「名稱」「基準日」「年化撥回率」，每支取最新一筆
+    function parseTrustYields(rows){
+      const head = (rows[0] || []).map(h => String(h ?? '').trim());
+      const iName = head.indexOf('名稱'), iDate = head.indexOf('基準日'), iRate = head.indexOf('年化撥回率');
+      if (iName < 0 || iRate < 0) { console.warn('全委撥回表頭找不到「名稱／年化撥回率」'); return; }
+      const latest = new Map(); // name → {t, val}
+      for (let i = 1; i < rows.length; i++){
+        const r = rows[i]; if (!r) continue;
+        const name = String(r[iName] ?? '').trim(); if (!name) continue;
+        const raw = r[iRate];
+        let val = typeof raw === 'string' ? parseFloat(raw.replace(/[%\s,]/g, '')) : parseFloat(raw);
+        if (!Number.isFinite(val) || val <= 0) continue;
+        if (typeof raw !== 'string' || !raw.includes('%')) { if (val < 1) val *= 100; }
+        const dt = iDate >= 0 ? parseDateLoose(r[iDate]) : null;
+        const t = dt ? dt.getTime() : -i;
+        const cur = latest.get(name);
+        if (!cur || t > cur.t) latest.set(name, { t, val });
+      }
+      for (const [name, o] of latest) if (!state.yieldMap.has(name)) state.yieldMap.set(name, o.val);
+    }
+
+    // 合併主淨值表與全委淨值表（依日期對齊，欄名重複時以主表為準）
+    function mergeNavRows(mainRows, extraRows){
+      const toTable = rows => {
+        const names = [], idx = [];
+        (rows?.[0] || []).slice(1).forEach((h, j) => {
+          const n = String(h ?? '').trim();
+          if (n && !names.includes(n)) { names.push(n); idx.push(j + 1); }
+        });
+        const byDate = new Map();
+        for (let i = 1; i < (rows?.length || 0); i++){
+          const r = rows[i]; if (!r) continue;
+          const dt = parseDateLoose(r[0]); if (!dt) continue;
+          const k = dateKey(dt);
+          const rec = byDate.get(k) || { dt, vals: {} };
+          names.forEach((n, c) => { const v = r[idx[c]]; if (v !== null && v !== undefined && v !== '') rec.vals[n] = v; });
+          byDate.set(k, rec);
+        }
+        return { names, byDate };
+      };
+      const A = toTable(mainRows), B = toTable(extraRows);
+      const extraNames = B.names.filter(n => !A.names.includes(n));
+      const allNames = [...A.names, ...extraNames];
+      const keys = new Set([...A.byDate.keys(), ...B.byDate.keys()]);
+      const out = [['日期', ...allNames]];
+      for (const k of keys){
+        const a = A.byDate.get(k), b = B.byDate.get(k);
+        const dt = (a || b).dt;
+        out.push([dt, ...A.names.map(n => a?.vals[n] ?? null), ...extraNames.map(n => b?.vals[n] ?? null)]);
+      }
+      return { rows: out, added: extraNames.length };
     }
 
     // ════════════════════════════════════════════════════════
