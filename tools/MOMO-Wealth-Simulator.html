@@ -78,6 +78,11 @@
     .brand-dot{width:10px;height:10px;border-radius:50%;margin-top:2px;flex:0 0 auto;box-shadow:0 0 0 2px rgba(255,255,255,0.06) inset,0 0 14px rgba(255,255,255,0.06);}
     .brand-text{flex:1 1 auto;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;opacity:.95;}
     .chk-col{text-align:center;display:flex;flex-direction:column;align-items:center;}
+    .fund-group{display:flex;justify-content:space-between;align-items:center;padding:6px 6px;margin-top:6px;background:#141c2b;border-left:3px solid var(--gold);border-radius:4px;font-size:11px;font-weight:900;color:var(--gold);}
+    .fund-group.g-div{border-left-color:#34D399;color:#34D399;}
+    .fund-group .g-count{font-size:10px;font-weight:700;color:#64748b;}
+    .yield-tag{flex:0 0 auto;min-width:38px;text-align:right;font-size:10px;font-weight:900;color:#34D399;margin-top:1px;}
+    .fund-name .brand-text{color:#dbe4f0;}
     input[type="checkbox"]{accent-color:var(--gold);cursor:pointer;transform:scale(1.05);}
     input[type="checkbox"].bench-chk{accent-color:var(--accent-blue);}
     .strat-block{border-radius:14px;padding:14px;margin-bottom:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.06);border-left:4px solid #666;}
@@ -817,10 +822,12 @@
     // Config：A=代號, B=名稱, C=配息率
     function parseConfigYields(rows){
       state.yieldMap.clear();
+      state.configOrder = [];
       for (let i = 1; i < rows.length; i++){
         const r = rows[i];
         if (!r || !r[1]) continue;
         const name = String(r[1]).trim();
+        if (name) state.configOrder.push(name);
         const raw = r[2];
         if (!name || raw === null || raw === undefined || raw === '') continue;
         let val = typeof raw === 'string' ? parseFloat(raw.replace(/[%\s,]/g, '')) : parseFloat(raw);
@@ -937,6 +944,40 @@
     // ════════════════════════════════════════════════════════
     // 基金選擇清單
     // ════════════════════════════════════════════════════════
+    // 由基金名稱判斷投信（長的關鍵字放前面）
+    const FUND_HOUSES = [
+      ['元大人壽全權委託元大投信','元大'],['復華投信全委','復華'],
+      ['摩根士丹利','摩根士丹利'],['鋒裕匯理','東方匯理'],['東方匯理','東方匯理'],['富蘭克林','富蘭克林'],
+      ['PIMCO','PIMCO'],['JPM','摩根'],
+      ...['施羅德','安聯','安本','貝萊德','聯博','富達','富邦','復華','摩根','景順','元大','統一','群益','國泰','中信','兆豐',
+          '野村','百達','瀚亞','晉達','高盛','霸菱','路博邁','柏瑞','先機','駿利','法巴','宏利','第一金','凱基','台新','永豐','保德信','新光','合庫','華南永昌','日盛']
+        .map(k => [k, k])
+    ];
+    function fundHouse(name){
+      const n = String(name || '');
+      for (const [k, h] of FUND_HOUSES) if (n.startsWith(k) || (k.length > 2 && n.includes(k))) return h;
+      for (const [k, h] of FUND_HOUSES) if (n.includes(k)) return h;
+      return (n.match(/^[^\s\-－—(（]{1,4}/) || ['其他'])[0];
+    }
+
+    // 清單分組：配息（配息率高→低）＋ 不配息依投信，順序依 Config
+    function groupFunds(){
+      const order = new Map((state.configOrder || []).map((n, i) => [n, i]));
+      const rank = n => order.has(n) ? order.get(n) : 1e6 + state.fundNames.indexOf(n);
+      const yld = n => state.yieldMap.get(n) || 0;
+      const div = state.fundNames.filter(n => yld(n) > 0).sort((a, b) => yld(b) - yld(a) || rank(a) - rank(b));
+      const houses = new Map();
+      state.fundNames.filter(n => !(yld(n) > 0)).sort((a, b) => rank(a) - rank(b)).forEach(n => {
+        const h = fundHouse(n);
+        if (!houses.has(h)) houses.set(h, []);
+        houses.get(h).push(n);
+      });
+      const groups = [];
+      if (div.length) groups.push({ key: 'div', label: '💰 配息（配息率高→低）', names: div, isDiv: true });
+      for (const [h, names] of houses) groups.push({ key: 'h_' + h, label: h, names, isDiv: false });
+      return groups;
+    }
+
     function renderFundSelectors(){
       const momoSet = new Set(state.momo), benchSet = new Set(state.bench);
       const html = [`
@@ -945,17 +986,21 @@
           <div class="chk-col" style="color:var(--gold);font-weight:900;">MOMO<br>(A)</div>
           <div class="chk-col" style="color:var(--accent-blue);font-weight:900;">原始<br>(B)</div>
         </div>`];
-      for (const name of state.fundNames){
-        const color = getBrandColor(name), safe = escapeHtml(name);
-        html.push(`
-          <div class="fund-item" data-name="${escapeHtml(name.toLowerCase())}">
+      for (const g of groupFunds()){
+        const gk = escapeHtml(g.key);
+        html.push(`<div class="fund-group${g.isDiv ? ' g-div' : ''}" data-group="${gk}"><span>${escapeHtml(g.label)}</span><span class="g-count">${g.names.length} 支</span></div>`);
+        for (const name of g.names){
+          const safe = escapeHtml(name), y = state.yieldMap.get(name);
+          const tag = g.isDiv && y ? `<span class="yield-tag">${y.toFixed(1)}%</span>` : '';
+          html.push(`
+          <div class="fund-item" data-group="${gk}" data-name="${escapeHtml(name.toLowerCase())}">
             <div class="fund-name" title="${safe}">
-              <span class="brand-dot" style="background:${color}"></span>
-              <span class="brand-text" style="color:${color}">${safe}</span>
+              ${tag}<span class="brand-text">${safe}</span>
             </div>
             <div class="chk-col"><input type="checkbox" class="momo-chk" data-name="${safe}" ${momoSet.has(name)?'checked':''} /></div>
             <div class="chk-col"><input type="checkbox" class="bench-chk" data-name="${safe}" ${benchSet.has(name)?'checked':''} /></div>
           </div>`);
+        }
       }
       $('fund-list-container').innerHTML = html.join('');
       applyFundFilter();
@@ -970,11 +1015,19 @@
     function applyFundFilter(){
       const tokens = ($('fund-filter').value || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
       const onlySel = $('toggle-only-selected').checked;
+      const visible = new Map();
       document.querySelectorAll('#fund-list-container .fund-item:not(.fund-head)').forEach(el => {
         const name = el.dataset.name || "";
         const sel = el.querySelector('.momo-chk').checked || el.querySelector('.bench-chk').checked;
         const ok = (!tokens.length || tokens.every(t => name.includes(t))) && (!onlySel || sel);
         el.style.display = ok ? '' : 'none';
+        if (ok) visible.set(el.dataset.group, (visible.get(el.dataset.group) || 0) + 1);
+      });
+      // 分組標題：該組沒有可見基金就隱藏，數量顯示篩選後支數
+      document.querySelectorAll('#fund-list-container .fund-group').forEach(g => {
+        const n = visible.get(g.dataset.group) || 0;
+        g.style.display = n ? '' : 'none';
+        const c = g.querySelector('.g-count'); if (c) c.textContent = `${n} 支`;
       });
       updateSelectedCounts();
     }
