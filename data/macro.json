@@ -1,24 +1,24 @@
 {
   "success": true,
-  "asOf": "2026-11-22",
+  "asOf": "2026-11-23",
   "items": [
     {
       "id": "DGS10",
-      "value": 5.04,
-      "prev": 5.12,
-      "date": "2026-11-19"
+      "value": 4.92,
+      "prev": 5.13,
+      "date": "2026-11-20"
     },
     {
       "id": "T10Y2Y",
       "value": 0.29,
-      "prev": 0.32,
-      "date": "2026-11-20"
+      "prev": 0.31,
+      "date": "2026-11-23"
     },
     {
       "id": "DFEDTARU",
       "value": 4,
       "prev": 3.75,
-      "date": "2026-11-22"
+      "date": "2026-11-23"
     },
     {
       "id": "CPI_YOY",
@@ -40,9 +40,9 @@
     }
   ],
   "mcs": {
-    "score": 53,
+    "score": 49,
     "stage": "Slowdown",
-    "asOf": "2026-11-19"
+    "asOf": "2026-11-20"
   },
   "compass": {
     "label": "2026 Q4",
