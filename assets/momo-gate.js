@@ -3,7 +3,8 @@
  * 放在自用頁面 <head> 的最前面（不要加 defer / async）：
  *   <script src="/MOMO_FinSphere/assets/momo-gate.js"></script>
  *
- * - 輸入密碼後，這台裝置記住 30 天（存在瀏覽器 localStorage）
+ * - 信任裝置：輸入一次密碼後，這台裝置的瀏覽器會記住；每次打開自用頁都會自動延長 365 天，
+ *   只要一年內有用過就不會再問密碼（清除瀏覽器資料、無痕視窗、換瀏覽器才需要重新輸入）
  * - 更換密碼：開「自用工具」首頁 → 最下方「更換密碼」產生新的 HASH，貼到下面那一行
  * - 注意：這是前端密碼，用來擋一般人；repo 是公開的，原始碼在 GitHub 上仍看得到
  */
@@ -15,7 +16,7 @@
   // ▲
   var SALT = 'momo-gate:';
   var KEY = 'momo_gate_v1';
-  var DAYS = 30;
+  var DAYS = 365;
 
   window.__momoPrivate = true; // 讓 momo-site.js 知道這是自用頁：不送 GA、不加公開頁尾
 
@@ -43,7 +44,10 @@
     });
   };
 
-  if (ok()) return;
+  if (ok()) {   // 信任裝置：每次使用自動延長
+    try { localStorage.setItem(KEY, JSON.stringify({ h: HASH, exp: Date.now() + DAYS * 864e5 })); } catch (e) {}
+    return;
+  }
 
   // 未登入：先藏起整頁內容
   var hide = document.createElement('style');
@@ -69,7 +73,7 @@
       '<form class="g-box" autocomplete="on">' +
         '<img src="/icon-192.png" alt="">' +
         '<h1>MOMO專用工具</h1>' +
-        '<p>請輸入密碼（這台裝置會記住 ' + DAYS + ' 天）</p>' +
+        '<p>輸入一次即可，這台裝置會記住，之後不用再輸入</p>' +
         '<input type="password" name="password" autocomplete="current-password" placeholder="密碼" required autofocus>' +
         '<button type="submit">進入</button>' +
         '<div class="g-err" aria-live="polite"></div>' +
