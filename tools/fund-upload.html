@@ -195,10 +195,11 @@
                 <table class="file-table" id="fileListTable">
                     <thead>
                         <tr>
-                            <th width="35%">原始檔名</th>
-                            <th width="35%"><i class="fa-solid fa-pen"></i> 基金名稱 (將作為 Sheet 名稱)</th>
-                            <th width="15%" style="text-align:center;">狀態</th>
-                            <th width="15%" style="text-align:center;">操作</th>
+                            <th width="24%">原始檔名</th>
+                            <th width="38%"><i class="fa-solid fa-pen"></i> 基金名稱 (將作為 Sheet 名稱)</th>
+                            <th width="18%">MoneyDJ 代號 <span style="font-weight:400;color:var(--muted);font-size:12px;">(模式B用，選填)</span></th>
+                            <th width="10%" style="text-align:center;">狀態</th>
+                            <th width="10%" style="text-align:center;">操作</th>
                         </tr>
                     </thead>
                     <tbody id="fileListBody"></tbody>
@@ -211,6 +212,9 @@
                 </button>
                 <button class="btn primary" onclick="runMergeProcess()" style="max-width: 400px; flex: 1;">
                     <i class="fa-solid fa-file-export"></i> 開始處理並下載 Excel
+                </button>
+                <button class="btn" id="sendToBBtn" onclick="runMergeProcess(true)" style="max-width: 300px; flex: 1;" title="分頁存檔模式：整理後直接帶到模式 B，代號一起帶入">
+                    <i class="fa-solid fa-arrow-right"></i> 整理後直接送到模式 B
                 </button>
             </div>
         </div>
@@ -249,7 +253,7 @@
         <div>
           <label class="block">1. 上傳來源檔 (最新淨值)</label>
           <div class="drop-zone" style="min-height: 100px; padding: 20px;">
-             <div class="drop-txt" style="font-size:13px;">拖曳或點擊 <b>來源檔</b></div>
+             <div class="drop-txt" id="sourceDropTxt" style="font-size:13px;">拖曳或點擊 <b>來源檔</b></div>
              <input type="file" id="sourceFile" accept=".xlsx,.xls" />
           </div>
           <div id="sourcePreviewArea" class="hide">
@@ -388,7 +392,7 @@ function handleMergeFiles(fileList) {
         let defaultName = file.name.replace(/\.[^/.]+$/, "");
         if (defaultName.length > 30) defaultName = defaultName.substring(0, 30);
 
-        selectedMergeFiles.push({ id: nextFileId++, file, name: defaultName });
+        selectedMergeFiles.push({ id: nextFileId++, file, name: defaultName, code: getSavedCode(defaultName) });
         addedCount++;
     });
 
@@ -432,7 +436,33 @@ function removeMergeFile(id) {
 
 function updateFundName(id, value) {
     const item = selectedMergeFiles.find(f => f.id === id);
-    if (item) item.name = value;
+    if (!item) return;
+    item.name = value;
+    // 改名時，如果還沒填代號，帶入以前記過的代號
+    const saved = getSavedCode(value);
+    const box = document.getElementById(`fundCode-${id}`);
+    if (saved && box && !box.value.trim()) { box.value = saved; item.code = saved; }
+}
+function updateFundCode(id, value) {
+    const item = selectedMergeFiles.find(f => f.id === id);
+    if (!item) return;
+    item.code = value.trim();
+    saveCode(item.name, item.code);
+}
+
+// ===== MoneyDJ 代號記憶：基金名稱（Sheet 名稱）→ 代號，存在這台電腦的瀏覽器，模式 B 自動帶入 =====
+const CODE_KEY = 'momo_fund_codes';
+function sheetSafe(name) {
+    let n = String(name || '').trim().replace(/[:\/\\?*\[\]]/g, "_");
+    return n.length > 31 ? n.substring(0, 31) : n;
+}
+function loadCodes() { try { return JSON.parse(localStorage.getItem(CODE_KEY) || '{}'); } catch (e) { return {}; } }
+function getSavedCode(name) { const m = loadCodes(); return m[sheetSafe(name)] || ''; }
+function saveCode(name, code) {
+    const key = sheetSafe(name); if (!key) return;
+    const m = loadCodes();
+    if (code) m[key] = code; else delete m[key];
+    try { localStorage.setItem(CODE_KEY, JSON.stringify(m)); } catch (e) {}
 }
 
 function renderMergeFileList() {
@@ -453,6 +483,10 @@ function renderMergeFileList() {
             <td>
                 <input type="text" id="sheetName-${item.id}" value="${item.name}" placeholder="輸入基金名稱"
                        oninput="updateFundName(${item.id}, this.value)">
+            </td>
+            <td>
+                <input type="text" id="fundCode-${item.id}" value="${item.code || ''}" placeholder="如 shzb0 或貼連結"
+                       oninput="updateFundCode(${item.id}, this.value)">
             </td>
             <td style="text-align:center;" id="status-${item.id}">
                 <span class="status-badge status-wait">待處理</span>
@@ -477,8 +511,9 @@ function readFileContent(file, encoding) {
     });
 }
 
-async function runMergeProcess() {
-    const exportMode = document.querySelector('input[name="exportMode"]:checked').value;
+async function runMergeProcess(toModeB) {
+    let exportMode = document.querySelector('input[name="exportMode"]:checked').value;
+    if (toModeB) exportMode = 'sheets';   // 模式 B 讀的是「每檔基金一個分頁」
     const encoding = $('#encodingSelect').value;
     const isFill = $('#chkFill').checked;
 
@@ -508,6 +543,7 @@ async function runMergeProcess() {
                 counter++;
             }
             usedSheetNames.add(sheetName);
+            if (item.code) saveCode(sheetName, item.code);
 
             const csvText = await readFileContent(file, encoding);
             const parseResult = Papa.parse(csvText, { header: false, skipEmptyLines: true });
@@ -588,6 +624,18 @@ async function runMergeProcess() {
 
         const stamp = new Date().toISOString().slice(0,10).replace(/-/g,"");
         const fileName = exportMode === 'sheets' ? `MOMO_Sheets_${stamp}.xlsx` : `MOMO_Merged_${stamp}.xlsx`;
+        if (toModeB) {
+            const buf = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const f = new File([buf], fileName, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const dt = new DataTransfer(); dt.items.add(f);
+            const inp = $('#sourceFile'); inp.files = dt.files;
+            inp.dispatchEvent(new Event('change'));
+            logMsg($('#updateLog'), `📥 已從模式 A 帶入 ${workbook.SheetNames.length} 檔基金（${fileName}），代號已自動填入，確認後按預覽或寫入`, "ok");
+            $('#loadingOverlay').classList.add('hide');
+            switchTab('update');
+            setTimeout(() => $('#view-update').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+            return;
+        }
         XLSX.writeFile(workbook, fileName);
 
         setTimeout(() => {
@@ -633,6 +681,7 @@ $('#sourceFile').addEventListener('change', async function(){
     const container = $('#sourcePreviewArea');
     const tagsContainer = $('#sourceFundTags');
 
+    $('#sourceDropTxt').innerHTML = file ? `已選擇：<b>${file.name}</b>（點擊可更換）` : '拖曳或點擊 <b>來源檔</b>';
     if(!file) { container.classList.add('hide'); return; }
 
     tagsContainer.innerHTML = '載入中...';
@@ -651,6 +700,10 @@ $('#sourceFile').addEventListener('change', async function(){
                 <input type="text" id="srcFundCode-${idx}" data-fundname="${sheet}" placeholder="Config 沒有這檔時：貼上 MoneyDJ 連結或代號（如 shzb0）">
             `;
             tagsContainer.appendChild(row);
+            const saved = getSavedCode(sheet);
+            const box = row.querySelector('input');
+            if (saved) box.value = saved;
+            box.addEventListener('change', () => saveCode(sheet, box.value.trim()));
         });
 
     } catch(e) {
