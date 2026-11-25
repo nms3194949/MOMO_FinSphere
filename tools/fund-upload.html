@@ -235,8 +235,8 @@
     <div class="card">
       <div class="card-hd">⚙️ 更新參數設定</div>
       <div class="card-bd">
-        <div>
-          <label class="block">1. GAS Web App 網址</label>
+        <div id="gasUrlWrap" hidden>
+          <label class="block">GAS Web App 網址</label>
           <input type="text" id="gasUrl" value="https://script.google.com/macros/s/AKfycbwUk4wagt8SSchnpz8oqj1XkgfGM2--9M41WBlZGUpsT29dtdv1wV55nowk37ClEmlxyw/exec" placeholder="貼上你的 Apps Script exec URL...">
           <div id="gasUrlStatus" style="font-size:12px; margin-top:5px; text-align:right; color:var(--muted);"></div>
         </div>
@@ -247,7 +247,7 @@
         </div>
 
         <div>
-          <label class="block">2. 上傳來源檔 (最新淨值)</label>
+          <label class="block">1. 上傳來源檔 (最新淨值)</label>
           <div class="drop-zone" style="min-height: 100px; padding: 20px;">
              <div class="drop-txt" style="font-size:13px;">拖曳或點擊 <b>來源檔</b></div>
              <input type="file" id="sourceFile" accept=".xlsx,.xls" />
@@ -259,7 +259,7 @@
         </div>
 
         <div>
-          <label class="block">3. 寫入策略</label>
+          <label class="block">2. 寫入策略</label>
           <div class="toggle-row">
             <label><input type="radio" name="mode" value="fill" checked><div class="toggle-lbl">只補空白</div></label>
             <label><input type="radio" name="mode" value="overwrite"><div class="toggle-lbl">強制覆蓋</div></label>
