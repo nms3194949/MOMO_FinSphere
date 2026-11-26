@@ -82,6 +82,8 @@
     .pk-info { font-size: 13px; color: var(--ink-2); margin: 8px 0 0; line-height: 1.7; }
     .pk-info.err { color: var(--warn); }
     .pk-lock { border: 0; background: none; color: var(--muted); font: 600 12.5px var(--sans); text-decoration: underline; cursor: pointer; padding: 0; margin-top: 6px; }
+    .kv .ks { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+    .kv .v.sub { color: var(--ink-2); font-size: .92em; }
   </style>
 </head>
 <body>
@@ -124,7 +126,8 @@
           <h2>目前水位</h2>
           <div class="kv"><span class="k">目前借款成數</span><span class="v" id="o-r">—</span></div>
           <div class="kv"><span class="k">貨幣帳戶（未進場）</span><span class="v" id="o-c">—</span></div>
-          <div class="kv"><span class="k">基金再跌多少會斷頭</span><span class="v" id="o-dd">—</span></div>
+          <div class="kv"><span class="k">基金再跌多少會斷頭<small class="ks">貨幣帳戶不動，只算已進場基金</small></span><span class="v" id="o-dd">—</span></div>
+          <div class="kv"><span class="k">整張保單價值再跌多少會斷頭<small class="ks">換算成整體帳戶的跌幅</small></span><span class="v" id="o-ddv">—</span></div>
           <div class="bar" id="bar"></div>
         </section>
       </div>
@@ -190,7 +193,7 @@
     function calc() {
       var V = num('v'), F = Math.min(num('f'), V), L = num('l'), d = num('d') / 100, cut = num('cut') / 100;
       if (!(V > 0) || $('l').value === '') {
-        ['o-r', 'o-c', 'o-dd', 'e', 'e-dd', 'rp-dd'].forEach(function (k) { $(k).textContent = '—'; });
+        ['o-r', 'o-c', 'o-dd', 'o-ddv', 'e', 'e-dd', 'rp-dd'].forEach(function (k) { $(k).textContent = '—'; });
         document.querySelectorAll('#e-card .kv, .opt').forEach(function (el) { el.style.display = 'none'; });
         $('fix-h').innerHTML = '② 回到抗損 ' + tag(d) + ' 的兩種方式';
         msg('e-msg', 'info', '請先輸入保單價值、已進場基金金額與借款本息。'); msg('fix-msg'); msg('rp-msg');
@@ -203,6 +206,10 @@
       $('o-c').textContent = yuan(C);
       $('o-dd').textContent = tolTxt(tNow);
       $('o-dd').className = 'v' + (tNow < d ? ' hit' : '');
+      // 整體帳戶：L = cut × V ×（1 − y）→ y = 1 − L ÷（cut × V）＝ 基金跌幅 × 已進場比例
+      var tAcc = L >= cut * V ? 0 : 1 - L / (cut * V);
+      $('o-ddv').textContent = tAcc === 0 ? '已達斷頭線' : pc(tAcc);
+      $('o-ddv').className = 'v sub';
       
       // ① 依抗損可進場的基金總額（只用貨幣帳戶，不再借款；轉入基金不改變借款成數）
       var Fmax = d > 0 ? (V - L / cut) / d : 0;
