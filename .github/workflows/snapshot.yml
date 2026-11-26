@@ -40,6 +40,10 @@ jobs:
         continue-on-error: true
         run: node scripts/dividend-health.mjs
 
+      - name: MOMO 市場共振指數快照
+        continue-on-error: true   # GAS 還沒加 get_mri 或暫時失敗時，沿用上一次的數據
+        run: node scripts/mri.mjs
+
       - name: 有變動才提交
         id: commit
         run: |

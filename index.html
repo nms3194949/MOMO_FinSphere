@@ -214,6 +214,26 @@
     .hero-line { display: inline-block; margin-left: 4px; font-size: 14px; font-weight: 700; color: #6ee7a8; text-decoration: none; align-self: center; }
     .hero-line:hover { text-decoration: underline; }
     .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+    /* MOMO 市場共振指數（首頁右側儀表卡） */
+    .hero-top { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: center; }
+    .mri-card { display: block; background: rgba(20,31,56,.92); border: 1px solid #2a3654; border-radius: 16px; padding: 14px 16px 12px; color: #edeff5; text-decoration: none; transition: border-color .15s, transform .15s; }
+    .mri-card:hover { border-color: var(--gold-soft); transform: translateY(-2px); }
+    .mri-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; }
+    .mri-hd b { color: var(--gold-soft); letter-spacing: .04em; }
+    .mri-hd time { color: #7a8296; font-size: 12px; }
+    .mri-card .mri-gauge { display: block; width: 100%; max-width: 240px; height: auto; margin: 4px auto 0; }
+    .mri-val { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: -6px; }
+    .mri-val strong { font-size: 34px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; color: #fff; }
+    .mri-band { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+    .mri-band.b-g { background: #173d29; color: #8fe0ad; } .mri-band.b-y { background: #4a3d12; color: #f3d77a; } .mri-band.b-o { background: #4f2d14; color: #ffb37a; }
+    .mri-band.b-r { background: #5a1f1f; color: #ffb4a8; } .mri-band.b-x { background: #8f1d1d; color: #fff; }
+    .mri-note { margin: 8px 0 8px; font-size: 12.5px; line-height: 1.6; color: #aab2bf; text-align: center; }
+    .mri-assets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .mri-a { text-align: center; font-size: 12px; padding: 4px 0; border-radius: 6px; background: #1e2a45; color: #7a8296; }
+    .mri-a.on { background: #5a1f1f; color: #ffb4a8; font-weight: 700; }
+    .mri-ft { display: flex; justify-content: space-between; gap: 8px; margin-top: 9px; font-size: 12px; color: #7a8296; }
+    .mri-ft .go { color: var(--gold-soft); font-weight: 700; white-space: nowrap; }
+    @media (max-width: 860px) { .hero-top { grid-template-columns: minmax(0, 1fr); gap: 20px; } .mri-card { max-width: 420px; } }
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 22px; border-radius: 999px; font-weight: 700; font-size: 15px; text-decoration: none; border: 1.5px solid transparent; transition: opacity .15s; }
     .btn:hover { opacity: .88; }
     .btn-line { background: var(--line-green); color: #fff; }
@@ -393,6 +413,8 @@
     <!-- Hero：MOMO財商智庫 -->
     <section class="hero">
       <div class="wrap">
+        <div class="hero-top">
+        <div class="hero-main">
         <div class="hero-brand">
           <span class="kicker">經濟數據 × 試算工具 × 市場觀察</span>
           <h1>MOMO<span class="gold">財商智庫</span></h1>
@@ -403,6 +425,19 @@
           <a class="btn btn-gold" href="dividend-calculator.html">開始試算</a>
           <a class="btn btn-ghost" href="./tools/">所有工具</a>
           <a class="hero-line js-utm" data-href="https://lin.ee/sdrEuGA" data-loc="hero" href="https://lin.ee/sdrEuGA" target="_blank" rel="noopener">加入官方 LINE →</a>
+        </div>
+        </div>
+        <!-- MOMO 市場共振指數：由每日快照（scripts/mri.mjs）寫入，請勿手動修改 -->
+        <!-- SNAP:MRI:START -->
+          <a class="mri-card" href="indicators/mri.html" aria-label="MOMO 市場共振指數 80.5，高度共振，了解 MRI">
+            <div class="mri-hd"><b>MOMO 市場共振指數 MRI</b><time datetime="2026-11-24">2026-11-24</time></div>
+            <svg class="mri-gauge" viewBox="-10 0 280 150" width="240" role="img" aria-labelledby="mri-h-t"><title id="mri-h-t">MRI 儀表：80.5，高度共振</title><path d="M26.0,126.0 A104,104 0 0 1 96.0,29.7" stroke="#2f9e5a" stroke-width="22" fill="none"/><path d="M99.7,28.5 A104,104 0 0 1 160.3,28.5" stroke="#e0b84a" stroke-width="22" fill="none"/><path d="M164.0,29.7 A104,104 0 0 1 213.0,65.3" stroke="#e8873a" stroke-width="22" fill="none"/><path d="M215.3,68.5 A104,104 0 0 1 232.4,109.8" stroke="#d64545" stroke-width="22" fill="none"/><path d="M233.0,113.7 A104,104 0 0 1 234.0,126.0" stroke="#8f1d1d" stroke-width="22" fill="none"/><text x="5.0" y="132.0" font-size="11" fill="#7a8296" text-anchor="middle">0</text><text x="91.4" y="13.1" font-size="11" fill="#7a8296" text-anchor="middle">40</text><text x="168.6" y="13.1" font-size="11" fill="#7a8296" text-anchor="middle">60</text><text x="231.1" y="58.5" font-size="11" fill="#7a8296" text-anchor="middle">80</text><text x="253.5" y="112.4" font-size="11" fill="#7a8296" text-anchor="middle">95</text><text x="255.0" y="132.0" font-size="11" fill="#7a8296" text-anchor="middle">100</text><g transform="rotate(54.9 130 128)"><path d="M125,128 L130,30 L135,128 Z" fill="#ffffff"/></g><circle cx="130" cy="128" r="9" fill="#ffffff"/><circle cx="130" cy="128" r="4" fill="#0c152a"/></svg>
+            <div class="mri-val"><strong>80.5</strong><span class="mri-band b-r">🔴 高度共振</span></div>
+            <p class="mri-note">股、債、金多數同步下跌，市場壓力明顯｜今天 3 類資產明顯下跌</p>
+            <div class="mri-assets"><span class="mri-a on" title="美股：下跌強度 1.05">美股</span><span class="mri-a" title="台股：下跌強度 0.00">台股</span><span class="mri-a on" title="歐股：下跌強度 1.18">歐股</span><span class="mri-a" title="高收益債：下跌強度 0.63">高收益債</span><span class="mri-a" title="美國公債：下跌強度 0.00">美國公債</span><span class="mri-a on" title="黃金：下跌強度 1.31">黃金</span></div>
+            <div class="mri-ft"><span>前一日 94.8｜一週前 95.6</span><span class="go">了解 MRI →</span></div>
+          </a>
+          <!-- SNAP:MRI:END -->
         </div>
 
         <!-- 經濟數據速覽：由 GitHub Actions 每天寫入靜態數據（scripts/snapshot.mjs）。

@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <title>MOMO 市場共振指數（MRI）：股、債、金是不是一起跌？今日數值與歷史走勢｜MOMO財商智庫</title>
+  <meta name="description" content="MOMO 市場共振指數（MRI）是 MOMO 自主設計的市場狀態溫度計（0～100），每天衡量美股、台股、歐股、高收益債、美國公債、黃金六類資產是否同步下跌。附今日數值、六資產下跌強度、2015 年以來走勢、計算方法與限制。" />
+  <link rel="canonical" href="https://momowinwin.com/MOMO_FinSphere/indicators/mri.html" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="明哲MOMO" />
+  <meta name="theme-color" content="#f6f1e7" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="MOMO財商智庫" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="MOMO 市場共振指數（MRI）：股、債、金是不是一起跌？" />
+  <meta property="og:description" content="0～100 的市場狀態溫度計，每天看六類資產是否同步下跌。附今日數值、歷史走勢與計算方法。" />
+  <meta property="og:url" content="https://momowinwin.com/MOMO_FinSphere/indicators/mri.html" />
+  <meta property="og:image" content="https://momowinwin.com/og-default.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://momowinwin.com/MOMO_FinSphere/indicators/mri.html#webpage",
+        "name": "MOMO 市場共振指數（MRI）",
+        "url": "https://momowinwin.com/MOMO_FinSphere/indicators/mri.html",
+        "inLanguage": "zh-Hant-TW",
+        "dateModified": "2026-11-24",
+        "isPartOf": { "@id": "https://momowinwin.com/#website" },
+        "author": { "@id": "https://momowinwin.com/momo-blog/about/#person" },
+        "publisher": { "@id": "https://momowinwin.com/momo-blog/about/#person" },
+        "about": { "@type": "Thing", "name": "MOMO 市場共振指數", "alternateName": ["MRI", "MOMO Resonance Index", "市場共振指數"] }
+      },
+      {
+        "@type": "Dataset",
+        "name": "MOMO 市場共振指數（MRI）日資料",
+        "description": "MOMO 自主設計的跨資產同步下跌指標，0～100，衡量美股、台股、歐股、高收益債、美國公債、黃金六類資產近 5 個交易日的同步下跌強度，以近 5 年歷史百分位表示，每日更新。",
+        "url": "https://momowinwin.com/MOMO_FinSphere/indicators/mri.html",
+        "creator": { "@id": "https://momowinwin.com/momo-blog/about/#person" },
+        "isAccessibleForFree": true,
+        "variableMeasured": "MRI（0～100，歷史百分位）",
+        "dateModified": "2026-11-24",
+        "distribution": { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://momowinwin.com/MOMO_FinSphere/data/mri.json" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "MOMO雙贏策略", "item": "https://momowinwin.com/" },
+          { "@type": "ListItem", "position": 2, "name": "MOMO財商智庫", "item": "https://momowinwin.com/MOMO_FinSphere/" },
+          { "@type": "ListItem", "position": 3, "name": "經濟指標", "item": "https://momowinwin.com/MOMO_FinSphere/indicators/" },
+          { "@type": "ListItem", "position": 4, "name": "MOMO 市場共振指數" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "MRI 很高，是不是該賣出？", "acceptedAnswer": { "@type": "Answer", "text": "不是。MRI 描述的是「已經發生」的跨資產同步下跌，不是崩盤機率，也不是買賣訊號。歷史上各燈號之後的平均報酬差異不大，單看 MRI 不能判斷進出場時機。它比較適合用來確認：現在的下跌是單一市場的事，還是分散配置也一起失效。" } },
+          { "@type": "Question", "name": "MRI 和 VIX 有什麼不同？", "acceptedAnswer": { "@type": "Answer", "text": "VIX 是標普 500 選擇權的隱含波動率，反映市場對未來 30 天美股波動的預期；MRI 量測的是已經發生、而且跨越股票、債券、黃金的同步下跌。VIX 高但 MRI 低，代表美股緊張但尚未擴散；MRI 高但 VIX 不高，代表多類資產已經一起跌。" } },
+          { "@type": "Question", "name": "為什麼公債和黃金也會一起跌？", "acceptedAnswer": { "@type": "Answer", "text": "公債和黃金常被當作避險資產，但在利率快速上升（例如 2022 年）或市場急需現金時（例如 2020 年 3 月），投資人會同時賣出各種資產換現金，避險資產也會下跌。MRI 會把這種「避險失效」的狀況反映出來。" } },
+          { "@type": "Question", "name": "MRI 多久更新一次？", "acceptedAnswer": { "@type": "Answer", "text": "每天自動更新一次。六類代理標的都更新淨值後才計算，任一資料尚未更新時沿用前一天的數值。" } }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&display=swap" />
+
+  <style>
+    :root {
+      --bg: #f6f1e7; --surface: #fffdf8; --ink: #0c152a; --ink-2: #44506a; --muted: #7a8296;
+      --line: #e4dccb; --gold: #a88a3d; --gold-soft: #d2c696; --gold-bg: #f1e8cf; --line-green: #06c755;
+      --up: #b4562b; --down: #1e7a55;
+      --serif: 'Noto Serif TC', 'Songti TC', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.85; letter-spacing: .02em; }
+    a { color: inherit; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; max-width: 880px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; }
+    .back { color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .back:hover { color: var(--gold); }
+
+    .crumbs { font-size: 13px; color: var(--muted); margin: 24px 0 0; }
+    .toc { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin: 22px 0 4px; padding: 12px 14px; background: var(--surface, #fffdf7); border: 1px solid var(--line); border-radius: 12px; font-size: 14px; }
+    .toc b { color: var(--ink); margin-right: 4px; }
+    .toc a { text-decoration: none; color: var(--ink-2); padding: 3px 10px; border-radius: 999px; background: rgba(176,141,74,.10); }
+    .toc a:hover { color: var(--gold); }
+    h2[id] { scroll-margin-top: 90px; }
+    .crumbs a { text-decoration: none; color: var(--ink-2); }
+    .crumbs a:hover { color: var(--gold); }
+    .eyebrow { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .12em; margin: 18px 0 6px; }
+    h1 { font-family: var(--serif); font-weight: 800; font-size: clamp(26px, 5.6vw, 36px); line-height: 1.4; margin: 0 0 14px; }
+    .answer { font-size: 17px; line-height: 1.9; margin: 0 0 6px; }
+    .answer b { font-size: 20px; color: var(--ink); }
+    .updated { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 0 28px; }
+    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+    .stat.main { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .stat .k { font-size: 13px; color: var(--ink-2); }
+    .stat.main .k, .stat.main .sub { color: #c9cfdb; }
+    .stat .v { font-family: var(--serif); font-weight: 800; font-size: 26px; line-height: 1.35; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .stat.main .v { color: var(--gold-soft); }
+    .stat .v small { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--muted); }
+    .stat.up .v { color: var(--up); } .stat.down .v { color: var(--down); }
+    .stat .sub { font-size: 12px; color: var(--muted); }
+
+    h2 { font-family: var(--serif); font-size: 23px; line-height: 1.45; margin: 34px 0 12px; }
+    h3 { font-size: 17px; margin: 20px 0 6px; }
+    p { margin: 0 0 12px; color: var(--ink-2); }
+    p b, li b { color: var(--ink); }
+    ul, ol { padding-left: 1.3em; color: var(--ink-2); margin: 0 0 12px; }
+    li { margin: 4px 0; }
+
+    .chart { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 8px; }
+    .chart svg { display: block; width: 100%; height: auto; aspect-ratio: 960 / 320; }
+    .chart .g { stroke: #ece5d6; stroke-width: 1; }
+    .chart .yl { font: 12px var(--sans); fill: var(--muted); text-anchor: end; }
+    .chart .xl { font: 12px var(--sans); fill: var(--muted); text-anchor: middle; }
+    .chart .a { fill: rgba(168,138,61,.12); }
+    .chart .l { fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .chart .hi { fill: var(--up); } .chart .lo { fill: var(--down); }
+    .chart .last { fill: var(--ink); stroke: #fff; stroke-width: 2; }
+    .chart .l2 { fill: none; stroke: #0c152a; stroke-width: 1.6; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
+    .chart .d2 { fill: #0c152a; }
+    .chart .z { stroke: #b4562b; stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .chart .lg { display: inline-flex; align-items: center; gap: 6px; margin-right: 12px; }
+    .chart .lg::before { content: ''; display: inline-block; width: 18px; height: 0; border-top: 2.5px solid var(--gold); }
+    .chart .lg.l2::before { border-top: 2px dashed var(--ink); }
+    .chart figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    caption { text-align: left; font-size: 13px; color: var(--muted); padding: 0 0 6px; }
+    th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    td.up { color: var(--up); } td.down { color: var(--down); }
+    .note { font-size: 13px; color: var(--muted); }
+
+    .formula { display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--gold-bg); color: var(--ink); font-weight: 700; font-size: 15px; margin: 2px 0 12px; }
+    .timeline li { margin: 8px 0; }
+
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+    .faq summary { cursor: pointer; font-weight: 700; }
+    .faq details p { margin: 8px 0 0; }
+
+    .related { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .related a { display: block; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; transition: border-color .15s; }
+    .related a:hover { border-color: var(--gold-soft); }
+    .related .t { display: block; font-size: 12.5px; color: var(--gold); font-weight: 700; }
+    .related .h { display: block; font-weight: 700; line-height: 1.6; }
+    .src { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat .v { font-size: 22px; }
+      .chart { padding: 8px 6px 6px; }
+      .chart .yl, .chart .xl { font-size: 30px; }
+      .chart .l { stroke-width: 2; }
+      th, td { padding: 8px 10px; }
+      td:first-child { white-space: nowrap; }
+    }
+
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .mri-now { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 18px 14px; margin: 6px 0 10px; }
+    .now-g { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+    .now-g .mri-gauge { max-width: 100%; height: auto; }
+    .now-v strong { font-family: var(--serif); font-size: 46px; line-height: 1; margin-right: 10px; font-variant-numeric: tabular-nums; }
+    .now-v p { margin: 8px 0 0; }
+    .now-v .asof { font-size: 13px; color: var(--muted); }
+    .mri-band { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 14px; font-weight: 700; vertical-align: 8px; }
+    .b-g { background: #e3f3e8; color: #1e6b3c; } .b-y { background: #fbf1d3; color: #8a6400; } .b-o { background: #fde8d6; color: #a1531a; }
+    .b-r { background: #fbe2e2; color: #a12d2d; } .b-x { background: #8f1d1d; color: #fff; }
+    .now-k { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 14px 0 6px; }
+    .now-k div { background: #fbf7ee; border-radius: 10px; padding: 8px 12px; }
+    .now-k span { display: block; font-size: 12.5px; color: var(--muted); }
+    .now-k b { font-family: var(--serif); font-size: 21px; font-variant-numeric: tabular-nums; }
+    .mri-now h3 { margin: 14px 0 2px; }
+    .hint { font-size: 13.5px; color: var(--muted); }
+    .comp { display: grid; gap: 6px; }
+    .cp { display: grid; grid-template-columns: 76px minmax(0, 1fr) 48px; align-items: center; gap: 10px; font-size: 14px; }
+    .cp .cb { height: 10px; border-radius: 999px; background: #eee6d6; overflow: hidden; }
+    .cp .cb i { display: block; height: 100%; background: #c9cfdb; border-radius: 999px; }
+    .cp.on .cb i { background: #d64545; } .cp.on .cl { font-weight: 700; color: var(--ink); }
+    .cp .cv { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+    .mri-chart { position: relative; margin: 0 0 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 10px 6px; }
+    .mri-chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+    .mri-chart figcaption { font-size: 13px; color: var(--muted); margin: 0 0 4px 4px; }
+    .mri-tip { position: absolute; top: 8px; right: 12px; background: var(--ink); color: #fff; font-size: 12.5px; padding: 3px 10px; border-radius: 8px; pointer-events: none; }
+    .bands td:nth-child(1) { white-space: nowrap; }
+    .risk { background: #fdf3e7; border: 1px solid #f0cfa3; border-radius: 12px; padding: 12px 14px; font-size: 14px; color: #6b4a12; margin: 0 0 12px; line-height: 1.8; }
+    .risk b { color: #6b4a12; }
+    .tw { overflow-x: auto; }
+    table.bt td, table.bt th { white-space: nowrap; }
+    table.bt tr.all td { font-weight: 700; background: #fbf7ee; }
+    .steps li { margin: 8px 0; }
+    @media (max-width: 720px) { .now-k { grid-template-columns: repeat(2, minmax(0, 1fr)); } .now-v strong { font-size: 40px; } }
+  </style>
+  <script defer src="/MOMO_FinSphere/assets/momo-site.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/MOMO_FinSphere/" aria-label="MOMO財商智庫 首頁"><img src="/icon-96.png" alt="" width="32" height="32" />MOMO財商智庫</a>
+      <a class="back" href="/MOMO_FinSphere/indicators/">← 經濟指標總覽</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="crumbs" aria-label="麵包屑"><a href="/MOMO_FinSphere/">MOMO財商智庫</a> › <a href="/MOMO_FinSphere/indicators/">經濟指標</a> › MOMO 市場共振指數</nav>
+    <p class="eyebrow">MOMO 自主指標｜市場狀態溫度計</p>
+    <h1>MOMO 市場共振指數（MRI）：股、債、金是不是一起跌？</h1>
+    <p class="answer">截至 <span class="js-mri-d">2026-11-24</span>，MOMO 市場共振指數（MRI）為 <b><span class="js-mri-v">80.5</span></b>，屬於「<span class="js-mri-b">高度共振</span>」。MRI 用 0～100 表示美股、台股、歐股、高收益債、美國公債、黃金六類資產「同時下跌」的程度：數字越高，代表下跌越跨市場擴散，分散配置越難發揮保護效果。</p>
+    <p class="updated">每天自動更新｜由明哲MOMO設計與維護｜MRI 是描述市場狀態的指標，不是崩盤機率，也不是買賣訊號</p>
+
+    <nav class="toc" aria-label="本頁目錄"><b>本頁目錄</b>
+      <a href="#hist-t">歷史走勢</a><a href="#read">怎麼看</a><a href="#bt-t">歷史統計</a><a href="#events">重大事件</a><a href="#vix">和 VIX 的不同</a><a href="#method">計算方法</a><a href="#faq-title">常見問題</a>
+    </nav>
+
+    <!-- 以下 SNAP 區塊由每日快照（scripts/mri.mjs）自動更新，請勿手動修改 -->
+    <!-- SNAP:MRIPAGE:START -->
+      <section class="mri-now" aria-labelledby="now-t">
+        <h2 id="now-t" class="sr">今天的 MRI</h2>
+        <div class="now-g"><svg class="mri-gauge" viewBox="-10 0 280 150" width="300" role="img" aria-labelledby="mri-p-t"><title id="mri-p-t">MRI 儀表：80.5，高度共振</title><path d="M26.0,126.0 A104,104 0 0 1 96.0,29.7" stroke="#2f9e5a" stroke-width="22" fill="none"/><path d="M99.7,28.5 A104,104 0 0 1 160.3,28.5" stroke="#e0b84a" stroke-width="22" fill="none"/><path d="M164.0,29.7 A104,104 0 0 1 213.0,65.3" stroke="#e8873a" stroke-width="22" fill="none"/><path d="M215.3,68.5 A104,104 0 0 1 232.4,109.8" stroke="#d64545" stroke-width="22" fill="none"/><path d="M233.0,113.7 A104,104 0 0 1 234.0,126.0" stroke="#8f1d1d" stroke-width="22" fill="none"/><text x="5.0" y="132.0" font-size="11" fill="#7a8296" text-anchor="middle">0</text><text x="91.4" y="13.1" font-size="11" fill="#7a8296" text-anchor="middle">40</text><text x="168.6" y="13.1" font-size="11" fill="#7a8296" text-anchor="middle">60</text><text x="231.1" y="58.5" font-size="11" fill="#7a8296" text-anchor="middle">80</text><text x="253.5" y="112.4" font-size="11" fill="#7a8296" text-anchor="middle">95</text><text x="255.0" y="132.0" font-size="11" fill="#7a8296" text-anchor="middle">100</text><g transform="rotate(54.9 130 128)"><path d="M125,128 L130,30 L135,128 Z" fill="#0c152a"/></g><circle cx="130" cy="128" r="9" fill="#0c152a"/><circle cx="130" cy="128" r="4" fill="#fffdf8"/></svg>
+          <div class="now-v"><strong>80.5</strong><span class="mri-band b-r">🔴 高度共振</span><p>股、債、金多數同步下跌，市場壓力明顯</p><p class="asof">資料日期 <time datetime="2026-11-24">2026-11-24</time>｜方法版本 v0.1.0</p></div>
+        </div>
+        <div class="now-k">
+          <div><span>前一日</span><b>94.8</b></div>
+          <div><span>一週前</span><b>95.6</b></div>
+          <div><span>一個月前</span><b>72.5</b></div>
+          <div><span>明顯下跌資產</span><b>3 / 6</b></div>
+        </div>
+        <h3>六類資產今天的下跌強度</h3>
+        <p class="hint">數值是近 5 個交易日的跌幅除以該資產平常的波動；1 以上代表「比平常明顯的下跌」，0 代表沒有下跌。</p>
+        <div class="comp"><div class="cp on"><span class="cl">美股</span><span class="cb"><i style="width:26%"></i></span><span class="cv">1.05</span></div><div class="cp"><span class="cl">台股</span><span class="cb"><i style="width:0%"></i></span><span class="cv">0.00</span></div><div class="cp on"><span class="cl">歐股</span><span class="cb"><i style="width:29%"></i></span><span class="cv">1.18</span></div><div class="cp"><span class="cl">高收益債</span><span class="cb"><i style="width:16%"></i></span><span class="cv">0.63</span></div><div class="cp"><span class="cl">美國公債</span><span class="cb"><i style="width:0%"></i></span><span class="cv">0.00</span></div><div class="cp on"><span class="cl">黃金</span><span class="cb"><i style="width:33%"></i></span><span class="cv">1.31</span></div></div>
+      </section>
+      <section aria-labelledby="hist-t">
+        <h2 id="hist-t">歷史走勢</h2>
+        <figure class="mri-chart"><figcaption>近一年 MRI（滑過圖表看每日數值）</figcaption><svg id="mri-c1" viewBox="0 0 760 220" role="img" aria-label="近一年 MRI（滑過圖表看每日數值）" data-t0="1763942400000" data-t1="1795478400000" data-l="34" data-iw="716"><rect x="34" y="121.2" width="716" height="72.8" fill="#2f9e5a" opacity=".10"/><rect x="34" y="84.8" width="716" height="36.4" fill="#e0b84a" opacity=".10"/><rect x="34" y="48.4" width="716" height="36.4" fill="#e8873a" opacity=".10"/><rect x="34" y="21.1" width="716" height="27.3" fill="#d64545" opacity=".10"/><rect x="34" y="12.0" width="716" height="9.1" fill="#8f1d1d" opacity=".10"/><line x1="34" x2="750" y1="194.0" y2="194.0" stroke="#e4dccb" stroke-width="1"/><text x="28" y="198.0" font-size="10" fill="#7a8296" text-anchor="end">0</text><line x1="34" x2="750" y1="121.2" y2="121.2" stroke="#e4dccb" stroke-width="1"/><text x="28" y="125.2" font-size="10" fill="#7a8296" text-anchor="end">40</text><line x1="34" x2="750" y1="84.8" y2="84.8" stroke="#e4dccb" stroke-width="1"/><text x="28" y="88.8" font-size="10" fill="#7a8296" text-anchor="end">60</text><line x1="34" x2="750" y1="48.4" y2="48.4" stroke="#e4dccb" stroke-width="1"/><text x="28" y="52.4" font-size="10" fill="#7a8296" text-anchor="end">80</text><line x1="34" x2="750" y1="21.1" y2="21.1" stroke="#e4dccb" stroke-width="1"/><line x1="34" x2="750" y1="12.0" y2="12.0" stroke="#e4dccb" stroke-width="1"/><text x="28" y="16.0" font-size="10" fill="#7a8296" text-anchor="end">100</text><text x="108.5" y="212" font-size="10" fill="#7a8296" text-anchor="middle">26/1</text><text x="224.3" y="212" font-size="10" fill="#7a8296" text-anchor="middle">26/3</text><text x="343.9" y="212" font-size="10" fill="#7a8296" text-anchor="middle">26/5</text><text x="463.6" y="212" font-size="10" fill="#7a8296" text-anchor="middle">26/7</text><text x="585.2" y="212" font-size="10" fill="#7a8296" text-anchor="middle">26/9</text><text x="704.9" y="212" font-size="10" fill="#7a8296" text-anchor="middle">26/11</text><line x1="736.3" x2="736.3" y1="12" y2="194" stroke="#0c152a" stroke-dasharray="3 3" opacity=".45"/><text x="732.3" y="23" font-size="10" fill="#0c152a" text-anchor="end">2026/11</text><polyline points="34.0,70.4 36.0,164.0 37.9,164.0 39.9,164.0 41.8,164.0 47.7,163.8 49.7,163.8 51.7,163.6 53.6,123.0 55.6,163.6 61.5,111.6 63.4,108.8 65.4,121.7 67.3,163.6 69.3,121.0 75.2,123.7 77.2,115.2 79.1,86.8 81.1,94.1 83.0,163.8 88.9,163.8 90.9,163.6 92.8,163.6 96.8,163.6 102.7,163.4 104.6,163.4 106.6,113.2 110.5,87.0 116.4,129.0 118.4,163.2 120.3,163.2 122.3,163.2 124.2,163.1 130.1,163.1 132.1,162.9 134.0,162.9 136.0,162.9 138.0,125.9 143.9,103.4 145.8,81.5 147.8,96.4 149.7,118.8 151.7,127.8 157.6,163.1 159.5,162.9 161.5,162.9 163.5,162.9 165.4,162.9 171.3,50.8 173.3,56.6 175.2,45.3 177.2,31.3 179.2,89.9 185.0,162.9 187.0,162.9 189.0,162.9 190.9,162.9 192.9,162.9 198.8,95.9 200.7,73.5 202.7,108.3 204.7,108.1 206.6,163.1 212.5,163.1 214.5,163.1 216.4,163.1 218.4,162.9 220.4,162.9 226.2,85.5 228.2,33.1 230.2,24.4 232.1,22.2 234.1,14.5 240.0,17.5 241.9,86.1 243.9,46.6 245.9,33.1 247.8,37.1 253.7,49.3 255.7,40.9 257.6,34.9 259.6,40.4 261.6,32.2 267.4,34.0 269.4,18.6 271.4,57.3 273.3,60.0 275.3,69.7 281.2,41.5 283.1,95.7 285.1,131.0 287.1,163.2 289.0,163.2 294.9,163.2 296.9,163.2 298.8,163.2 300.8,163.1 302.7,163.1 308.6,162.9 310.6,162.9 312.6,162.9 314.5,162.7 316.5,162.7 322.4,162.5 324.3,89.0 326.3,85.9 328.2,71.9 330.2,44.4 336.1,56.6 338.1,52.8 340.0,41.3 342.0,76.8 343.9,75.3 349.8,55.5 351.8,98.1 353.7,162.7 355.7,162.7 357.7,162.5 363.6,162.5 365.5,130.3 367.5,62.6 369.4,71.7 371.4,23.8 377.3,23.8 379.2,21.5 381.2,34.8 383.2,45.3 385.1,162.9 391.0,162.7 393.0,162.7 394.9,162.5 396.9,162.5 398.9,162.5 404.8,162.3 406.7,118.1 408.7,116.5 410.6,162.5 412.6,35.1 418.5,30.9 420.4,35.5 422.4,23.8 424.4,26.9 426.3,100.6 432.2,162.5 434.2,162.5 436.1,162.5 438.1,162.3 440.1,162.3 445.9,55.0 447.9,35.5 449.9,38.2 451.8,48.8 453.8,44.6 459.7,53.7 461.6,88.4 463.6,117.6 465.6,162.3 467.5,162.3 473.4,162.3 475.4,100.8 477.3,75.3 479.3,60.6 481.3,47.5 487.1,35.5 489.1,72.8 491.1,131.0 493.0,106.1 495.0,54.4 500.9,64.6 502.8,73.3 504.8,64.8 506.8,33.3 508.7,55.5 514.6,85.5 516.6,55.7 518.5,24.9 520.5,162.5 522.4,99.0 528.3,101.9 530.3,162.5 532.3,162.5 534.2,162.3 536.2,162.3 542.1,162.2 544.0,121.9 546.0,162.2 548.0,162.2 549.9,129.6 555.8,162.0 557.8,120.1 559.7,96.8 561.7,63.0 563.6,80.4 569.5,79.7 571.5,127.8 573.5,162.2 575.4,162.2 577.4,162.2 583.3,97.7 585.2,37.3 587.2,42.6 589.1,67.3 591.1,78.8 597.0,123.4 599.0,162.3 600.9,111.2 602.9,28.9 604.8,37.3 610.7,18.9 612.7,19.3 614.6,25.8 616.6,97.0 618.6,65.1 624.5,162.5 626.4,162.3 628.4,78.6 630.3,28.6 632.3,53.7 638.2,23.1 640.1,18.0 642.1,32.0 644.1,54.4 646.0,38.9 651.9,47.5 653.9,101.0 655.8,72.1 657.8,102.6 659.8,116.1 665.6,162.3 667.6,79.5 669.6,70.4 671.5,89.7 673.5,77.0 679.4,69.0 681.3,68.1 683.3,162.3 685.3,83.0 687.2,43.1 693.1,62.1 695.1,100.6 697.0,93.0 699.0,162.5 701.0,92.6 706.8,84.4 708.8,59.5 710.8,82.6 712.7,44.0 714.7,48.9 720.6,162.9 722.5,99.9 724.5,71.1 726.5,56.6 728.4,53.3 734.3,22.7 736.3,20.0 738.2,15.6 740.2,16.0 742.2,13.5 748.0,21.5 750.0,47.5" fill="none" stroke="#0c152a" stroke-width="1.4" stroke-linejoin="round"/><g class="mri-hover" style="display:none"><line y1="12" y2="194" stroke="#a88a3d"/><circle r="4" fill="#a88a3d"/></g></svg><div class="mri-tip" hidden></div></figure>
+        
+      </section>
+      <script type="application/json" id="mri-data">{"c1":[["2025-11-24",67.9],["2025-11-25",16.5],["2025-11-26",16.5],["2025-11-27",16.5],["2025-11-28",16.5],["2025-12-01",16.6],["2025-12-02",16.6],["2025-12-03",16.7],["2025-12-04",39],["2025-12-05",16.7],["2025-12-08",45.3],["2025-12-09",46.8],["2025-12-10",39.7],["2025-12-11",16.7],["2025-12-12",40.1],["2025-12-15",38.6],["2025-12-16",43.3],["2025-12-17",58.9],["2025-12-18",54.9],["2025-12-19",16.6],["2025-12-22",16.6],["2025-12-23",16.7],["2025-12-24",16.7],["2025-12-26",16.7],["2025-12-29",16.8],["2025-12-30",16.8],["2025-12-31",44.4],["2026-01-02",58.8],["2026-01-05",35.7],["2026-01-06",16.9],["2026-01-07",16.9],["2026-01-08",16.9],["2026-01-09",17],["2026-01-12",17],["2026-01-13",17.1],["2026-01-14",17.1],["2026-01-15",17.1],["2026-01-16",37.4],["2026-01-19",49.8],["2026-01-20",61.8],["2026-01-21",53.6],["2026-01-22",41.3],["2026-01-23",36.4],["2026-01-26",17],["2026-01-27",17.1],["2026-01-28",17.1],["2026-01-29",17.1],["2026-01-30",17.1],["2026-02-02",78.7],["2026-02-03",75.5],["2026-02-04",81.7],["2026-02-05",89.4],["2026-02-06",57.2],["2026-02-09",17.1],["2026-02-10",17.1],["2026-02-11",17.1],["2026-02-12",17.1],["2026-02-13",17.1],["2026-02-16",53.9],["2026-02-17",66.2],["2026-02-18",47.1],["2026-02-19",47.2],["2026-02-20",17],["2026-02-23",17],["2026-02-24",17],["2026-02-25",17],["2026-02-26",17.1],["2026-02-27",17.1],["2026-03-02",59.6],["2026-03-03",88.4],["2026-03-04",93.2],["2026-03-05",94.4],["2026-03-06",98.6],["2026-03-09",97],["2026-03-10",59.3],["2026-03-11",81],["2026-03-12",88.4],["2026-03-13",86.2],["2026-03-16",79.5],["2026-03-17",84.1],["2026-03-18",87.4],["2026-03-19",84.4],["2026-03-20",88.9],["2026-03-23",87.9],["2026-03-24",96.4],["2026-03-25",75.1],["2026-03-26",73.6],["2026-03-27",68.3],["2026-03-30",83.8],["2026-03-31",54],["2026-04-01",34.6],["2026-04-02",16.9],["2026-04-03",16.9],["2026-04-06",16.9],["2026-04-07",16.9],["2026-04-08",16.9],["2026-04-09",17],["2026-04-10",17],["2026-04-13",17.1],["2026-04-14",17.1],["2026-04-15",17.1],["2026-04-16",17.2],["2026-04-17",17.2],["2026-04-20",17.3],["2026-04-21",57.7],["2026-04-22",59.4],["2026-04-23",67.1],["2026-04-24",82.2],["2026-04-27",75.5],["2026-04-28",77.6],["2026-04-29",83.9],["2026-04-30",64.4],["2026-05-01",65.2],["2026-05-04",76.1],["2026-05-05",52.7],["2026-05-06",17.2],["2026-05-07",17.2],["2026-05-08",17.3],["2026-05-11",17.3],["2026-05-12",35],["2026-05-13",72.2],["2026-05-14",67.2],["2026-05-15",93.5],["2026-05-18",93.5],["2026-05-19",94.8],["2026-05-20",87.5],["2026-05-21",81.7],["2026-05-22",17.1],["2026-05-25",17.2],["2026-05-26",17.2],["2026-05-27",17.3],["2026-05-28",17.3],["2026-05-29",17.3],["2026-06-01",17.4],["2026-06-02",41.7],["2026-06-03",42.6],["2026-06-04",17.3],["2026-06-05",87.3],["2026-06-08",89.6],["2026-06-09",87.1],["2026-06-10",93.5],["2026-06-11",91.8],["2026-06-12",51.3],["2026-06-15",17.3],["2026-06-16",17.3],["2026-06-17",17.3],["2026-06-18",17.4],["2026-06-19",17.4],["2026-06-22",76.4],["2026-06-23",87.1],["2026-06-24",85.6],["2026-06-25",79.8],["2026-06-26",82.1],["2026-06-29",77.1],["2026-06-30",58],["2026-07-01",42],["2026-07-02",17.4],["2026-07-03",17.4],["2026-07-06",17.4],["2026-07-07",51.2],["2026-07-08",65.2],["2026-07-09",73.3],["2026-07-10",80.5],["2026-07-13",87.1],["2026-07-14",66.6],["2026-07-15",34.6],["2026-07-16",48.3],["2026-07-17",76.7],["2026-07-20",71.1],["2026-07-21",66.3],["2026-07-22",71],["2026-07-23",88.3],["2026-07-24",76.1],["2026-07-27",59.6],["2026-07-28",76],["2026-07-29",92.9],["2026-07-30",17.3],["2026-07-31",52.2],["2026-08-03",50.6],["2026-08-04",17.3],["2026-08-05",17.3],["2026-08-06",17.4],["2026-08-07",17.4],["2026-08-10",17.5],["2026-08-11",39.6],["2026-08-12",17.5],["2026-08-13",17.5],["2026-08-14",35.4],["2026-08-17",17.6],["2026-08-18",40.6],["2026-08-19",53.4],["2026-08-20",72],["2026-08-21",62.4],["2026-08-24",62.8],["2026-08-25",36.4],["2026-08-26",17.5],["2026-08-27",17.5],["2026-08-28",17.5],["2026-08-31",52.9],["2026-09-01",86.1],["2026-09-02",83.2],["2026-09-03",69.6],["2026-09-04",63.3],["2026-09-07",38.8],["2026-09-08",17.4],["2026-09-09",45.5],["2026-09-10",90.7],["2026-09-11",86.1],["2026-09-14",96.2],["2026-09-15",96],["2026-09-16",92.4],["2026-09-17",53.3],["2026-09-18",70.8],["2026-09-21",17.3],["2026-09-22",17.4],["2026-09-23",63.4],["2026-09-24",90.9],["2026-09-25",77.1],["2026-09-28",93.9],["2026-09-29",96.7],["2026-09-30",89],["2026-10-01",76.7],["2026-10-02",85.2],["2026-10-05",80.5],["2026-10-06",51.1],["2026-10-07",67],["2026-10-08",50.2],["2026-10-09",42.8],["2026-10-12",17.4],["2026-10-13",62.9],["2026-10-14",67.9],["2026-10-15",57.3],["2026-10-16",64.3],["2026-10-19",68.7],["2026-10-20",69.2],["2026-10-21",17.4],["2026-10-22",61],["2026-10-23",82.9],["2026-10-26",72.5],["2026-10-27",51.3],["2026-10-28",55.5],["2026-10-29",17.3],["2026-10-30",55.7],["2026-11-02",60.2],["2026-11-03",73.9],["2026-11-04",61.2],["2026-11-05",82.4],["2026-11-06",79.7],["2026-11-09",17.1],["2026-11-10",51.7],["2026-11-11",67.5],["2026-11-12",75.5],["2026-11-13",77.3],["2026-11-16",94.1],["2026-11-17",95.6],["2026-11-18",98],["2026-11-19",97.8],["2026-11-20",99.2],["2026-11-23",94.8],["2026-11-24",80.5]],"c2":[]}</script>
+      <section aria-labelledby="bt-t">
+        <h2 id="bt-t">燈號分組的歷史統計</h2>
+        <div class="risk"><b>投資風險提示</b>：以下為 2015-08-04 ～ 2026-11-24 的<b>樣本內歷史回測</b>，以六類資產代理標的等權平均計算；前瞻報酬期間重疊、天數不獨立，<b>不代表未來結果，也不是進出場建議</b>。投資一定有風險，基金投資有賺有賠，申購前應詳閱公開說明書。</div>
+        <div class="tw"><table class="bt"><thead><tr><th>MRI 燈號</th><th>天數</th><th>之後 20 日平均</th><th>20 日上漲比例</th><th>之後 60 日平均</th><th>60 日上漲比例</th><th>60 日最差</th></tr></thead><tbody><tr><td>🟢 共振偏低</td><td>1,260</td><td>+0.7%</td><td>59%</td><td>+2.2%</td><td>70%</td><td>-24.0%</td></tr><tr><td>🟡 一般波動</td><td>572</td><td>+0.9%</td><td>61%</td><td>+2.5%</td><td>72%</td><td>-23.7%</td></tr><tr><td>🟠 共振升高</td><td>559</td><td>+0.7%</td><td>57%</td><td>+2.1%</td><td>68%</td><td>-17.7%</td></tr><tr><td>🔴 高度共振</td><td>414</td><td>+0.9%</td><td>64%</td><td>+2.1%</td><td>66%</td><td>-16.8%</td></tr><tr><td>🔴 歷史極端</td><td>137</td><td>+0.2%</td><td>53%</td><td>+2.1%</td><td>48%</td><td>-15.1%</td></tr><tr class="all"><td>全部</td><td>2,942</td><td>+0.7%</td><td>60%</td><td>+2.2%</td><td>69%</td><td>-24.0%</td></tr></tbody></table></div>
+        <p class="hint">怎麼讀：各燈號之後的平均報酬差異不大，<b>單看 MRI 數值不能判斷進場時機</b>。比較不同的是「歷史極端」：之後 60 日上漲比例明顯低於全部樣本，代表極端共振出現時，市場通常還在震盪，不一定是底部。</p>
+      </section><!-- SNAP:MRIPAGE:END -->
+
+    <h2 id="read">怎麼看 MRI 的數字？</h2>
+    <p>MRI 回答一個問題：<b>這次下跌是單一市場的事，還是股、債、金一起跌？</b>單一市場大跌未必是系統性風險；但股票、信用債、公債和黃金同時明顯下跌，通常代表市場正在缺錢、或分散配置失效。</p>
+    <div class="table-wrap"><table class="bands">
+      <thead><tr><th>MRI</th><th style="text-align:left">燈號</th><th style="text-align:left">代表的意思</th></tr></thead>
+      <tbody>
+        <tr><td>0～未滿 40</td><td style="text-align:left">🟢 共振偏低</td><td style="text-align:left">下跌沒有跨市場擴散，各資產各走各的</td></tr>
+        <tr><td>40～未滿 60</td><td style="text-align:left">🟡 一般波動</td><td style="text-align:left">有零星同步下跌，屬於正常波動</td></tr>
+        <tr><td>60～未滿 80</td><td style="text-align:left">🟠 共振升高</td><td style="text-align:left">多項資產開始一起跌，分散效果變弱</td></tr>
+        <tr><td>80～未滿 95</td><td style="text-align:left">🔴 高度共振</td><td style="text-align:left">股、債、金多數同步下跌，市場壓力明顯</td></tr>
+        <tr><td>95～100</td><td style="text-align:left">🔴 歷史極端</td><td style="text-align:left">同步下跌強度落在近 5 年最高的 5%</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">MRI 是「歷史百分位」：80 代表今天的同步下跌強度，高於近 5 年約 80% 的交易日。單一市場暴跌、其他資產沒跌時，MRI 會很低，這是刻意的設計，因為 MRI 只看「一起跌」。</p>
+
+    <h2 id="events">歷史上的重大共振事件</h2>
+    <ul class="timeline">
+      <li><b>2020 年 2～3 月｜疫情衝擊</b>：六類資產幾乎全數同步下跌，連黃金也大跌，是 MRI 樣本中最劇烈的一次。市場急需現金時，避險資產也會被賣出。</li>
+      <li><b>2022 年 9～10 月｜快速升息</b>：美國公債先跌，股市隨後跟上。利率驅動的下跌，常見公債領先其他資產。</li>
+      <li><b>2025 年 4 月｜關稅衝擊</b>：衝擊來得急、退得也快，約一週後 MRI 就回到綠燈區。</li>
+      <li><b>2026 年 11 月</b>：公債先跌、黃金同步走弱，11/17 起進入歷史極端區，見上方即時走勢。</li>
+    </ul>
+    <p class="note">以上是事後回顧，事件數量少，不能當作會重複發生的規律。</p>
+
+    <h2 id="vix">MRI 和 VIX 恐慌指數有什麼不同？</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th style="text-align:left">指標</th><th style="text-align:left">衡量什麼</th><th style="text-align:left">範圍</th></tr></thead>
+      <tbody>
+        <tr><td>VIX</td><td style="text-align:left">標普 500 選擇權的隱含波動率，市場對未來 30 天的「預期」</td><td style="text-align:left">只看美股</td></tr>
+        <tr><td>MRI</td><td style="text-align:left">近 5 個交易日「已經發生」的同步下跌</td><td style="text-align:left">股、債、金六類資產</td></tr>
+      </tbody>
+    </table></div>
+    <p>兩個一起看：VIX 高、MRI 低，代表美股很緊張但還沒擴散；MRI 高、VIX 不高，代表多類資產已經一起跌，只是美股的恐慌還沒反映出來。</p>
+
+    <h2 id="method">MRI 怎麼計算？</h2>
+    <ol class="steps">
+      <li><b>算每類資產的下跌強度</b>：取近 5 個交易日的報酬（含配息還原），除以該資產過去約一年的正常波動。只看下跌，上漲記為 0。數值 1 以上代表「比平常明顯的下跌」。</li>
+      <li><b>算「一起跌」的程度</b>：把六類資產兩兩配對，看每一對是否同時下跌、跌得多深，再取平均。只有一類資產大跌、其他沒跌時，這個值是 0。</li>
+      <li><b>換成 0～100</b>：和近 5 年（約 1,260 個交易日）的歷史比較，換算成百分位，就是 MRI。</li>
+    </ol>
+    <p><b>代理標的</b>：美股、台股、歐股、高收益債、美國公債、黃金各一檔代表性基金的還原淨值（含配息還原）。</p>
+    <p><b>限制</b>：代理標的是基金而非指數，含費用與經理人差異；除台股外以美元計價，數值包含匯率影響，反映的是「台灣投資人持有境外基金時看到的共振」；各市場收盤時間不同，同一事件可能分散在相鄰兩天。方法版本 v0.1.0，若有調整會標示新版本號。</p>
+
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">常見問題</h2>
+      <details><summary>MRI 很高，是不是該賣出？</summary><p>不是。MRI 描述的是「已經發生」的跨資產同步下跌，不是崩盤機率，也不是買賣訊號。歷史上各燈號之後的平均報酬差異不大，單看 MRI 不能判斷進出場時機。它比較適合用來確認：現在的下跌是單一市場的事，還是分散配置也一起失效。</p></details>
+      <details><summary>MRI 和 VIX 有什麼不同？</summary><p>VIX 是標普 500 選擇權的隱含波動率，反映市場對未來 30 天美股波動的預期；MRI 量測的是已經發生、而且跨越股票、債券、黃金的同步下跌。VIX 高但 MRI 低，代表美股緊張但尚未擴散；MRI 高但 VIX 不高，代表多類資產已經一起跌。</p></details>
+      <details><summary>為什麼公債和黃金也會一起跌？</summary><p>公債和黃金常被當作避險資產，但在利率快速上升（例如 2022 年）或市場急需現金時（例如 2020 年 3 月），投資人會同時賣出各種資產換現金，避險資產也會下跌。MRI 會把這種「避險失效」的狀況反映出來。</p></details>
+      <details><summary>MRI 多久更新一次？</summary><p>每天自動更新一次。六類代理標的都更新淨值後才計算，任一資料尚未更新時沿用前一天的數值。</p></details>
+    </section>
+
+    <h2>延伸閱讀</h2>
+    <div class="related">
+      <a href="/momo-blog/posts/2026-10-post01/"><span class="t">配置筆記・資產配置</span><span class="h">股、債、黃金一起跌，資產配置失效了嗎？</span></a>
+      <a href="/MOMO_FinSphere/indicators/us10y.html"><span class="t">經濟指標・利率</span><span class="h">美國 10 年期公債殖利率：最新數據與走勢</span></a>
+      <a href="/MOMO_FinSphere/tools/cycle.html"><span class="t">工具・景氣</span><span class="h">景氣循環儀表板：短週期 MCS × 長週期康波</span></a>
+      <a href="/MOMO_FinSphere/tools/dividend-health.html"><span class="t">MOMO 原創數據</span><span class="h">配息基金健康度報告</span></a>
+    </div>
+
+    <p class="src">MOMO 市場共振指數（MRI）由明哲MOMO自主設計，資料取自各代理基金之還原淨值，每日自動更新；原始數據下載：<a href="/MOMO_FinSphere/data/mri.json">mri.json</a>。<br /><b>投資風險提示</b>：本頁內容僅供市場觀察與教育參考，不構成投資建議、報酬承諾或保證。歷史回測為樣本內研究，不代表未來結果；指標可能出現落後、誤報或失效。投資一定有風險，基金投資有賺有賠，申購前應詳閱公開說明書。</p>
+  </main>
+  <script>
+  (function () {
+    var el = document.getElementById('mri-data'); if (!el) return;
+    var D = JSON.parse(el.textContent);
+    ['c1', 'c2'].forEach(function (k) {
+      var svg = document.getElementById('mri-' + k), pts = D[k]; if (!svg || !pts || !pts.length) return;
+      var t0 = +svg.dataset.t0, t1 = +svg.dataset.t1, L = +svg.dataset.l, iw = +svg.dataset.iw;
+      var g = svg.querySelector('.mri-hover'), ln = g.querySelector('line'), c = g.querySelector('circle'), tip = svg.parentNode.querySelector('.mri-tip');
+      var ts = pts.map(function (p) { return Date.parse(p[0]); });
+      function move(ev) {
+        var r = svg.getBoundingClientRect(), x = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left) / r.width * svg.viewBox.baseVal.width;
+        var t = t0 + (x - L) / iw * (t1 - t0), lo = 0, hi = ts.length - 1;
+        while (hi - lo > 1) { var m = (lo + hi) >> 1; if (ts[m] < t) lo = m; else hi = m; }
+        var i = Math.abs(ts[lo] - t) < Math.abs(ts[hi] - t) ? lo : hi, p = pts[i];
+        var px = L + (ts[i] - t0) / (t1 - t0) * iw, py = 12 + (1 - p[1] / 100) * 182;
+        ln.setAttribute('x1', px); ln.setAttribute('x2', px); c.setAttribute('cx', px); c.setAttribute('cy', py);
+        g.style.display = ''; tip.hidden = false; tip.textContent = p[0] + '｜MRI ' + p[1].toFixed(1);
+      }
+      svg.addEventListener('mousemove', move); svg.addEventListener('touchmove', move, { passive: true });
+      svg.addEventListener('mouseleave', function () { g.style.display = 'none'; tip.hidden = true; });
+    });
+  })();
+  </script>
+</body>
+</html>
