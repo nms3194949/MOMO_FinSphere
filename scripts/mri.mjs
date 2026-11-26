@@ -57,11 +57,11 @@ function heroCard(d) {
   const chips = d.assets.map((a) => { const x = d.components[a.key]; const on = x != null && x >= 1; return `<span class="mri-a${on ? ' on' : ''}" title="${esc(a.label)}：下跌強度 ${x == null ? 'N/A' : x.toFixed(2)}">${esc(a.label)}</span>`; }).join('');
   const chg = prev == null ? '' : `前一日 ${prev.toFixed(1)}${wk != null ? `｜一週前 ${wk.toFixed(1)}` : ''}`;
   return `
-          <a class="mri-card" href="indicators/mri.html" aria-label="MOMO 市場共振指數 ${d.value.toFixed(1)}，${b.name}，了解 MRI">
+          <a class="mri-card" style="--bc:${b.color}" href="indicators/mri.html" aria-label="MOMO 市場共振指數 ${d.value.toFixed(1)}，${b.name}，了解 MRI">
             <div class="mri-hd"><b>MOMO 市場共振指數 MRI</b><time datetime="${d.as_of}">${d.as_of}</time></div>
-            ${gauge(d.value, { w: 240, dark: true, id: 'mri-h' })}
+            ${gauge(d.value, { w: 250, dark: false, id: 'mri-h' })}
             <div class="mri-val"><strong>${d.value.toFixed(1)}</strong><span class="mri-band b-${b.key}">${b.icon} ${b.name}</span></div>
-            <p class="mri-note">${esc(b.note)}${d.participating_assets ? `｜今天 ${d.participating_assets} 類資產明顯下跌` : ''}</p>
+            <p class="mri-note">${esc(b.note)}${d.participating_assets ? `<br>今天 <b>${d.participating_assets}</b> 類資產明顯下跌` : ''}</p>
             <div class="mri-assets">${chips}</div>
             <div class="mri-ft"><span>${chg}</span><span class="go">了解 MRI →</span></div>
           </a>
