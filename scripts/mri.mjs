@@ -69,6 +69,7 @@ function heroCard(d) {
 }
 
 // ---------- 走勢圖 ----------
+const MA = 10;   // 走勢圖的平滑天數（只影響圖，不改變 MRI 本身）
 const EVENTS = [['2020-02-24', '2020 疫情'], ['2022-09-19', '2022 升息'], ['2025-04-04', '2025 關稅'], ['2026-11-17', '2026/11']];
 function chart(H, { id, title }) {
   const W = 760, Ht = 220, L = 34, R = 10, T = 12, B = 26, iw = W - L - R, ih = Ht - T - B;
@@ -84,8 +85,9 @@ function chart(H, { id, title }) {
   else { const c = new Date(Date.UTC(s.getUTCFullYear(), s.getUTCMonth() + 1, 1)); while (c <= e) { if (c.getUTCMonth() % 2 === 0) ticks.push([c.toISOString().slice(0, 10), `${c.getUTCFullYear() % 100}/${c.getUTCMonth() + 1}`]); c.setUTCMonth(c.getUTCMonth() + 1); } }
   const xt = ticks.map(([d, l]) => `<text x="${X(d).toFixed(1)}" y="${Ht - 8}" font-size="10" fill="#7a8296" text-anchor="middle">${l}</text>`).join('');
   const pts = H.map((p) => `${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(' ');
+  const mpts = H.filter((p) => p[3] != null).map((p) => `${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join(' ');
   const ev = EVENTS.filter(([d]) => Date.parse(d) >= t0 && Date.parse(d) <= t1).map(([d, l]) => `<line x1="${X(d).toFixed(1)}" x2="${X(d).toFixed(1)}" y1="${T}" y2="${T + ih}" stroke="#0c152a" stroke-dasharray="3 3" opacity=".45"/><text x="${(X(d) > L + iw - 60 ? X(d) - 4 : X(d) + 4).toFixed(1)}" y="${T + 11}" font-size="10" fill="#0c152a" text-anchor="${X(d) > L + iw - 60 ? 'end' : 'start'}">${l}</text>`).join('');
-  return `<figure class="mri-chart"><figcaption>${esc(title)}</figcaption><svg id="${id}" viewBox="0 0 ${W} ${Ht}" role="img" aria-label="${esc(title)}" data-t0="${t0}" data-t1="${t1}" data-l="${L}" data-iw="${iw}">${bands}${grid}${xt}${ev}<polyline points="${pts}" fill="none" stroke="#0c152a" stroke-width="${long ? 0.9 : 1.4}" stroke-linejoin="round"/><g class="mri-hover" style="display:none"><line y1="${T}" y2="${T + ih}" stroke="#a88a3d"/><circle r="4" fill="#a88a3d"/></g></svg><div class="mri-tip" hidden></div></figure>`;
+  return `<figure class="mri-chart"><figcaption>${esc(title)}<span class="lg"><i class="lg-ma"></i>${MA} 日平均</span><span class="lg"><i class="lg-d"></i>每日數值</span></figcaption><svg id="${id}" viewBox="0 0 ${W} ${Ht}" role="img" aria-label="${esc(title)}" data-t0="${t0}" data-t1="${t1}" data-l="${L}" data-iw="${iw}">${bands}${grid}${xt}${ev}<polyline points="${pts}" fill="none" stroke="#9aa3b5" stroke-width="${long ? 0.5 : 0.9}" stroke-linejoin="round" opacity="${long ? 0.45 : 0.7}"/><polyline points="${mpts}" fill="none" stroke="#0c152a" stroke-width="${long ? 1.6 : 2.4}" stroke-linejoin="round"/><g class="mri-hover" style="display:none"><line y1="${T}" y2="${T + ih}" stroke="#a88a3d"/><circle r="4" fill="#a88a3d"/></g></svg><div class="mri-tip" hidden></div></figure>`;
 }
 
 // ---------- 說明頁數據區 ----------
@@ -96,7 +98,8 @@ function pageBlock(d) {
     const x = d.components[a.key], w = x == null ? 0 : Math.min(100, x / 4 * 100);
     return `<div class="cp${x != null && x >= 1 ? ' on' : ''}"><span class="cl">${esc(a.label)}</span><span class="cb"><i style="width:${w.toFixed(0)}%"></i></span><span class="cv">${x == null ? 'N/A' : x.toFixed(2)}</span></div>`;
   }).join('');
-  const last1y = H.filter((p) => Date.parse(p[0]) >= Date.parse(d.as_of) - 365 * 864e5);
+  const HM = H.map((p, i) => { if (i < MA - 1) return [p[0], p[1], p[2], null]; let t = 0; for (let k = i - MA + 1; k <= i; k++) t += H[k][1]; return [p[0], p[1], p[2], Math.round(t / MA * 10) / 10]; });
+  const last1y = HM.filter((p) => Date.parse(p[0]) >= Date.parse(d.as_of) - 365 * 864e5);
   const longChart = Date.parse(d.as_of) - Date.parse(H[0][0]) > 3 * 365 * 864e5;
   const rows = (d.summary || []).map((s) => `<tr${s.band === '全部' ? ' class="all"' : ''}><td>${esc(s.band)}</td><td>${s.days.toLocaleString('en-US')}</td><td>${pct(s.f20)}</td><td>${pc0(s.up20)}</td><td>${pct(s.f60)}</td><td>${pc0(s.up60)}</td><td>${pct(s.worst60)}</td></tr>`).join('');
   return `
@@ -117,10 +120,10 @@ function pageBlock(d) {
       </section>
       <section aria-labelledby="hist-t">
         <h2 id="hist-t">歷史走勢</h2>
-        ${chart(last1y, { id: 'mri-c1', title: '近一年 MRI（滑過圖表看每日數值）' })}
-        ${longChart ? chart(H, { id: 'mri-c2', title: `${H[0][0].slice(0, 4)} 年至今 MRI（虛線為重大事件）` }) : ''}
+        ${chart(last1y, { id: 'mri-c1', title: '近一年 MRI' })}
+        ${longChart ? chart(HM, { id: 'mri-c2', title: `${H[0][0].slice(0, 4)} 年至今 MRI（虛線為重大事件）` }) : ''}
       </section>
-      <script type="application/json" id="mri-data">${JSON.stringify({ c1: last1y.map((p) => [p[0], p[1]]), c2: longChart ? H.map((p) => [p[0], p[1]]) : [] })}</script>
+      <script type="application/json" id="mri-data">${JSON.stringify({ c1: last1y.map((p) => [p[0], p[1], p[3]]), c2: longChart ? HM.map((p) => [p[0], p[1], p[3]]) : [] })}</script>
       ${rows ? `<section aria-labelledby="bt-t">
         <h2 id="bt-t">燈號分組的歷史統計</h2>
         <div class="risk"><b>投資風險提示</b>：以下為 ${esc(d.sample)} 的<b>樣本內歷史回測</b>，以六類資產代理標的等權平均計算；前瞻報酬期間重疊、天數不獨立，<b>不代表未來結果，也不是進出場建議</b>。投資一定有風險，基金投資有賺有賠，申購前應詳閱公開說明書。</div>
