@@ -76,9 +76,11 @@ export function network(d, { w = 280, id = 'n' } = {}) {
       + `<text x="${n.x.toFixed(1)}" y="${(n.y - 2).toFixed(1)}" font-size="12.5" font-weight="700" fill="${c.text}" text-anchor="middle">${SHORT[n.k]}</text>`
       + `<text x="${n.x.toFixed(1)}" y="${(n.y + 13).toFixed(1)}" font-size="11" fill="${c.text}" text-anchor="middle">${sub}</text></g>`;
   }).join('');
-  const core = `<circle cx="${cx}" cy="${cy}" r="40" fill="${b.color}"/><circle cx="${cx}" cy="${cy}" r="46" fill="none" stroke="${b.color}" stroke-width="2" opacity=".35"/>`
+  // 中心 MRI：向外擴散的波紋，共振越高波紋越快、越多；高度共振以上加上心跳，歷史極端再加輕微震動（CSS 動畫，見頁面樣式 .mri-core）
+  const waves = [0, 1, 2].map((i) => `<circle class="mri-wave w${i}" cx="${cx}" cy="${cy}" r="40" fill="none" stroke="${b.color}" stroke-width="3"/>`).join('');
+  const core = `<g class="mri-core lv-${b.key}">${waves}<g class="mri-beat"><circle cx="${cx}" cy="${cy}" r="40" fill="${b.color}"/><circle cx="${cx}" cy="${cy}" r="46" fill="none" stroke="${b.color}" stroke-width="2" opacity=".35"/>`
     + `<text x="${cx}" y="${cy - 8}" font-size="15" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">MRI</text>`
-    + `<text x="${cx}" y="${cy + 17}" font-size="23" font-weight="900" fill="#fff" text-anchor="middle">${d.value.toFixed(1)}</text>`;
+    + `<text x="${cx}" y="${cy + 17}" font-size="23" font-weight="900" fill="#fff" text-anchor="middle">${d.value.toFixed(1)}</text></g></g>`;
   return `<svg class="mri-net" viewBox="0 0 300 300" width="${w}" role="img" aria-labelledby="${id}-t"><title id="${id}-t">共振網路圖：MRI ${d.value.toFixed(1)}，${b.name}；${d.participating_assets} 類資產明顯下跌，紅線代表兩類資產同時下跌</title>${faint}${spokes}${hot}${core}${nodes}</svg>`;
 }
 
