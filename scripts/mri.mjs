@@ -50,19 +50,60 @@ export function gauge(v, { w = 260, dark = true, id = 'g' } = {}) {
     + `<circle cx="${cx}" cy="${cy}" r="9" fill="${needle}"/><circle cx="${cx}" cy="${cy}" r="4" fill="${dark ? '#0c152a' : '#fffdf8'}"/></svg>`;
 }
 
+
+// ---------- 共振網路圖（正六邊形：六資產兩兩連線，中間 MRI） ----------
+const ORDER = ['us_eq', 'tw_eq', 'eu_eq', 'hy', 'ust', 'gold'];   // 上、右上、右下、下、左下、左上
+const SHORT = { us_eq: '美股', tw_eq: '台股', eu_eq: '歐股', hy: '高收債', ust: '公債', gold: '黃金' };
+export function network(d, { w = 280, id = 'n' } = {}) {
+  const cx = 150, cy = 150, R = 108, nr = 27, b = band(d.value);
+  const P = ORDER.map((k, i) => { const a = (-90 + 60 * i) * Math.PI / 180; return { k, x: cx + R * Math.cos(a), y: cy + R * Math.sin(a), v: d.components[k], r5: d.returns5 ? d.returns5[k] : null }; });
+  const lv = (v) => (v == null ? 0 : v >= 1 ? 2 : v > 0 ? 1 : 0);
+  const C = { 2: { fill: '#fbe2e2', stroke: '#d64545', text: '#a12d2d' }, 1: { fill: '#fdeedd', stroke: '#e8873a', text: '#a1531a' }, 0: { fill: '#f4f0e6', stroke: '#d3cdbf', text: '#9aa0ab' } };
+  let faint = '', hot = '';
+  for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+    const A = P[i], B = P[j], va = A.v || 0, vb = B.v || 0;
+    const seg = `x1="${A.x.toFixed(1)}" y1="${A.y.toFixed(1)}" x2="${B.x.toFixed(1)}" y2="${B.y.toFixed(1)}"`;
+    if (va > 0 && vb > 0) {
+      const s = Math.sqrt(va * vb), col = va >= 1 && vb >= 1 ? '#d64545' : '#e8873a';
+      hot += `<line ${seg} stroke="${col}" stroke-width="${Math.min(5, 1.2 + 1.8 * s).toFixed(1)}" opacity="${Math.min(0.9, 0.45 + 0.25 * s).toFixed(2)}"/>`;
+    } else faint += `<line ${seg} stroke="#e2dccd" stroke-width="1"/>`;
+  }
+  const spokes = P.map((n) => { const L = lv(n.v); return `<line x1="${cx}" y1="${cy}" x2="${n.x.toFixed(1)}" y2="${n.y.toFixed(1)}" stroke="${L ? C[L].stroke : '#e2dccd'}" stroke-width="${L === 2 ? 2 : 1}" opacity="${L ? 0.55 : 1}"/>`; }).join('');
+  const nodes = P.map((n) => {
+    const L = lv(n.v), c = C[L];
+    const sub = n.r5 != null && isFinite(n.r5) ? (n.r5 >= 0 ? '+' : '−') + Math.abs(n.r5 * 100).toFixed(1) + '%' : (n.v == null ? 'N/A' : '強度 ' + n.v.toFixed(2));
+    return `<g><title>${SHORT[n.k]}：下跌強度 ${n.v == null ? 'N/A' : n.v.toFixed(2)}${n.r5 != null ? `，近 5 日 ${(n.r5 * 100).toFixed(1)}%` : ''}</title><circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${nr}" fill="${c.fill}" stroke="${c.stroke}" stroke-width="${L === 2 ? 2.4 : 1.4}"/>`
+      + `<text x="${n.x.toFixed(1)}" y="${(n.y - 2).toFixed(1)}" font-size="12.5" font-weight="700" fill="${c.text}" text-anchor="middle">${SHORT[n.k]}</text>`
+      + `<text x="${n.x.toFixed(1)}" y="${(n.y + 13).toFixed(1)}" font-size="11" fill="${c.text}" text-anchor="middle">${sub}</text></g>`;
+  }).join('');
+  const core = `<circle cx="${cx}" cy="${cy}" r="40" fill="${b.color}"/><circle cx="${cx}" cy="${cy}" r="46" fill="none" stroke="${b.color}" stroke-width="2" opacity=".35"/>`
+    + `<text x="${cx}" y="${cy - 8}" font-size="15" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">MRI</text>`
+    + `<text x="${cx}" y="${cy + 17}" font-size="23" font-weight="900" fill="#fff" text-anchor="middle">${d.value.toFixed(1)}</text>`;
+  return `<svg class="mri-net" viewBox="0 0 300 300" width="${w}" role="img" aria-labelledby="${id}-t"><title id="${id}-t">共振網路圖：MRI ${d.value.toFixed(1)}，${b.name}；${d.participating_assets} 類資產明顯下跌，紅線代表兩類資產同時下跌</title>${faint}${spokes}${hot}${core}${nodes}</svg>`;
+}
+
+// ---------- 五段色條＋目前位置 ----------
+export function scale(v) {
+  const W = 264, X = (t) => (t / 100) * W;
+  let lo = 0;
+  const segs = BANDS.map((b) => { const hi = Math.min(100, b.max); const r = `<rect x="${(X(lo) + 1).toFixed(1)}" y="12" width="${(X(hi) - X(lo) - 2).toFixed(1)}" height="8" rx="4" fill="${b.color}"/>`; lo = hi; return r; }).join('');
+  const m = X(Math.max(0, Math.min(100, v)));
+  const lab = [0, 40, 60, 80, 95].map((t) => `<text x="${X(t).toFixed(1)}" y="34" font-size="10" fill="#7a8296" text-anchor="${t === 0 ? 'start' : 'middle'}">${t}</text>`).join('');
+  return `<svg class="mri-scale" viewBox="0 0 ${W} 38" role="img" aria-label="MRI 位於 0～100 的 ${v.toFixed(1)}">${segs}<path d="M${m.toFixed(1)},11 l-5,-8 h10 z" fill="#0c152a"/>${lab}</svg>`;
+}
+
 // ---------- 首頁卡片 ----------
 function heroCard(d) {
   const b = band(d.value), H = d.history, n = H.length;
   const prev = n > 1 ? H[n - 2][1] : null, wk = n > 5 ? H[n - 6][1] : null;
-  const chips = d.assets.map((a) => { const x = d.components[a.key]; const on = x != null && x >= 1; return `<span class="mri-a${on ? ' on' : ''}" title="${esc(a.label)}：下跌強度 ${x == null ? 'N/A' : x.toFixed(2)}">${esc(a.label)}</span>`; }).join('');
   const chg = prev == null ? '' : `前一日 ${prev.toFixed(1)}${wk != null ? `｜一週前 ${wk.toFixed(1)}` : ''}`;
   return `
           <a class="mri-card" style="--bc:${b.color}" href="indicators/mri.html" aria-label="MOMO 市場共振指數 ${d.value.toFixed(1)}，${b.name}，了解 MRI">
-            <div class="mri-hd"><b>MOMO 市場共振指數 MRI</b><time datetime="${d.as_of}">${d.as_of}</time></div>
-            ${gauge(d.value, { w: 250, dark: false, id: 'mri-h' })}
-            <div class="mri-val"><strong>${d.value.toFixed(1)}</strong><span class="mri-band b-${b.key}">${b.icon} ${b.name}</span></div>
-            <p class="mri-note">${esc(b.note)}${d.participating_assets ? `<br>今天 <b>${d.participating_assets}</b> 類資產明顯下跌` : ''}</p>
-            <div class="mri-assets">${chips}</div>
+            <div class="mri-hd"><b>MOMO 市場共振指數</b><time datetime="${d.as_of}">${d.as_of}</time></div>
+            <div class="mri-top"><span class="mri-band b-${b.key}">${b.icon} ${b.name}</span><span class="mri-cnt">${d.participating_assets} / 6 類資產明顯下跌</span></div>
+            ${network(d, { w: 270, id: 'mri-h' })}
+            ${scale(d.value)}
+            <p class="mri-note">${esc(b.note)}</p>
             <div class="mri-ft"><span>${chg}</span><span class="go">了解 MRI →</span></div>
           </a>
           `;
@@ -105,7 +146,7 @@ function pageBlock(d) {
   return `
       <section class="mri-now" aria-labelledby="now-t">
         <h2 id="now-t" class="sr">今天的 MRI</h2>
-        <div class="now-g">${gauge(d.value, { w: 300, dark: false, id: 'mri-p' })}
+        <div class="now-g"><div class="now-net">${network(d, { w: 320, id: 'mri-p' })}${scale(d.value)}</div>
           <div class="now-v"><strong>${d.value.toFixed(1)}</strong><span class="mri-band b-${b.key}">${b.icon} ${b.name}</span><p>${esc(b.note)}</p><p class="asof">資料日期 <time datetime="${d.as_of}">${d.as_of}</time>｜方法版本 v${esc(d.method_version)}</p></div>
         </div>
         <div class="now-k">
@@ -114,6 +155,7 @@ function pageBlock(d) {
           <div><span>一個月前</span><b>${mo ? mo[1].toFixed(1) : '—'}</b></div>
           <div><span>明顯下跌資產</span><b>${d.participating_assets} / 6</b></div>
         </div>
+        <p class="hint">網路圖怎麼看：球越紅代表該資產跌得越明顯；兩顆球之間的線越紅越粗，代表這兩類資產正在一起跌；淡色線代表沒有同步下跌。中間是今天的 MRI。</p>
         <h3>六類資產今天的下跌強度</h3>
         <p class="hint">數值是近 5 個交易日的跌幅除以該資產平常的波動；1 以上代表「比平常明顯的下跌」，0 代表沒有下跌。</p>
         <div class="comp">${comp}</div>
