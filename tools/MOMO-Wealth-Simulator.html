@@ -362,6 +362,32 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
 #load-status{margin-top:0;cursor:pointer;}
 #load-status .reload-hint{margin-left:auto;font-size:13px;color:var(--muted);opacity:.7;}
 #load-status:hover .reload-hint{opacity:1;}
+/* ═══ 結論橫幅＋對決條（取代 6 張 KPI 卡）═══ */
+.bottom-grid .kpi-row{display:none !important;}
+.vd-banner{border-radius:16px;padding:20px 24px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;background:linear-gradient(180deg,rgba(249,226,124,.10),rgba(0,0,0,.25));border:1px solid rgba(249,226,124,.28);}
+.vd-k{font-size:13px;font-weight:800;color:#d9c27a;}
+.vd-v{font-size:42px;font-weight:900;color:#fff;line-height:1.15;letter-spacing:.3px;}
+.vd-s{font-size:13px;color:#aab2bf;font-weight:700;margin-top:4px;}
+.vd-s .up{color:#7fd6a4;} .vd-s .dn{color:#fca5a5;}
+.vd-r{text-align:right;font-size:12px;color:#aab2bf;font-weight:800;}
+.vd-r b{display:block;font-size:22px;color:#fff;font-weight:900;margin-top:2px;}
+.vd-bars{margin-top:12px;border-radius:16px;padding:16px 20px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06);}
+.vd-leg{display:flex;gap:16px;font-size:12px;color:#8aa0b8;font-weight:800;margin-bottom:12px;}
+.vd-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
+.vd-grid{display:grid;grid-template-columns:86px minmax(0,1fr) 120px;gap:10px 12px;align-items:center;font-size:13px;font-weight:800;color:#e2e8f0;}
+.vd-bar{display:flex;height:30px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.04);}
+.vd-bar div{display:flex;align-items:center;font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;}
+.vd-bar .p{padding-left:10px;color:#0A1221;} .vd-bar .d{justify-content:flex-end;padding-right:8px;}
+.vd-tot{text-align:right;font-size:15px;font-weight:900;}
+.vd-foot{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#8aa0b8;font-weight:800;}
+.vd-foot b{font-weight:900;} .vd-foot .neg{color:#f87171;}
+body.theme-a .vd-banner{background:#0c152a;border-color:#0c152a;}
+body.theme-a .vd-k{color:#c9b77a;}
+body.theme-a .vd-bars{background:#fffdf8;border-color:#e4dccb;}
+body.theme-a .vd-leg,body.theme-a .vd-foot{color:#7a8296;} body.theme-a .vd-foot{border-top-color:#ece5d6;}
+body.theme-a .vd-grid{color:#0c152a;} body.theme-a .vd-bar{background:#f6f1e7;}
+body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} body.theme-a .vd-foot b{color:#0c152a;}
+@media(max-width:640px){.vd-v{font-size:32px;}.vd-grid{grid-template-columns:64px minmax(0,1fr);}.vd-tot{grid-column:2;text-align:left;margin-top:-6px;}}
   </style>
   <!-- MOMO財商智庫：網站圖示、GA4、統一頁尾與免責聲明 -->
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -537,6 +563,17 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
         </div>
 
         <div class="bottom-grid">
+          <div id="verdict">
+            <div class="vd-banner">
+              <div><div class="vd-k" id="vd-k">MOMO 配置比原始方案多出</div><div class="vd-v" id="vd-v">$ 0</div><div class="vd-s" id="vd-s">請先選擇基金並確認選擇</div></div>
+              <div class="vd-r" id="vd-r">期末本金差額<b id="vd-pd">$ 0</b></div>
+            </div>
+            <div class="vd-bars">
+              <div class="vd-leg"><span><i id="vd-lp"></i>期末本金</span><span><i id="vd-ld"></i>累積配息</span></div>
+              <div class="vd-grid" id="vd-grid"></div>
+              <div class="vd-foot" id="vd-foot"></div>
+            </div>
+          </div>
           <div class="kpi-row">
             <div class="metric-card">
               <div class="metric-top">
@@ -1454,7 +1491,14 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
           layout: { padding: { bottom: 36, left: 4, right: 6, top: 6 } },
           scales: {
             x: { grid: { color: t.grid }, ticks: { color: t.tick, maxTicksLimit: 10, autoSkip: true, padding: 14, maxRotation: 45, minRotation: 35 } },
-            y: { grid: { color: t.grid }, ticks: { color: t.tick, callback: v => money(v).replace('$ ', '$') } }
+            y: { grid: { color: t.grid }, ticks: { color: t.tick, callback: v => money(v).replace('$ ', '$') } },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, border: { display: false },
+                  afterDataLimits: sc => {
+                    const ch = sc.chart; let lo = Infinity, hi = -Infinity;
+                    ch.data.datasets.forEach((d, k) => { if (!ch.isDatasetVisible(k)) return; d.data.forEach(v => { if (typeof v === 'number' && isFinite(v)){ if (v < lo) lo = v; if (v > hi) hi = v; } }); });
+                    if (lo !== Infinity){ sc.min = lo; sc.max = hi; }
+                  },
+                  ticks: { color: t.tick, callback: v => { const p0 = num('p0') || 1; const r = (v / p0 - 1) * 100; return `${r > 0 ? '+' : ''}${r.toFixed(0)}%`; } } }
           },
           plugins: {
             legend: { labels: { color: t.legend, boxWidth: 12, boxHeight: 12, usePointStyle: true } },
@@ -1558,6 +1602,7 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
       updateDisclaimer(null);
       $('lead-div-ratio').textContent = '—';
       setLeadCard(0, 1, 0, 0);
+      renderVerdict(null);
       $('mdd-tbody').innerHTML = '<tr><td colspan="4" style="color:#475569;text-align:center;padding:20px;">請先選擇基金並確認選擇</td></tr>';
     }
 
@@ -1639,9 +1684,56 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
       $('bench-mdd').textContent = `${(bD?.mdd ?? 0).toFixed(1)}%`;
       renderMddTable(mD, bD);
       state.last = { s, cmp, mD, bD, momoTW, benchTW, momoDiv, benchDiv };
+      renderVerdict({ s, mD, bD, momoP, benchP, momoDiv, benchDiv });
       if ($('present').classList.contains('on')) renderPresent();
 
       drawCorrMatrix();
+    }
+
+    function renderVerdict(L){
+      const brand = isBrand();
+      const C = brand ? { ap:'#a88a3d', ad:'#e2d5ad', bp:'#8b96ab', bd:'#d5dae4', bt:'#44506a' }
+                      : { ap:'#F9E27C', ad:'rgba(249,226,124,.35)', bp:'#38BDF8', bd:'rgba(56,189,248,.35)', bt:'#9fb2c7' };
+      $('vd-lp').style.background = C.ap; $('vd-ld').style.background = C.ad;
+      const wan = v => (v / 10000).toFixed(1) + ' 萬';
+      const pctTxt = v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
+      if (!L){
+        $('vd-k').textContent = 'MOMO 配置比原始方案多出'; $('vd-v').textContent = money(0);
+        $('vd-s').textContent = '請先選擇基金並確認選擇'; $('vd-pd').textContent = money(0);
+        $('vd-grid').innerHTML = ''; $('vd-foot').innerHTML = ''; return;
+      }
+      const { s, mD, bD, momoP, benchP, momoDiv, benchDiv } = L;
+      const momoTW = momoP + momoDiv, benchTW = benchP + benchDiv;
+      const hasA = !!s.momoP, hasB = !!s.benchP;
+      if (hasA && hasB){
+        const lead = momoTW - benchTW, pd = momoP - benchP, dd = momoDiv - benchDiv;
+        const lp = benchTW ? lead / benchTW * 100 : 0;
+        $('vd-k').textContent = lead >= 0 ? 'MOMO 配置比原始方案多出' : 'MOMO 配置比原始方案少了';
+        $('vd-v').textContent = money(Math.abs(lead));
+        let tail = '';
+        if (Math.abs(dd) > 1){
+          if (dd < 0 && lead > 0) tail = `　·　少領配息 ${money(-dd)}，換回 ${(lead / -dd).toFixed(2)} 倍`;
+          else tail = `　·　${dd < 0 ? '少領' : '多領'}配息 ${money(Math.abs(dd))}`;
+        }
+        $('vd-s').innerHTML = `總含息價值 <span class="${lp >= 0 ? 'up' : 'dn'}">${pctTxt(lp)}</span>${tail}`;
+        $('vd-r').innerHTML = `期末本金差額<b id="vd-pd">${pd >= 0 ? '+' : '-'}${money(Math.abs(pd)).replace('$ ', '$ ')}</b>`;
+      } else {
+        const P = hasA ? momoP : benchP, TW = hasA ? momoTW : benchTW, arr = hasA ? s.momoP : s.benchP;
+        $('vd-k').textContent = (hasA ? 'MOMO 配置' : '原始方案') + '｜總含息價值';
+        $('vd-v').textContent = money(TW);
+        $('vd-s').innerHTML = `本金報酬 <span class="${P >= arr[0] ? 'up' : 'dn'}">${pctTxt((P / arr[0] - 1) * 100)}</span>（不含息）`;
+        $('vd-r').innerHTML = `期末本金<b id="vd-pd">${money(P)}</b>`;
+      }
+      const max = Math.max(hasA ? momoTW : 0, hasB ? benchTW : 0) || 1;
+      const row = (name, P, D, TW, cp, cd, strong) => `
+        <span style="${strong ? '' : `color:${C.bt}`}">${name}</span>
+        <div class="vd-bar"><div class="p" style="width:${(P / max * 100).toFixed(2)}%;background:${cp}">本金 ${wan(P)}</div><div class="d" style="width:${(D / max * 100).toFixed(2)}%;background:${cd};padding:0"></div></div>
+        <span class="vd-tot" style="${strong ? '' : `color:${C.bt}`}">${money(TW)}</span>`;
+      $('vd-grid').innerHTML = (hasA ? row('MOMO', momoP, momoDiv, momoTW, C.ap, C.ad, true) : '') + (hasB ? row('原始方案', benchP, benchDiv, benchTW, C.bp, C.bd, !hasA) : '');
+      const f = [];
+      f.push(`最大回撤　${hasA ? `MOMO <b class="neg">${(mD?.mdd ?? 0).toFixed(1)}%</b>` : ''}${hasA && hasB ? '　' : ''}${hasB ? `原始 <b class="neg">${(bD?.mdd ?? 0).toFixed(1)}%</b>` : ''}`);
+      f.push(`累積配息　${hasA ? `MOMO <b>${money(momoDiv)}</b>` : ''}${hasA && hasB ? '　' : ''}${hasB ? `原始 <b>${money(benchDiv)}</b>` : ''}`);
+      $('vd-foot').innerHTML = f.map(x => `<span>${x}</span>`).join('');
     }
 
     function renderMddTable(mD, bD){
