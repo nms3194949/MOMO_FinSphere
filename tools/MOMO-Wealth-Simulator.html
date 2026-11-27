@@ -1476,8 +1476,10 @@
       const segment = { borderDash: c => (c.p0DataIndex >= s.histLen - 1 ? [6, 6] : undefined) };
 
       const ds = [];
-      if (s.momoP) ds.push({ label:'MOMO策略 淨值(不含息)', data:s.momoP, borderColor:'#F9E27C', backgroundColor:grad, borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill: s.benchP ? 1 : false, segment });
-      if (s.benchP) ds.push({ label:'原始方案(B) 淨值(不含息)', data:s.benchP, borderColor:'#38BDF8', backgroundColor:'rgba(56,189,248,0.06)', borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill:false, segment });
+      // 圖例標上區間報酬（歷史段，與 C 單檔比較同口徑；不含配息）
+      const histPct = arr => { if (!arr) return ''; const v = (arr[s.histLen - 1] / arr[0] - 1) * 100; return `（${v >= 0 ? '+' : ''}${v.toFixed(1)}%）`; };
+      if (s.momoP) ds.push({ label:'MOMO策略 淨值(不含息)' + histPct(s.momoP), data:s.momoP, borderColor:'#F9E27C', backgroundColor:grad, borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill: s.benchP ? 1 : false, segment });
+      if (s.benchP) ds.push({ label:'原始方案(B) 淨值(不含息)' + histPct(s.benchP), data:s.benchP, borderColor:'#38BDF8', backgroundColor:'rgba(56,189,248,0.06)', borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill:false, segment });
       if (cmp) cmp.lines.forEach(l => ds.push({ label: `C｜${shortName(l.name)}（${l.pct === null ? '—' : (l.pct >= 0 ? '+' : '') + l.pct.toFixed(1) + '%'}）`, data: l.data, borderColor: l.color, borderWidth: 1.6, borderDash: [], tension: 0.08, fill: false, spanGaps: false }));
       ds.push({ label:'初始水位', data:s.labels.map(() => s.p0), borderColor:'rgba(255,255,255,0.28)', borderWidth:1.5, tension:0, fill:false, borderDash:[3, 6] });
       ch.data.labels = s.labels;
