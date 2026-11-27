@@ -257,6 +257,43 @@
 
     @media(max-width:820px){body{padding:12px;}#report-capture{padding:20px;border-radius:22px;}.title-wrap h1{font-size:22px;}.contact-card{width:100%;min-width:0;justify-content:space-between;}.contact-text .t2{font-size:16px;}.chart-wrapper{height:460px;}}
     @media(max-width:480px){.chart-wrapper{height:420px;padding:12px 12px 58px 12px;}.big,.glow-amount{font-size:30px;}.contact-text .hint{display:none;}}
+
+    /* 可收合區塊 */
+    details.fold > summary { list-style: none; cursor: pointer; user-select: none; margin: 0; padding: 4px 0; }
+    details.fold > summary::-webkit-details-marker { display: none; }
+    details.fold > summary > span:first-child::before { content: "▸"; display: inline-block; width: 16px; color: var(--gold); transition: transform .15s; }
+    details.fold[open] > summary > span:first-child::before { transform: rotate(90deg); }
+    details.fold[open] > summary { margin-bottom: 12px; }
+    details.fold:not([open]) { padding-bottom: 6px; }
+
+    /* ═══ 展示模式（風格 A：米白＋香檳金） ═══ */
+    .btn-present { border: 1px solid rgba(210,198,150,.55); background: rgba(210,198,150,.12); color: #f3e3b0; font-weight: 900; font-size: 12px; padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+    .btn-present:hover { background: rgba(210,198,150,.22); }
+    #present { position: fixed; inset: 0; z-index: 9999; background: #f6f1e7; color: #0c152a; overflow: auto; display: none; font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif; }
+    #present.on { display: block; }
+    .pm-wrap { max-width: 1180px; margin: 0 auto; padding: 36px 40px 28px; }
+    .pm-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .pm-brand { font-size: 13px; letter-spacing: .22em; color: #a88a3d; font-weight: 800; }
+    .pm-close { border: 1px solid #e4dccb; background: #fffdf8; color: #44506a; border-radius: 999px; padding: 7px 16px; font-size: 13px; cursor: pointer; }
+    .pm-lead { margin: 22px 0 4px; font-size: 18px; color: #44506a; }
+    .pm-big { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .pm-big strong { font-size: clamp(44px, 6.4vw, 76px); font-weight: 900; letter-spacing: -.01em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+    .pm-chip { font-size: 16px; font-weight: 800; padding: 6px 16px; border-radius: 999px; background: #e3f3e8; color: #1e6b3c; }
+    .pm-chip.neg { background: #fbe2e2; color: #a12d2d; }
+    .pm-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; margin-top: 26px; align-items: stretch; }
+    .pm-chart { background: #fffdf8; border: 1px solid #e4dccb; border-radius: 18px; padding: 18px 18px 10px; }
+    .pm-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13.5px; color: #44506a; margin: 0 0 8px 4px; }
+    .pm-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+    .pm-canvas { position: relative; height: 380px; }
+    .pm-kpis { display: grid; gap: 14px; }
+    .pm-kpi { background: #fffdf8; border: 1px solid #e4dccb; border-radius: 16px; padding: 16px 18px; }
+    .pm-kpi .k { font-size: 13px; color: #7a8296; }
+    .pm-kpi .a { font-size: 28px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .pm-kpi .b { font-size: 13px; color: #7a8296; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .pm-kpi .b b { color: #44506a; }
+    .pm-foot { margin-top: 20px; font-size: 11.5px; line-height: 1.7; color: #8a90a0; }
+    .pm-foot .who { color: #a88a3d; font-weight: 700; }
+    @media (max-width: 900px) { .pm-wrap { padding: 24px 18px; } .pm-grid { grid-template-columns: minmax(0, 1fr); } .pm-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .pm-kpi .a { font-size: 20px; } .pm-canvas { height: 280px; } }
   </style>
   <!-- MOMO財商智庫：網站圖示、GA4、統一頁尾與免責聲明 -->
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -423,7 +460,7 @@
         <div class="chart-wrapper">
           <div class="chart-title">
             <h4>整合輸出：淨值走勢（不含息）</h4>
-            <div class="badge" id="year-badge">歷史尾端</div>
+            <div style="display:flex;gap:8px;align-items:center;"><button class="btn-present" id="btn-present" type="button" title="收起設定，只顯示結論、走勢與重點數字（Esc 離開）">▶ 展示模式</button><div class="badge" id="year-badge">歷史尾端</div></div>
           </div>
           <div class="chart-canvas-wrap"><canvas id="mainChart"></canvas></div>
         </div>
@@ -492,11 +529,11 @@
           </div>
 
           <!-- 以下區塊匯出時自動隱藏（.no-export） -->
-          <div class="section no-export">
-            <div class="section-title">
-              <span>👁️ 組合選取明細（僅檢視）</span>
-              <span class="hint">此區塊匯出截圖會自動隱藏</span>
-            </div>
+          <details class="section no-export fold" data-fold="sel">
+            <summary class="section-title">
+              <span>組合選取明細（僅檢視）</span>
+              <span class="hint">開發驗證用｜匯出時自動隱藏</span>
+            </summary>
             <div class="selection-grid">
               <div class="sel-card">
                 <div class="sel-head">
@@ -513,10 +550,10 @@
                 <div class="sel-list" id="sel-list-b"><div class="sel-empty">尚未選擇基金</div></div>
               </div>
             </div>
-          </div>
+          </details>
 
-          <div class="section no-export">
-            <div class="section-title"><span>🛠 上傳數據驗證區（走勢 %）</span></div>
+          <details class="section no-export fold" data-fold="val">
+            <summary class="section-title"><span>上傳數據驗證區（走勢 %）</span><span class="hint">開發驗證用</span></summary>
             <div class="validation-grid">
               <div class="v-chart-box">
                 <div class="v-title" style="border-color:var(--accent-blue)">原始方案走勢</div>
@@ -527,10 +564,10 @@
                 <div class="v-chart-h"><canvas id="valMomoChart"></canvas></div>
               </div>
             </div>
-          </div>
+          </details>
 
-          <div class="section no-export">
-            <div class="section-title"><span>📉 MDD 最大回撤驗證細節</span></div>
+          <details class="section no-export fold" data-fold="mdd">
+            <summary class="section-title"><span>MDD 最大回撤驗證細節</span><span class="hint">開發驗證用</span></summary>
             <div class="table-wrap">
               <table class="mdd-table">
                 <thead>
@@ -545,10 +582,10 @@
               * 計算公式：（最低點 − 最高點）÷ 最高點 × 100%<br/>
               * 此計算基於目前選取的「進場區間」歷史數據
             </div>
-          </div>
+          </details>
 
-          <div class="section no-export">
-            <div class="section-title"><span>🔗 基金相關係數矩陣（日報酬率，依進場區間）</span></div>
+          <details class="section no-export fold" data-fold="corr" open>
+            <summary class="section-title"><span>基金相關係數矩陣（日報酬率，依進場區間）</span></summary>
             <div class="corr-tabs" id="corr-tabs">
               <button class="corr-tab active" type="button" data-tab="momo">A 組（MOMO）</button>
               <button class="corr-tab" type="button" data-tab="bench">B 組（原始方案）</button>
@@ -559,7 +596,7 @@
               <div class="corr-legend-bar"></div>
               <div class="corr-legend-labels"><span>-1</span><span>0</span><span>+1</span></div>
             </div>
-          </div>
+          </details>
         </div>
       </div>
     </div>
@@ -1524,6 +1561,8 @@
       $('momo-mdd').textContent = `${(mD?.mdd ?? 0).toFixed(1)}%`;
       $('bench-mdd').textContent = `${(bD?.mdd ?? 0).toFixed(1)}%`;
       renderMddTable(mD, bD);
+      state.last = { s, cmp, mD, bD, momoTW, benchTW, momoDiv, benchDiv };
+      if ($('present').classList.contains('on')) renderPresent();
 
       drawCorrMatrix();
     }
@@ -1918,6 +1957,68 @@
     // ════════════════════════════════════════════════════════
     // 事件綁定 & 初始化
     // ════════════════════════════════════════════════════════
+
+    // ════════════════════════════════════════════════════════
+    // 展示模式
+    // ════════════════════════════════════════════════════════
+    let pmChart = null;
+    function pmMoney(v){ return '$' + nf0.format(Math.round(v || 0)); }
+    function pmCount(el, to, ms = 900){
+      const t0 = performance.now();
+      const step = t => { const k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 3); el.textContent = (to < 0 ? '−' : '') + pmMoney(Math.abs(to) * e); if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }
+    function renderPresent(){
+      const L = state.last;
+      if (!L || !L.s){ $('pm-lead').textContent = '請先選擇 A 或 B 組合並按「確認選擇並更新圖表」。'; return; }
+      const { s, cmp, mD, bD, momoTW, benchTW, momoDiv, benchDiv } = L;
+      const both = !!(s.momoP && s.benchP);
+      const period = state.showFuture ? `未來推演 ${$('proj-years').value} 年` : $('entry-window-label').textContent.trim();
+      const p0txt = nf0.format(Math.round(s.p0 / 10000)) + ' 萬';
+      if (both){
+        const diff = momoTW - benchTW, pct = benchTW ? diff / benchTW * 100 : 0;
+        $('pm-lead').textContent = `同樣 ${p0txt}、${period}，MOMO 配置比原始方案${diff >= 0 ? '多出' : '少了'}`;
+        pmCount($('pm-big'), Math.abs(diff));
+        $('pm-chip').textContent = `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`; $('pm-chip').className = 'pm-chip' + (diff < 0 ? ' neg' : ''); $('pm-chip').style.display = '';
+      } else {
+        const tw = s.momoP ? momoTW : benchTW;
+        $('pm-lead').textContent = `${p0txt}、${period}，${s.momoP ? 'MOMO 配置' : '原始方案'}的總價值（含配息）`;
+        pmCount($('pm-big'), tw); $('pm-chip').style.display = 'none';
+      }
+      const A = s.momoP ? 'a' : 'b';
+      $('pm-k1').textContent = pmMoney(s.momoP ? momoTW : benchTW);
+      $('pm-k1b').innerHTML = both ? `原始方案 <b>${pmMoney(benchTW)}</b>` : '';
+      const mdd = d => d ? `${d.mdd.toFixed(1)}%` : '—';
+      $('pm-k2').textContent = mdd(s.momoP ? mD : bD);
+      $('pm-k2b').innerHTML = both ? `原始方案 <b>${mdd(bD)}</b>` : '';
+      $('pm-k3').textContent = pmMoney(s.momoP ? momoDiv : benchDiv);
+      $('pm-k3b').innerHTML = both ? `原始方案 <b>${pmMoney(benchDiv)}</b>` : '';
+      $('pm-meta').textContent = $('disclaimer-meta').textContent;
+
+      // 走勢圖：年份刻度、A 金、B 灰藍、C 淡色
+      const pct = arr => arr ? (arr[s.histLen - 1] / arr[0] - 1) * 100 : null;
+      const fmt = v => v === null ? '' : `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
+      const seg = { borderDash: c => (c.p0DataIndex >= s.histLen - 1 ? [6, 6] : undefined) };
+      const ds = [], leg = [];
+      if (s.momoP){ ds.push({ label: 'MOMO 配置', data: s.momoP, borderColor: '#a88a3d', backgroundColor: 'rgba(210,198,150,.22)', borderWidth: 3.2, fill: true, tension: .1, segment: seg }); leg.push(`<span><i style="background:#a88a3d"></i>MOMO 配置 ${fmt(pct(s.momoP))}</span>`); }
+      if (s.benchP){ ds.push({ label: '原始方案', data: s.benchP, borderColor: '#8b96ab', borderWidth: 2.4, fill: false, tension: .1, segment: seg }); leg.push(`<span><i style="background:#8b96ab"></i>原始方案 ${fmt(pct(s.benchP))}</span>`); }
+      if (cmp) cmp.lines.forEach(l => { ds.push({ label: shortName(l.name), data: l.data, borderColor: l.color, borderWidth: 1.4, fill: false, tension: .1, spanGaps: false }); leg.push(`<span><i style="background:${l.color}"></i>${escapeHtml(shortName(l.name))} ${fmt(l.pct)}</span>`); });
+      $('pm-legend').innerHTML = leg.join('');
+      if (pmChart) pmChart.destroy();
+      pmChart = new Chart($('pmChart').getContext('2d'), {
+        type: 'line', data: { labels: s.labels, datasets: ds },
+        options: { responsive: true, maintainAspectRatio: false, animation: { duration: 900 },
+          interaction: { mode: 'index', intersect: false }, elements: { point: { radius: 0, hoverRadius: 4 } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#7a8296', maxRotation: 0, autoSkip: false, callback: function (v, i) { const k = this.getLabelForValue(v) || ''; const prev = i > 0 ? (this.getLabelForValue(v - 1) || '') : ''; return k.slice(0, 4) !== prev.slice(0, 4) ? k.slice(0, 4) : ''; } } },
+            y: { grid: { color: '#ece5d6' }, border: { display: false }, ticks: { color: '#7a8296', callback: v => '$' + nf0.format(Math.round(v / 10000)) + '萬' } }
+          },
+          plugins: { legend: { display: false }, tooltip: { filter: c => c.raw !== null && c.raw !== undefined, callbacks: { label: c => `${c.dataset.label}：${pmMoney(c.raw)}` } } } }
+      });
+    }
+    function openPresent(){ $('present').classList.add('on'); document.body.style.overflow = 'hidden'; renderPresent(); }
+    function closePresent(){ $('present').classList.remove('on'); document.body.style.overflow = ''; }
+
     function bindEvents(){
       $('p0').addEventListener('input', scheduleUpdate);
       $('proj-years').addEventListener('input', scheduleUpdate);
@@ -1926,6 +2027,15 @@
       $('btn-toggle-future').addEventListener('click', toggleFuture);
       $('btn-load').addEventListener('click', fetchAllData);
       $('btn-apply').addEventListener('click', applySelection);
+      $('btn-present').addEventListener('click', openPresent);
+      $('pm-close').addEventListener('click', closePresent);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('present').classList.contains('on')) closePresent(); });
+      // 收合區塊打開時，重畫裡面的圖（收合時寬度為 0）
+      document.querySelectorAll('details.fold').forEach(d => d.addEventListener('toggle', () => {
+        if (!d.open) return;
+        if (d.dataset.fold === 'val'){ ['momo', 'bench'].forEach(t => updateValidationChart(t)); }
+        if (d.dataset.fold === 'corr'){ corrCache.key = ''; drawCorrMatrix(); }
+      }));
       $('btn-export').addEventListener('click', exportImg);
       $('btn-export-ig').addEventListener('click', exportIG);
       $('fund-filter').addEventListener('input', applyFundFilter);
@@ -1988,5 +2098,23 @@
     });
   })();
   </script>
+
+  <!-- ═══════════ 展示模式（給客戶看：只留結論、走勢、重點數字） ═══════════ -->
+  <div id="present" role="dialog" aria-modal="true" aria-label="配置策略推演展示模式">
+    <div class="pm-wrap">
+      <div class="pm-top"><span class="pm-brand">MOMO雙贏策略｜配置策略推演</span><button class="pm-close" id="pm-close" type="button">✕ 離開展示（Esc）</button></div>
+      <p class="pm-lead" id="pm-lead"></p>
+      <div class="pm-big"><strong id="pm-big">$0</strong><span class="pm-chip" id="pm-chip"></span></div>
+      <div class="pm-grid">
+        <div class="pm-chart"><div class="pm-legend" id="pm-legend"></div><div class="pm-canvas"><canvas id="pmChart"></canvas></div></div>
+        <div class="pm-kpis">
+          <div class="pm-kpi"><div class="k">總價值（含配息）</div><div class="a" id="pm-k1">—</div><div class="b" id="pm-k1b"></div></div>
+          <div class="pm-kpi"><div class="k">區間最大回撤</div><div class="a" id="pm-k2">—</div><div class="b" id="pm-k2b"></div></div>
+          <div class="pm-kpi"><div class="k">累積配息</div><div class="a" id="pm-k3">—</div><div class="b" id="pm-k3b"></div></div>
+        </div>
+      </div>
+      <div class="pm-foot"><span class="who">明哲MOMO｜MOMO雙贏策略</span>　<span id="pm-meta"></span><br />※ 本畫面為歷史淨值回測與情境模擬，僅供說明資產配置概念，不構成投資建議，亦非任何報酬之保證。基金過去績效不代表未來表現；配息率不代表報酬率，配息來源可能為本金。投資前請詳閱公開說明書。</div>
+    </div>
+  </div>
 </body>
 </html>
