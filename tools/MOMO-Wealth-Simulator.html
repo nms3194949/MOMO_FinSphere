@@ -388,6 +388,12 @@ body.theme-a .vd-leg,body.theme-a .vd-foot{color:#7a8296;} body.theme-a .vd-foot
 body.theme-a .vd-grid{color:#0c152a;} body.theme-a .vd-bar{background:#f6f1e7;}
 body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} body.theme-a .vd-foot b{color:#0c152a;}
 @media(max-width:640px){.vd-v{font-size:32px;}.vd-grid{grid-template-columns:64px minmax(0,1fr);}.vd-tot{grid-column:2;text-align:left;margin-top:-6px;}}
+.ymode{display:flex;align-items:center;gap:0;margin-top:8px;font-size:11px;font-weight:900;}
+.ymode span{color:var(--muted);margin-right:8px;}
+.ymode button{flex:1;border:1px solid var(--line);background:transparent;color:var(--muted);padding:6px 8px;cursor:pointer;font-weight:900;font-family:inherit;font-size:11px;}
+.ymode button:first-of-type{border-radius:999px 0 0 999px;} .ymode button:last-of-type{border-radius:0 999px 999px 0;border-left:0;}
+.ymode button.on{background:var(--gold);border-color:var(--gold);color:#0A1221;}
+body.theme-a .ymode button{background:#fff;} body.theme-a .ymode button.on{background:#a88a3d;border-color:#a88a3d;color:#fff;}
   </style>
   <!-- MOMO財商智庫：網站圖示、GA4、統一頁尾與免責聲明 -->
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -485,6 +491,10 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
             <span id="cfg-led" class="led" title="Config 配息率" style="margin-left:6px;"></span>
             <span id="cfg-led-text" style="color:#475569;">Config</span>
             <span class="reload-hint">↻</span>
+          </div>
+          <div class="ymode" id="ymode" title="選擇配息試算要用哪一種配息率">
+            <span>配息率</span>
+            <button type="button" data-y="base">原本配息率</button><button type="button" data-y="now">現價配息率</button>
           </div>
         </div>
 
@@ -848,7 +858,10 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
       fundNames: [],
       momo: [], bench: [],   // 已確認的組合成分
       cmp: [],               // 單檔比較（C）：各自畫一條線，不影響 A／B 計算
-      yieldMap: new Map(),   // 基金名稱 → 配息率%
+      yieldMap: new Map(),   // 基金名稱 → 目前採用的配息率%（指向下面其中一份）
+      yieldBase: new Map(),  // Config C 欄：配息率%
+      yieldNow: new Map(),   // Config D 欄：現價配息率%
+      yieldMode: (() => { try { return localStorage.getItem('momo_sim_ymode') === 'now' ? 'now' : 'base'; } catch (e) { return 'base'; } })(),
       weights: { momo: new Map(), bench: new Map() },
       showFuture: false,
       dataVersion: 0,
@@ -969,7 +982,34 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
     }
 
     // Config：A=代號, B=名稱, C=配息率
+    const parseRate = raw => {
+      if (raw === null || raw === undefined || raw === '') return null;
+      let val = typeof raw === 'string' ? parseFloat(raw.replace(/[%\s,]/g, '')) : parseFloat(raw);
+      if (!Number.isFinite(val) || val <= 0) return null;
+      if (val < 1) val *= 100; // 0.064 → 6.4
+      return val;
+    };
+    function useYieldMode(){
+      state.yieldMap.clear();
+      const src = state.yieldMode === 'now' ? state.yieldNow : state.yieldBase;
+      for (const [k, v] of src) state.yieldMap.set(k, v);
+      // 現價欄空白的基金，退回用原本配息率，避免變成不配息
+      if (state.yieldMode === 'now') for (const [k, v] of state.yieldBase) if (!state.yieldMap.has(k)) state.yieldMap.set(k, v);
+    }
+    // Config：A=代號, B=名稱, C=配息率%, D=現價配息率%
     function parseConfigYields(rows){
+      state.yieldBase.clear(); state.yieldNow.clear();
+      for (let i = 1; i < rows.length; i++){
+        const r = rows[i]; if (!r || !r[1]) continue;
+        const name = String(r[1]).trim(); if (!name) continue;
+        const b = parseRate(r[2]), n = parseRate(r[3]);
+        if (b !== null) state.yieldBase.set(name, b);
+        if (n !== null) state.yieldNow.set(name, n);
+      }
+      parseConfigYieldsLegacy(rows);
+      useYieldMode();
+    }
+    function parseConfigYieldsLegacy(rows){
       state.yieldMap.clear();
       state.configOrder = [];
       for (let i = 1; i < rows.length; i++){
@@ -1004,7 +1044,11 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
         const cur = latest.get(name);
         if (!cur || t > cur.t) latest.set(name, { t, val });
       }
-      for (const [name, o] of latest) if (!state.yieldMap.has(name)) state.yieldMap.set(name, o.val);
+      for (const [name, o] of latest){
+        if (!state.yieldBase.has(name)) state.yieldBase.set(name, o.val);
+        if (!state.yieldNow.has(name)) state.yieldNow.set(name, o.val);
+      }
+      useYieldMode();
     }
 
     // 合併主淨值表與全委淨值表（依日期對齊，欄名重複時以主表為準）
@@ -1142,7 +1186,7 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
         html.push(`<div class="fund-group${g.isDiv ? ' g-div' : ''}" data-group="${gk}"><span>${escapeHtml(g.label)}</span><span class="g-count">${g.names.length} 支</span></div>`);
         for (const name of g.names){
           const safe = escapeHtml(name), y = state.yieldMap.get(name);
-          const tag = g.isDiv && y ? `<span class="yield-tag">配息率 ${y.toFixed(1)}%</span>` : '';
+          const tag = g.isDiv && y ? `<span class="yield-tag">${state.yieldMode === 'now' ? '現價' : '配息率'} ${y.toFixed(1)}%</span>` : '';
           html.push(`
           <div class="fund-item" data-group="${gk}" data-name="${escapeHtml(name.toLowerCase())}">
             <div class="fund-name" title="${safe}">
@@ -1557,7 +1601,7 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
       const parts = [
         `回測區間：${s.labels[0]} ～ ${s.labels[s.histLen - 1]}（${$('entry-window-label').textContent}）`,
         `初始本金 ${money(s.p0)}`,
-        `累積配息依目前年配息率估算（${yields.join('／')}），非實際配息紀錄`
+        `累積配息依${state.yieldMode === 'now' ? '現價配息率' : '原本配息率'}估算（${yields.join('／')}），非實際配息紀錄`
       ];
       if (state.showFuture) parts.push(`虛線為依 CAGR 假設推估之未來 ${$('proj-years').value} 年情境，非預期報酬`);
       parts.push(`製表日 ${dateKey(new Date())}`);
@@ -1997,7 +2041,7 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
       // 風險揭露
       $('ig-meta').textContent = [
         `回測區間 ${labels[0]} ～ ${labels[i]}`,
-        `累積配息依目前年配息率估算（A ${num('momo-div').toFixed(2)}%／B ${num('bench-div').toFixed(2)}%），非實際配息紀錄`,
+        `累積配息依${state.yieldMode === 'now' ? '現價配息率' : '原本配息率'}估算（A ${num('momo-div').toFixed(2)}%／B ${num('bench-div').toFixed(2)}%），非實際配息紀錄`,
         `未計入保單相關費用`,
         `製表日 ${dateKey(new Date())}`
       ].join('｜');
@@ -2201,6 +2245,23 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
       $('entry-window-slider').addEventListener('input', e => onEntrySliderInput(e.target.value));
       $('btn-toggle-future').addEventListener('click', toggleFuture);
       $('btn-load').addEventListener('click', fetchAllData);
+      const syncYmode = () => document.querySelectorAll('#ymode button').forEach(b => b.classList.toggle('on', b.dataset.y === state.yieldMode));
+      syncYmode();
+      $('ymode').addEventListener('click', e => {
+        const b = e.target.closest('button'); if (!b || b.dataset.y === state.yieldMode) return;
+        state.yieldMode = b.dataset.y;
+        try { localStorage.setItem('momo_sim_ymode', state.yieldMode); } catch (err) {}
+        syncYmode();
+        useYieldMode();
+        document.querySelectorAll('.fund-item:not(.fund-head)').forEach(it => {
+          const tag = it.querySelector('.yield-tag'), chk = it.querySelector('.momo-chk');
+          if (!tag || !chk) return;
+          const y = state.yieldMap.get(chk.dataset.name);
+          tag.textContent = y ? `${state.yieldMode === 'now' ? '現價' : '配息率'} ${y.toFixed(1)}%` : '';
+        });
+        calcWeightedYield('momo'); calcWeightedYield('bench');
+        scheduleUpdate();
+      });
       $('load-status').addEventListener('click', () => { if (!$('btn-load').disabled) fetchAllData(); });
       $('btn-apply').addEventListener('click', applySelection);
       $('btn-present').addEventListener('click', openPresent);
