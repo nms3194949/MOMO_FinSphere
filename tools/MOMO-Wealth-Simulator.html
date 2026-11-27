@@ -356,6 +356,12 @@ body.theme-a .block-header span[style*="gold-soft"]{color:#8a6d24 !important;}
 body.theme-a .gs-toggle{color:#8a6d24;}
 body.theme-a .corr-legend-bar{background:linear-gradient(90deg,#5b7fb5 0%,#f3ecdc 50%,#a88a3d 100%);}
 body.theme-a .corr-legend-labels{color:#7a8296;}
+/* 只留讀取燈號：Sheet 設定與讀取按鈕收起，點燈號列可重新讀取 */
+.gs-box{background:none !important;border:0 !important;padding:0 !important;margin-bottom:14px;}
+#gs-toggle,#gs-body,#btn-load{display:none !important;}
+#load-status{margin-top:0;cursor:pointer;}
+#load-status .reload-hint{margin-left:auto;font-size:13px;color:var(--muted);opacity:.7;}
+#load-status:hover .reload-hint{opacity:1;}
   </style>
   <!-- MOMO財商智庫：網站圖示、GA4、統一頁尾與免責聲明 -->
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -404,11 +410,11 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
           </div>
           <input type="hidden" id="entry-window" value="3" />
         </div>
-        <div class="input-group">
+        <div class="input-group" style="display:none" data-hidden="future">
           <label>未來推演年數: <span id="year-display" style="color:#fff">3</span> 年</label>
           <input type="range" id="proj-years" min="1" max="10" value="3" style="padding:0;height:6px;" />
         </div>
-        <div class="input-group">
+        <div class="input-group" style="display:none" data-hidden="future">
           <button id="btn-toggle-future" type="button"
             style="width:100%;padding:8px;background:rgba(255,255,255,0.1);border:1px solid var(--line);color:var(--muted);border-radius:10px;cursor:pointer;font-weight:800;font-size:12px;">
             顯示未來推演線
@@ -447,11 +453,12 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
           <button class="btn-action btn-load" id="btn-load" type="button" style="font-size:12px;padding:12px;margin-top:8px;">
             讀取資料 &amp; Config
           </button>
-          <div id="load-status">
+          <div id="load-status" title="點一下重新讀取資料" role="button" tabindex="0">
             <span id="nav-led" class="led" title="淨值資料"></span>
             <span id="nav-led-text" style="color:#475569;">淨值</span>
             <span id="cfg-led" class="led" title="Config 配息率" style="margin-left:6px;"></span>
             <span id="cfg-led-text" style="color:#475569;">Config</span>
+            <span class="reload-hint">↻</span>
           </div>
         </div>
 
@@ -524,7 +531,7 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
         <div class="chart-wrapper">
           <div class="chart-title">
             <h4>整合輸出：淨值走勢（不含息）</h4>
-            <div style="display:flex;gap:8px;align-items:center;"><button class="btn-present" id="btn-present" type="button" title="收起設定，只顯示結論、走勢與重點數字（Esc 離開）">▶ 展示模式</button><div class="badge" id="year-badge">歷史尾端</div></div>
+            <div style="display:flex;gap:8px;align-items:center;"><button class="btn-present" id="btn-present" type="button" title="收起設定，只顯示結論、走勢與重點數字（Esc 離開）">▶ 展示模式</button><div class="badge" id="year-badge" style="display:none">歷史尾端</div></div>
           </div>
           <div class="chart-canvas-wrap"><canvas id="mainChart"></canvas></div>
         </div>
@@ -2104,6 +2111,7 @@ body.theme-a .corr-legend-labels{color:#7a8296;}
       $('entry-window-slider').addEventListener('input', e => onEntrySliderInput(e.target.value));
       $('btn-toggle-future').addEventListener('click', toggleFuture);
       $('btn-load').addEventListener('click', fetchAllData);
+      $('load-status').addEventListener('click', () => { if (!$('btn-load').disabled) fetchAllData(); });
       $('btn-apply').addEventListener('click', applySelection);
       $('btn-present').addEventListener('click', openPresent);
       $('pm-close').addEventListener('click', closePresent);
