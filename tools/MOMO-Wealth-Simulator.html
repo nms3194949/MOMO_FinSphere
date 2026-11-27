@@ -1312,14 +1312,12 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
 
     function calcWeightedYield(type){
       const names = state[type], el = $(UI[type].div);
-      if (!names.length || !state.yieldMap.size) return;
+      // 清空組合 → 配息率歸零；Config 沒有的基金視為不配息（0%），不再沿用上一次的數字
+      if (!names.length){ el.value = '0.00'; return; }
       const w = getWeights(type);
-      let weighted = 0, matched = 0;
-      names.forEach((n, i) => {
-        const y = state.yieldMap.get(n);
-        if (y !== undefined){ weighted += y * w[i]; matched++; }
-      });
-      if (matched) el.value = weighted.toFixed(2); // 沒比對到則保留手動值
+      let weighted = 0;
+      names.forEach((n, i) => { weighted += (state.yieldMap.get(n) || 0) * w[i]; });
+      el.value = weighted.toFixed(2);
     }
 
     function renderSelectionPreview(){
@@ -1373,12 +1371,12 @@ body.theme-a .vd-bar .p{color:#fff;} body.theme-a .vd-foot .neg{color:#a12d2d;} 
     // 依目前進場區間計算歷史 CAGR（與主圖同一組資料）
     function fillCagrFromHistory(onlyType){
       const h = buildHistory(1);
-      if (!h) return;
+      if (!h){ for (const t of (onlyType ? [onlyType] : ['momo', 'bench'])) if (!state[t].length) $(UI[t].cagr).value = '0.00'; return; }
       const years = (h.dts[h.dts.length - 1] - h.dts[0]) / DAY_MS / 365;
       if (years < 0.1) return;
       for (const t of (onlyType ? [onlyType] : ['momo', 'bench'])){
         const s = h[t];
-        if (!s) continue;
+        if (!s){ $(UI[t].cagr).value = '0.00'; continue; }
         const cagr = (Math.pow(s[s.length - 1] / s[0], 1 / years) - 1) * 100;
         const el = $(UI[t].cagr);
         el.value = cagr.toFixed(2);
