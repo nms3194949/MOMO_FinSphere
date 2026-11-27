@@ -64,6 +64,8 @@
     .tool-btn.danger{border-color:rgba(248,113,113,0.30);color:#fecaca;}
     .tool-btn.gold{border-color:rgba(249,226,124,0.35);color:var(--gold-strong);}
     .tool-btn.blue{border-color:rgba(56,189,248,0.35);color:#bfeaff;}
+    .tool-btn.cmp{border-color:rgba(196,181,253,0.40);color:#ddd6fe;}
+    .cmp-chk{accent-color:#a78bfa;}
     .selector-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap;}
     .sum-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(0,0,0,0.25);color:#9fb2c7;font-weight:900;font-size:12px;white-space:nowrap;}
     .sum-badge.good{border-color:rgba(52,211,153,0.25);color:#a7f3d0;}
@@ -71,7 +73,7 @@
     .toggle-wrap{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.04);color:#cfe2ff;font-weight:900;font-size:12px;cursor:pointer;user-select:none;margin:0;}
     .toggle-wrap input{accent-color:var(--gold);transform:scale(1.05);cursor:pointer;}
     .fund-selector-container{max-height:260px;overflow-y:auto;background:#000;border-radius:10px;padding:0 10px 10px;border:1px solid rgba(255,255,255,0.1);margin-bottom:10px;}
-    .fund-item{display:grid;grid-template-columns:1fr 46px 46px;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.05);padding:8px 0;font-size:11px;color:#ccc;}
+    .fund-item{display:grid;grid-template-columns:1fr 40px 40px 40px;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.05);padding:8px 0;font-size:11px;color:#ccc;}
     .fund-item:last-child{border-bottom:none;}
     .fund-head{position:sticky;top:0;background:#000;z-index:2;border-bottom:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px 0;}
     .fund-name{font-weight:900;overflow:hidden;display:flex;align-items:flex-start;gap:8px;line-height:1.25;padding-left:4px;color:#cfe2ff;}
@@ -365,6 +367,7 @@
             <button class="tool-btn danger" type="button" data-clear="all">全部清除</button>
             <button class="tool-btn gold"   type="button" data-clear="momo">清除 A</button>
             <button class="tool-btn blue"   type="button" data-clear="bench">清除 B</button>
+            <button class="tool-btn cmp"    type="button" data-clear="cmp">清除 C</button>
           </div>
           <div class="fund-selector-container" id="fund-list-container"></div>
           <button class="btn-action btn-refresh" id="btn-apply" type="button">🔄 確認選擇並更新圖表</button>
@@ -699,6 +702,7 @@
       rawData: [],           // [{dt, key, raw:{name:v|null}, filled:{name:v|null}}]
       fundNames: [],
       momo: [], bench: [],   // 已確認的組合成分
+      cmp: [],               // 單檔比較（C）：各自畫一條線，不影響 A／B 計算
       yieldMap: new Map(),   // 基金名稱 → 配息率%
       weights: { momo: new Map(), bench: new Map() },
       showFuture: false,
@@ -935,9 +939,10 @@
       const exists = new Set(state.fundNames);
       state.momo  = state.momo.filter(n => exists.has(n));
       state.bench = state.bench.filter(n => exists.has(n));
+      state.cmp   = state.cmp.filter(n => exists.has(n));
 
       renderFundSelectors();
-      if (state.momo.length || state.bench.length) commitSelection();
+      if (state.momo.length || state.bench.length || state.cmp.length) commitSelection();
       else scheduleUpdate();
     }
 
@@ -979,12 +984,13 @@
     }
 
     function renderFundSelectors(){
-      const momoSet = new Set(state.momo), benchSet = new Set(state.bench);
+      const momoSet = new Set(state.momo), benchSet = new Set(state.bench), cmpSet = new Set(state.cmp);
       const html = [`
         <div class="fund-item fund-head">
           <div style="padding-left:4px;font-weight:900;">基金名稱</div>
           <div class="chk-col" style="color:var(--gold);font-weight:900;">MOMO<br>(A)</div>
           <div class="chk-col" style="color:var(--accent-blue);font-weight:900;">原始<br>(B)</div>
+          <div class="chk-col" style="color:#c4b5fd;font-weight:900;" title="單檔比較：每檔各畫一條線，不影響 A／B">比較<br>(C)</div>
         </div>`];
       for (const g of groupFunds()){
         const gk = escapeHtml(g.key);
@@ -999,6 +1005,7 @@
             </div>
             <div class="chk-col"><input type="checkbox" class="momo-chk" data-name="${safe}" ${momoSet.has(name)?'checked':''} /></div>
             <div class="chk-col"><input type="checkbox" class="bench-chk" data-name="${safe}" ${benchSet.has(name)?'checked':''} /></div>
+            <div class="chk-col"><input type="checkbox" class="cmp-chk" data-name="${safe}" ${cmpSet.has(name)?'checked':''} /></div>
           </div>`);
         }
       }
@@ -1009,7 +1016,8 @@
     function updateSelectedCounts(){
       const a = document.querySelectorAll('.momo-chk:checked').length;
       const b = document.querySelectorAll('.bench-chk:checked').length;
-      $('selected-counts').textContent = `A 已選 ${a} / B 已選 ${b}`;
+      const c = document.querySelectorAll('.cmp-chk:checked').length;
+      $('selected-counts').textContent = `A 已選 ${a} / B 已選 ${b} / C 比較 ${c}`;
     }
 
     function applyFundFilter(){
@@ -1018,7 +1026,7 @@
       const visible = new Map();
       document.querySelectorAll('#fund-list-container .fund-item:not(.fund-head)').forEach(el => {
         const name = el.dataset.name || "";
-        const sel = el.querySelector('.momo-chk').checked || el.querySelector('.bench-chk').checked;
+        const sel = el.querySelector('.momo-chk').checked || el.querySelector('.bench-chk').checked || el.querySelector('.cmp-chk').checked;
         const ok = (!tokens.length || tokens.every(t => name.includes(t))) && (!onlySel || sel);
         el.style.display = ok ? '' : 'none';
         if (ok) visible.set(el.dataset.group, (visible.get(el.dataset.group) || 0) + 1);
@@ -1035,15 +1043,16 @@
     function applySelection(){
       const momo  = [...document.querySelectorAll('.momo-chk:checked')].map(c => c.dataset.name);
       const bench = [...document.querySelectorAll('.bench-chk:checked')].map(c => c.dataset.name);
-      if (!momo.length && !bench.length){ alert("請至少選擇一支基金！"); return; }
-      state.momo = momo; state.bench = bench;
+      const cmp   = [...document.querySelectorAll('.cmp-chk:checked')].map(c => c.dataset.name);
+      if (!momo.length && !bench.length && !cmp.length){ alert("請至少選擇一支基金！"); return; }
+      state.momo = momo; state.bench = bench; state.cmp = cmp;
       commitSelection();
     }
 
     function clearSelection(type){
-      const types = type === 'all' ? ['momo', 'bench'] : [type];
+      const types = type === 'all' ? ['momo', 'bench', 'cmp'] : [type];
       for (const t of types){
-        document.querySelectorAll(`.${UI[t].chk}`).forEach(c => c.checked = false);
+        document.querySelectorAll(`.${t === 'cmp' ? 'cmp-chk' : UI[t].chk}`).forEach(c => c.checked = false);
         state[t] = [];
       }
       applyFundFilter();
@@ -1290,6 +1299,36 @@
     // ════════════════════════════════════════════════════════
     // 主圖 & KPI
     // ════════════════════════════════════════════════════════
+    // 單檔比較（C）：每檔基金以「第一個有淨值的日期 = 初始本金」換算，只畫歷史段
+    const CMP_COLORS = ['#c4b5fd', '#f472b6', '#34d399', '#fb923c', '#a3e635', '#f87171', '#2dd4bf', '#e879f9', '#facc15', '#60a5fa'];
+    function buildCompare(s){
+      const names = state.cmp;
+      if (!names.length || !state.rawData.length) return null;
+      const p0 = num('p0');
+      let labels, rows;
+      if (s){   // 有 A／B 時跟主圖共用日期軸
+        const byKey = new Map(state.rawData.map(r => [r.key, r]));
+        labels = s.labels; rows = labels.slice(0, s.histLen).map(k => byKey.get(k) || null);
+      } else {  // 只選 C：依進場區間取任一檔有淨值的日期
+        rows = sliceByEntryWindow(state.rawData.filter(r => names.some(n => r.filled[n] !== null)));
+        if (rows.length < 2) return null;
+        labels = rows.map(r => r.key);
+      }
+      const lines = names.map((n, i) => {
+        let base = null;
+        const data = labels.map((k, j) => {
+          const r = rows[j];
+          if (!r || r.filled[n] === null) return null;
+          if (base === null) base = r.filled[n];
+          return p0 * r.filled[n] / base;
+        });
+        const last = [...data].reverse().find(v => v !== null && v !== undefined);
+        return { name: n, data, color: CMP_COLORS[i % CMP_COLORS.length], pct: last ? (last / p0 - 1) * 100 : null };
+      });
+      return { labels, lines, histLen: rows.length };
+    }
+    const shortName = n => n.replace(/基金|證券投資信託|\(配現金\)|- \(配現金\)|（本基金.*?）|\(本基金.*?\)/g, '').trim().slice(0, 18);
+
     function initMainChart(){
       charts.main = new Chart($('mainChart').getContext('2d'), {
         type: 'line',
@@ -1305,7 +1344,7 @@
           },
           plugins: {
             legend: { labels: { color: '#c9d6e6', boxWidth: 12, boxHeight: 12, usePointStyle: true } },
-            tooltip: { callbacks: { label: c => `${c.dataset.label}：${money(c.raw)}` } }
+            tooltip: { filter: c => c.raw !== null && c.raw !== undefined, callbacks: { label: c => `${c.dataset.label}：${money(c.raw)}` } }
           }
         }
       });
@@ -1418,7 +1457,17 @@
       renderSelectionPreview();
       if (!charts.main) initMainChart();
       const s = buildSeries();
-      if (!s){ resetOutputs(); drawCorrMatrix(); return; }
+      const cmp = buildCompare(s);
+      if (!s){
+        resetOutputs();
+        if (cmp){   // 只選 C：主圖只畫單檔比較線
+          charts.main.data.labels = cmp.labels;
+          charts.main.data.datasets = cmp.lines.map(l => ({ label: `C｜${shortName(l.name)}（${l.pct === null ? '—' : (l.pct >= 0 ? '+' : '') + l.pct.toFixed(1) + '%'}）`, data: l.data, borderColor: l.color, borderWidth: 1.8, tension: 0.08, fill: false, spanGaps: false }))
+            .concat([{ label:'初始水位', data: cmp.labels.map(() => num('p0')), borderColor:'rgba(255,255,255,0.28)', borderWidth:1.5, tension:0, fill:false, borderDash:[3, 6] }]);
+          charts.main.update();
+        }
+        drawCorrMatrix(); return;
+      }
 
       const ch = charts.main, ctx = ch.ctx;
       const grad = ctx.createLinearGradient(0, 0, 0, 400);
@@ -1429,6 +1478,7 @@
       const ds = [];
       if (s.momoP) ds.push({ label:'MOMO策略 淨值(不含息)', data:s.momoP, borderColor:'#F9E27C', backgroundColor:grad, borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill: s.benchP ? 1 : false, segment });
       if (s.benchP) ds.push({ label:'原始方案(B) 淨值(不含息)', data:s.benchP, borderColor:'#38BDF8', backgroundColor:'rgba(56,189,248,0.06)', borderWidth:3, cubicInterpolationMode:'monotone', tension:0.08, fill:false, segment });
+      if (cmp) cmp.lines.forEach(l => ds.push({ label: `C｜${shortName(l.name)}（${l.pct === null ? '—' : (l.pct >= 0 ? '+' : '') + l.pct.toFixed(1) + '%'}）`, data: l.data, borderColor: l.color, borderWidth: 1.6, borderDash: [], tension: 0.08, fill: false, spanGaps: false }));
       ds.push({ label:'初始水位', data:s.labels.map(() => s.p0), borderColor:'rgba(255,255,255,0.28)', borderWidth:1.5, tension:0, fill:false, borderDash:[3, 6] });
       ch.data.labels = s.labels;
       ch.data.datasets = ds;
@@ -1890,7 +1940,7 @@
 
       // 基金清單：事件委派（取代每列各綁一次）
       $('fund-list-container').addEventListener('change', e => {
-        if (e.target.matches('.momo-chk, .bench-chk')) applyFundFilter();
+        if (e.target.matches('.momo-chk, .bench-chk, .cmp-chk')) applyFundFilter();
       });
 
       // 權重：事件委派
